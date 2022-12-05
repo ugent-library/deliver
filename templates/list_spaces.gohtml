@@ -1,0 +1,12 @@
+{{define "page_title"}}Spaces{{end}}
+{{define "body"}}
+    <form action="" method="post">
+        <input type="text" name="name">
+        <button type="submit">Create</button>
+    </form>
+    <ul>
+    {{range .Var.Spaces}}
+        <li>{{.Name}}</li>
+    {{end}}
+    </ul>
+{{end}}
