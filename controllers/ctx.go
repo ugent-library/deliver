@@ -6,23 +6,30 @@ import (
 	"net/url"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 )
 
-func Wrapper(router *mux.Router) func(func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
+func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
 	return func(fn func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			ctx := Ctx{router: router}
+			ctx := Ctx{c}
 			fn(w, r, ctx)
 		}
 	}
 }
 
+type Config struct {
+	Router       *mux.Router
+	SessionName  string
+	SessionStore sessions.Store
+}
+
 type Ctx struct {
-	router *mux.Router
+	Config
 }
 
 func (c Ctx) URL(route string, pairs ...string) *url.URL {
-	r := c.router.Get(route)
+	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("route '%s' not found", route))
 	}
@@ -34,7 +41,7 @@ func (c Ctx) URL(route string, pairs ...string) *url.URL {
 }
 
 func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
-	r := c.router.Get(route)
+	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("route '%s' not found", route))
 	}
