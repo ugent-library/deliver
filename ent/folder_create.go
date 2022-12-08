@@ -4,7 +4,9 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -20,6 +22,60 @@ type FolderCreate struct {
 	hooks    []Hook
 }
 
+// SetSpaceID sets the "space_id" field.
+func (fc *FolderCreate) SetSpaceID(s string) *FolderCreate {
+	fc.mutation.SetSpaceID(s)
+	return fc
+}
+
+// SetName sets the "name" field.
+func (fc *FolderCreate) SetName(s string) *FolderCreate {
+	fc.mutation.SetName(s)
+	return fc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (fc *FolderCreate) SetCreatedAt(t time.Time) *FolderCreate {
+	fc.mutation.SetCreatedAt(t)
+	return fc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (fc *FolderCreate) SetNillableCreatedAt(t *time.Time) *FolderCreate {
+	if t != nil {
+		fc.SetCreatedAt(*t)
+	}
+	return fc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (fc *FolderCreate) SetUpdatedAt(t time.Time) *FolderCreate {
+	fc.mutation.SetUpdatedAt(t)
+	return fc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (fc *FolderCreate) SetNillableUpdatedAt(t *time.Time) *FolderCreate {
+	if t != nil {
+		fc.SetUpdatedAt(*t)
+	}
+	return fc
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (fc *FolderCreate) SetExpiresAt(t time.Time) *FolderCreate {
+	fc.mutation.SetExpiresAt(t)
+	return fc
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (fc *FolderCreate) SetNillableExpiresAt(t *time.Time) *FolderCreate {
+	if t != nil {
+		fc.SetExpiresAt(*t)
+	}
+	return fc
+}
+
 // SetID sets the "id" field.
 func (fc *FolderCreate) SetID(s string) *FolderCreate {
 	fc.mutation.SetID(s)
@@ -30,20 +86,6 @@ func (fc *FolderCreate) SetID(s string) *FolderCreate {
 func (fc *FolderCreate) SetNillableID(s *string) *FolderCreate {
 	if s != nil {
 		fc.SetID(*s)
-	}
-	return fc
-}
-
-// SetSpaceID sets the "space" edge to the Space entity by ID.
-func (fc *FolderCreate) SetSpaceID(id string) *FolderCreate {
-	fc.mutation.SetSpaceID(id)
-	return fc
-}
-
-// SetNillableSpaceID sets the "space" edge to the Space entity by ID if the given value is not nil.
-func (fc *FolderCreate) SetNillableSpaceID(id *string) *FolderCreate {
-	if id != nil {
-		fc = fc.SetSpaceID(*id)
 	}
 	return fc
 }
@@ -145,6 +187,14 @@ func (fc *FolderCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (fc *FolderCreate) defaults() {
+	if _, ok := fc.mutation.CreatedAt(); !ok {
+		v := folder.DefaultCreatedAt()
+		fc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := fc.mutation.UpdatedAt(); !ok {
+		v := folder.DefaultUpdatedAt()
+		fc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := fc.mutation.ID(); !ok {
 		v := folder.DefaultID()
 		fc.mutation.SetID(v)
@@ -153,6 +203,21 @@ func (fc *FolderCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (fc *FolderCreate) check() error {
+	if _, ok := fc.mutation.SpaceID(); !ok {
+		return &ValidationError{Name: "space_id", err: errors.New(`ent: missing required field "Folder.space_id"`)}
+	}
+	if _, ok := fc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Folder.name"`)}
+	}
+	if _, ok := fc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Folder.created_at"`)}
+	}
+	if _, ok := fc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Folder.updated_at"`)}
+	}
+	if _, ok := fc.mutation.SpaceID(); !ok {
+		return &ValidationError{Name: "space", err: errors.New(`ent: missing required edge "Folder.space"`)}
+	}
 	return nil
 }
 
@@ -189,6 +254,22 @@ func (fc *FolderCreate) createSpec() (*Folder, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := fc.mutation.Name(); ok {
+		_spec.SetField(folder.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := fc.mutation.CreatedAt(); ok {
+		_spec.SetField(folder.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := fc.mutation.UpdatedAt(); ok {
+		_spec.SetField(folder.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := fc.mutation.ExpiresAt(); ok {
+		_spec.SetField(folder.FieldExpiresAt, field.TypeTime, value)
+		_node.ExpiresAt = value
+	}
 	if nodes := fc.mutation.SpaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -206,7 +287,7 @@ func (fc *FolderCreate) createSpec() (*Folder, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.space_folders = &nodes[0]
+		_node.SpaceID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := fc.mutation.FilesIDs(); len(nodes) > 0 {

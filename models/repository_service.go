@@ -12,14 +12,15 @@ import (
 	entmigrate "github.com/ugent-library/dilliver/ent/migrate"
 )
 
-type Space struct {
-	ID   string
-	Name string
-}
+type Space = ent.Space
+type Folder = ent.Folder
+type File = ent.File
 
 type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
 	CreateSpace(context.Context, *Space) error
+	Folders(context.Context, string) ([]*Folder, error)
+	CreateFolder(context.Context, *Folder) error
 }
 
 func NewRepositoryService(c Config) (RepositoryService, error) {
@@ -48,25 +49,38 @@ type repository struct {
 }
 
 func (r *repository) Spaces(ctx context.Context) ([]*Space, error) {
-	rows, err := r.db.Space.Query().All(ctx)
+	spaces, err := r.db.Space.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	objs := make([]*Space, len(rows))
-	for i, row := range rows {
-		objs[i] = &Space{
-			ID:   row.ID,
-			Name: row.Name,
-		}
-	}
-	return objs, nil
+	return spaces, nil
 }
 
 func (r *repository) CreateSpace(ctx context.Context, s *Space) error {
-	row, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
+	space, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
 	if err != nil {
 		return err
 	}
-	s.ID = row.ID
+	*s = *space
+	return nil
+}
+
+func (r *repository) Folders(ctx context.Context, spaceID string) ([]*Folder, error) {
+	folders, err := r.db.Folder.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return folders, nil
+}
+
+func (r *repository) CreateFolder(ctx context.Context, f *Folder) error {
+	folder, err := r.db.Folder.Create().
+		SetName(f.Name).
+		SetSpaceID(f.SpaceID).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	*f = *folder
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,17 +29,67 @@ func (fu *FileUpdate) Where(ps ...predicate.File) *FileUpdate {
 	return fu
 }
 
-// SetFolderID sets the "folder" edge to the Folder entity by ID.
-func (fu *FileUpdate) SetFolderID(id string) *FileUpdate {
-	fu.mutation.SetFolderID(id)
+// SetFolderID sets the "folder_id" field.
+func (fu *FileUpdate) SetFolderID(s string) *FileUpdate {
+	fu.mutation.SetFolderID(s)
 	return fu
 }
 
-// SetNillableFolderID sets the "folder" edge to the Folder entity by ID if the given value is not nil.
-func (fu *FileUpdate) SetNillableFolderID(id *string) *FileUpdate {
-	if id != nil {
-		fu = fu.SetFolderID(*id)
+// SetSha256 sets the "sha256" field.
+func (fu *FileUpdate) SetSha256(s string) *FileUpdate {
+	fu.mutation.SetSha256(s)
+	return fu
+}
+
+// SetName sets the "name" field.
+func (fu *FileUpdate) SetName(s string) *FileUpdate {
+	fu.mutation.SetName(s)
+	return fu
+}
+
+// SetSize sets the "size" field.
+func (fu *FileUpdate) SetSize(i int32) *FileUpdate {
+	fu.mutation.ResetSize()
+	fu.mutation.SetSize(i)
+	return fu
+}
+
+// AddSize adds i to the "size" field.
+func (fu *FileUpdate) AddSize(i int32) *FileUpdate {
+	fu.mutation.AddSize(i)
+	return fu
+}
+
+// SetContentType sets the "content_type" field.
+func (fu *FileUpdate) SetContentType(s string) *FileUpdate {
+	fu.mutation.SetContentType(s)
+	return fu
+}
+
+// SetDownloads sets the "downloads" field.
+func (fu *FileUpdate) SetDownloads(i int32) *FileUpdate {
+	fu.mutation.ResetDownloads()
+	fu.mutation.SetDownloads(i)
+	return fu
+}
+
+// SetNillableDownloads sets the "downloads" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableDownloads(i *int32) *FileUpdate {
+	if i != nil {
+		fu.SetDownloads(*i)
 	}
+	return fu
+}
+
+// AddDownloads adds i to the "downloads" field.
+func (fu *FileUpdate) AddDownloads(i int32) *FileUpdate {
+	fu.mutation.AddDownloads(i)
+	return fu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (fu *FileUpdate) SetUpdatedAt(t time.Time) *FileUpdate {
+	fu.mutation.SetUpdatedAt(t)
 	return fu
 }
 
@@ -64,13 +115,20 @@ func (fu *FileUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	fu.defaults()
 	if len(fu.hooks) == 0 {
+		if err = fu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = fu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*FileMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = fu.check(); err != nil {
+				return 0, err
 			}
 			fu.mutation = mutation
 			affected, err = fu.sqlSave(ctx)
@@ -112,6 +170,22 @@ func (fu *FileUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (fu *FileUpdate) defaults() {
+	if _, ok := fu.mutation.UpdatedAt(); !ok {
+		v := file.UpdateDefaultUpdatedAt()
+		fu.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (fu *FileUpdate) check() error {
+	if _, ok := fu.mutation.FolderID(); fu.mutation.FolderCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "File.folder"`)
+	}
+	return nil
+}
+
 func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -129,6 +203,30 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := fu.mutation.Sha256(); ok {
+		_spec.SetField(file.FieldSha256, field.TypeString, value)
+	}
+	if value, ok := fu.mutation.Name(); ok {
+		_spec.SetField(file.FieldName, field.TypeString, value)
+	}
+	if value, ok := fu.mutation.Size(); ok {
+		_spec.SetField(file.FieldSize, field.TypeInt32, value)
+	}
+	if value, ok := fu.mutation.AddedSize(); ok {
+		_spec.AddField(file.FieldSize, field.TypeInt32, value)
+	}
+	if value, ok := fu.mutation.ContentType(); ok {
+		_spec.SetField(file.FieldContentType, field.TypeString, value)
+	}
+	if value, ok := fu.mutation.Downloads(); ok {
+		_spec.SetField(file.FieldDownloads, field.TypeInt32, value)
+	}
+	if value, ok := fu.mutation.AddedDownloads(); ok {
+		_spec.AddField(file.FieldDownloads, field.TypeInt32, value)
+	}
+	if value, ok := fu.mutation.UpdatedAt(); ok {
+		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if fu.mutation.FolderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -184,17 +282,67 @@ type FileUpdateOne struct {
 	mutation *FileMutation
 }
 
-// SetFolderID sets the "folder" edge to the Folder entity by ID.
-func (fuo *FileUpdateOne) SetFolderID(id string) *FileUpdateOne {
-	fuo.mutation.SetFolderID(id)
+// SetFolderID sets the "folder_id" field.
+func (fuo *FileUpdateOne) SetFolderID(s string) *FileUpdateOne {
+	fuo.mutation.SetFolderID(s)
 	return fuo
 }
 
-// SetNillableFolderID sets the "folder" edge to the Folder entity by ID if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableFolderID(id *string) *FileUpdateOne {
-	if id != nil {
-		fuo = fuo.SetFolderID(*id)
+// SetSha256 sets the "sha256" field.
+func (fuo *FileUpdateOne) SetSha256(s string) *FileUpdateOne {
+	fuo.mutation.SetSha256(s)
+	return fuo
+}
+
+// SetName sets the "name" field.
+func (fuo *FileUpdateOne) SetName(s string) *FileUpdateOne {
+	fuo.mutation.SetName(s)
+	return fuo
+}
+
+// SetSize sets the "size" field.
+func (fuo *FileUpdateOne) SetSize(i int32) *FileUpdateOne {
+	fuo.mutation.ResetSize()
+	fuo.mutation.SetSize(i)
+	return fuo
+}
+
+// AddSize adds i to the "size" field.
+func (fuo *FileUpdateOne) AddSize(i int32) *FileUpdateOne {
+	fuo.mutation.AddSize(i)
+	return fuo
+}
+
+// SetContentType sets the "content_type" field.
+func (fuo *FileUpdateOne) SetContentType(s string) *FileUpdateOne {
+	fuo.mutation.SetContentType(s)
+	return fuo
+}
+
+// SetDownloads sets the "downloads" field.
+func (fuo *FileUpdateOne) SetDownloads(i int32) *FileUpdateOne {
+	fuo.mutation.ResetDownloads()
+	fuo.mutation.SetDownloads(i)
+	return fuo
+}
+
+// SetNillableDownloads sets the "downloads" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableDownloads(i *int32) *FileUpdateOne {
+	if i != nil {
+		fuo.SetDownloads(*i)
 	}
+	return fuo
+}
+
+// AddDownloads adds i to the "downloads" field.
+func (fuo *FileUpdateOne) AddDownloads(i int32) *FileUpdateOne {
+	fuo.mutation.AddDownloads(i)
+	return fuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (fuo *FileUpdateOne) SetUpdatedAt(t time.Time) *FileUpdateOne {
+	fuo.mutation.SetUpdatedAt(t)
 	return fuo
 }
 
@@ -227,13 +375,20 @@ func (fuo *FileUpdateOne) Save(ctx context.Context) (*File, error) {
 		err  error
 		node *File
 	)
+	fuo.defaults()
 	if len(fuo.hooks) == 0 {
+		if err = fuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = fuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*FileMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = fuo.check(); err != nil {
+				return nil, err
 			}
 			fuo.mutation = mutation
 			node, err = fuo.sqlSave(ctx)
@@ -281,6 +436,22 @@ func (fuo *FileUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (fuo *FileUpdateOne) defaults() {
+	if _, ok := fuo.mutation.UpdatedAt(); !ok {
+		v := file.UpdateDefaultUpdatedAt()
+		fuo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (fuo *FileUpdateOne) check() error {
+	if _, ok := fuo.mutation.FolderID(); fuo.mutation.FolderCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "File.folder"`)
+	}
+	return nil
+}
+
 func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -315,6 +486,30 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := fuo.mutation.Sha256(); ok {
+		_spec.SetField(file.FieldSha256, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.Name(); ok {
+		_spec.SetField(file.FieldName, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.Size(); ok {
+		_spec.SetField(file.FieldSize, field.TypeInt32, value)
+	}
+	if value, ok := fuo.mutation.AddedSize(); ok {
+		_spec.AddField(file.FieldSize, field.TypeInt32, value)
+	}
+	if value, ok := fuo.mutation.ContentType(); ok {
+		_spec.SetField(file.FieldContentType, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.Downloads(); ok {
+		_spec.SetField(file.FieldDownloads, field.TypeInt32, value)
+	}
+	if value, ok := fuo.mutation.AddedDownloads(); ok {
+		_spec.AddField(file.FieldDownloads, field.TypeInt32, value)
+	}
+	if value, ok := fuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if fuo.mutation.FolderCleared() {
 		edge := &sqlgraph.EdgeSpec{

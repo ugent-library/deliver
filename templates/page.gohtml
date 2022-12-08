@@ -4,6 +4,12 @@
         <title>{{block "page_title" .}}{{end}}</title>
     </head>
     <body>
+        {{range .Ctx.Flash}}
+        <div>
+            {{.Type}}: {{.Body}}
+        </div>
+        {{end}}
+
         {{block "body" .}}{{end}}
     </body>
 </html>

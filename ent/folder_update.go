@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,17 +30,41 @@ func (fu *FolderUpdate) Where(ps ...predicate.Folder) *FolderUpdate {
 	return fu
 }
 
-// SetSpaceID sets the "space" edge to the Space entity by ID.
-func (fu *FolderUpdate) SetSpaceID(id string) *FolderUpdate {
-	fu.mutation.SetSpaceID(id)
+// SetSpaceID sets the "space_id" field.
+func (fu *FolderUpdate) SetSpaceID(s string) *FolderUpdate {
+	fu.mutation.SetSpaceID(s)
 	return fu
 }
 
-// SetNillableSpaceID sets the "space" edge to the Space entity by ID if the given value is not nil.
-func (fu *FolderUpdate) SetNillableSpaceID(id *string) *FolderUpdate {
-	if id != nil {
-		fu = fu.SetSpaceID(*id)
+// SetName sets the "name" field.
+func (fu *FolderUpdate) SetName(s string) *FolderUpdate {
+	fu.mutation.SetName(s)
+	return fu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (fu *FolderUpdate) SetUpdatedAt(t time.Time) *FolderUpdate {
+	fu.mutation.SetUpdatedAt(t)
+	return fu
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (fu *FolderUpdate) SetExpiresAt(t time.Time) *FolderUpdate {
+	fu.mutation.SetExpiresAt(t)
+	return fu
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (fu *FolderUpdate) SetNillableExpiresAt(t *time.Time) *FolderUpdate {
+	if t != nil {
+		fu.SetExpiresAt(*t)
 	}
+	return fu
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (fu *FolderUpdate) ClearExpiresAt() *FolderUpdate {
+	fu.mutation.ClearExpiresAt()
 	return fu
 }
 
@@ -101,13 +126,20 @@ func (fu *FolderUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	fu.defaults()
 	if len(fu.hooks) == 0 {
+		if err = fu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = fu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*FolderMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = fu.check(); err != nil {
+				return 0, err
 			}
 			fu.mutation = mutation
 			affected, err = fu.sqlSave(ctx)
@@ -149,6 +181,22 @@ func (fu *FolderUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (fu *FolderUpdate) defaults() {
+	if _, ok := fu.mutation.UpdatedAt(); !ok {
+		v := folder.UpdateDefaultUpdatedAt()
+		fu.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (fu *FolderUpdate) check() error {
+	if _, ok := fu.mutation.SpaceID(); fu.mutation.SpaceCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Folder.space"`)
+	}
+	return nil
+}
+
 func (fu *FolderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -166,6 +214,18 @@ func (fu *FolderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := fu.mutation.Name(); ok {
+		_spec.SetField(folder.FieldName, field.TypeString, value)
+	}
+	if value, ok := fu.mutation.UpdatedAt(); ok {
+		_spec.SetField(folder.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := fu.mutation.ExpiresAt(); ok {
+		_spec.SetField(folder.FieldExpiresAt, field.TypeTime, value)
+	}
+	if fu.mutation.ExpiresAtCleared() {
+		_spec.ClearField(folder.FieldExpiresAt, field.TypeTime)
 	}
 	if fu.mutation.SpaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -275,17 +335,41 @@ type FolderUpdateOne struct {
 	mutation *FolderMutation
 }
 
-// SetSpaceID sets the "space" edge to the Space entity by ID.
-func (fuo *FolderUpdateOne) SetSpaceID(id string) *FolderUpdateOne {
-	fuo.mutation.SetSpaceID(id)
+// SetSpaceID sets the "space_id" field.
+func (fuo *FolderUpdateOne) SetSpaceID(s string) *FolderUpdateOne {
+	fuo.mutation.SetSpaceID(s)
 	return fuo
 }
 
-// SetNillableSpaceID sets the "space" edge to the Space entity by ID if the given value is not nil.
-func (fuo *FolderUpdateOne) SetNillableSpaceID(id *string) *FolderUpdateOne {
-	if id != nil {
-		fuo = fuo.SetSpaceID(*id)
+// SetName sets the "name" field.
+func (fuo *FolderUpdateOne) SetName(s string) *FolderUpdateOne {
+	fuo.mutation.SetName(s)
+	return fuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (fuo *FolderUpdateOne) SetUpdatedAt(t time.Time) *FolderUpdateOne {
+	fuo.mutation.SetUpdatedAt(t)
+	return fuo
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (fuo *FolderUpdateOne) SetExpiresAt(t time.Time) *FolderUpdateOne {
+	fuo.mutation.SetExpiresAt(t)
+	return fuo
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (fuo *FolderUpdateOne) SetNillableExpiresAt(t *time.Time) *FolderUpdateOne {
+	if t != nil {
+		fuo.SetExpiresAt(*t)
 	}
+	return fuo
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (fuo *FolderUpdateOne) ClearExpiresAt() *FolderUpdateOne {
+	fuo.mutation.ClearExpiresAt()
 	return fuo
 }
 
@@ -354,13 +438,20 @@ func (fuo *FolderUpdateOne) Save(ctx context.Context) (*Folder, error) {
 		err  error
 		node *Folder
 	)
+	fuo.defaults()
 	if len(fuo.hooks) == 0 {
+		if err = fuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = fuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*FolderMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = fuo.check(); err != nil {
+				return nil, err
 			}
 			fuo.mutation = mutation
 			node, err = fuo.sqlSave(ctx)
@@ -408,6 +499,22 @@ func (fuo *FolderUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (fuo *FolderUpdateOne) defaults() {
+	if _, ok := fuo.mutation.UpdatedAt(); !ok {
+		v := folder.UpdateDefaultUpdatedAt()
+		fuo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (fuo *FolderUpdateOne) check() error {
+	if _, ok := fuo.mutation.SpaceID(); fuo.mutation.SpaceCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Folder.space"`)
+	}
+	return nil
+}
+
 func (fuo *FolderUpdateOne) sqlSave(ctx context.Context) (_node *Folder, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -442,6 +549,18 @@ func (fuo *FolderUpdateOne) sqlSave(ctx context.Context) (_node *Folder, err err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := fuo.mutation.Name(); ok {
+		_spec.SetField(folder.FieldName, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(folder.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := fuo.mutation.ExpiresAt(); ok {
+		_spec.SetField(folder.FieldExpiresAt, field.TypeTime, value)
+	}
+	if fuo.mutation.ExpiresAtCleared() {
+		_spec.ClearField(folder.FieldExpiresAt, field.TypeTime)
 	}
 	if fuo.mutation.SpaceCleared() {
 		edge := &sqlgraph.EdgeSpec{

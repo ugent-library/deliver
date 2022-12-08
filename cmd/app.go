@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/gob"
 	"net/http"
 
 	"github.com/gorilla/handlers"
@@ -41,10 +42,13 @@ var appCmd = &cobra.Command{
 		sessionStore.Options.Path = "/"
 		sessionStore.Options.HttpOnly = true
 		sessionStore.Options.Secure = viper.GetBool("production")
+		// register Flash as a gob Type so CookieStore can serialize it
+		gob.Register(c.Flash{})
 
 		// controllers
 		pages := c.NewPages()
 		spaces := c.NewSpaces(services.Repository)
+		folders := c.NewFolders(services.Repository)
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{
@@ -57,6 +61,8 @@ var appCmd = &cobra.Command{
 		r.HandleFunc("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.HandleFunc("/spaces", wrap(spaces.List)).Methods("GET").Name("spaces")
 		r.HandleFunc("/spaces", wrap(spaces.Create)).Methods("POST").Name("create_space")
+		r.HandleFunc("/spaces/{space_id}/folders", wrap(folders.List)).Methods("GET").Name("folders")
+		r.HandleFunc("/spaces/{space_id}/folders", wrap(folders.Create)).Methods("POST").Name("create_folder")
 
 		// start server
 		if err = http.ListenAndServe(viper.GetString("app_addr"), r); err != nil {

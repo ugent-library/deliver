@@ -25,7 +25,6 @@ type FileQuery struct {
 	fields     []string
 	predicates []predicate.File
 	withFolder *FolderQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -286,6 +285,18 @@ func (fq *FileQuery) WithFolder(opts ...func(*FolderQuery)) *FileQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		FolderID string `json:"folder_id,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.File.Query().
+//		GroupBy(file.FieldFolderID).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (fq *FileQuery) GroupBy(field string, fields ...string) *FileGroupBy {
 	grbuild := &FileGroupBy{config: fq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -302,6 +313,16 @@ func (fq *FileQuery) GroupBy(field string, fields ...string) *FileGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		FolderID string `json:"folder_id,omitempty"`
+//	}
+//
+//	client.File.Query().
+//		Select(file.FieldFolderID).
+//		Scan(ctx, &v)
 func (fq *FileQuery) Select(fields ...string) *FileSelect {
 	fq.fields = append(fq.fields, fields...)
 	selbuild := &FileSelect{FileQuery: fq}
@@ -334,18 +355,11 @@ func (fq *FileQuery) prepareQuery(ctx context.Context) error {
 func (fq *FileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*File, error) {
 	var (
 		nodes       = []*File{}
-		withFKs     = fq.withFKs
 		_spec       = fq.querySpec()
 		loadedTypes = [1]bool{
 			fq.withFolder != nil,
 		}
 	)
-	if fq.withFolder != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, file.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*File).scanValues(nil, columns)
 	}
@@ -377,10 +391,7 @@ func (fq *FileQuery) loadFolder(ctx context.Context, query *FolderQuery, nodes [
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*File)
 	for i := range nodes {
-		if nodes[i].folder_files == nil {
-			continue
-		}
-		fk := *nodes[i].folder_files
+		fk := nodes[i].FolderID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -394,7 +405,7 @@ func (fq *FileQuery) loadFolder(ctx context.Context, query *FolderQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "folder_files" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "folder_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

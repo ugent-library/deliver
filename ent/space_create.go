@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -23,6 +24,34 @@ type SpaceCreate struct {
 // SetName sets the "name" field.
 func (sc *SpaceCreate) SetName(s string) *SpaceCreate {
 	sc.mutation.SetName(s)
+	return sc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (sc *SpaceCreate) SetCreatedAt(t time.Time) *SpaceCreate {
+	sc.mutation.SetCreatedAt(t)
+	return sc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (sc *SpaceCreate) SetNillableCreatedAt(t *time.Time) *SpaceCreate {
+	if t != nil {
+		sc.SetCreatedAt(*t)
+	}
+	return sc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (sc *SpaceCreate) SetUpdatedAt(t time.Time) *SpaceCreate {
+	sc.mutation.SetUpdatedAt(t)
+	return sc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (sc *SpaceCreate) SetNillableUpdatedAt(t *time.Time) *SpaceCreate {
+	if t != nil {
+		sc.SetUpdatedAt(*t)
+	}
 	return sc
 }
 
@@ -132,6 +161,14 @@ func (sc *SpaceCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *SpaceCreate) defaults() {
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		v := space.DefaultCreatedAt()
+		sc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := sc.mutation.UpdatedAt(); !ok {
+		v := space.DefaultUpdatedAt()
+		sc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := space.DefaultID()
 		sc.mutation.SetID(v)
@@ -142,6 +179,12 @@ func (sc *SpaceCreate) defaults() {
 func (sc *SpaceCreate) check() error {
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Space.name"`)}
+	}
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Space.created_at"`)}
+	}
+	if _, ok := sc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Space.updated_at"`)}
 	}
 	return nil
 }
@@ -182,6 +225,14 @@ func (sc *SpaceCreate) createSpec() (*Space, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Name(); ok {
 		_spec.SetField(space.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := sc.mutation.CreatedAt(); ok {
+		_spec.SetField(space.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := sc.mutation.UpdatedAt(); ok {
+		_spec.SetField(space.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if nodes := sc.mutation.FoldersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/dilliver/ent/file"
@@ -13,13 +14,28 @@ import (
 
 // File is the model entity for the File schema.
 type File struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
+	// FolderID holds the value of the "folder_id" field.
+	FolderID string `json:"folder_id,omitempty"`
+	// Sha256 holds the value of the "sha256" field.
+	Sha256 string `json:"sha256,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Size holds the value of the "size" field.
+	Size int32 `json:"size,omitempty"`
+	// ContentType holds the value of the "content_type" field.
+	ContentType string `json:"content_type,omitempty"`
+	// Downloads holds the value of the "downloads" field.
+	Downloads int32 `json:"downloads,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FileQuery when eager-loading is set.
-	Edges        FileEdges `json:"edges"`
-	folder_files *string
+	Edges FileEdges `json:"edges"`
 }
 
 // FileEdges holds the relations/edges for other nodes in the graph.
@@ -49,10 +65,12 @@ func (*File) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case file.FieldID:
+		case file.FieldSize, file.FieldDownloads:
+			values[i] = new(sql.NullInt64)
+		case file.FieldID, file.FieldFolderID, file.FieldSha256, file.FieldName, file.FieldContentType:
 			values[i] = new(sql.NullString)
-		case file.ForeignKeys[0]: // folder_files
-			values[i] = new(sql.NullString)
+		case file.FieldCreatedAt, file.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type File", columns[i])
 		}
@@ -74,12 +92,53 @@ func (f *File) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				f.ID = value.String
 			}
-		case file.ForeignKeys[0]:
+		case file.FieldFolderID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field folder_files", values[i])
+				return fmt.Errorf("unexpected type %T for field folder_id", values[i])
 			} else if value.Valid {
-				f.folder_files = new(string)
-				*f.folder_files = value.String
+				f.FolderID = value.String
+			}
+		case file.FieldSha256:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sha256", values[i])
+			} else if value.Valid {
+				f.Sha256 = value.String
+			}
+		case file.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				f.Name = value.String
+			}
+		case file.FieldSize:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field size", values[i])
+			} else if value.Valid {
+				f.Size = int32(value.Int64)
+			}
+		case file.FieldContentType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field content_type", values[i])
+			} else if value.Valid {
+				f.ContentType = value.String
+			}
+		case file.FieldDownloads:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field downloads", values[i])
+			} else if value.Valid {
+				f.Downloads = int32(value.Int64)
+			}
+		case file.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				f.CreatedAt = value.Time
+			}
+		case file.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				f.UpdatedAt = value.Time
 			}
 		}
 	}
@@ -113,7 +172,30 @@ func (f *File) Unwrap() *File {
 func (f *File) String() string {
 	var builder strings.Builder
 	builder.WriteString("File(")
-	builder.WriteString(fmt.Sprintf("id=%v", f.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
+	builder.WriteString("folder_id=")
+	builder.WriteString(f.FolderID)
+	builder.WriteString(", ")
+	builder.WriteString("sha256=")
+	builder.WriteString(f.Sha256)
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(f.Name)
+	builder.WriteString(", ")
+	builder.WriteString("size=")
+	builder.WriteString(fmt.Sprintf("%v", f.Size))
+	builder.WriteString(", ")
+	builder.WriteString("content_type=")
+	builder.WriteString(f.ContentType)
+	builder.WriteString(", ")
+	builder.WriteString("downloads=")
+	builder.WriteString(fmt.Sprintf("%v", f.Downloads))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(f.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(f.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

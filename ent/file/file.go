@@ -2,11 +2,31 @@
 
 package file
 
+import (
+	"time"
+)
+
 const (
 	// Label holds the string label denoting the file type in the database.
 	Label = "file"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldFolderID holds the string denoting the folder_id field in the database.
+	FieldFolderID = "folder_id"
+	// FieldSha256 holds the string denoting the sha256 field in the database.
+	FieldSha256 = "sha256"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
+	// FieldContentType holds the string denoting the content_type field in the database.
+	FieldContentType = "content_type"
+	// FieldDownloads holds the string denoting the downloads field in the database.
+	FieldDownloads = "downloads"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeFolder holds the string denoting the folder edge name in mutations.
 	EdgeFolder = "folder"
 	// Table holds the table name of the file in the database.
@@ -17,18 +37,20 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "folder" package.
 	FolderInverseTable = "folders"
 	// FolderColumn is the table column denoting the folder relation/edge.
-	FolderColumn = "folder_files"
+	FolderColumn = "folder_id"
 )
 
 // Columns holds all SQL columns for file fields.
 var Columns = []string{
 	FieldID,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "files"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"folder_files",
+	FieldFolderID,
+	FieldSha256,
+	FieldName,
+	FieldSize,
+	FieldContentType,
+	FieldDownloads,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -38,15 +60,18 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
+	// DefaultDownloads holds the default value on creation for the "downloads" field.
+	DefaultDownloads int32
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )

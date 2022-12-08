@@ -41,9 +41,18 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	if err := bindForm(r, &b); err != nil {
 		panic(err) // TODO
 	}
-	space := &models.Space{Name: b.Name}
+
+	space := &models.Space{
+		Name: b.Name,
+	}
 	if err := c.repository.CreateSpace(context.Background(), space); err != nil {
 		panic(err) // TODO
 	}
-	http.Redirect(w, r, ctx.URLPath("spaces").String(), http.StatusSeeOther)
+
+	ctx.PersistFlash(w, r, Flash{
+		Type: "info",
+		Body: "Space created succesfully",
+	})
+	redirectURL := ctx.URLPath("spaces").String()
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }

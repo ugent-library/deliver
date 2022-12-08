@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -31,6 +32,12 @@ func (su *SpaceUpdate) Where(ps ...predicate.Space) *SpaceUpdate {
 // SetName sets the "name" field.
 func (su *SpaceUpdate) SetName(s string) *SpaceUpdate {
 	su.mutation.SetName(s)
+	return su
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (su *SpaceUpdate) SetUpdatedAt(t time.Time) *SpaceUpdate {
+	su.mutation.SetUpdatedAt(t)
 	return su
 }
 
@@ -81,6 +88,7 @@ func (su *SpaceUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	su.defaults()
 	if len(su.hooks) == 0 {
 		affected, err = su.sqlSave(ctx)
 	} else {
@@ -129,6 +137,14 @@ func (su *SpaceUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (su *SpaceUpdate) defaults() {
+	if _, ok := su.mutation.UpdatedAt(); !ok {
+		v := space.UpdateDefaultUpdatedAt()
+		su.mutation.SetUpdatedAt(v)
+	}
+}
+
 func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -149,6 +165,9 @@ func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Name(); ok {
 		_spec.SetField(space.FieldName, field.TypeString, value)
+	}
+	if value, ok := su.mutation.UpdatedAt(); ok {
+		_spec.SetField(space.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if su.mutation.FoldersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -229,6 +248,12 @@ func (suo *SpaceUpdateOne) SetName(s string) *SpaceUpdateOne {
 	return suo
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (suo *SpaceUpdateOne) SetUpdatedAt(t time.Time) *SpaceUpdateOne {
+	suo.mutation.SetUpdatedAt(t)
+	return suo
+}
+
 // AddFolderIDs adds the "folders" edge to the Folder entity by IDs.
 func (suo *SpaceUpdateOne) AddFolderIDs(ids ...string) *SpaceUpdateOne {
 	suo.mutation.AddFolderIDs(ids...)
@@ -283,6 +308,7 @@ func (suo *SpaceUpdateOne) Save(ctx context.Context) (*Space, error) {
 		err  error
 		node *Space
 	)
+	suo.defaults()
 	if len(suo.hooks) == 0 {
 		node, err = suo.sqlSave(ctx)
 	} else {
@@ -337,6 +363,14 @@ func (suo *SpaceUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (suo *SpaceUpdateOne) defaults() {
+	if _, ok := suo.mutation.UpdatedAt(); !ok {
+		v := space.UpdateDefaultUpdatedAt()
+		suo.mutation.SetUpdatedAt(v)
+	}
+}
+
 func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -374,6 +408,9 @@ func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error
 	}
 	if value, ok := suo.mutation.Name(); ok {
 		_spec.SetField(space.FieldName, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.UpdatedAt(); ok {
+		_spec.SetField(space.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if suo.mutation.FoldersCleared() {
 		edge := &sqlgraph.EdgeSpec{

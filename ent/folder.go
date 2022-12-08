@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/dilliver/ent/folder"
@@ -13,13 +14,22 @@ import (
 
 // Folder is the model entity for the Folder schema.
 type Folder struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
+	// SpaceID holds the value of the "space_id" field.
+	SpaceID string `json:"space_id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// ExpiresAt holds the value of the "expires_at" field.
+	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FolderQuery when eager-loading is set.
-	Edges         FolderEdges `json:"edges"`
-	space_folders *string
+	Edges FolderEdges `json:"edges"`
 }
 
 // FolderEdges holds the relations/edges for other nodes in the graph.
@@ -60,10 +70,10 @@ func (*Folder) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case folder.FieldID:
+		case folder.FieldID, folder.FieldSpaceID, folder.FieldName:
 			values[i] = new(sql.NullString)
-		case folder.ForeignKeys[0]: // space_folders
-			values[i] = new(sql.NullString)
+		case folder.FieldCreatedAt, folder.FieldUpdatedAt, folder.FieldExpiresAt:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Folder", columns[i])
 		}
@@ -85,12 +95,35 @@ func (f *Folder) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				f.ID = value.String
 			}
-		case folder.ForeignKeys[0]:
+		case folder.FieldSpaceID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field space_folders", values[i])
+				return fmt.Errorf("unexpected type %T for field space_id", values[i])
 			} else if value.Valid {
-				f.space_folders = new(string)
-				*f.space_folders = value.String
+				f.SpaceID = value.String
+			}
+		case folder.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				f.Name = value.String
+			}
+		case folder.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				f.CreatedAt = value.Time
+			}
+		case folder.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				f.UpdatedAt = value.Time
+			}
+		case folder.FieldExpiresAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
+			} else if value.Valid {
+				f.ExpiresAt = value.Time
 			}
 		}
 	}
@@ -129,7 +162,21 @@ func (f *Folder) Unwrap() *Folder {
 func (f *Folder) String() string {
 	var builder strings.Builder
 	builder.WriteString("Folder(")
-	builder.WriteString(fmt.Sprintf("id=%v", f.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
+	builder.WriteString("space_id=")
+	builder.WriteString(f.SpaceID)
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(f.Name)
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(f.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(f.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("expires_at=")
+	builder.WriteString(f.ExpiresAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

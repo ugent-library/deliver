@@ -2,11 +2,25 @@
 
 package folder
 
+import (
+	"time"
+)
+
 const (
 	// Label holds the string label denoting the folder type in the database.
 	Label = "folder"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldSpaceID holds the string denoting the space_id field in the database.
+	FieldSpaceID = "space_id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
+	// FieldExpiresAt holds the string denoting the expires_at field in the database.
+	FieldExpiresAt = "expires_at"
 	// EdgeSpace holds the string denoting the space edge name in mutations.
 	EdgeSpace = "space"
 	// EdgeFiles holds the string denoting the files edge name in mutations.
@@ -19,25 +33,24 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "space" package.
 	SpaceInverseTable = "spaces"
 	// SpaceColumn is the table column denoting the space relation/edge.
-	SpaceColumn = "space_folders"
+	SpaceColumn = "space_id"
 	// FilesTable is the table that holds the files relation/edge.
 	FilesTable = "files"
 	// FilesInverseTable is the table name for the File entity.
 	// It exists in this package in order to avoid circular dependency with the "file" package.
 	FilesInverseTable = "files"
 	// FilesColumn is the table column denoting the files relation/edge.
-	FilesColumn = "folder_files"
+	FilesColumn = "folder_id"
 )
 
 // Columns holds all SQL columns for folder fields.
 var Columns = []string{
 	FieldID,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "folders"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"space_folders",
+	FieldSpaceID,
+	FieldName,
+	FieldCreatedAt,
+	FieldUpdatedAt,
+	FieldExpiresAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -47,15 +60,16 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )

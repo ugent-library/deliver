@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -18,6 +20,16 @@ func (Folder) Fields() []ent.Field {
 		field.String("id").
 			Unique().
 			DefaultFunc(ulid.MustGenerate),
+		field.String("space_id"),
+		field.String("name"),
+		field.Time("created_at").
+			Default(time.Now).
+			Immutable(),
+		field.Time("updated_at").
+			Default(time.Now).
+			UpdateDefault(time.Now),
+		field.Time("expires_at").
+			Optional(),
 	}
 }
 
@@ -26,7 +38,9 @@ func (Folder) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("space", Space.Type).
 			Ref("folders").
-			Unique(),
+			Unique().
+			Required().
+			Field("space_id"),
 		edge.To("files", File.Type),
 	}
 }

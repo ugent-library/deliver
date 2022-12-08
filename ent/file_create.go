@@ -4,7 +4,9 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,6 +21,78 @@ type FileCreate struct {
 	hooks    []Hook
 }
 
+// SetFolderID sets the "folder_id" field.
+func (fc *FileCreate) SetFolderID(s string) *FileCreate {
+	fc.mutation.SetFolderID(s)
+	return fc
+}
+
+// SetSha256 sets the "sha256" field.
+func (fc *FileCreate) SetSha256(s string) *FileCreate {
+	fc.mutation.SetSha256(s)
+	return fc
+}
+
+// SetName sets the "name" field.
+func (fc *FileCreate) SetName(s string) *FileCreate {
+	fc.mutation.SetName(s)
+	return fc
+}
+
+// SetSize sets the "size" field.
+func (fc *FileCreate) SetSize(i int32) *FileCreate {
+	fc.mutation.SetSize(i)
+	return fc
+}
+
+// SetContentType sets the "content_type" field.
+func (fc *FileCreate) SetContentType(s string) *FileCreate {
+	fc.mutation.SetContentType(s)
+	return fc
+}
+
+// SetDownloads sets the "downloads" field.
+func (fc *FileCreate) SetDownloads(i int32) *FileCreate {
+	fc.mutation.SetDownloads(i)
+	return fc
+}
+
+// SetNillableDownloads sets the "downloads" field if the given value is not nil.
+func (fc *FileCreate) SetNillableDownloads(i *int32) *FileCreate {
+	if i != nil {
+		fc.SetDownloads(*i)
+	}
+	return fc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (fc *FileCreate) SetCreatedAt(t time.Time) *FileCreate {
+	fc.mutation.SetCreatedAt(t)
+	return fc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (fc *FileCreate) SetNillableCreatedAt(t *time.Time) *FileCreate {
+	if t != nil {
+		fc.SetCreatedAt(*t)
+	}
+	return fc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (fc *FileCreate) SetUpdatedAt(t time.Time) *FileCreate {
+	fc.mutation.SetUpdatedAt(t)
+	return fc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (fc *FileCreate) SetNillableUpdatedAt(t *time.Time) *FileCreate {
+	if t != nil {
+		fc.SetUpdatedAt(*t)
+	}
+	return fc
+}
+
 // SetID sets the "id" field.
 func (fc *FileCreate) SetID(s string) *FileCreate {
 	fc.mutation.SetID(s)
@@ -29,20 +103,6 @@ func (fc *FileCreate) SetID(s string) *FileCreate {
 func (fc *FileCreate) SetNillableID(s *string) *FileCreate {
 	if s != nil {
 		fc.SetID(*s)
-	}
-	return fc
-}
-
-// SetFolderID sets the "folder" edge to the Folder entity by ID.
-func (fc *FileCreate) SetFolderID(id string) *FileCreate {
-	fc.mutation.SetFolderID(id)
-	return fc
-}
-
-// SetNillableFolderID sets the "folder" edge to the Folder entity by ID if the given value is not nil.
-func (fc *FileCreate) SetNillableFolderID(id *string) *FileCreate {
-	if id != nil {
-		fc = fc.SetFolderID(*id)
 	}
 	return fc
 }
@@ -129,6 +189,18 @@ func (fc *FileCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (fc *FileCreate) defaults() {
+	if _, ok := fc.mutation.Downloads(); !ok {
+		v := file.DefaultDownloads
+		fc.mutation.SetDownloads(v)
+	}
+	if _, ok := fc.mutation.CreatedAt(); !ok {
+		v := file.DefaultCreatedAt()
+		fc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := fc.mutation.UpdatedAt(); !ok {
+		v := file.DefaultUpdatedAt()
+		fc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := fc.mutation.ID(); !ok {
 		v := file.DefaultID()
 		fc.mutation.SetID(v)
@@ -137,6 +209,33 @@ func (fc *FileCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (fc *FileCreate) check() error {
+	if _, ok := fc.mutation.FolderID(); !ok {
+		return &ValidationError{Name: "folder_id", err: errors.New(`ent: missing required field "File.folder_id"`)}
+	}
+	if _, ok := fc.mutation.Sha256(); !ok {
+		return &ValidationError{Name: "sha256", err: errors.New(`ent: missing required field "File.sha256"`)}
+	}
+	if _, ok := fc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "File.name"`)}
+	}
+	if _, ok := fc.mutation.Size(); !ok {
+		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "File.size"`)}
+	}
+	if _, ok := fc.mutation.ContentType(); !ok {
+		return &ValidationError{Name: "content_type", err: errors.New(`ent: missing required field "File.content_type"`)}
+	}
+	if _, ok := fc.mutation.Downloads(); !ok {
+		return &ValidationError{Name: "downloads", err: errors.New(`ent: missing required field "File.downloads"`)}
+	}
+	if _, ok := fc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "File.created_at"`)}
+	}
+	if _, ok := fc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "File.updated_at"`)}
+	}
+	if _, ok := fc.mutation.FolderID(); !ok {
+		return &ValidationError{Name: "folder", err: errors.New(`ent: missing required edge "File.folder"`)}
+	}
 	return nil
 }
 
@@ -173,6 +272,34 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := fc.mutation.Sha256(); ok {
+		_spec.SetField(file.FieldSha256, field.TypeString, value)
+		_node.Sha256 = value
+	}
+	if value, ok := fc.mutation.Name(); ok {
+		_spec.SetField(file.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := fc.mutation.Size(); ok {
+		_spec.SetField(file.FieldSize, field.TypeInt32, value)
+		_node.Size = value
+	}
+	if value, ok := fc.mutation.ContentType(); ok {
+		_spec.SetField(file.FieldContentType, field.TypeString, value)
+		_node.ContentType = value
+	}
+	if value, ok := fc.mutation.Downloads(); ok {
+		_spec.SetField(file.FieldDownloads, field.TypeInt32, value)
+		_node.Downloads = value
+	}
+	if value, ok := fc.mutation.CreatedAt(); ok {
+		_spec.SetField(file.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := fc.mutation.UpdatedAt(); ok {
+		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
 	if nodes := fc.mutation.FolderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -190,7 +317,7 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.folder_files = &nodes[0]
+		_node.FolderID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

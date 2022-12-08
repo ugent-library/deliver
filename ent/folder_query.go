@@ -28,7 +28,6 @@ type FolderQuery struct {
 	predicates []predicate.Folder
 	withSpace  *SpaceQuery
 	withFiles  *FileQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -323,6 +322,18 @@ func (fq *FolderQuery) WithFiles(opts ...func(*FileQuery)) *FolderQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		SpaceID string `json:"space_id,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Folder.Query().
+//		GroupBy(folder.FieldSpaceID).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (fq *FolderQuery) GroupBy(field string, fields ...string) *FolderGroupBy {
 	grbuild := &FolderGroupBy{config: fq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -339,6 +350,16 @@ func (fq *FolderQuery) GroupBy(field string, fields ...string) *FolderGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		SpaceID string `json:"space_id,omitempty"`
+//	}
+//
+//	client.Folder.Query().
+//		Select(folder.FieldSpaceID).
+//		Scan(ctx, &v)
 func (fq *FolderQuery) Select(fields ...string) *FolderSelect {
 	fq.fields = append(fq.fields, fields...)
 	selbuild := &FolderSelect{FolderQuery: fq}
@@ -371,19 +392,12 @@ func (fq *FolderQuery) prepareQuery(ctx context.Context) error {
 func (fq *FolderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Folder, error) {
 	var (
 		nodes       = []*Folder{}
-		withFKs     = fq.withFKs
 		_spec       = fq.querySpec()
 		loadedTypes = [2]bool{
 			fq.withSpace != nil,
 			fq.withFiles != nil,
 		}
 	)
-	if fq.withSpace != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, folder.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Folder).scanValues(nil, columns)
 	}
@@ -422,10 +436,7 @@ func (fq *FolderQuery) loadSpace(ctx context.Context, query *SpaceQuery, nodes [
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Folder)
 	for i := range nodes {
-		if nodes[i].space_folders == nil {
-			continue
-		}
-		fk := *nodes[i].space_folders
+		fk := nodes[i].SpaceID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -439,7 +450,7 @@ func (fq *FolderQuery) loadSpace(ctx context.Context, query *SpaceQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "space_folders" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "space_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -457,7 +468,6 @@ func (fq *FolderQuery) loadFiles(ctx context.Context, query *FileQuery, nodes []
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	query.Where(predicate.File(func(s *sql.Selector) {
 		s.Where(sql.InValues(folder.FilesColumn, fks...))
 	}))
@@ -466,13 +476,10 @@ func (fq *FolderQuery) loadFiles(ctx context.Context, query *FileQuery, nodes []
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.folder_files
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "folder_files" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.FolderID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "folder_files" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "folder_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

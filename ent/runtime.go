@@ -3,6 +3,8 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/ugent-library/dilliver/ent/file"
 	"github.com/ugent-library/dilliver/ent/folder"
 	"github.com/ugent-library/dilliver/ent/schema"
@@ -15,18 +17,52 @@ import (
 func init() {
 	fileFields := schema.File{}.Fields()
 	_ = fileFields
+	// fileDescDownloads is the schema descriptor for downloads field.
+	fileDescDownloads := fileFields[6].Descriptor()
+	// file.DefaultDownloads holds the default value on creation for the downloads field.
+	file.DefaultDownloads = fileDescDownloads.Default.(int32)
+	// fileDescCreatedAt is the schema descriptor for created_at field.
+	fileDescCreatedAt := fileFields[7].Descriptor()
+	// file.DefaultCreatedAt holds the default value on creation for the created_at field.
+	file.DefaultCreatedAt = fileDescCreatedAt.Default.(func() time.Time)
+	// fileDescUpdatedAt is the schema descriptor for updated_at field.
+	fileDescUpdatedAt := fileFields[8].Descriptor()
+	// file.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	file.DefaultUpdatedAt = fileDescUpdatedAt.Default.(func() time.Time)
+	// file.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	file.UpdateDefaultUpdatedAt = fileDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// fileDescID is the schema descriptor for id field.
 	fileDescID := fileFields[0].Descriptor()
 	// file.DefaultID holds the default value on creation for the id field.
 	file.DefaultID = fileDescID.Default.(func() string)
 	folderFields := schema.Folder{}.Fields()
 	_ = folderFields
+	// folderDescCreatedAt is the schema descriptor for created_at field.
+	folderDescCreatedAt := folderFields[3].Descriptor()
+	// folder.DefaultCreatedAt holds the default value on creation for the created_at field.
+	folder.DefaultCreatedAt = folderDescCreatedAt.Default.(func() time.Time)
+	// folderDescUpdatedAt is the schema descriptor for updated_at field.
+	folderDescUpdatedAt := folderFields[4].Descriptor()
+	// folder.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	folder.DefaultUpdatedAt = folderDescUpdatedAt.Default.(func() time.Time)
+	// folder.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	folder.UpdateDefaultUpdatedAt = folderDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// folderDescID is the schema descriptor for id field.
 	folderDescID := folderFields[0].Descriptor()
 	// folder.DefaultID holds the default value on creation for the id field.
 	folder.DefaultID = folderDescID.Default.(func() string)
 	spaceFields := schema.Space{}.Fields()
 	_ = spaceFields
+	// spaceDescCreatedAt is the schema descriptor for created_at field.
+	spaceDescCreatedAt := spaceFields[2].Descriptor()
+	// space.DefaultCreatedAt holds the default value on creation for the created_at field.
+	space.DefaultCreatedAt = spaceDescCreatedAt.Default.(func() time.Time)
+	// spaceDescUpdatedAt is the schema descriptor for updated_at field.
+	spaceDescUpdatedAt := spaceFields[3].Descriptor()
+	// space.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	space.DefaultUpdatedAt = spaceDescUpdatedAt.Default.(func() time.Time)
+	// space.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	space.UpdateDefaultUpdatedAt = spaceDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// spaceDescID is the schema descriptor for id field.
 	spaceDescID := spaceFields[0].Descriptor()
 	// space.DefaultID holds the default value on creation for the id field.
