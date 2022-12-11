@@ -24,7 +24,7 @@ var appCmd = &cobra.Command{
 		// setup services
 		services, err := models.NewServices(models.Config{
 			DatabaseURL:       viper.GetString("database_url"),
-			S3Endpoint:        viper.GetString("s3_endpoint"),
+			S3URL:             viper.GetString("s3_url"),
 			S3AccessKeyID:     viper.GetString("s3_access_key_id"),
 			S3SecretAccessKey: viper.GetString("s3_secret_access_key"),
 			S3Bucket:          viper.GetString("s3_bucket"),

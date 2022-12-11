@@ -28,7 +28,7 @@ type SpaceForm struct {
 }
 
 func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	spaces, err := c.repo.Spaces(context.Background())
+	spaces, err := c.repo.Spaces(context.TODO())
 	if err != nil {
 		panic(err) // TODO
 	}
@@ -37,7 +37,7 @@ func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 
 func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	spaceID := mux.Vars(r)["spaceID"]
-	folders, err := c.repo.Folders(context.Background(), spaceID)
+	folders, err := c.repo.Folders(context.TODO(), spaceID)
 	if err != nil {
 		panic(err) // TODO
 	}
@@ -56,7 +56,7 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	space := &models.Space{
 		Name: b.Name,
 	}
-	if err := c.repo.CreateSpace(context.Background(), space); err != nil {
+	if err := c.repo.CreateSpace(context.TODO(), space); err != nil {
 		panic(err) // TODO
 	}
 

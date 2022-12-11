@@ -34,7 +34,7 @@ func NewRepositoryService(c Config) (RepositoryService, error) {
 	driver := entsql.OpenDB(entdialect.Postgres, db)
 	client := ent.NewClient(ent.Driver(driver))
 
-	err = client.Schema.Create(context.Background(),
+	err = client.Schema.Create(context.TODO(),
 		entmigrate.WithDropIndex(true),
 	)
 	if err != nil {

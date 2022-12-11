@@ -45,7 +45,7 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 		SpaceID: spaceID,
 		Name:    b.Name,
 	}
-	if err := c.repo.CreateFolder(context.Background(), folder); err != nil {
+	if err := c.repo.CreateFolder(context.TODO(), folder); err != nil {
 		panic(err) // TODO
 	}
 
@@ -92,7 +92,7 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 		ContentType: contentType,
 	}
 
-	if err = c.repo.CreateFile(context.Background(), file, f); err != nil {
+	if err = c.repo.CreateFile(context.TODO(), file, f); err != nil {
 		panic(err) // TODO
 	}
 
