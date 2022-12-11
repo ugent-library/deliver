@@ -41,16 +41,16 @@ func NewRepositoryService(c Config) (RepositoryService, error) {
 		return nil, err
 	}
 
-	return &repository{
+	return &repositoryService{
 		db: client,
 	}, nil
 }
 
-type repository struct {
+type repositoryService struct {
 	db *ent.Client
 }
 
-func (r *repository) Spaces(ctx context.Context) ([]*Space, error) {
+func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
 	spaces, err := r.db.Space.Query().All(ctx)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (r *repository) Spaces(ctx context.Context) ([]*Space, error) {
 	return spaces, nil
 }
 
-func (r *repository) CreateSpace(ctx context.Context, s *Space) error {
+func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	space, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (r *repository) CreateSpace(ctx context.Context, s *Space) error {
 	return nil
 }
 
-func (r *repository) Folders(ctx context.Context, spaceID string) ([]*Folder, error) {
+func (r *repositoryService) Folders(ctx context.Context, spaceID string) ([]*Folder, error) {
 	folders, err := r.db.Folder.Query().All(ctx)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (r *repository) Folders(ctx context.Context, spaceID string) ([]*Folder, er
 	return folders, nil
 }
 
-func (r *repository) CreateFolder(ctx context.Context, f *Folder) error {
+func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 	folder, err := r.db.Folder.Create().
 		SetName(f.Name).
 		SetSpaceID(f.SpaceID).
@@ -87,6 +87,6 @@ func (r *repository) CreateFolder(ctx context.Context, f *Folder) error {
 	return nil
 }
 
-func (r *repository) CreateFile(ctx context.Context, f *File, b io.Reader) error {
+func (r *repositoryService) CreateFile(ctx context.Context, f *File, b io.Reader) error {
 	return nil
 }

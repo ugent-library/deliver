@@ -5,11 +5,16 @@ import (
 )
 
 type Config struct {
-	DatabaseURL string
+	DatabaseURL       string
+	S3Endpoint        string
+	S3AccessKeyID     string
+	S3SecretAccessKey string
+	S3Bucket          string
 }
 
 type Services struct {
 	Repository RepositoryService
+	File       FileService
 }
 
 func NewServices(c Config) (*Services, error) {

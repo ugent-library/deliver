@@ -23,6 +23,7 @@ func init() {
 	viper.SetDefault("app_addr", "localhost:3002")
 	viper.SetDefault("session_name", "dilliver")
 	viper.SetDefault("session_max_age", 86400*30) // 30 days
+	viper.SetDefault("s3_bucket", "dilliver")
 }
 
 func initConfig() {
