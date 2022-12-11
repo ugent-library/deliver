@@ -21,7 +21,10 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.
 	return func(fn func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := Ctx{
-				Config: c,
+				Log:          c.Log,
+				router:       c.Router,
+				sessionStore: c.SessionStore,
+				sessionName:  c.SessionName,
 			}
 			if err := ctx.loadSession(w, r); err != nil {
 				// TODO handle error gracefully
@@ -36,8 +39,8 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.
 type Config struct {
 	Log          *zap.SugaredLogger
 	Router       *mux.Router
-	SessionName  string
 	SessionStore sessions.Store
+	SessionName  string
 }
 
 type Flash struct {
@@ -45,13 +48,24 @@ type Flash struct {
 	Body template.HTML
 }
 
+type Var map[string]any
+
 type Ctx struct {
-	Config
-	Flash []Flash
+	Log          *zap.SugaredLogger
+	router       *mux.Router
+	sessionStore sessions.Store
+	sessionName  string
+	Flash        []Flash
+	Var          Var
+}
+
+func (c Ctx) Yield(v Var) Ctx {
+	c.Var = v
+	return c
 }
 
 func (c Ctx) URL(route string, pairs ...string) *url.URL {
-	r := c.Router.Get(route)
+	r := c.router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
 	}
@@ -63,7 +77,7 @@ func (c Ctx) URL(route string, pairs ...string) *url.URL {
 }
 
 func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
-	r := c.Router.Get(route)
+	r := c.router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
 	}
@@ -75,7 +89,7 @@ func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
 }
 
 func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error {
-	s, err := c.SessionStore.Get(r, c.SessionName)
+	s, err := c.sessionStore.Get(r, c.sessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
@@ -89,7 +103,7 @@ func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error
 }
 
 func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
-	s, err := c.SessionStore.Get(r, c.SessionName)
+	s, err := c.sessionStore.Get(r, c.sessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}

@@ -19,12 +19,3 @@ func bindForm(r *http.Request, b any) error {
 	}
 	return formDecoder.Decode(b, r.Form)
 }
-
-func yield[C any, V any](c C, v V) Yield[C, V] {
-	return Yield[C, V]{c, v}
-}
-
-type Yield[C any, V any] struct {
-	Ctx C
-	Var V
-}

@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"database/sql"
+	"io"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -21,6 +22,7 @@ type RepositoryService interface {
 	CreateSpace(context.Context, *Space) error
 	Folders(context.Context, string) ([]*Folder, error)
 	CreateFolder(context.Context, *Folder) error
+	CreateFile(context.Context, *File, io.Reader) error
 }
 
 func NewRepositoryService(c Config) (RepositoryService, error) {
@@ -82,5 +84,9 @@ func (r *repository) CreateFolder(ctx context.Context, f *Folder) error {
 		return err
 	}
 	*f = *folder
+	return nil
+}
+
+func (r *repository) CreateFile(ctx context.Context, f *File, b io.Reader) error {
 	return nil
 }

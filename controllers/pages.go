@@ -17,5 +17,5 @@ func NewPages() *Pages {
 }
 
 func (c *Pages) Home(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	c.homeView.Render(w, yield(ctx, struct{}{}))
+	c.homeView.Render(w, ctx)
 }

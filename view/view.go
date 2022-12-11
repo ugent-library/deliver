@@ -14,6 +14,7 @@ var (
 	TemplateExtension = ".gohtml"
 	ContentType       = "text/html"
 	Funcs             template.FuncMap
+	Option            = "missingkey=error"
 	bufPool           = sync.Pool{
 		New: func() interface{} {
 			return &bytes.Buffer{}
@@ -41,12 +42,13 @@ func New(tmpl string, files ...string) (View, error) {
 		files[i] = f + TemplateExtension
 	}
 
-	t, err := template.New(tmpl).ParseFS(FS, append(files, tmpl)...)
+	t, err := template.New(tmpl).
+		Option(Option).
+		Funcs(Funcs).
+		ParseFS(FS, append(files, tmpl)...)
 	if err != nil {
 		return View{}, err
 	}
-
-	t.Funcs(Funcs)
 
 	return View{Template: t}, nil
 }

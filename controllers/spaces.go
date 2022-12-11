@@ -4,19 +4,22 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
 )
 
 type Spaces struct {
-	repository models.RepositoryService
-	listView   view.View
+	repo     models.RepositoryService
+	listView view.View
+	showView view.View
 }
 
 func NewSpaces(r models.RepositoryService) *Spaces {
 	return &Spaces{
-		repository: r,
-		listView:   view.MustNew("page", "list_spaces"),
+		repo:     r,
+		listView: view.MustNew("page", "list_spaces"),
+		showView: view.MustNew("page", "show_space"),
 	}
 }
 
@@ -24,16 +27,24 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
-type ListSpacesVars struct {
-	Spaces []*models.Space
-}
-
 func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	spaces, err := c.repository.Spaces(context.Background())
+	spaces, err := c.repo.Spaces(context.Background())
 	if err != nil {
 		panic(err) // TODO
 	}
-	c.listView.Render(w, yield(ctx, ListSpacesVars{Spaces: spaces}))
+	c.listView.Render(w, ctx.Yield(Var{"spaces": spaces}))
+}
+
+func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+	spaceID := mux.Vars(r)["spaceID"]
+	folders, err := c.repo.Folders(context.Background(), spaceID)
+	if err != nil {
+		panic(err) // TODO
+	}
+	c.showView.Render(w, ctx.Yield(Var{
+		"spaceID": spaceID,
+		"folders": folders,
+	}))
 }
 
 func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
@@ -45,7 +56,7 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	space := &models.Space{
 		Name: b.Name,
 	}
-	if err := c.repository.CreateSpace(context.Background(), space); err != nil {
+	if err := c.repo.CreateSpace(context.Background(), space); err != nil {
 		panic(err) // TODO
 	}
 
@@ -53,6 +64,6 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 		Type: "info",
 		Body: "Space created succesfully",
 	})
-	redirectURL := ctx.URLPath("spaces").String()
+	redirectURL := ctx.URLPath("space", "spaceID", space.ID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }

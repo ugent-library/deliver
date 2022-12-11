@@ -1,0 +1,15 @@
+{{define "page_title"}}{{.Var.folderID}}{{end}}
+{{define "body"}}
+    <form action="{{.URLPath "upload_file" "folderID" .Var.folderID}}"
+        enctype="multipart/form-data"
+        method="post"
+    >
+        <input type="file" name="file">
+        <button type="submit">Upload</button>
+    </form>
+    <ul>
+    {{range .Var.files}}
+        <li>{{.Name}}</li>
+    {{end}}
+    </ul>
+{{end}}

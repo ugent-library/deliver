@@ -61,8 +61,10 @@ var appCmd = &cobra.Command{
 		r.HandleFunc("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.HandleFunc("/spaces", wrap(spaces.List)).Methods("GET").Name("spaces")
 		r.HandleFunc("/spaces", wrap(spaces.Create)).Methods("POST").Name("create_space")
-		r.HandleFunc("/spaces/{space_id}/folders", wrap(folders.List)).Methods("GET").Name("folders")
-		r.HandleFunc("/spaces/{space_id}/folders", wrap(folders.Create)).Methods("POST").Name("create_folder")
+		r.HandleFunc("/spaces/{spaceID}", wrap(spaces.Show)).Methods("GET").Name("space")
+		r.HandleFunc("/spaces/{spaceID}/folders", wrap(folders.Create)).Methods("POST").Name("create_folder")
+		r.HandleFunc("/folders/{folderID}", wrap(folders.Show)).Methods("GET").Name("folder")
+		r.HandleFunc("/folders/{folderID}/files", wrap(folders.UploadFile)).Methods("POST").Name("upload_file")
 
 		// start server
 		if err = http.ListenAndServe(viper.GetString("app_addr"), r); err != nil {
