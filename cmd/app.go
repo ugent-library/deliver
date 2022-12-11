@@ -52,6 +52,7 @@ var appCmd = &cobra.Command{
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{
+			Log:          logger,
 			Router:       r,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
