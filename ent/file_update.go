@@ -35,9 +35,9 @@ func (fu *FileUpdate) SetFolderID(s string) *FileUpdate {
 	return fu
 }
 
-// SetSha256 sets the "sha256" field.
-func (fu *FileUpdate) SetSha256(s string) *FileUpdate {
-	fu.mutation.SetSha256(s)
+// SetMd5 sets the "md5" field.
+func (fu *FileUpdate) SetMd5(s string) *FileUpdate {
+	fu.mutation.SetMd5(s)
 	return fu
 }
 
@@ -48,14 +48,14 @@ func (fu *FileUpdate) SetName(s string) *FileUpdate {
 }
 
 // SetSize sets the "size" field.
-func (fu *FileUpdate) SetSize(i int32) *FileUpdate {
+func (fu *FileUpdate) SetSize(i int64) *FileUpdate {
 	fu.mutation.ResetSize()
 	fu.mutation.SetSize(i)
 	return fu
 }
 
 // AddSize adds i to the "size" field.
-func (fu *FileUpdate) AddSize(i int32) *FileUpdate {
+func (fu *FileUpdate) AddSize(i int64) *FileUpdate {
 	fu.mutation.AddSize(i)
 	return fu
 }
@@ -204,17 +204,17 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := fu.mutation.Sha256(); ok {
-		_spec.SetField(file.FieldSha256, field.TypeString, value)
+	if value, ok := fu.mutation.Md5(); ok {
+		_spec.SetField(file.FieldMd5, field.TypeString, value)
 	}
 	if value, ok := fu.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 	}
 	if value, ok := fu.mutation.Size(); ok {
-		_spec.SetField(file.FieldSize, field.TypeInt32, value)
+		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 	}
 	if value, ok := fu.mutation.AddedSize(); ok {
-		_spec.AddField(file.FieldSize, field.TypeInt32, value)
+		_spec.AddField(file.FieldSize, field.TypeInt64, value)
 	}
 	if value, ok := fu.mutation.ContentType(); ok {
 		_spec.SetField(file.FieldContentType, field.TypeString, value)
@@ -288,9 +288,9 @@ func (fuo *FileUpdateOne) SetFolderID(s string) *FileUpdateOne {
 	return fuo
 }
 
-// SetSha256 sets the "sha256" field.
-func (fuo *FileUpdateOne) SetSha256(s string) *FileUpdateOne {
-	fuo.mutation.SetSha256(s)
+// SetMd5 sets the "md5" field.
+func (fuo *FileUpdateOne) SetMd5(s string) *FileUpdateOne {
+	fuo.mutation.SetMd5(s)
 	return fuo
 }
 
@@ -301,14 +301,14 @@ func (fuo *FileUpdateOne) SetName(s string) *FileUpdateOne {
 }
 
 // SetSize sets the "size" field.
-func (fuo *FileUpdateOne) SetSize(i int32) *FileUpdateOne {
+func (fuo *FileUpdateOne) SetSize(i int64) *FileUpdateOne {
 	fuo.mutation.ResetSize()
 	fuo.mutation.SetSize(i)
 	return fuo
 }
 
 // AddSize adds i to the "size" field.
-func (fuo *FileUpdateOne) AddSize(i int32) *FileUpdateOne {
+func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
 	fuo.mutation.AddSize(i)
 	return fuo
 }
@@ -487,17 +487,17 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 			}
 		}
 	}
-	if value, ok := fuo.mutation.Sha256(); ok {
-		_spec.SetField(file.FieldSha256, field.TypeString, value)
+	if value, ok := fuo.mutation.Md5(); ok {
+		_spec.SetField(file.FieldMd5, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.Size(); ok {
-		_spec.SetField(file.FieldSize, field.TypeInt32, value)
+		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 	}
 	if value, ok := fuo.mutation.AddedSize(); ok {
-		_spec.AddField(file.FieldSize, field.TypeInt32, value)
+		_spec.AddField(file.FieldSize, field.TypeInt64, value)
 	}
 	if value, ok := fuo.mutation.ContentType(); ok {
 		_spec.SetField(file.FieldContentType, field.TypeString, value)

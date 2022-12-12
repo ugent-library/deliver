@@ -13,8 +13,8 @@ const (
 	FieldID = "id"
 	// FieldFolderID holds the string denoting the folder_id field in the database.
 	FieldFolderID = "folder_id"
-	// FieldSha256 holds the string denoting the sha256 field in the database.
-	FieldSha256 = "sha256"
+	// FieldMd5 holds the string denoting the md5 field in the database.
+	FieldMd5 = "md5"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldSize holds the string denoting the size field in the database.
@@ -44,7 +44,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldFolderID,
-	FieldSha256,
+	FieldMd5,
 	FieldName,
 	FieldSize,
 	FieldContentType,

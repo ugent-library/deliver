@@ -3,13 +3,13 @@ package models
 import (
 	"context"
 	"database/sql"
-	"io"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	entdialect "entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/dilliver/ent"
+	"github.com/ugent-library/dilliver/ent/folder"
 	entmigrate "github.com/ugent-library/dilliver/ent/migrate"
 )
 
@@ -21,8 +21,9 @@ type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
 	CreateSpace(context.Context, *Space) error
 	Folders(context.Context, string) ([]*Folder, error)
+	Folder(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
-	CreateFile(context.Context, *File, io.Reader) error
+	CreateFile(context.Context, *File) error
 }
 
 func NewRepositoryService(c Config) (RepositoryService, error) {
@@ -75,10 +76,21 @@ func (r *repositoryService) Folders(ctx context.Context, spaceID string) ([]*Fol
 	return folders, nil
 }
 
+func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folder, error) {
+	folder, err := r.db.Folder.Query().
+		Where(folder.IDEQ(folderID)).
+		WithFiles().
+		First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return folder, nil
+}
+
 func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 	folder, err := r.db.Folder.Create().
-		SetName(f.Name).
 		SetSpaceID(f.SpaceID).
+		SetName(f.Name).
 		Save(ctx)
 	if err != nil {
 		return err
@@ -87,6 +99,18 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 	return nil
 }
 
-func (r *repositoryService) CreateFile(ctx context.Context, f *File, b io.Reader) error {
+func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
+	file, err := r.db.File.Create().
+		SetID(f.ID).
+		SetFolderID(f.FolderID).
+		SetMd5(f.Md5).
+		SetName(f.Name).
+		SetContentType(f.ContentType).
+		SetSize(f.Size).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	*f = *file
 	return nil
 }

@@ -21,9 +21,9 @@ func (File) Fields() []ent.Field {
 			Unique().
 			DefaultFunc(ulid.MustGenerate),
 		field.String("folder_id"),
-		field.String("sha256"),
+		field.String("md5"),
 		field.String("name"),
-		field.Int32("size"),
+		field.Int64("size"),
 		field.String("content_type"),
 		field.Int32("downloads").
 			Default(0),

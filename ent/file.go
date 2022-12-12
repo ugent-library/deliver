@@ -19,12 +19,12 @@ type File struct {
 	ID string `json:"id,omitempty"`
 	// FolderID holds the value of the "folder_id" field.
 	FolderID string `json:"folder_id,omitempty"`
-	// Sha256 holds the value of the "sha256" field.
-	Sha256 string `json:"sha256,omitempty"`
+	// Md5 holds the value of the "md5" field.
+	Md5 string `json:"md5,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Size holds the value of the "size" field.
-	Size int32 `json:"size,omitempty"`
+	Size int64 `json:"size,omitempty"`
 	// ContentType holds the value of the "content_type" field.
 	ContentType string `json:"content_type,omitempty"`
 	// Downloads holds the value of the "downloads" field.
@@ -67,7 +67,7 @@ func (*File) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case file.FieldSize, file.FieldDownloads:
 			values[i] = new(sql.NullInt64)
-		case file.FieldID, file.FieldFolderID, file.FieldSha256, file.FieldName, file.FieldContentType:
+		case file.FieldID, file.FieldFolderID, file.FieldMd5, file.FieldName, file.FieldContentType:
 			values[i] = new(sql.NullString)
 		case file.FieldCreatedAt, file.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -98,11 +98,11 @@ func (f *File) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				f.FolderID = value.String
 			}
-		case file.FieldSha256:
+		case file.FieldMd5:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field sha256", values[i])
+				return fmt.Errorf("unexpected type %T for field md5", values[i])
 			} else if value.Valid {
-				f.Sha256 = value.String
+				f.Md5 = value.String
 			}
 		case file.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -114,7 +114,7 @@ func (f *File) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
-				f.Size = int32(value.Int64)
+				f.Size = value.Int64
 			}
 		case file.FieldContentType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -176,8 +176,8 @@ func (f *File) String() string {
 	builder.WriteString("folder_id=")
 	builder.WriteString(f.FolderID)
 	builder.WriteString(", ")
-	builder.WriteString("sha256=")
-	builder.WriteString(f.Sha256)
+	builder.WriteString("md5=")
+	builder.WriteString(f.Md5)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(f.Name)

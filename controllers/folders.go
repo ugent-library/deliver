@@ -31,9 +31,12 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 
 func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	folderID := mux.Vars(r)["folderID"]
+	folder, err := c.repo.Folder(context.TODO(), folderID)
+	if err != nil {
+		panic(err) // TODO
+	}
 	c.showView.Render(w, ctx.Yield(Var{
-		"folderID": folderID,
-		"files":    nil,
+		"folder": folder,
 	}))
 }
 
@@ -69,41 +72,47 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	if err := r.ParseMultipartForm(32_000_000); err != nil {
 		panic(err) // TODO
 	}
-	f, fileHeader, err := r.FormFile("file")
-	if err != nil {
-		panic(err) // TODO
-	}
-	defer f.Close()
 
-	// detect content type
-	buf := make([]byte, 512)
-	_, err = f.Read(buf)
-	if err != nil {
-		panic(err) // TODO
-	}
-	contentType := http.DetectContentType(buf)
+	for _, fileHeader := range r.MultipartForm.File["file"] {
+		f, err := fileHeader.Open()
+		if err != nil {
+			panic(err) // TODO
+		}
+		defer f.Close()
 
-	// and rewind
-	_, err = f.Seek(0, io.SeekStart)
-	if err != nil {
-		panic(err) // TODO
-	}
+		// detect content type
+		buf := make([]byte, 512)
+		_, err = f.Read(buf)
+		if err != nil {
+			panic(err) // TODO
+		}
+		contentType := http.DetectContentType(buf)
 
-	fileID := ulid.MustGenerate()
+		// and rewind
+		_, err = f.Seek(0, io.SeekStart)
+		if err != nil {
+			panic(err) // TODO
+		}
 
-	if err = c.file.Add(context.TODO(), fileID, f); err != nil {
-		panic(err) // TODO
-	}
+		file := &models.File{
+			FolderID:    folderID,
+			ID:          ulid.MustGenerate(),
+			Name:        fileHeader.Filename,
+			ContentType: contentType,
+			Size:        fileHeader.Size,
+		}
 
-	file := &models.File{
-		FolderID:    folderID,
-		ID:          fileID,
-		Name:        fileHeader.Filename,
-		ContentType: contentType,
-	}
+		// TODO get size
+		md5, err := c.file.Add(context.TODO(), file.ID, f)
+		if err != nil {
+			panic(err) // TODO
+		}
 
-	if err = c.repo.CreateFile(context.TODO(), file, f); err != nil {
-		panic(err) // TODO
+		file.Md5 = md5
+
+		if err = c.repo.CreateFile(context.TODO(), file); err != nil {
+			panic(err) // TODO
+		}
 	}
 
 	ctx.PersistFlash(w, r, Flash{

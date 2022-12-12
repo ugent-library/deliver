@@ -37,10 +37,10 @@ type FileMutation struct {
 	op            Op
 	typ           string
 	id            *string
-	sha256        *string
+	md5           *string
 	name          *string
-	size          *int32
-	addsize       *int32
+	size          *int64
+	addsize       *int64
 	content_type  *string
 	downloads     *int32
 	adddownloads  *int32
@@ -194,40 +194,40 @@ func (m *FileMutation) ResetFolderID() {
 	m.folder = nil
 }
 
-// SetSha256 sets the "sha256" field.
-func (m *FileMutation) SetSha256(s string) {
-	m.sha256 = &s
+// SetMd5 sets the "md5" field.
+func (m *FileMutation) SetMd5(s string) {
+	m.md5 = &s
 }
 
-// Sha256 returns the value of the "sha256" field in the mutation.
-func (m *FileMutation) Sha256() (r string, exists bool) {
-	v := m.sha256
+// Md5 returns the value of the "md5" field in the mutation.
+func (m *FileMutation) Md5() (r string, exists bool) {
+	v := m.md5
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSha256 returns the old "sha256" field's value of the File entity.
+// OldMd5 returns the old "md5" field's value of the File entity.
 // If the File object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FileMutation) OldSha256(ctx context.Context) (v string, err error) {
+func (m *FileMutation) OldMd5(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSha256 is only allowed on UpdateOne operations")
+		return v, errors.New("OldMd5 is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSha256 requires an ID field in the mutation")
+		return v, errors.New("OldMd5 requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSha256: %w", err)
+		return v, fmt.Errorf("querying old value for OldMd5: %w", err)
 	}
-	return oldValue.Sha256, nil
+	return oldValue.Md5, nil
 }
 
-// ResetSha256 resets all changes to the "sha256" field.
-func (m *FileMutation) ResetSha256() {
-	m.sha256 = nil
+// ResetMd5 resets all changes to the "md5" field.
+func (m *FileMutation) ResetMd5() {
+	m.md5 = nil
 }
 
 // SetName sets the "name" field.
@@ -267,13 +267,13 @@ func (m *FileMutation) ResetName() {
 }
 
 // SetSize sets the "size" field.
-func (m *FileMutation) SetSize(i int32) {
+func (m *FileMutation) SetSize(i int64) {
 	m.size = &i
 	m.addsize = nil
 }
 
 // Size returns the value of the "size" field in the mutation.
-func (m *FileMutation) Size() (r int32, exists bool) {
+func (m *FileMutation) Size() (r int64, exists bool) {
 	v := m.size
 	if v == nil {
 		return
@@ -284,7 +284,7 @@ func (m *FileMutation) Size() (r int32, exists bool) {
 // OldSize returns the old "size" field's value of the File entity.
 // If the File object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FileMutation) OldSize(ctx context.Context) (v int32, err error) {
+func (m *FileMutation) OldSize(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSize is only allowed on UpdateOne operations")
 	}
@@ -299,7 +299,7 @@ func (m *FileMutation) OldSize(ctx context.Context) (v int32, err error) {
 }
 
 // AddSize adds i to the "size" field.
-func (m *FileMutation) AddSize(i int32) {
+func (m *FileMutation) AddSize(i int64) {
 	if m.addsize != nil {
 		*m.addsize += i
 	} else {
@@ -308,7 +308,7 @@ func (m *FileMutation) AddSize(i int32) {
 }
 
 // AddedSize returns the value that was added to the "size" field in this mutation.
-func (m *FileMutation) AddedSize() (r int32, exists bool) {
+func (m *FileMutation) AddedSize() (r int64, exists bool) {
 	v := m.addsize
 	if v == nil {
 		return
@@ -535,8 +535,8 @@ func (m *FileMutation) Fields() []string {
 	if m.folder != nil {
 		fields = append(fields, file.FieldFolderID)
 	}
-	if m.sha256 != nil {
-		fields = append(fields, file.FieldSha256)
+	if m.md5 != nil {
+		fields = append(fields, file.FieldMd5)
 	}
 	if m.name != nil {
 		fields = append(fields, file.FieldName)
@@ -566,8 +566,8 @@ func (m *FileMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case file.FieldFolderID:
 		return m.FolderID()
-	case file.FieldSha256:
-		return m.Sha256()
+	case file.FieldMd5:
+		return m.Md5()
 	case file.FieldName:
 		return m.Name()
 	case file.FieldSize:
@@ -591,8 +591,8 @@ func (m *FileMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case file.FieldFolderID:
 		return m.OldFolderID(ctx)
-	case file.FieldSha256:
-		return m.OldSha256(ctx)
+	case file.FieldMd5:
+		return m.OldMd5(ctx)
 	case file.FieldName:
 		return m.OldName(ctx)
 	case file.FieldSize:
@@ -621,12 +621,12 @@ func (m *FileMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFolderID(v)
 		return nil
-	case file.FieldSha256:
+	case file.FieldMd5:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSha256(v)
+		m.SetMd5(v)
 		return nil
 	case file.FieldName:
 		v, ok := value.(string)
@@ -636,7 +636,7 @@ func (m *FileMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case file.FieldSize:
-		v, ok := value.(int32)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -706,7 +706,7 @@ func (m *FileMutation) AddedField(name string) (ent.Value, bool) {
 func (m *FileMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case file.FieldSize:
-		v, ok := value.(int32)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -749,8 +749,8 @@ func (m *FileMutation) ResetField(name string) error {
 	case file.FieldFolderID:
 		m.ResetFolderID()
 		return nil
-	case file.FieldSha256:
-		m.ResetSha256()
+	case file.FieldMd5:
+		m.ResetMd5()
 		return nil
 	case file.FieldName:
 		m.ResetName()

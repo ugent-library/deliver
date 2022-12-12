@@ -88,10 +88,10 @@ func FolderID(v string) predicate.File {
 	})
 }
 
-// Sha256 applies equality check predicate on the "sha256" field. It's identical to Sha256EQ.
-func Sha256(v string) predicate.File {
+// Md5 applies equality check predicate on the "md5" field. It's identical to Md5EQ.
+func Md5(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSha256), v))
+		s.Where(sql.EQ(s.C(FieldMd5), v))
 	})
 }
 
@@ -103,7 +103,7 @@ func Name(v string) predicate.File {
 }
 
 // Size applies equality check predicate on the "size" field. It's identical to SizeEQ.
-func Size(v int32) predicate.File {
+func Size(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSize), v))
 	})
@@ -236,102 +236,102 @@ func FolderIDContainsFold(v string) predicate.File {
 	})
 }
 
-// Sha256EQ applies the EQ predicate on the "sha256" field.
-func Sha256EQ(v string) predicate.File {
+// Md5EQ applies the EQ predicate on the "md5" field.
+func Md5EQ(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSha256), v))
+		s.Where(sql.EQ(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256NEQ applies the NEQ predicate on the "sha256" field.
-func Sha256NEQ(v string) predicate.File {
+// Md5NEQ applies the NEQ predicate on the "md5" field.
+func Md5NEQ(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSha256), v))
+		s.Where(sql.NEQ(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256In applies the In predicate on the "sha256" field.
-func Sha256In(vs ...string) predicate.File {
+// Md5In applies the In predicate on the "md5" field.
+func Md5In(vs ...string) predicate.File {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSha256), v...))
+		s.Where(sql.In(s.C(FieldMd5), v...))
 	})
 }
 
-// Sha256NotIn applies the NotIn predicate on the "sha256" field.
-func Sha256NotIn(vs ...string) predicate.File {
+// Md5NotIn applies the NotIn predicate on the "md5" field.
+func Md5NotIn(vs ...string) predicate.File {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSha256), v...))
+		s.Where(sql.NotIn(s.C(FieldMd5), v...))
 	})
 }
 
-// Sha256GT applies the GT predicate on the "sha256" field.
-func Sha256GT(v string) predicate.File {
+// Md5GT applies the GT predicate on the "md5" field.
+func Md5GT(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSha256), v))
+		s.Where(sql.GT(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256GTE applies the GTE predicate on the "sha256" field.
-func Sha256GTE(v string) predicate.File {
+// Md5GTE applies the GTE predicate on the "md5" field.
+func Md5GTE(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSha256), v))
+		s.Where(sql.GTE(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256LT applies the LT predicate on the "sha256" field.
-func Sha256LT(v string) predicate.File {
+// Md5LT applies the LT predicate on the "md5" field.
+func Md5LT(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSha256), v))
+		s.Where(sql.LT(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256LTE applies the LTE predicate on the "sha256" field.
-func Sha256LTE(v string) predicate.File {
+// Md5LTE applies the LTE predicate on the "md5" field.
+func Md5LTE(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSha256), v))
+		s.Where(sql.LTE(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256Contains applies the Contains predicate on the "sha256" field.
-func Sha256Contains(v string) predicate.File {
+// Md5Contains applies the Contains predicate on the "md5" field.
+func Md5Contains(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldSha256), v))
+		s.Where(sql.Contains(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256HasPrefix applies the HasPrefix predicate on the "sha256" field.
-func Sha256HasPrefix(v string) predicate.File {
+// Md5HasPrefix applies the HasPrefix predicate on the "md5" field.
+func Md5HasPrefix(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldSha256), v))
+		s.Where(sql.HasPrefix(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256HasSuffix applies the HasSuffix predicate on the "sha256" field.
-func Sha256HasSuffix(v string) predicate.File {
+// Md5HasSuffix applies the HasSuffix predicate on the "md5" field.
+func Md5HasSuffix(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldSha256), v))
+		s.Where(sql.HasSuffix(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256EqualFold applies the EqualFold predicate on the "sha256" field.
-func Sha256EqualFold(v string) predicate.File {
+// Md5EqualFold applies the EqualFold predicate on the "md5" field.
+func Md5EqualFold(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldSha256), v))
+		s.Where(sql.EqualFold(s.C(FieldMd5), v))
 	})
 }
 
-// Sha256ContainsFold applies the ContainsFold predicate on the "sha256" field.
-func Sha256ContainsFold(v string) predicate.File {
+// Md5ContainsFold applies the ContainsFold predicate on the "md5" field.
+func Md5ContainsFold(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldSha256), v))
+		s.Where(sql.ContainsFold(s.C(FieldMd5), v))
 	})
 }
 
@@ -435,21 +435,21 @@ func NameContainsFold(v string) predicate.File {
 }
 
 // SizeEQ applies the EQ predicate on the "size" field.
-func SizeEQ(v int32) predicate.File {
+func SizeEQ(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSize), v))
 	})
 }
 
 // SizeNEQ applies the NEQ predicate on the "size" field.
-func SizeNEQ(v int32) predicate.File {
+func SizeNEQ(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldSize), v))
 	})
 }
 
 // SizeIn applies the In predicate on the "size" field.
-func SizeIn(vs ...int32) predicate.File {
+func SizeIn(vs ...int64) predicate.File {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -460,7 +460,7 @@ func SizeIn(vs ...int32) predicate.File {
 }
 
 // SizeNotIn applies the NotIn predicate on the "size" field.
-func SizeNotIn(vs ...int32) predicate.File {
+func SizeNotIn(vs ...int64) predicate.File {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -471,28 +471,28 @@ func SizeNotIn(vs ...int32) predicate.File {
 }
 
 // SizeGT applies the GT predicate on the "size" field.
-func SizeGT(v int32) predicate.File {
+func SizeGT(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldSize), v))
 	})
 }
 
 // SizeGTE applies the GTE predicate on the "size" field.
-func SizeGTE(v int32) predicate.File {
+func SizeGTE(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldSize), v))
 	})
 }
 
 // SizeLT applies the LT predicate on the "size" field.
-func SizeLT(v int32) predicate.File {
+func SizeLT(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldSize), v))
 	})
 }
 
 // SizeLTE applies the LTE predicate on the "size" field.
-func SizeLTE(v int32) predicate.File {
+func SizeLTE(v int64) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldSize), v))
 	})

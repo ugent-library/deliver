@@ -27,9 +27,9 @@ func (fc *FileCreate) SetFolderID(s string) *FileCreate {
 	return fc
 }
 
-// SetSha256 sets the "sha256" field.
-func (fc *FileCreate) SetSha256(s string) *FileCreate {
-	fc.mutation.SetSha256(s)
+// SetMd5 sets the "md5" field.
+func (fc *FileCreate) SetMd5(s string) *FileCreate {
+	fc.mutation.SetMd5(s)
 	return fc
 }
 
@@ -40,7 +40,7 @@ func (fc *FileCreate) SetName(s string) *FileCreate {
 }
 
 // SetSize sets the "size" field.
-func (fc *FileCreate) SetSize(i int32) *FileCreate {
+func (fc *FileCreate) SetSize(i int64) *FileCreate {
 	fc.mutation.SetSize(i)
 	return fc
 }
@@ -212,8 +212,8 @@ func (fc *FileCreate) check() error {
 	if _, ok := fc.mutation.FolderID(); !ok {
 		return &ValidationError{Name: "folder_id", err: errors.New(`ent: missing required field "File.folder_id"`)}
 	}
-	if _, ok := fc.mutation.Sha256(); !ok {
-		return &ValidationError{Name: "sha256", err: errors.New(`ent: missing required field "File.sha256"`)}
+	if _, ok := fc.mutation.Md5(); !ok {
+		return &ValidationError{Name: "md5", err: errors.New(`ent: missing required field "File.md5"`)}
 	}
 	if _, ok := fc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "File.name"`)}
@@ -272,16 +272,16 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := fc.mutation.Sha256(); ok {
-		_spec.SetField(file.FieldSha256, field.TypeString, value)
-		_node.Sha256 = value
+	if value, ok := fc.mutation.Md5(); ok {
+		_spec.SetField(file.FieldMd5, field.TypeString, value)
+		_node.Md5 = value
 	}
 	if value, ok := fc.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	if value, ok := fc.mutation.Size(); ok {
-		_spec.SetField(file.FieldSize, field.TypeInt32, value)
+		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 		_node.Size = value
 	}
 	if value, ok := fc.mutation.ContentType(); ok {
