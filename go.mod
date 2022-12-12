@@ -27,6 +27,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
@@ -49,6 +50,7 @@ require (
 	ariga.io/atlas v0.7.3-0.20221011160332-3ca609863edd // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.43
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.29.5
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

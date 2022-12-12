@@ -7,11 +7,13 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/ugent-library/dilliver/models"
+	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
 )
 
 type Folders struct {
 	repo     models.RepositoryService
+	file     models.FileService
 	showView view.View
 }
 
@@ -19,9 +21,10 @@ type FolderForm struct {
 	Name string `form:"name"`
 }
 
-func NewFolders(r models.RepositoryService) *Folders {
+func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	return &Folders{
 		repo:     r,
+		file:     f,
 		showView: view.MustNew("page", "show_folder"),
 	}
 }
@@ -86,8 +89,15 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 		panic(err) // TODO
 	}
 
+	fileID := ulid.MustGenerate()
+
+	if err = c.file.Add(context.TODO(), fileID, f); err != nil {
+		panic(err) // TODO
+	}
+
 	file := &models.File{
 		FolderID:    folderID,
+		ID:          fileID,
 		Name:        fileHeader.Filename,
 		ContentType: contentType,
 	}
@@ -102,4 +112,9 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	})
 	redirectURL := ctx.URLPath("folder", "folderID", folderID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+func (c *Folders) DownloadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+	fileID := mux.Vars(r)["fileID"]
+	c.file.Get(context.TODO(), fileID, w)
 }

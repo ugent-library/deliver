@@ -19,12 +19,18 @@ type Services struct {
 }
 
 func NewServices(c Config) (*Services, error) {
-	repository, err := NewRepositoryService(c)
+	repositoryService, err := NewRepositoryService(c)
+	if err != nil {
+		return nil, err
+	}
+
+	fileService, err := NewFileService(c)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Services{
-		Repository: repository,
+		Repository: repositoryService,
+		File:       fileService,
 	}, nil
 }
