@@ -25,8 +25,6 @@ func (File) Fields() []ent.Field {
 		field.String("name"),
 		field.Int64("size"),
 		field.String("content_type"),
-		field.Int32("downloads").
-			Default(0),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

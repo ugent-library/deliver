@@ -17,16 +17,12 @@ import (
 func init() {
 	fileFields := schema.File{}.Fields()
 	_ = fileFields
-	// fileDescDownloads is the schema descriptor for downloads field.
-	fileDescDownloads := fileFields[6].Descriptor()
-	// file.DefaultDownloads holds the default value on creation for the downloads field.
-	file.DefaultDownloads = fileDescDownloads.Default.(int32)
 	// fileDescCreatedAt is the schema descriptor for created_at field.
-	fileDescCreatedAt := fileFields[7].Descriptor()
+	fileDescCreatedAt := fileFields[6].Descriptor()
 	// file.DefaultCreatedAt holds the default value on creation for the created_at field.
 	file.DefaultCreatedAt = fileDescCreatedAt.Default.(func() time.Time)
 	// fileDescUpdatedAt is the schema descriptor for updated_at field.
-	fileDescUpdatedAt := fileFields[8].Descriptor()
+	fileDescUpdatedAt := fileFields[7].Descriptor()
 	// file.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	file.DefaultUpdatedAt = fileDescUpdatedAt.Default.(func() time.Time)
 	// file.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

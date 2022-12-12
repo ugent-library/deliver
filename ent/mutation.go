@@ -42,8 +42,6 @@ type FileMutation struct {
 	size          *int64
 	addsize       *int64
 	content_type  *string
-	downloads     *int32
-	adddownloads  *int32
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -358,62 +356,6 @@ func (m *FileMutation) ResetContentType() {
 	m.content_type = nil
 }
 
-// SetDownloads sets the "downloads" field.
-func (m *FileMutation) SetDownloads(i int32) {
-	m.downloads = &i
-	m.adddownloads = nil
-}
-
-// Downloads returns the value of the "downloads" field in the mutation.
-func (m *FileMutation) Downloads() (r int32, exists bool) {
-	v := m.downloads
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDownloads returns the old "downloads" field's value of the File entity.
-// If the File object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FileMutation) OldDownloads(ctx context.Context) (v int32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDownloads is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDownloads requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDownloads: %w", err)
-	}
-	return oldValue.Downloads, nil
-}
-
-// AddDownloads adds i to the "downloads" field.
-func (m *FileMutation) AddDownloads(i int32) {
-	if m.adddownloads != nil {
-		*m.adddownloads += i
-	} else {
-		m.adddownloads = &i
-	}
-}
-
-// AddedDownloads returns the value that was added to the "downloads" field in this mutation.
-func (m *FileMutation) AddedDownloads() (r int32, exists bool) {
-	v := m.adddownloads
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetDownloads resets all changes to the "downloads" field.
-func (m *FileMutation) ResetDownloads() {
-	m.downloads = nil
-	m.adddownloads = nil
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (m *FileMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -531,7 +473,7 @@ func (m *FileMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FileMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 7)
 	if m.folder != nil {
 		fields = append(fields, file.FieldFolderID)
 	}
@@ -546,9 +488,6 @@ func (m *FileMutation) Fields() []string {
 	}
 	if m.content_type != nil {
 		fields = append(fields, file.FieldContentType)
-	}
-	if m.downloads != nil {
-		fields = append(fields, file.FieldDownloads)
 	}
 	if m.created_at != nil {
 		fields = append(fields, file.FieldCreatedAt)
@@ -574,8 +513,6 @@ func (m *FileMutation) Field(name string) (ent.Value, bool) {
 		return m.Size()
 	case file.FieldContentType:
 		return m.ContentType()
-	case file.FieldDownloads:
-		return m.Downloads()
 	case file.FieldCreatedAt:
 		return m.CreatedAt()
 	case file.FieldUpdatedAt:
@@ -599,8 +536,6 @@ func (m *FileMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldSize(ctx)
 	case file.FieldContentType:
 		return m.OldContentType(ctx)
-	case file.FieldDownloads:
-		return m.OldDownloads(ctx)
 	case file.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case file.FieldUpdatedAt:
@@ -649,13 +584,6 @@ func (m *FileMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetContentType(v)
 		return nil
-	case file.FieldDownloads:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDownloads(v)
-		return nil
 	case file.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -681,9 +609,6 @@ func (m *FileMutation) AddedFields() []string {
 	if m.addsize != nil {
 		fields = append(fields, file.FieldSize)
 	}
-	if m.adddownloads != nil {
-		fields = append(fields, file.FieldDownloads)
-	}
 	return fields
 }
 
@@ -694,8 +619,6 @@ func (m *FileMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case file.FieldSize:
 		return m.AddedSize()
-	case file.FieldDownloads:
-		return m.AddedDownloads()
 	}
 	return nil, false
 }
@@ -711,13 +634,6 @@ func (m *FileMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSize(v)
-		return nil
-	case file.FieldDownloads:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDownloads(v)
 		return nil
 	}
 	return fmt.Errorf("unknown File numeric field %s", name)
@@ -760,9 +676,6 @@ func (m *FileMutation) ResetField(name string) error {
 		return nil
 	case file.FieldContentType:
 		m.ResetContentType()
-		return nil
-	case file.FieldDownloads:
-		m.ResetDownloads()
 		return nil
 	case file.FieldCreatedAt:
 		m.ResetCreatedAt()

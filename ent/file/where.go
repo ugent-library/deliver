@@ -116,13 +116,6 @@ func ContentType(v string) predicate.File {
 	})
 }
 
-// Downloads applies equality check predicate on the "downloads" field. It's identical to DownloadsEQ.
-func Downloads(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDownloads), v))
-	})
-}
-
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
@@ -594,70 +587,6 @@ func ContentTypeEqualFold(v string) predicate.File {
 func ContentTypeContainsFold(v string) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldContentType), v))
-	})
-}
-
-// DownloadsEQ applies the EQ predicate on the "downloads" field.
-func DownloadsEQ(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDownloads), v))
-	})
-}
-
-// DownloadsNEQ applies the NEQ predicate on the "downloads" field.
-func DownloadsNEQ(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDownloads), v))
-	})
-}
-
-// DownloadsIn applies the In predicate on the "downloads" field.
-func DownloadsIn(vs ...int32) predicate.File {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldDownloads), v...))
-	})
-}
-
-// DownloadsNotIn applies the NotIn predicate on the "downloads" field.
-func DownloadsNotIn(vs ...int32) predicate.File {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldDownloads), v...))
-	})
-}
-
-// DownloadsGT applies the GT predicate on the "downloads" field.
-func DownloadsGT(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDownloads), v))
-	})
-}
-
-// DownloadsGTE applies the GTE predicate on the "downloads" field.
-func DownloadsGTE(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDownloads), v))
-	})
-}
-
-// DownloadsLT applies the LT predicate on the "downloads" field.
-func DownloadsLT(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDownloads), v))
-	})
-}
-
-// DownloadsLTE applies the LTE predicate on the "downloads" field.
-func DownloadsLTE(v int32) predicate.File {
-	return predicate.File(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDownloads), v))
 	})
 }
 

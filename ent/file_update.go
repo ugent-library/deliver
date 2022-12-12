@@ -66,27 +66,6 @@ func (fu *FileUpdate) SetContentType(s string) *FileUpdate {
 	return fu
 }
 
-// SetDownloads sets the "downloads" field.
-func (fu *FileUpdate) SetDownloads(i int32) *FileUpdate {
-	fu.mutation.ResetDownloads()
-	fu.mutation.SetDownloads(i)
-	return fu
-}
-
-// SetNillableDownloads sets the "downloads" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableDownloads(i *int32) *FileUpdate {
-	if i != nil {
-		fu.SetDownloads(*i)
-	}
-	return fu
-}
-
-// AddDownloads adds i to the "downloads" field.
-func (fu *FileUpdate) AddDownloads(i int32) *FileUpdate {
-	fu.mutation.AddDownloads(i)
-	return fu
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (fu *FileUpdate) SetUpdatedAt(t time.Time) *FileUpdate {
 	fu.mutation.SetUpdatedAt(t)
@@ -219,12 +198,6 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := fu.mutation.ContentType(); ok {
 		_spec.SetField(file.FieldContentType, field.TypeString, value)
 	}
-	if value, ok := fu.mutation.Downloads(); ok {
-		_spec.SetField(file.FieldDownloads, field.TypeInt32, value)
-	}
-	if value, ok := fu.mutation.AddedDownloads(); ok {
-		_spec.AddField(file.FieldDownloads, field.TypeInt32, value)
-	}
 	if value, ok := fu.mutation.UpdatedAt(); ok {
 		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -316,27 +289,6 @@ func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
 // SetContentType sets the "content_type" field.
 func (fuo *FileUpdateOne) SetContentType(s string) *FileUpdateOne {
 	fuo.mutation.SetContentType(s)
-	return fuo
-}
-
-// SetDownloads sets the "downloads" field.
-func (fuo *FileUpdateOne) SetDownloads(i int32) *FileUpdateOne {
-	fuo.mutation.ResetDownloads()
-	fuo.mutation.SetDownloads(i)
-	return fuo
-}
-
-// SetNillableDownloads sets the "downloads" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableDownloads(i *int32) *FileUpdateOne {
-	if i != nil {
-		fuo.SetDownloads(*i)
-	}
-	return fuo
-}
-
-// AddDownloads adds i to the "downloads" field.
-func (fuo *FileUpdateOne) AddDownloads(i int32) *FileUpdateOne {
-	fuo.mutation.AddDownloads(i)
 	return fuo
 }
 
@@ -501,12 +453,6 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 	}
 	if value, ok := fuo.mutation.ContentType(); ok {
 		_spec.SetField(file.FieldContentType, field.TypeString, value)
-	}
-	if value, ok := fuo.mutation.Downloads(); ok {
-		_spec.SetField(file.FieldDownloads, field.TypeInt32, value)
-	}
-	if value, ok := fuo.mutation.AddedDownloads(); ok {
-		_spec.AddField(file.FieldDownloads, field.TypeInt32, value)
 	}
 	if value, ok := fuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
