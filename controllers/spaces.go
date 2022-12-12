@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -38,6 +39,10 @@ func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	spaceID := mux.Vars(r)["spaceID"]
 	space, err := c.repo.Space(context.TODO(), spaceID)
+	if errors.Is(err, models.ErrNotFound) {
+		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
+		return
+	}
 	if err != nil {
 		panic(err) // TODO
 	}

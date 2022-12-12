@@ -21,10 +21,7 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.
 	return func(fn func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := Ctx{
-				Log:          c.Log,
-				router:       c.Router,
-				sessionStore: c.SessionStore,
-				sessionName:  c.SessionName,
+				Config: c,
 			}
 			if err := ctx.loadSession(w, r); err != nil {
 				// TODO handle error gracefully
@@ -51,12 +48,9 @@ type Flash struct {
 type Var map[string]any
 
 type Ctx struct {
-	Log          *zap.SugaredLogger
-	sessionStore sessions.Store
-	sessionName  string
-	router       *mux.Router
-	Flash        []Flash
-	Var          Var
+	Config
+	Flash []Flash
+	Var   Var
 }
 
 func (c Ctx) Yield(v Var) Ctx {
@@ -65,7 +59,7 @@ func (c Ctx) Yield(v Var) Ctx {
 }
 
 func (c Ctx) URL(route string, pairs ...string) *url.URL {
-	r := c.router.Get(route)
+	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
 	}
@@ -77,7 +71,7 @@ func (c Ctx) URL(route string, pairs ...string) *url.URL {
 }
 
 func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
-	r := c.router.Get(route)
+	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
 	}
@@ -89,7 +83,7 @@ func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
 }
 
 func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error {
-	s, err := c.sessionStore.Get(r, c.sessionName)
+	s, err := c.SessionStore.Get(r, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
@@ -103,7 +97,7 @@ func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error
 }
 
 func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
-	s, err := c.sessionStore.Get(r, c.sessionName)
+	s, err := c.SessionStore.Get(r, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}

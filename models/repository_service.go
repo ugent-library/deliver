@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -13,6 +14,8 @@ import (
 	entmigrate "github.com/ugent-library/dilliver/ent/migrate"
 	"github.com/ugent-library/dilliver/ent/space"
 )
+
+var ErrNotFound = errors.New("not found")
 
 type Space = ent.Space
 type Folder = ent.Folder
@@ -60,6 +63,21 @@ func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
 	return rows, nil
 }
 
+func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, error) {
+	row, err := r.db.Space.Query().
+		Where(space.IDEQ(spaceID)).
+		WithFolders().
+		First(ctx)
+	if err != nil {
+		var e *ent.NotFoundError
+		if errors.As(err, &e) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return row, nil
+}
+
 func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	row, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
 	if err != nil {
@@ -69,23 +87,16 @@ func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	return nil
 }
 
-func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, error) {
-	row, err := r.db.Space.Query().
-		Where(space.IDEQ(spaceID)).
-		WithFolders().
-		First(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return row, nil
-}
-
 func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folder, error) {
 	row, err := r.db.Folder.Query().
 		Where(folder.IDEQ(folderID)).
 		WithFiles().
 		First(ctx)
 	if err != nil {
+		var e *ent.NotFoundError
+		if errors.As(err, &e) {
+			return nil, ErrNotFound
+		}
 		return nil, err
 	}
 	return row, nil

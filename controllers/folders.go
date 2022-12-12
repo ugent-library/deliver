@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 
@@ -32,6 +33,10 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	folderID := mux.Vars(r)["folderID"]
 	folder, err := c.repo.Folder(context.TODO(), folderID)
+	if errors.Is(err, models.ErrNotFound) {
+		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
+		return
+	}
 	if err != nil {
 		panic(err) // TODO
 	}

@@ -79,9 +79,9 @@ var appCmd = &cobra.Command{
 			Router:       r,
 		})
 
-		// static files
+		// routes
+		r.NotFoundHandler = wrap(pages.NotFound)
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-		// add routes
 		r.HandleFunc("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.HandleFunc("/spaces", wrap(spaces.List)).Methods("GET").Name("spaces")
 		r.HandleFunc("/spaces", wrap(spaces.Create)).Methods("POST").Name("create_space")
