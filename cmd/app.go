@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/gob"
+	"html/template"
 	"net/http"
 
 	"github.com/gorilla/handlers"
@@ -10,7 +11,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/dilliver/controllers"
+	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
+	"github.com/ugent-library/dilliver/view"
 )
 
 func init() {
@@ -33,11 +36,25 @@ var appCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
+		// setup assets
+		assets, err := mix.New(mix.Config{
+			ManifestFile: "static/mix-manifest.json",
+			PublicPath:   "/static/",
+		})
+		if err != nil {
+			logger.Fatal(err)
+		}
+
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
 		r.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(true)))
+
+		// setup views
+		view.FuncMap = template.FuncMap{
+			"assetPath": assets.AssetPath,
+		}
 
 		// setup sessions
 		sessionName := viper.GetString("session_name")
@@ -57,11 +74,13 @@ var appCmd = &cobra.Command{
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{
 			Log:          logger,
-			Router:       r,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
+			Router:       r,
 		})
 
+		// static files
+		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		// add routes
 		r.HandleFunc("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.HandleFunc("/spaces", wrap(spaces.List)).Methods("GET").Name("spaces")

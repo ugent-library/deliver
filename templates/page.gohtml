@@ -1,15 +1,23 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>{{block "page_title" .}}{{end}}</title>
-    </head>
-    <body>
-        {{range .Flash}}
-        <div>
-            {{.Type}}: {{.Body}}
-        </div>
-        {{end}}
+<html class="u-maximize-height" dir="ltr" lang="en">
 
-        {{block "body" .}}{{end}}
-    </body>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="{{assetPath "/css/app.css"}}">
+    <link rel="icon" href="{{assetPath "/favicon.ico"}}">
+    <title>{{block "page_title" .}}{{end}}</title>
+</head>
+<body class="u-maximize-height overflow-hidden u-scroll-wrapper">
+    {{range .Flash}}
+    <div>
+        {{.Type}}: {{.Body}}
+    </div>
+    {{end}}
+
+    {{block "body" .}}{{end}}
+
+    <script type="application/javascript" src="{{assetPath "/js/app.js"}}"></script>
+</body>
 </html>

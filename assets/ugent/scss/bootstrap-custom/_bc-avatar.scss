@@ -1,0 +1,177 @@
+/**
+ * Component: Avatar
+ * ===
+ * Avatars and large avatars
+ */
+
+$bc-avatar-dimensions: 3.2rem !default;
+$bc-avatar-md-dimensions: 4.8rem !default;
+$bc-avatar-xl-dimensions: 9.6rem !default;
+$bc-avatar-lg-dimensions: 6.4rem !default;
+$bc-avatar-sm-dimensions: 2.4rem !default;
+$bc-avatar-tiny-dimensions: 1.6rem !default;
+
+.bc-avatar {
+  width: $bc-avatar-dimensions;
+  height: $bc-avatar-dimensions;
+  min-width: $bc-avatar-dimensions;
+  min-height: $bc-avatar-dimensions;
+  line-height: $bc-avatar-dimensions;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  text-align: center;
+  color: $white;
+  font-size: 1.4rem;
+  background-color: $primary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  .if {
+    font-size: 2rem;
+  }
+}
+
+.bc-avatar--img {
+  background: none;
+  border: 0.1rem solid $border;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+.bc-avatar--tiny {
+  width: $bc-avatar-tiny-dimensions;
+  height: $bc-avatar-tiny-dimensions;
+  min-width: $bc-avatar-tiny-dimensions;
+  min-height: $bc-avatar-tiny-dimensions;
+  line-height: $bc-avatar-tiny-dimensions;
+  font-size: 1rem;
+  .if {
+    font-size: 1.2rem;
+  }
+}
+
+.bc-avatar--small {
+  width: $bc-avatar-sm-dimensions;
+  height: $bc-avatar-sm-dimensions;
+  min-width: $bc-avatar-sm-dimensions;
+  min-height: $bc-avatar-sm-dimensions;
+  line-height: $bc-avatar-sm-dimensions;
+  font-size: 1rem;
+  .if {
+    font-size: 1.6rem;
+  }
+}
+
+.bc-avatar--medium {
+  width: $bc-avatar-md-dimensions;
+  height: $bc-avatar-md-dimensions;
+  min-width: $bc-avatar-md-dimensions;
+  min-height: $bc-avatar-md-dimensions;
+  line-height: $bc-avatar-md-dimensions;
+  font-size: 2rem;
+  .if {
+    font-size: 2.4rem;
+  }
+}
+
+.bc-avatar--large {
+  width: $bc-avatar-lg-dimensions;
+  height: $bc-avatar-lg-dimensions;
+  min-width: $bc-avatar-lg-dimensions;
+  min-height: $bc-avatar-lg-dimensions;
+  line-height: $bc-avatar-lg-dimensions;
+  font-size: 2.4rem;
+  .if {
+    font-size: 2.8rem;
+  }
+}
+
+.bc-avatar--xlarge {
+  width: $bc-avatar-xl-dimensions;
+  height: $bc-avatar-xl-dimensions;
+  min-width: $bc-avatar-xl-dimensions;
+  min-height: $bc-avatar-xl-dimensions;
+  line-height: $bc-avatar-xl-dimensions;
+  font-size: 2.8rem;
+  .if {
+    font-size: 3.2rem;
+  }
+}
+
+.bc-avatar-and-text {
+  display: flex;
+  align-items: center;
+
+  .bc-avatar {
+    margin-right: 1.6rem;
+  }
+
+  &__text {
+    padding-right: .5rem;
+  }
+}
+
+.bc-avatar-icon .if{
+  font-size: 1.6rem;
+}
+
+.bc-avatar--rounded {
+  border-radius: 0.3rem;
+}
+
+
+.bc-avatar--muted {
+  background-color: $gray-300;
+}
+
+.bc-avatar--turquoise {
+  background: $turquoise;
+}
+
+.bc-avatar--orange {
+  background: $orange;
+}
+
+.bc-avatar--green {
+  background: $green;
+}
+
+.bc-avatar--grey-blue {
+  background: $grey-blue;
+}
+
+.bc-avatar--light-purple {
+  background: $light-purple;
+}
+
+.bc-avatar--warm-orange {
+  background: $warm-orange;
+}
+
+.bc-avatar--salmon-pink {
+  background: $salmon-pink;
+}
+
+.bc-avatar--light-blue {
+  background: $light-blue;
+  color: $blue;
+}
+
+.bc-avatar--light-danger {
+  background-color: $light-warm-red;
+  color: $warm-red;
+}
+
+.bc-avatar--danger {
+  background-color: $warm-red;
+  color: $white;
+}

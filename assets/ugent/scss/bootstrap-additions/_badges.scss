@@ -1,0 +1,107 @@
+//
+// Additions to Bootstrap `_badge.scss`
+//
+
+.badge {
+  height: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  line-height: 2.4rem;
+
+  // Fix Safari
+  -webkit-appearance: none
+}
+
+.badge .if {
+  font-size: 1.6rem;
+}
+
+.if + .badge-text,
+.badge-text + .if,
+.badge-value + .if,
+.bc-avatar + .badge-text,
+.badge-text + .bc-avatar {
+  padding-left: .6rem;
+}
+
+.c-counter + .badge-text,
+.badge-text + .c-counter {
+  margin-left: .4rem;
+}
+
+.badge .bc-avatar:first-child {
+  margin-left: -.8rem;
+}
+
+.badge-value {
+  opacity: 0.85;
+}
+
+.badge .if:last-child,
+.badge .bc-avatar:last-child {
+  margin-right: -.6rem;
+}
+
+.badge .if:first-child,
+.badge .bc-avatar:first-child {
+  margin-left: -.6rem;
+}
+
+.badge-lg {
+  height: 2.8rem;
+}
+
+.badge-default {
+  background-color: $light-blue;
+  color: $blue;
+}
+
+.badge-secondary,
+a.badge-secondary {
+  color: $icon-default;
+  background-color: $gray-50;
+  color: $gray-600;
+
+   &:hover,
+   &:focus {
+     background-color: $gray-50;
+     color: $text;
+   }
+}
+
+.badge-success {
+  background-color: $light-green;
+  color: $dark-green;
+}
+
+.badge-danger {
+  background-color: $light-warm-red;
+  color: $dark-warm-red;
+}
+
+.badge-warning {
+  background-color: $light-orange;
+  color: $dark-orange;
+}
+
+.badge-outline-secondary {
+  border: .1rem solid $border-color;
+  background-color: $white;
+  color: $gray-600;
+}
+
+.badge-list {
+  margin: 0 -0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+
+  .badge {
+    margin: 0.4rem;
+  }
+}
+
+.badge-sm {
+  height: 2rem;
+  font-size: 1.2rem;
+  padding: 0.3rem 0.6rem;
+}

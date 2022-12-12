@@ -1,0 +1,87 @@
+/* ==========================================================================
+    Component: Thumbnail
+   ========================================================================== */
+
+.c-thumbnail {
+  width: 9.6rem;
+}
+
+.c-thumbnail-small {
+  width: 6.4rem;
+}
+
+
+.c-thumbnail-large {
+  width: 11.2rem;
+}
+
+.c-thumbnail-lg-large {
+  @include media-breakpoint-up(lg) {
+    width: 11.2rem;
+  }
+}
+
+.c-thumbnail-xl-large {
+  @include media-breakpoint-up(xl) {
+    width: 11.2rem;
+  }
+}
+
+.c-thumbnail-5-4 {
+  .c-thumbnail-inner {
+    padding-bottom: 125%;
+  }
+}
+
+.c-thumbnail-1-1 {
+  .c-thumbnail-inner {
+    padding-bottom: 100%;
+  }
+}
+
+.c-thumbnail-img {
+  .c-thumbnail-inner {
+    border: 0.1rem solid $border;
+  }
+
+  img {
+    border-radius: 0.3rem;
+  }
+}
+
+.c-thumbnail-inner {
+  background: $light-blue;
+  height: 0;
+  position: relative;
+  border-radius: 0.3rem;
+  .if {
+    color: $blue;
+    position: absolute;
+    top: calc(50% - 1.2rem);
+    left: calc(50% - 1.2rem);
+  }
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.c-thumbnail-and-text {
+  display: flex;
+  align-items: center;
+
+  .c-thumbnail {
+    margin-right: 2rem;
+  }
+
+  .c-thumbnail-text {
+    flex: 1;
+  }
+}

@@ -38,9 +38,9 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.
 
 type Config struct {
 	Log          *zap.SugaredLogger
-	Router       *mux.Router
 	SessionStore sessions.Store
 	SessionName  string
+	Router       *mux.Router
 }
 
 type Flash struct {
@@ -52,9 +52,9 @@ type Var map[string]any
 
 type Ctx struct {
 	Log          *zap.SugaredLogger
-	router       *mux.Router
 	sessionStore sessions.Store
 	sessionName  string
+	router       *mux.Router
 	Flash        []Flash
 	Var          Var
 }

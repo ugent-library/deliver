@@ -13,7 +13,7 @@ var (
 	FS                = os.DirFS("templates")
 	TemplateExtension = ".gohtml"
 	ContentType       = "text/html"
-	Funcs             template.FuncMap
+	FuncMap           template.FuncMap
 	Option            = "missingkey=error"
 	bufPool           = sync.Pool{
 		New: func() interface{} {
@@ -44,7 +44,7 @@ func New(tmpl string, files ...string) (View, error) {
 
 	t, err := template.New(tmpl).
 		Option(Option).
-		Funcs(Funcs).
+		Funcs(FuncMap).
 		ParseFS(FS, append(files, tmpl)...)
 	if err != nil {
 		return View{}, err
