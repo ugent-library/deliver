@@ -1,11 +1,11 @@
-{{define "page_title"}}{{.Var.spaceID}}{{end}}
+{{define "page_title"}}{{.Var.space.Name}}{{end}}
 {{define "body"}}
-    <form action="{{.URLPath "create_folder" "spaceID" .Var.spaceID}}" method="post">
+    <form action="{{.URLPath "create_folder" "spaceID" .Var.space.ID}}" method="post">
         <input type="text" name="name">
         <button type="submit">Create</button>
     </form>
     <ul>
-    {{range .Var.folders}}
+    {{range .Var.space.Edges.Folders}}
         <li><a href="{{$.URLPath "folder" "folderID" .ID}}">{{.Name}}</a></li>
     {{end}}
     </ul>

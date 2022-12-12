@@ -11,6 +11,7 @@ import (
 	"github.com/ugent-library/dilliver/ent"
 	"github.com/ugent-library/dilliver/ent/folder"
 	entmigrate "github.com/ugent-library/dilliver/ent/migrate"
+	"github.com/ugent-library/dilliver/ent/space"
 )
 
 type Space = ent.Space
@@ -19,8 +20,8 @@ type File = ent.File
 
 type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
+	Space(context.Context, string) (*Space, error)
 	CreateSpace(context.Context, *Space) error
-	Folders(context.Context, string) ([]*Folder, error)
 	Folder(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
 	CreateFile(context.Context, *File) error
@@ -52,55 +53,58 @@ type repositoryService struct {
 }
 
 func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
-	spaces, err := r.db.Space.Query().All(ctx)
+	rows, err := r.db.Space.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return spaces, nil
+	return rows, nil
 }
 
 func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
-	space, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
+	row, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
 	if err != nil {
 		return err
 	}
-	*s = *space
+	*s = *row
 	return nil
 }
 
-func (r *repositoryService) Folders(ctx context.Context, spaceID string) ([]*Folder, error) {
-	folders, err := r.db.Folder.Query().All(ctx)
+func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, error) {
+	row, err := r.db.Space.Query().
+		Where(space.IDEQ(spaceID)).
+		WithFolders().
+		First(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return folders, nil
+	return row, nil
 }
 
 func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folder, error) {
-	folder, err := r.db.Folder.Query().
+	row, err := r.db.Folder.Query().
 		Where(folder.IDEQ(folderID)).
 		WithFiles().
 		First(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return folder, nil
+	return row, nil
 }
 
 func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
-	folder, err := r.db.Folder.Create().
+	row, err := r.db.Folder.Create().
 		SetSpaceID(f.SpaceID).
 		SetName(f.Name).
 		Save(ctx)
 	if err != nil {
 		return err
 	}
-	*f = *folder
+	*f = *row
 	return nil
 }
 
 func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
-	file, err := r.db.File.Create().
+	row, err := r.db.File.Create().
 		SetID(f.ID).
 		SetFolderID(f.FolderID).
 		SetMd5(f.Md5).
@@ -111,6 +115,6 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	if err != nil {
 		return err
 	}
-	*f = *file
+	*f = *row
 	return nil
 }

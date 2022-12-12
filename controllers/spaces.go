@@ -37,13 +37,12 @@ func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 
 func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	spaceID := mux.Vars(r)["spaceID"]
-	folders, err := c.repo.Folders(context.TODO(), spaceID)
+	space, err := c.repo.Space(context.TODO(), spaceID)
 	if err != nil {
 		panic(err) // TODO
 	}
 	c.showView.Render(w, ctx.Yield(Var{
-		"spaceID": spaceID,
-		"folders": folders,
+		"space": space,
 	}))
 }
 
