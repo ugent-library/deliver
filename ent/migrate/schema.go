@@ -29,7 +29,7 @@ var (
 				Symbol:     "files_folders_files",
 				Columns:    []*schema.Column{FilesColumns[7]},
 				RefColumns: []*schema.Column{FoldersColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -52,7 +52,7 @@ var (
 				Symbol:     "folders_spaces_folders",
 				Columns:    []*schema.Column{FoldersColumns[5]},
 				RefColumns: []*schema.Column{SpacesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}

@@ -33,7 +33,9 @@ func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	if err != nil {
 		panic(err) // TODO
 	}
-	c.listView.Render(w, ctx.Yield(Var{"spaces": spaces}))
+	c.listView.Render(w, ctx.Yield(Var{
+		"spaces": spaces,
+	}))
 }
 
 func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {

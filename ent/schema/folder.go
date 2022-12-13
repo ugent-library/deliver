@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/ugent-library/dilliver/ulid"
@@ -41,6 +42,9 @@ func (Folder) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("space_id"),
-		edge.To("files", File.Type),
+		edge.To("files", File.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 	}
 }

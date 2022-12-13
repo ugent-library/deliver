@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/ugent-library/dilliver/ulid"
@@ -34,6 +35,9 @@ func (Space) Fields() []ent.Field {
 // Edges of the Space.
 func (Space) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("folders", Folder.Type),
+		edge.To("folders", Folder.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 	}
 }
