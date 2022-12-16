@@ -27,7 +27,9 @@ type RepositoryService interface {
 	CreateSpace(context.Context, *Space) error
 	Folder(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
+	DeleteFolder(context.Context, string) error
 	CreateFile(context.Context, *File) error
+	DeleteFile(context.Context, string) error
 }
 
 func NewRepositoryService(c Config) (RepositoryService, error) {
@@ -114,6 +116,13 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 	return nil
 }
 
+func (r *repositoryService) DeleteFolder(ctx context.Context, folderID string) error {
+	err := r.db.Folder.
+		DeleteOneID(folderID).
+		Exec(ctx)
+	return err
+}
+
 func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	row, err := r.db.File.Create().
 		SetID(f.ID).
@@ -128,4 +137,11 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	}
 	*f = *row
 	return nil
+}
+
+func (r *repositoryService) DeleteFile(ctx context.Context, fileID string) error {
+	err := r.db.File.
+		DeleteOneID(fileID).
+		Exec(ctx)
+	return err
 }

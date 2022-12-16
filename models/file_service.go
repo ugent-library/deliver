@@ -14,6 +14,7 @@ import (
 type FileService interface {
 	Add(context.Context, string, io.ReadSeekCloser) (string, error)
 	Get(context.Context, string, io.Writer) error
+	Delete(context.Context, string) error
 }
 
 // see https://stackoverflow.com/questions/67575681/is-aws-go-sdk-v2-integrated-with-local-minio-server
@@ -71,6 +72,14 @@ func (f *fileService) Get(ctx context.Context, id string, b io.Writer) error {
 		return err
 	}
 	return nil
+}
+
+func (f *fileService) Delete(ctx context.Context, id string) error {
+	_, err := f.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(f.bucket),
+		Key:    aws.String(id),
+	})
+	return err
 }
 
 // implement io.WriterAt for a plain io.Writer
