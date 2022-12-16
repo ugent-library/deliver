@@ -68,6 +68,31 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
 
+// TODO remove files
+func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+	folderID := mux.Vars(r)["folderID"]
+
+	folder, err := c.repo.Folder(context.TODO(), folderID)
+	if errors.Is(err, models.ErrNotFound) {
+		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
+		return
+	}
+	if err != nil {
+		panic(err) // TODO
+	}
+
+	if err := c.repo.DeleteFolder(context.TODO(), folderID); err != nil {
+		panic(err) // TODO
+	}
+
+	ctx.PersistFlash(w, r, Flash{
+		Type: Info,
+		Body: "Folder deleted succesfully",
+	})
+	redirectURL := ctx.URLPath("space", "spaceID", folder.SpaceID).String()
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
 func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	folderID := mux.Vars(r)["folderID"]
 
@@ -126,9 +151,4 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	})
 	redirectURL := ctx.URLPath("folder", "folderID", folderID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
-}
-
-func (c *Folders) DownloadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	fileID := mux.Vars(r)["fileID"]
-	c.file.Get(context.TODO(), fileID, w)
 }

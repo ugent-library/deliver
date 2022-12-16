@@ -70,6 +70,7 @@ var appCmd = &cobra.Command{
 		pages := c.NewPages()
 		spaces := c.NewSpaces(services.Repository)
 		folders := c.NewFolders(services.Repository, services.File)
+		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{
@@ -88,8 +89,10 @@ var appCmd = &cobra.Command{
 		r.HandleFunc("/spaces/{spaceID}", wrap(spaces.Show)).Methods("GET").Name("space")
 		r.HandleFunc("/spaces/{spaceID}/folders", wrap(folders.Create)).Methods("POST").Name("create_folder")
 		r.HandleFunc("/folders/{folderID}", wrap(folders.Show)).Methods("GET").Name("folder")
+		r.HandleFunc("/folders/{folderID}", wrap(folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.HandleFunc("/folders/{folderID}/files", wrap(folders.UploadFile)).Methods("POST").Name("upload_file")
-		r.HandleFunc("/folders/{folderID}/files/{fileID}", wrap(folders.DownloadFile)).Methods("GET").Name("download_file")
+		r.HandleFunc("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
+		r.HandleFunc("/files/{fileID}", wrap(files.Delete)).Methods("DELETE").Name("delete_file")
 
 		// start server
 		if err = http.ListenAndServe(viper.GetString("app_addr"), r); err != nil {

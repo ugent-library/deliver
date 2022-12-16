@@ -10,6 +10,7 @@ import (
 	entdialect "entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/dilliver/ent"
+	"github.com/ugent-library/dilliver/ent/file"
 	"github.com/ugent-library/dilliver/ent/folder"
 	entmigrate "github.com/ugent-library/dilliver/ent/migrate"
 	"github.com/ugent-library/dilliver/ent/space"
@@ -28,6 +29,7 @@ type RepositoryService interface {
 	Folder(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
 	DeleteFolder(context.Context, string) error
+	File(context.Context, string) (*File, error)
 	CreateFile(context.Context, *File) error
 	DeleteFile(context.Context, string) error
 }
@@ -92,6 +94,7 @@ func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folder, error) {
 	row, err := r.db.Folder.Query().
 		Where(folder.IDEQ(folderID)).
+		WithSpace().
 		WithFiles().
 		First(ctx)
 	if err != nil {
@@ -137,6 +140,21 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	}
 	*f = *row
 	return nil
+}
+
+func (r *repositoryService) File(ctx context.Context, fileID string) (*File, error) {
+	row, err := r.db.File.Query().
+		Where(file.IDEQ(fileID)).
+		WithFolder().
+		First(ctx)
+	if err != nil {
+		var e *ent.NotFoundError
+		if errors.As(err, &e) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return row, nil
 }
 
 func (r *repositoryService) DeleteFile(ctx context.Context, fileID string) error {

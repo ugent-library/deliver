@@ -1,12 +1,100 @@
 {{define "page_title"}}{{.Var.space.Name}}{{end}}
 {{define "body"}}
-    <form action="{{.URLPath "create_folder" "spaceID" .Var.space.ID}}" method="post">
-        <input type="text" name="name">
-        <button type="submit">Create</button>
-    </form>
-    <ul>
-    {{range .Var.space.Edges.Folders}}
-        <li><a href="{{$.URLPath "folder" "folderID" .ID}}">{{.Name}}</a></li>
-    {{end}}
-    </ul>
+    <div class="bg-white">
+        <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+            <div class="bc-toolbar">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item">
+                        <h4 class="bc-toolbar-title">{{.Var.space.Name}}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="u-scroll-wrapper__body p-6">
+        <div class="card w-100 mb-6">
+            <div class="card-header">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">Make a folder</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form action="{{.URLPath "create_folder" "spaceID" .Var.space.ID}}" method="post">
+                    <div class="form-group">
+                        <div class="form-row form-group">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
+                            <div class="col-lg-5 col-xl-4">
+                                <input class="form-control" type="text" name="name" id="folder-name">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="offset-lg-3 offset-xl-2">
+                                <button class="btn btn-primary ml-4" type="submit">
+                                    <i class="if if-check"></i>
+                                    <span class="btn-text">Make folder</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card w-100 mb-6">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
+                            <th class="text-nowrap">Shareable link</th>
+                            <th class="text-nowrap">Documents</th>
+                            <th class="text-nowrap">Expires on</th>
+                            <th class="text-nowrap">Created at</th>
+                            <th class="text-nowrap">Updated at</th>
+                            <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Var.space.Edges.Folders}}
+                        <tr>
+                            <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                                <a href="{{$.URLPath "folder" "folderID" .ID}}">{{.Name}}</a>
+                            </td>
+                            <td class="text-nowrap">
+                                <code class="c-code">
+                                    <a href="{{$.URLPath "folder" "folderID" .ID}}" target="_blank">{{$.URL "folder" "folderID" .ID}}</a>
+                                </code>
+                            </td>
+                            <td class="text-nowrap">
+                                <p></p>
+                            </td>
+                            <td class="text-nowrap">
+                                <p></p>
+                            </td>
+                            <td class="text-nowrap">
+                                <p>{{.CreatedAt}}</p>
+                            </td>
+                            <td class="text-nowrap">
+                                <p>{{.UpdatedAt}}</p>
+                            </td>
+                            <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                                <div class="c-button-toolbar flex-nowrap">
+                                    <button class="btn btn-icon-only btn-link">
+                                        <i class="if if-edit"></i>
+                                        <div class="sr-only">Edit folder</div>
+                                    </button>
+                                    <button class="btn btn-icon-only btn-link">
+                                        <i class="if if-delete"></i>
+                                        <div class="sr-only">Delete folder</div>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {{end}}

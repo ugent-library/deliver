@@ -9,15 +9,63 @@
     <link rel="icon" href="{{assetPath "/favicon.ico"}}">
     <title>{{block "page_title" .}}{{end}}</title>
 </head>
-<body class="u-maximize-height overflow-hidden u-scroll-wrapper">
-    {{range .Flash}}
-    <div>
-        {{.Type}}: {{.Body}}
-    </div>
-    {{end}}
 
-    {{block "body" .}}{{end}}
+<body class="u-maximize-height overflow-hidden u-scroll-wrapper">
+    <header>
+        <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
+            <div class="bc-toolbar bc-toolbar-sm">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="{{.URLPath "home"}}">
+                                        <img class="d-none d-lg-inline-block" src="{{assetPath "/images/ghent-university-library-logo.svg"}}" alt="Ghent University Library">
+                                        <img class="d-inline-block d-lg-none" src="{{assetPath "/images/ghent-university-library-mark.svg"}}" alt="Ghent University Library">
+                                    </a>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="d-flex u-maximize-height">
+            <div class="c-sidebar">
+                <div class="c-sidebar__menu">
+                    <nav>
+                        <ul class="c-sidebar-menu">
+                            <li class="c-sidebar__item c-sidebar__item--active">
+                                <a href="{{.URLPath "home"}}">
+                                    <span class="c-sidebar__icon">
+                                        <i class="if if-file"></i>
+                                    </span>
+                                    <span class="c-sidebar__label">Docs</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="c-sidebar__bottom">
+                    <img src="{{assetPath "/images/logo-ugent-white.svg"}}" alt="Logo UGent" height="48px" width="auto">
+                </div>
+            </div>
+
+            <div class="w-100 u-scroll-wrapper">
+                {{range .Flash}}
+                <div>
+                    {{.Type}}: {{.Body}}
+                </div>
+                {{end}}
+
+                {{block "body" .}}{{end}}
+            </div>
+        </div>
+    </main>
 
     <script type="application/javascript" src="{{assetPath "/js/app.js"}}"></script>
 </body>
+
 </html>
