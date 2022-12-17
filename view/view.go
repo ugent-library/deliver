@@ -58,7 +58,7 @@ func (v View) Status(code int) View {
 	return v
 }
 
-func (v View) Render(w http.ResponseWriter, data any) {
+func (v View) Render(w http.ResponseWriter, data any) error {
 	if w.Header().Get("Content-Type") == "" {
 		w.Header().Set("Content-Type", ContentType)
 	}
@@ -70,13 +70,13 @@ func (v View) Render(w http.ResponseWriter, data any) {
 	}()
 
 	if err := v.Template.Execute(buf, data); err != nil {
-		// TODO
-		panic(err)
+		return err
 	}
 
 	if v.status != 0 {
 		w.WriteHeader(v.status)
 	}
 
-	io.Copy(w, buf)
+	_, err := io.Copy(w, buf)
+	return err
 }

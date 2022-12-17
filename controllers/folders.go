@@ -1,9 +1,6 @@
 package controllers
 
 import (
-	"context"
-	"errors"
-	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -30,34 +27,30 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	}
 }
 
-func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	folderID := mux.Vars(r)["folderID"]
-	folder, err := c.repo.Folder(context.TODO(), folderID)
-	if errors.Is(err, models.ErrNotFound) {
-		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
-		return
-	}
+	folder, err := c.repo.Folder(r.Context(), folderID)
 	if err != nil {
-		panic(err) // TODO
+		return err
 	}
-	c.showView.Render(w, ctx.Yield(Var{
+	return c.showView.Render(w, ctx.Yield(Var{
 		"folder": folder,
 	}))
 }
 
-func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	spaceID := mux.Vars(r)["spaceID"]
 	b := FolderForm{}
 	if err := bindForm(r, &b); err != nil {
-		panic(err) // TODO
+		return err
 	}
 
 	folder := &models.Folder{
 		SpaceID: spaceID,
 		Name:    b.Name,
 	}
-	if err := c.repo.CreateFolder(context.TODO(), folder); err != nil {
-		panic(err) // TODO
+	if err := c.repo.CreateFolder(r.Context(), folder); err != nil {
+		return err
 	}
 
 	ctx.PersistFlash(w, r, Flash{
@@ -66,23 +59,21 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	})
 	redirectURL := ctx.URLPath("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
+	return nil
 }
 
 // TODO remove files
-func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	folderID := mux.Vars(r)["folderID"]
 
-	folder, err := c.repo.Folder(context.TODO(), folderID)
-	if errors.Is(err, models.ErrNotFound) {
-		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
-		return
-	}
+	folder, err := c.repo.Folder(r.Context(), folderID)
 	if err != nil {
-		panic(err) // TODO
+		return err
 	}
 
-	if err := c.repo.DeleteFolder(context.TODO(), folderID); err != nil {
-		panic(err) // TODO
+	if err := c.repo.DeleteFolder(r.Context(), folderID); err != nil {
+		return err
 	}
 
 	ctx.PersistFlash(w, r, Flash{
@@ -91,37 +82,30 @@ func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	})
 	redirectURL := ctx.URLPath("space", "spaceID", folder.SpaceID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
+	return nil
 }
 
-func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	folderID := mux.Vars(r)["folderID"]
 
 	// 2GB limit on request body
 	r.Body = http.MaxBytesReader(w, r.Body, 2_000_000_000)
 	// buffer limit of 32MB
 	if err := r.ParseMultipartForm(32_000_000); err != nil {
-		panic(err) // TODO
+		return err
 	}
 
 	for _, fileHeader := range r.MultipartForm.File["file"] {
 		f, err := fileHeader.Open()
 		if err != nil {
-			panic(err) // TODO
+			return err
 		}
 		defer f.Close()
 
-		// detect content type
-		buf := make([]byte, 512)
-		_, err = f.Read(buf)
+		contentType, err := detectContentType(f)
 		if err != nil {
-			panic(err) // TODO
-		}
-		contentType := http.DetectContentType(buf)
-
-		// and rewind
-		_, err = f.Seek(0, io.SeekStart)
-		if err != nil {
-			panic(err) // TODO
+			return err
 		}
 
 		file := &models.File{
@@ -133,15 +117,15 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 		}
 
 		// TODO get size
-		md5, err := c.file.Add(context.TODO(), file.ID, f)
+		md5, err := c.file.Add(r.Context(), file.ID, f)
 		if err != nil {
-			panic(err) // TODO
+			return err
 		}
 
 		file.Md5 = md5
 
-		if err = c.repo.CreateFile(context.TODO(), file); err != nil {
-			panic(err) // TODO
+		if err = c.repo.CreateFile(r.Context(), file); err != nil {
+			return err
 		}
 	}
 
@@ -151,4 +135,6 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	})
 	redirectURL := ctx.URLPath("folder", "folderID", folderID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
+	return nil
 }

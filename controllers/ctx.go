@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/ugent-library/dilliver/models"
 	"go.uber.org/zap"
 )
 
@@ -18,9 +20,8 @@ const (
 	flashSessionKey = "flash"
 )
 
-func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
-	// TODO let fn return an error like echo
-	return func(fn func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
+func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
+	return func(fn func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := Ctx{
 				Config:    c,
@@ -28,11 +29,12 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.
 				CSRFTag:   csrf.TemplateField(r),
 			}
 			if err := ctx.loadSession(w, r); err != nil {
-				// TODO handle error gracefully
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				ctx.handleError(w, r, err)
 				return
 			}
-			fn(w, r, ctx)
+			if err := fn(w, r, ctx); err != nil {
+				ctx.handleError(w, r, err)
+			}
 		}
 	}
 }
@@ -119,4 +121,14 @@ func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return nil
+}
+
+func (c *Ctx) handleError(w http.ResponseWriter, r *http.Request, err error) {
+	if errors.Is(err, models.ErrNotFound) {
+		c.Router.NotFoundHandler.ServeHTTP(w, r)
+		return
+	}
+
+	// TODO error page
+	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,42 +27,38 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
-func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	spaces, err := c.repo.Spaces(context.TODO())
+func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	spaces, err := c.repo.Spaces(r.Context())
 	if err != nil {
-		panic(err) // TODO
+		return err
 	}
-	c.listView.Render(w, ctx.Yield(Var{
+	return c.listView.Render(w, ctx.Yield(Var{
 		"spaces": spaces,
 	}))
 }
 
-func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	spaceID := mux.Vars(r)["spaceID"]
 	space, err := c.repo.Space(context.TODO(), spaceID)
-	if errors.Is(err, models.ErrNotFound) {
-		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
-		return
-	}
 	if err != nil {
-		panic(err) // TODO
+		return err
 	}
-	c.showView.Render(w, ctx.Yield(Var{
+	return c.showView.Render(w, ctx.Yield(Var{
 		"space": space,
 	}))
 }
 
-func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	b := SpaceForm{}
 	if err := bindForm(r, &b); err != nil {
-		panic(err) // TODO
+		return err
 	}
 
 	space := &models.Space{
 		Name: b.Name,
 	}
 	if err := c.repo.CreateSpace(context.TODO(), space); err != nil {
-		panic(err) // TODO
+		return err
 	}
 
 	ctx.PersistFlash(w, r, Flash{
@@ -72,4 +67,6 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) {
 	})
 	redirectURL := ctx.URLPath("space", "spaceID", space.ID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
+	return nil
 }

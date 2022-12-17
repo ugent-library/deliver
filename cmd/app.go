@@ -113,6 +113,7 @@ var appCmd = &cobra.Command{
 		handler := handlers.HTTPMethodOverrideHandler(r)
 
 		// start server
+		// TODO timemouts
 		if err = http.ListenAndServe(viper.GetString("app_addr"), handler); err != nil {
 			logger.Fatal(err)
 		}

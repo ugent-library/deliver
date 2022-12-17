@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"context"
-	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -21,44 +19,32 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-func (c *Files) Download(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Files) Download(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	fileID := mux.Vars(r)["fileID"]
-
-	_, err := c.repo.File(context.TODO(), fileID)
-	if errors.Is(err, models.ErrNotFound) {
-		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
-		return
+	if _, err := c.repo.File(r.Context(), fileID); err != nil {
+		return err
 	}
-	if err != nil {
-		panic(err) // TODO
-	}
-	c.file.Get(context.TODO(), fileID, w)
+	return c.file.Get(r.Context(), fileID, w)
 }
 
-func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) {
+func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	fileID := mux.Vars(r)["fileID"]
-
-	file, err := c.repo.File(context.TODO(), fileID)
-	if errors.Is(err, models.ErrNotFound) {
-		ctx.Router.NotFoundHandler.ServeHTTP(w, r)
-		return
-	}
+	file, err := c.repo.File(r.Context(), fileID)
 	if err != nil {
-		panic(err) // TODO
+		return err
 	}
-
-	if err := c.repo.DeleteFile(context.TODO(), fileID); err != nil {
-		panic(err) // TODO
+	if err := c.repo.DeleteFile(r.Context(), fileID); err != nil {
+		return err
 	}
-
-	if err := c.file.Delete(context.TODO(), fileID); err != nil {
-		panic(err) // TODO
+	if err := c.file.Delete(r.Context(), fileID); err != nil {
+		return err
 	}
-
 	ctx.PersistFlash(w, r, Flash{
 		Type: Info,
 		Body: "File deleted succesfully",
 	})
 	redirectURL := ctx.URLPath("folder", "folderID", file.FolderID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
+	return nil
 }

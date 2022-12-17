@@ -18,10 +18,10 @@ func NewPages() *Pages {
 	}
 }
 
-func (c *Pages) Home(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	c.homeView.Render(w, ctx)
+func (c *Pages) Home(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	return c.homeView.Render(w, ctx)
 }
 
-func (c *Pages) NotFound(w http.ResponseWriter, r *http.Request, ctx Ctx) {
-	c.notFoundView.Render(w, ctx)
+func (c *Pages) NotFound(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	return c.notFoundView.Render(w, ctx)
 }
