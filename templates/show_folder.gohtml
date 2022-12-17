@@ -23,8 +23,9 @@
             <div class="card-body">
                 <form action="{{.URLPath "upload_file" "folderID" .Var.folder.ID}}"
                     enctype="multipart/form-data"
-                    method="post"
+                    method="POST"
                 >
+                    {{.CSRFTag}}
                     <div class="form-group">
                         <input type="file" name="file" multiple>
                         <button class="btn btn-primary" type="submit">
@@ -83,10 +84,14 @@
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                 <div class="c-button-toolbar flex-nowrap">
-                                    <button class="btn btn-icon-only btn-link">
-                                        <i class="if if-delete"></i>
-                                        <div class="sr-only">Delete file</div>
-                                    </button>
+                                    <form action="{{$.URLPath "delete_file" "fileID" .ID}}" method="POST">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        {{$.CSRFTag}}
+                                        <button class="btn btn-icon-only btn-link" type="submit">
+                                            <i class="if if-delete"></i>
+                                            <div class="sr-only">Delete file</div>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

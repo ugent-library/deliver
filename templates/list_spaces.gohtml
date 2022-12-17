@@ -1,6 +1,7 @@
 {{define "page_title"}}Spaces{{end}}
 {{define "body"}}
-    <form action="{{.URLPath "create_space"}}" method="post">
+    <form action="{{.URLPath "create_space"}}" method="POST">
+        {{.CSRFTag}}
         <input type="text" name="name">
         <button type="submit">Create</button>
     </form>

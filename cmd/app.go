@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -14,6 +15,8 @@ import (
 	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
+	"github.com/ugent-library/dilliver/zaphttp"
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -49,7 +52,19 @@ var appCmd = &cobra.Command{
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
-		r.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(true)))
+		r.Use(zaphttp.Handler("app", logger.Desugar()))
+		r.Use(handlers.RecoveryHandler(
+			handlers.PrintRecoveryStack(true),
+			handlers.RecoveryLogger(&recoveryLogger{logger}),
+		))
+		r.Use(csrf.Protect(
+			[]byte(viper.GetString("csrf_secret")),
+			csrf.CookieName(viper.GetString("csrf_cookie_name")),
+			csrf.Path("/"),
+			csrf.Secure(viper.GetBool("production")),
+			csrf.SameSite(csrf.SameSiteStrictMode),
+			csrf.FieldName("csrf_token"),
+		))
 
 		// setup views
 		view.FuncMap = template.FuncMap{
@@ -92,11 +107,23 @@ var appCmd = &cobra.Command{
 		r.HandleFunc("/folders/{folderID}", wrap(folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.HandleFunc("/folders/{folderID}/files", wrap(folders.UploadFile)).Methods("POST").Name("upload_file")
 		r.HandleFunc("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
-		r.HandleFunc("/files/{fileID}", wrap(files.Delete)).Methods("DELETE").Name("delete_file")
+		r.Handle("/files/{fileID}", wrap(files.Delete)).Methods("DELETE").Name("delete_file")
+
+		// apply method overwrites before request reaches the router
+		handler := handlers.HTTPMethodOverrideHandler(r)
 
 		// start server
-		if err = http.ListenAndServe(viper.GetString("app_addr"), r); err != nil {
+		if err = http.ListenAndServe(viper.GetString("app_addr"), handler); err != nil {
 			logger.Fatal(err)
 		}
 	},
+}
+
+// implement handlers.RecoveryHandlerLogger for zap logger
+type recoveryLogger struct {
+	l *zap.SugaredLogger
+}
+
+func (p *recoveryLogger) Println(args ...any) {
+	p.l.Error(args...)
 }

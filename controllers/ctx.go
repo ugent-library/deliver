@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"go.uber.org/zap"
@@ -18,10 +19,13 @@ const (
 )
 
 func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
+	// TODO let fn return an error like echo
 	return func(fn func(http.ResponseWriter, *http.Request, Ctx)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := Ctx{
-				Config: c,
+				Config:    c,
+				CSRFToken: csrf.Token(r),
+				CSRFTag:   csrf.TemplateField(r),
 			}
 			if err := ctx.loadSession(w, r); err != nil {
 				// TODO handle error gracefully
@@ -49,8 +53,10 @@ type Var map[string]any
 
 type Ctx struct {
 	Config
-	Flash []Flash
-	Var   Var
+	CSRFToken string
+	CSRFTag   template.HTML
+	Flash     []Flash
+	Var       Var
 }
 
 func (c Ctx) Yield(v Var) Ctx {

@@ -21,7 +21,8 @@
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{.URLPath "create_folder" "spaceID" .Var.space.ID}}" method="post">
+                <form action="{{.URLPath "create_folder" "spaceID" .Var.space.ID}}" method="POST">
+                    {{.CSRFTag}}
                     <div class="form-group">
                         <div class="form-row form-group">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
