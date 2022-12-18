@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/ugent-library/dilliver/models"
 )
 
@@ -20,7 +19,7 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 }
 
 func (c *Files) Download(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	fileID := mux.Vars(r)["fileID"]
+	fileID := ctx.Path("fileID")
 	if _, err := c.repo.File(r.Context(), fileID); err != nil {
 		return err
 	}
@@ -28,7 +27,7 @@ func (c *Files) Download(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 }
 
 func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	fileID := mux.Vars(r)["fileID"]
+	fileID := ctx.Path("fileID")
 	file, err := c.repo.File(r.Context(), fileID)
 	if err != nil {
 		return err

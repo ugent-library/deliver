@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
@@ -28,7 +27,7 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 }
 
 func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	folderID := mux.Vars(r)["folderID"]
+	folderID := ctx.Path("folderID")
 	folder, err := c.repo.Folder(r.Context(), folderID)
 	if err != nil {
 		return err
@@ -39,7 +38,7 @@ func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 }
 
 func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	spaceID := mux.Vars(r)["spaceID"]
+	spaceID := ctx.Path("spaceID")
 	b := FolderForm{}
 	if err := bindForm(r, &b); err != nil {
 		return err
@@ -57,6 +56,7 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 		Type: Info,
 		Body: "Folder created succesfully",
 	})
+
 	redirectURL := ctx.URLPath("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 
@@ -65,7 +65,7 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 
 // TODO remove files
 func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	folderID := mux.Vars(r)["folderID"]
+	folderID := ctx.Path("folderID")
 
 	folder, err := c.repo.Folder(r.Context(), folderID)
 	if err != nil {
@@ -80,6 +80,7 @@ func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 		Type: Info,
 		Body: "Folder deleted succesfully",
 	})
+
 	redirectURL := ctx.URLPath("space", "spaceID", folder.SpaceID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 
@@ -87,7 +88,7 @@ func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 }
 
 func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	folderID := mux.Vars(r)["folderID"]
+	folderID := ctx.Path("folderID")
 
 	// 2GB limit on request body
 	r.Body = http.MaxBytesReader(w, r.Body, 2_000_000_000)
@@ -133,6 +134,7 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) er
 		Type: Info,
 		Body: "File added succesfully",
 	})
+
 	redirectURL := ctx.URLPath("folder", "folderID", folderID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 

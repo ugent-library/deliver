@@ -25,6 +25,7 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx) error)
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := Ctx{
 				Config:    c,
+				path:      mux.Vars(r),
 				CSRFToken: csrf.Token(r),
 				CSRFTag:   csrf.TemplateField(r),
 			}
@@ -55,10 +56,15 @@ type Var map[string]any
 
 type Ctx struct {
 	Config
+	path      map[string]string
 	CSRFToken string
 	CSRFTag   template.HTML
 	Flash     []Flash
 	Var       Var
+}
+
+func (c Ctx) Path(k string) string {
+	return c.path[k]
 }
 
 func (c Ctx) Yield(v Var) Ctx {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
 )
@@ -38,8 +37,8 @@ func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 }
 
 func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	spaceID := mux.Vars(r)["spaceID"]
-	space, err := c.repo.Space(context.TODO(), spaceID)
+	spaceID := ctx.Path("spaceID")
+	space, err := c.repo.Space(r.Context(), spaceID)
 	if err != nil {
 		return err
 	}
@@ -65,6 +64,7 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 		Type: "info",
 		Body: "Space created succesfully",
 	})
+
 	redirectURL := ctx.URLPath("space", "spaceID", space.ID).String()
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 
