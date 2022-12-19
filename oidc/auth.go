@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -32,7 +33,7 @@ type Auth struct {
 func NewAuth(ctx context.Context, c Config) (*Auth, error) {
 	oidcProvider, err := oidc.NewProvider(ctx, c.URL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("oidc: %w", err)
 	}
 
 	// configure an oidc aware oauth2 client
@@ -67,14 +68,14 @@ func NewAuth(ctx context.Context, c Config) (*Auth, error) {
 }
 
 func (a *Auth) BeginAuth(w http.ResponseWriter, r *http.Request) error {
-	state, err := generateRandomState()
+	state, err := newState()
 	if err != nil {
-		return err
+		return fmt.Errorf("oidc: %w", err)
 	}
 
 	h, err := a.secureCookie.Encode(a.cookieName, state)
 	if err != nil {
-		return err
+		return fmt.Errorf("oidc: %w", err)
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -93,12 +94,12 @@ func (a *Auth) BeginAuth(w http.ResponseWriter, r *http.Request) error {
 func (a *Auth) CompleteAuth(w http.ResponseWriter, r *http.Request, claims any) error {
 	cookie, err := r.Cookie(a.cookieName)
 	if err != nil {
-		return err
+		return fmt.Errorf("oidc: %w", err)
 	}
 
 	var state string
 	if err = a.secureCookie.Decode(a.cookieName, cookie.Value, &state); err != nil {
-		return err
+		return fmt.Errorf("oidc: %w", err)
 	}
 
 	if r.URL.Query().Get("state") != state {
@@ -107,7 +108,7 @@ func (a *Auth) CompleteAuth(w http.ResponseWriter, r *http.Request, claims any) 
 
 	oauthToken, err := a.oauthClient.Exchange(r.Context(), r.URL.Query().Get("code"))
 	if err != nil {
-		return err
+		return fmt.Errorf("oidc: %w", err)
 	}
 
 	// extract id token from oauth2 token
@@ -119,13 +120,13 @@ func (a *Auth) CompleteAuth(w http.ResponseWriter, r *http.Request, claims any) 
 	// verify id token
 	idToken, err := a.tokenVerifier.Verify(r.Context(), rawIDToken)
 	if err != nil {
-		return err
+		return fmt.Errorf("oidc: %w", err)
 	}
 
 	return idToken.Claims(claims)
 }
 
-func generateRandomState() (string, error) {
+func newState() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		return "", err
