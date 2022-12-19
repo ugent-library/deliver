@@ -97,17 +97,36 @@
                 </div>
             </div>
 
-            <div class="w-100 u-scroll-wrapper">
-                {{range .Flash}}
-                <div>
-                    {{.Type}}: {{.Body}}
-                </div>
-                {{end}}
-
-                {{block "body" .}}{{end}}
-            </div>
+            {{block "body" .}}{{end}}
         </div>
     </main>
+
+    <div id="flash-messages">
+        {{range .Flash}}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+            <div class="toast-body">
+                {{if eq .Type "success"}}
+                <i class="if if--success if-check-circle-fill"></i>
+                {{else if eq .Type "info"}}
+                <i class="if if--primary if-info-circle-filled"></i>
+                {{else if eq .Type "warning"}}
+                <i class="if if--warning if-alert-fill"></i>
+                {{else if eq .Type "error"}}
+                <i class="if if--error if-error-circle-fill"></i>
+                {{end}}
+                <div class="toast-content">
+                    {{if .Title}}
+                    <h3 class="alert-title">{{.Title}}</h3>
+                    {{end}}
+                    {{.Body}}
+                </div>
+                <button class="close" type="button" data-dismiss="toast" aria-label="Close">
+                    <i class="if if-close"></i>
+                </button>
+            </div>
+        </div>
+        {{end}}
+    </div>
 
     <script type="application/javascript" src="{{assetPath "/js/app.js"}}"></script>
 </body>

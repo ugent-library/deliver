@@ -51,8 +51,9 @@ type Config struct {
 }
 
 type Flash struct {
-	Type string
-	Body template.HTML
+	Type  string
+	Title string
+	Body  template.HTML
 }
 
 type Var map[string]any

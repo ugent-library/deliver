@@ -1,5 +1,6 @@
 {{define "page_title"}}Spaces{{end}}
 {{define "body"}}
+<div class="w-100 u-scroll-wrapper">
     <form action="{{.URLPath "create_space"}}" method="POST">
         {{.CSRFTag}}
         <input type="text" name="name">
@@ -10,4 +11,5 @@
         <li><a href="{{$.URLPath "space" "spaceID" .ID}}">{{.Name}}</a></li>
     {{end}}
     </ul>
+<div class="w-100 u-scroll-wrapper">
 {{end}}

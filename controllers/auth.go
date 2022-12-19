@@ -29,7 +29,7 @@ func (c *Auth) Callback(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	}); err != nil {
 		return err
 	}
-	ctx.Redirect(w, r, "home")
+	ctx.Redirect(w, r, "spaces")
 	return nil
 }
 

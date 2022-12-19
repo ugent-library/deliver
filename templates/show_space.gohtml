@@ -1,11 +1,40 @@
 {{define "page_title"}}{{.Var.space.Name}}{{end}}
 {{define "body"}}
+<div class="c-sub-sidebar c-sidebar--bordered">
+    <div class="bc-navbar bc-navbar--xlarge bc-navbar--bordered-bottom">
+        <div class="bc-toolbar">
+            <div class="bc-toolbar-left">
+                <div class="bc-toolbar-item">
+                    <h4 class="bc-toolbar-title">Your docs spaces</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="c-sub-sidebar__menu my-6">
+        <nav>
+            <ul class="c-sub-sidebar-menu">
+                <li class="c-sub-sidebar__item c-sub-sidebar__item--active">
+                    <a href="{{.URLPath "space" "spaceID" .Var.space.ID}}">
+                        <span class="c-sidebar__label">{{.Var.space.Name}}</span>
+                    </a>
+                </li>
+                <li class="c-sub-sidebar__item">
+                    <a href="#">
+                        <span class="c-sidebar__label">New space</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div class="w-100 u-scroll-wrapper">
     <div class="bg-white">
         <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
                     <div class="bc-toolbar-item">
-                        <h4 class="bc-toolbar-title">{{.Var.space.Name}}</h4>
+                        <h4 class="bc-toolbar-title">{{.Var.space.Name}} folders</h4>
                     </div>
                 </div>
             </div>
@@ -98,4 +127,5 @@
             </div>
         </div>
     </div>
+</div>
 {{end}}
