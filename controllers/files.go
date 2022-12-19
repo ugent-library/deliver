@@ -38,12 +38,12 @@ func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 	if err := c.file.Delete(r.Context(), fileID); err != nil {
 		return err
 	}
+
 	ctx.PersistFlash(w, r, Flash{
 		Type: Info,
 		Body: "File deleted succesfully",
 	})
-	redirectURL := ctx.URLPath("folder", "folderID", file.FolderID).String()
-	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+	ctx.RedirectTo(w, r, "folder", "folderID", file.FolderID)
 
 	return nil
 }

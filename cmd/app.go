@@ -1,19 +1,23 @@
 package cmd
 
 import (
+	"context"
 	"encoding/gob"
 	"html/template"
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/dilliver/controllers"
 	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
+	"github.com/ugent-library/dilliver/oidc"
 	"github.com/ugent-library/dilliver/view"
 	"github.com/ugent-library/dilliver/zaphttp"
 	"go.uber.org/zap"
@@ -29,10 +33,10 @@ var appCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// setup services
 		services, err := models.NewServices(models.Config{
-			DatabaseURL:       viper.GetString("database_url"),
+			DatabaseURL:       viper.GetString("db_url"),
 			S3URL:             viper.GetString("s3_url"),
-			S3AccessKeyID:     viper.GetString("s3_access_key_id"),
-			S3SecretAccessKey: viper.GetString("s3_secret_access_key"),
+			S3AccessKeyID:     viper.GetString("s3_id"),
+			S3SecretAccessKey: viper.GetString("s3_secret"),
 			S3Bucket:          viper.GetString("s3_bucket"),
 		})
 		if err != nil {
@@ -52,14 +56,14 @@ var appCmd = &cobra.Command{
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
-		r.Use(zaphttp.Handler("app", logger.Desugar()))
+		// r.Use(zaphttp.Handler("app", logger.Desugar()))
 		r.Use(handlers.RecoveryHandler(
 			handlers.PrintRecoveryStack(true),
 			handlers.RecoveryLogger(&recoveryLogger{logger}),
 		))
 		r.Use(csrf.Protect(
 			[]byte(viper.GetString("csrf_secret")),
-			csrf.CookieName(viper.GetString("csrf_cookie_name")),
+			csrf.CookieName(viper.GetString("session_name")+".csrf"),
 			csrf.Path("/"),
 			csrf.Secure(viper.GetBool("production")),
 			csrf.SameSite(csrf.SameSiteStrictMode),
@@ -81,7 +85,30 @@ var appCmd = &cobra.Command{
 		// register Flash as a gob Type so CookieStore can serialize it
 		gob.Register(c.Flash{})
 
+		// setup auth
+		authURL := url.URL{
+			Host: viper.GetString("addr"), // TODO make public address configurable
+			Path: "/auth/callback",
+		}
+		if viper.GetBool("production") {
+			authURL.Scheme = "https"
+		} else {
+			authURL.Scheme = "http"
+		}
+		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
+			URL:          viper.GetString("oidc_url"),
+			ClientID:     viper.GetString("oidc_id"),
+			ClientSecret: viper.GetString("oidc_secret"),
+			RedirectURL:  authURL.String(),
+			CookieSecret: []byte(viper.GetString("session_secret")),
+			CookieName:   viper.GetString("session_name") + ".state",
+		})
+		if err != nil {
+			logger.Fatal(err)
+		}
+
 		// controllers
+		auth := c.NewAuth(oidcAuth)
 		pages := c.NewPages()
 		spaces := c.NewSpaces(services.Repository)
 		folders := c.NewFolders(services.Repository, services.File)
@@ -99,6 +126,9 @@ var appCmd = &cobra.Command{
 		r.NotFoundHandler = wrap(pages.NotFound)
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		r.HandleFunc("/", wrap(pages.Home)).Methods("GET").Name("home")
+		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
+		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
+		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
 		r.HandleFunc("/spaces", wrap(spaces.List)).Methods("GET").Name("spaces")
 		r.HandleFunc("/spaces", wrap(spaces.Create)).Methods("POST").Name("create_space")
 		r.HandleFunc("/spaces/{spaceID}", wrap(spaces.Show)).Methods("GET").Name("space")
@@ -109,12 +139,14 @@ var appCmd = &cobra.Command{
 		r.HandleFunc("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(files.Delete)).Methods("DELETE").Name("delete_file")
 
-		// apply method overwrites before request reaches the router
-		handler := handlers.HTTPMethodOverrideHandler(r)
+		// apply method overwrite and logging handlers before request reaches the router
+		var handler http.Handler = r
+		handler = zaphttp.Handler("app", logger.Desugar())(handler)
+		handler = handlers.HTTPMethodOverrideHandler(handler)
 
 		// start server
-		// TODO timemouts
-		if err = http.ListenAndServe(viper.GetString("app_addr"), handler); err != nil {
+		// TODO timemouts, graceful shutdown?
+		if err = http.ListenAndServe(viper.GetString("addr"), handler); err != nil {
 			logger.Fatal(err)
 		}
 	},

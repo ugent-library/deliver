@@ -96,6 +96,10 @@ func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
 	return u
 }
 
+func (c Ctx) RedirectTo(w http.ResponseWriter, r *http.Request, route string, pairs ...string) {
+	http.Redirect(w, r, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
+}
+
 func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error {
 	s, err := c.SessionStore.Get(r, c.SessionName)
 	if err != nil {

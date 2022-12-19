@@ -22,10 +22,9 @@ func init() {
 	viper.SetEnvPrefix("dilliver")
 	viper.SetDefault("s3_region", "us-east-1")
 	viper.SetDefault("s3_bucket", "dilliver")
-	viper.SetDefault("app_addr", "localhost:3002")
+	viper.SetDefault("addr", "localhost:3002")
 	viper.SetDefault("session_name", "dilliver")
 	viper.SetDefault("session_max_age", 86400*30) // 30 days
-	viper.SetDefault("csrf_cookie_name", "dilliver.csrf-token")
 }
 
 func initConfig() {
