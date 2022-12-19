@@ -114,10 +114,14 @@
                                         <i class="if if-edit"></i>
                                         <div class="sr-only">Edit folder</div>
                                     </button>
-                                    <button class="btn btn-icon-only btn-link">
-                                        <i class="if if-delete"></i>
-                                        <div class="sr-only">Delete folder</div>
-                                    </button>
+                                    <form action="{{$.URLPath "delete_folder" "folderID" .ID}}" method="POST">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        {{$.CSRFTag}}
+                                        <button class="btn btn-icon-only btn-link" type="submit">
+                                            <i class="if if-delete"></i>
+                                            <div class="sr-only">Delete folder</div>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
