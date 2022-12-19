@@ -64,7 +64,7 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 		Type: "info",
 		Body: "Space created succesfully",
 	})
-	ctx.RedirectTo(w, r, "space", "spaceID", space.ID)
+	ctx.Redirect(w, r, "space", "spaceID", space.ID)
 
 	return nil
 }

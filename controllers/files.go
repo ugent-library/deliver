@@ -43,7 +43,7 @@ func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 		Type: Info,
 		Body: "File deleted succesfully",
 	})
-	ctx.RedirectTo(w, r, "folder", "folderID", file.FolderID)
+	ctx.Redirect(w, r, "folder", "folderID", file.FolderID)
 
 	return nil
 }

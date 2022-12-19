@@ -56,7 +56,7 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 		Type: Info,
 		Body: "Folder created succesfully",
 	})
-	ctx.RedirectTo(w, r, "folder", "folderID", folder.ID)
+	ctx.Redirect(w, r, "folder", "folderID", folder.ID)
 
 	return nil
 }
@@ -78,7 +78,7 @@ func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 		Type: Info,
 		Body: "Folder deleted succesfully",
 	})
-	ctx.RedirectTo(w, r, "space", "spaceID", folder.SpaceID)
+	ctx.Redirect(w, r, "space", "spaceID", folder.SpaceID)
 
 	return nil
 }
@@ -130,7 +130,7 @@ func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) er
 		Type: Info,
 		Body: "File added succesfully",
 	})
-	ctx.RedirectTo(w, r, "folder", "folderID", folderID)
+	ctx.Redirect(w, r, "folder", "folderID", folderID)
 
 	return nil
 }

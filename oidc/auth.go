@@ -18,9 +18,9 @@ type Config struct {
 	ClientID         string
 	ClientSecret     string
 	RedirectURL      string
-	CookieSecret     []byte
-	CookieName       string
 	AdditionalScopes []string
+	CookieName       string
+	CookieSecret     []byte
 }
 
 type Auth struct {

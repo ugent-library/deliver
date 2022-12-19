@@ -18,13 +18,16 @@ const (
 	Info = "info"
 
 	flashSessionKey = "flash"
+	userSessionKey  = "user"
 )
 
+// TODO use a pointer to Ctx?
 func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
 	return func(fn func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := Ctx{
 				Config:    c,
+				Request:   r,
 				path:      mux.Vars(r),
 				CSRFToken: csrf.Token(r),
 				CSRFTag:   csrf.TemplateField(r),
@@ -56,11 +59,13 @@ type Var map[string]any
 
 type Ctx struct {
 	Config
+	Request   *http.Request
 	path      map[string]string
 	CSRFToken string
 	CSRFTag   template.HTML
 	Flash     []Flash
 	Var       Var
+	user      *models.User
 }
 
 func (c Ctx) Path(k string) string {
@@ -81,6 +86,15 @@ func (c Ctx) URL(route string, pairs ...string) *url.URL {
 	if err != nil {
 		panic(fmt.Errorf("can't reverse route '%s': %w", route, err))
 	}
+	if u.Host == "" {
+		u.Host = c.Request.Host
+	}
+	if u.Scheme == "" {
+		u.Scheme = c.Request.URL.Scheme
+	}
+	if u.Scheme == "" {
+		u.Scheme = "http"
+	}
 	return u
 }
 
@@ -96,8 +110,38 @@ func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c Ctx) RedirectTo(w http.ResponseWriter, r *http.Request, route string, pairs ...string) {
+func (c Ctx) Redirect(w http.ResponseWriter, r *http.Request, route string, pairs ...string) {
 	http.Redirect(w, r, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
+}
+
+func (c Ctx) User() *models.User {
+	return c.user
+}
+
+func (c *Ctx) SetUser(w http.ResponseWriter, r *http.Request, u *models.User) error {
+	s, err := c.SessionStore.Get(r, c.SessionName)
+	if err != nil {
+		return fmt.Errorf("couldn't get session data: %w", err)
+	}
+	s.Values[userSessionKey] = u
+	if err := s.Save(r, w); err != nil {
+		return fmt.Errorf("couldn't save session data: %w", err)
+	}
+	c.user = u
+	return nil
+}
+
+func (c *Ctx) DeleteUser(w http.ResponseWriter, r *http.Request) error {
+	s, err := c.SessionStore.Get(r, c.SessionName)
+	if err != nil {
+		return fmt.Errorf("couldn't get session data: %w", err)
+	}
+	delete(s.Values, userSessionKey)
+	if err := s.Save(r, w); err != nil {
+		return fmt.Errorf("couldn't save session data: %w", err)
+	}
+	c.user = nil
+	return nil
 }
 
 func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error {
@@ -105,9 +149,7 @@ func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
-
 	s.AddFlash(f, flashSessionKey)
-
 	if err := s.Save(r, w); err != nil {
 		return fmt.Errorf("couldn't save session data: %w", err)
 	}
@@ -120,14 +162,16 @@ func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
 
-	flashes := s.Flashes(flashSessionKey)
+	if user := s.Values[userSessionKey]; user != nil {
+		c.user = user.(*models.User)
+	}
+
+	for _, f := range s.Flashes(flashSessionKey) {
+		c.Flash = append(c.Flash, f.(Flash))
+	}
 
 	if err := s.Save(r, w); err != nil {
 		return fmt.Errorf("couldn't save session data: %w", err)
-	}
-
-	for _, f := range flashes {
-		c.Flash = append(c.Flash, f.(Flash))
 	}
 
 	return nil

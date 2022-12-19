@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"html/template"
 	"net/http"
-	"net/url"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
@@ -31,6 +30,8 @@ var appCmd = &cobra.Command{
 	Use:   "app",
 	Short: "Start the web app server",
 	Run: func(cmd *cobra.Command, args []string) {
+		isProduction := viper.GetBool("production")
+
 		// setup services
 		services, err := models.NewServices(models.Config{
 			DatabaseURL:       viper.GetString("db_url"),
@@ -56,16 +57,16 @@ var appCmd = &cobra.Command{
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
-		// r.Use(zaphttp.Handler("app", logger.Desugar()))
 		r.Use(handlers.RecoveryHandler(
 			handlers.PrintRecoveryStack(true),
-			handlers.RecoveryLogger(&recoveryLogger{logger}),
+			// TODO
+			// handlers.RecoveryLogger(&recoveryLogger{logger}),
 		))
 		r.Use(csrf.Protect(
 			[]byte(viper.GetString("csrf_secret")),
 			csrf.CookieName(viper.GetString("session_name")+".csrf"),
 			csrf.Path("/"),
-			csrf.Secure(viper.GetBool("production")),
+			csrf.Secure(isProduction),
 			csrf.SameSite(csrf.SameSiteStrictMode),
 			csrf.FieldName("csrf_token"),
 		))
@@ -81,27 +82,19 @@ var appCmd = &cobra.Command{
 		sessionStore.MaxAge(viper.GetInt("session_max_age"))
 		sessionStore.Options.Path = "/"
 		sessionStore.Options.HttpOnly = true
-		sessionStore.Options.Secure = viper.GetBool("production")
-		// register Flash as a gob Type so CookieStore can serialize it
+		sessionStore.Options.Secure = isProduction
+		// register types so CookieStore can serialize it
 		gob.Register(c.Flash{})
+		gob.Register(&models.User{})
 
 		// setup auth
-		authURL := url.URL{
-			Host: viper.GetString("addr"), // TODO make public address configurable
-			Path: "/auth/callback",
-		}
-		if viper.GetBool("production") {
-			authURL.Scheme = "https"
-		} else {
-			authURL.Scheme = "http"
-		}
 		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
 			URL:          viper.GetString("oidc_url"),
 			ClientID:     viper.GetString("oidc_id"),
 			ClientSecret: viper.GetString("oidc_secret"),
-			RedirectURL:  authURL.String(),
-			CookieSecret: []byte(viper.GetString("session_secret")),
+			RedirectURL:  viper.GetString("oidc_redirect_url"),
 			CookieName:   viper.GetString("session_name") + ".state",
+			CookieSecret: []byte(viper.GetString("session_secret")),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -143,6 +136,9 @@ var appCmd = &cobra.Command{
 		var handler http.Handler = r
 		handler = zaphttp.Handler("app", logger.Desugar())(handler)
 		handler = handlers.HTTPMethodOverrideHandler(handler)
+		if isProduction {
+			handler = handlers.ProxyHeaders(handler)
+		}
 
 		// start server
 		// TODO timemouts, graceful shutdown?
