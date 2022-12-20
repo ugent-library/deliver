@@ -27,6 +27,10 @@ type SpaceForm struct {
 }
 
 func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	spaces, err := c.repo.Spaces(r.Context())
 	if err != nil {
 		return err
@@ -37,6 +41,10 @@ func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 }
 
 func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	spaceID := ctx.Path("spaceID")
 	space, err := c.repo.Space(r.Context(), spaceID)
 	if err != nil {
@@ -48,6 +56,10 @@ func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 }
 
 func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	b := SpaceForm{}
 	if err := bindForm(r, &b); err != nil {
 		return err

@@ -27,6 +27,10 @@ func (c *Files) Download(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 }
 
 func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	fileID := ctx.Path("fileID")
 	file, err := c.repo.File(r.Context(), fileID)
 	if err != nil {

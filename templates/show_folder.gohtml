@@ -22,17 +22,20 @@
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{.URLPath "upload_file" "folderID" .Var.folder.ID}}"
+                <form class="change-submit"
+                    action="{{.URLPath "upload_file" "folderID" .Var.folder.ID}}"
                     enctype="multipart/form-data"
                     method="POST"
                 >
                     {{.CSRFTag}}
-                    <div class="form-group">
+                    <div class="c-file-upload">
                         <input type="file" name="file" multiple>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="if if-check"></i>
-                            <span class="btn-text">Upload files</span>
-                        </button>
+                        <div class="c-file-upload__content">
+                            <p>Drag and drop or</p>
+                            <button class="btn btn-outline-primary" type="submit" data-loading="Uploading...">
+                                Upload files
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

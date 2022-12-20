@@ -38,6 +38,10 @@ func (c *Folders) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 }
 
 func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	spaceID := ctx.Path("spaceID")
 	b := FolderForm{}
 	if err := bindForm(r, &b); err != nil {
@@ -63,6 +67,10 @@ func (c *Folders) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 
 // TODO remove files
 func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	folderID := ctx.Path("folderID")
 
 	folder, err := c.repo.Folder(r.Context(), folderID)
@@ -84,6 +92,10 @@ func (c *Folders) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error 
 }
 
 func (c *Folders) UploadFile(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+	if ctx.User() == nil {
+		return ErrUnauthorized
+	}
+
 	folderID := ctx.Path("folderID")
 
 	// 2GB limit on request body

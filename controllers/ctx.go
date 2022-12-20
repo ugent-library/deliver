@@ -22,6 +22,7 @@ const (
 )
 
 // TODO use a pointer to Ctx?
+// TODO turn wrapper into an object?
 func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
 	return func(fn func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +42,18 @@ func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx) error)
 			}
 		}
 	}
+}
+
+var (
+	ErrUnauthorized = &HTTPError{http.StatusUnauthorized}
+)
+
+type HTTPError struct {
+	Code int
+}
+
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("http error %d: %s", e.Code, http.StatusText(e.Code))
 }
 
 type Config struct {
@@ -178,12 +191,20 @@ func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// TODO register error handlers
 func (c *Ctx) handleError(w http.ResponseWriter, r *http.Request, err error) {
-	if errors.Is(err, models.ErrNotFound) {
-		c.Router.NotFoundHandler.ServeHTTP(w, r)
-		return
+	if err == models.ErrNotFound {
+		err = &HTTPError{Code: http.StatusNotFound}
 	}
 
-	// TODO error page
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	var httpErr *HTTPError
+	if !errors.As(err, &httpErr) {
+		httpErr = &HTTPError{Code: http.StatusInternalServerError}
+	}
+
+	if httpErr.Code == http.StatusNotFound {
+		c.Router.NotFoundHandler.ServeHTTP(w, r)
+	} else {
+		http.Error(w, http.StatusText(httpErr.Code), httpErr.Code)
+	}
 }
