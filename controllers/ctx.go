@@ -202,9 +202,12 @@ func (c *Ctx) handleError(w http.ResponseWriter, r *http.Request, err error) {
 		httpErr = &HTTPError{Code: http.StatusInternalServerError}
 	}
 
-	if httpErr.Code == http.StatusNotFound {
+	switch httpErr.Code {
+	case http.StatusNotFound:
 		c.Router.NotFoundHandler.ServeHTTP(w, r)
-	} else {
+	case http.StatusUnauthorized:
+		c.Redirect(w, r, "login")
+	default:
 		http.Error(w, http.StatusText(httpErr.Code), httpErr.Code)
 	}
 }

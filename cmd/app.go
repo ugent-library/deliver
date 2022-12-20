@@ -19,7 +19,6 @@ import (
 	"github.com/ugent-library/dilliver/oidc"
 	"github.com/ugent-library/dilliver/view"
 	"github.com/ugent-library/dilliver/zaphttp"
-	"go.uber.org/zap"
 )
 
 func init() {
@@ -149,10 +148,10 @@ var appCmd = &cobra.Command{
 }
 
 // implement handlers.RecoveryHandlerLogger for zap logger
-type recoveryLogger struct {
-	l *zap.SugaredLogger
-}
+// type recoveryLogger struct {
+// 	l *zap.SugaredLogger
+// }
 
-func (p *recoveryLogger) Println(args ...any) {
-	p.l.Error(args...)
-}
+// func (p *recoveryLogger) Println(args ...any) {
+// 	p.l.Error(args...)
+// }
