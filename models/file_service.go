@@ -21,7 +21,7 @@ type FileService interface {
 func NewFileService(c Config) (FileService, error) {
 	config := aws.Config{
 		Region:      c.S3Region,
-		Credentials: credentials.NewStaticCredentialsProvider(c.S3AccessKeyID, c.S3SecretAccessKey, ""),
+		Credentials: credentials.NewStaticCredentialsProvider(c.S3ID, c.S3Secret, ""),
 	}
 	if c.S3URL != "" {
 		config.EndpointResolverWithOptions = aws.EndpointResolverWithOptionsFunc(func(service, region string, opts ...any) (aws.Endpoint, error) {

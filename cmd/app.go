@@ -12,7 +12,6 @@ import (
 	"github.com/gorilla/sessions"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	c "github.com/ugent-library/dilliver/controllers"
 	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
@@ -29,15 +28,14 @@ var appCmd = &cobra.Command{
 	Use:   "app",
 	Short: "Start the web app server",
 	Run: func(cmd *cobra.Command, args []string) {
-		isProduction := viper.GetBool("production")
-
 		// setup services
 		services, err := models.NewServices(models.Config{
-			DatabaseURL:       viper.GetString("db_url"),
-			S3URL:             viper.GetString("s3_url"),
-			S3AccessKeyID:     viper.GetString("s3_id"),
-			S3SecretAccessKey: viper.GetString("s3_secret"),
-			S3Bucket:          viper.GetString("s3_bucket"),
+			DB:       config.DB,
+			S3URL:    config.S3.URL,
+			S3ID:     config.S3.ID,
+			S3Secret: config.S3.Secret,
+			S3Bucket: config.S3.Bucket,
+			S3Region: config.S3.Region,
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -62,10 +60,10 @@ var appCmd = &cobra.Command{
 			// handlers.RecoveryLogger(&recoveryLogger{logger}),
 		))
 		r.Use(csrf.Protect(
-			[]byte(viper.GetString("csrf_secret")),
-			csrf.CookieName(viper.GetString("session_name")+".csrf"),
+			[]byte(config.Session.Secret),
+			csrf.CookieName(config.Session.Name+".csrf"),
 			csrf.Path("/"),
-			csrf.Secure(isProduction),
+			csrf.Secure(config.Production),
 			csrf.SameSite(csrf.SameSiteStrictMode),
 			csrf.FieldName("csrf_token"),
 		))
@@ -76,24 +74,24 @@ var appCmd = &cobra.Command{
 		}
 
 		// setup sessions
-		sessionName := viper.GetString("session_name")
-		sessionStore := sessions.NewCookieStore([]byte(viper.GetString("session_secret")))
-		sessionStore.MaxAge(viper.GetInt("session_max_age"))
+		sessionName := config.Session.Name
+		sessionStore := sessions.NewCookieStore([]byte(config.Session.Secret))
+		sessionStore.MaxAge(config.Session.MaxAge)
 		sessionStore.Options.Path = "/"
 		sessionStore.Options.HttpOnly = true
-		sessionStore.Options.Secure = isProduction
+		sessionStore.Options.Secure = config.Production
 		// register types so CookieStore can serialize it
 		gob.Register(c.Flash{})
 		gob.Register(&models.User{})
 
 		// setup auth
 		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
-			URL:          viper.GetString("oidc_url"),
-			ClientID:     viper.GetString("oidc_id"),
-			ClientSecret: viper.GetString("oidc_secret"),
-			RedirectURL:  viper.GetString("oidc_redirect_url"),
-			CookieName:   viper.GetString("session_name") + ".state",
-			CookieSecret: []byte(viper.GetString("session_secret")),
+			URL:          config.Oidc.URL,
+			ClientID:     config.Oidc.ID,
+			ClientSecret: config.Oidc.Secret,
+			RedirectURL:  config.Oidc.RedirectURL,
+			CookieName:   config.Session.Name + ".state",
+			CookieSecret: []byte(config.Session.Secret),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -135,13 +133,13 @@ var appCmd = &cobra.Command{
 		var handler http.Handler = r
 		handler = zaphttp.Handler("app", logger.Desugar())(handler)
 		handler = handlers.HTTPMethodOverrideHandler(handler)
-		if isProduction {
+		if config.Production {
 			handler = handlers.ProxyHeaders(handler)
 		}
 
 		// start server
 		// TODO timemouts, graceful shutdown?
-		if err = http.ListenAndServe(viper.GetString("addr"), handler); err != nil {
+		if err = http.ListenAndServe(config.Addr, handler); err != nil {
 			logger.Fatal(err)
 		}
 	},

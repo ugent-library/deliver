@@ -35,7 +35,7 @@ type RepositoryService interface {
 }
 
 func NewRepositoryService(c Config) (RepositoryService, error) {
-	db, err := sql.Open("pgx", c.DatabaseURL)
+	db, err := sql.Open("pgx", c.DB)
 	if err != nil {
 		return nil, err
 	}

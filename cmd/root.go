@@ -6,7 +6,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var configFile string
+var (
+	configFile string
+	config     Config
+)
 
 var logger *zap.SugaredLogger
 
@@ -20,11 +23,11 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file")
 
 	viper.SetEnvPrefix("dilliver")
-	viper.SetDefault("s3_region", "us-east-1")
-	viper.SetDefault("s3_bucket", "dilliver")
+	viper.SetDefault("s3.region", "us-east-1")
+	viper.SetDefault("s3.bucket", "dilliver")
 	viper.SetDefault("addr", "localhost:3002")
-	viper.SetDefault("session_name", "dilliver")
-	viper.SetDefault("session_max_age", 86400*30) // 30 days
+	viper.SetDefault("session.name", "dilliver")
+	viper.SetDefault("session.max_age", 86400*30) // 30 days
 }
 
 func initConfig() {
@@ -34,12 +37,14 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv()
+
+	cobra.CheckErr(viper.Unmarshal(&config))
 }
 
 func initLogger() {
 	var l *zap.Logger
 	var e error
-	if viper.GetBool("production") {
+	if config.Production {
 		l, e = zap.NewProduction()
 	} else {
 		l, e = zap.NewDevelopment()

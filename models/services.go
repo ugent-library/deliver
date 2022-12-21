@@ -5,12 +5,12 @@ import (
 )
 
 type Config struct {
-	DatabaseURL       string
-	S3URL             string
-	S3Region          string
-	S3AccessKeyID     string
-	S3SecretAccessKey string
-	S3Bucket          string
+	DB       string
+	S3URL    string
+	S3Region string
+	S3ID     string
+	S3Secret string
+	S3Bucket string
 }
 
 type Services struct {

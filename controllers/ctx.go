@@ -78,7 +78,7 @@ type Ctx struct {
 	CSRFToken string
 	CSRFTag   template.HTML
 	Flash     []Flash
-	Var       Var
+	Var       any
 	user      *models.User
 }
 
@@ -86,7 +86,7 @@ func (c Ctx) Path(k string) string {
 	return c.path[k]
 }
 
-func (c Ctx) Yield(v Var) Ctx {
+func (c Ctx) Yield(v any) Ctx {
 	c.Var = v
 	return c
 }
