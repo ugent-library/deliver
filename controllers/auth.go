@@ -15,7 +15,7 @@ func NewAuth(oidcAuth *oidc.Auth) *Auth {
 	}
 }
 
-func (c *Auth) Callback(ctx *Ctx) error {
+func (c *Auth) Callback(ctx Ctx) error {
 	claims := oidc.Claims{}
 	if err := c.oidcAuth.CompleteAuth(ctx.Res, ctx.Req, &claims); err != nil {
 		return err
@@ -31,11 +31,11 @@ func (c *Auth) Callback(ctx *Ctx) error {
 	return nil
 }
 
-func (c *Auth) Login(ctx *Ctx) error {
+func (c *Auth) Login(ctx Ctx) error {
 	return c.oidcAuth.BeginAuth(ctx.Res, ctx.Req)
 }
 
-func (c *Auth) Logout(ctx *Ctx) error {
+func (c *Auth) Logout(ctx Ctx) error {
 	if err := ctx.DeleteUser(); err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package controllers
+package handler
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"go.uber.org/zap"
 )
@@ -23,10 +24,10 @@ const (
 )
 
 // TODO turn wrapper into an object
-func Wrapper(c Config) func(func(*Ctx) error) http.HandlerFunc {
-	return func(fn func(*Ctx) error) http.HandlerFunc {
+func Wrapper[U any](c Config) func(func(*Ctx[U]) error) http.HandlerFunc {
+	return func(fn func(*Ctx[U]) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			ctx := &Ctx{
+			ctx := &Ctx[U]{
 				Config:    c,
 				Res:       w,
 				Req:       r,
@@ -45,18 +46,6 @@ func Wrapper(c Config) func(func(*Ctx) error) http.HandlerFunc {
 	}
 }
 
-var (
-	ErrUnauthorized = &HTTPError{http.StatusUnauthorized}
-)
-
-type HTTPError struct {
-	Code int
-}
-
-func (e *HTTPError) Error() string {
-	return fmt.Sprintf("http error %d: %s", e.Code, http.StatusText(e.Code))
-}
-
 type Config struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
@@ -70,9 +59,7 @@ type Flash struct {
 	Body  template.HTML
 }
 
-type Var map[string]any
-
-type Ctx struct {
+type Ctx[U any] struct {
 	Config
 	Res       http.ResponseWriter
 	Req       *http.Request
@@ -81,23 +68,23 @@ type Ctx struct {
 	CSRFTag   template.HTML
 	Flash     []Flash
 	Var       any
-	user      *models.User
+	user      *U
 }
 
-func (c *Ctx) Context() context.Context {
+func (c *Ctx[U]) Context() context.Context {
 	return c.Req.Context()
 }
 
-func (c *Ctx) Path(k string) string {
+func (c *Ctx[U]) Path(k string) string {
 	return c.path[k]
 }
 
-func (c *Ctx) Yield(v any) *Ctx {
+func (c *Ctx[U]) Yield(v any) *Ctx[U] {
 	c.Var = v
 	return c
 }
 
-func (c *Ctx) URL(route string, pairs ...string) *url.URL {
+func (c *Ctx[U]) URL(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -118,7 +105,7 @@ func (c *Ctx) URL(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c *Ctx) URLPath(route string, pairs ...string) *url.URL {
+func (c *Ctx[U]) URLPath(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -130,15 +117,15 @@ func (c *Ctx) URLPath(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c *Ctx) Redirect(route string, pairs ...string) {
+func (c *Ctx[U]) Redirect(route string, pairs ...string) {
 	http.Redirect(c.Res, c.Req, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
 }
 
-func (c *Ctx) User() *models.User {
+func (c *Ctx[U]) User() *U {
 	return c.user
 }
 
-func (c *Ctx) SetUser(u *models.User) error {
+func (c *Ctx[U]) SetUser(u *U) error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -151,7 +138,7 @@ func (c *Ctx) SetUser(u *models.User) error {
 	return nil
 }
 
-func (c *Ctx) DeleteUser() error {
+func (c *Ctx[U]) DeleteUser() error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -164,7 +151,7 @@ func (c *Ctx) DeleteUser() error {
 	return nil
 }
 
-func (c *Ctx) PersistFlash(f Flash) error {
+func (c *Ctx[U]) PersistFlash(f Flash) error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -176,14 +163,14 @@ func (c *Ctx) PersistFlash(f Flash) error {
 	return nil
 }
 
-func (c *Ctx) loadSession() error {
+func (c *Ctx[U]) loadSession() error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
 
 	if user := s.Values[userSessionKey]; user != nil {
-		c.user = user.(*models.User)
+		c.user = user.(*U)
 	}
 
 	for _, f := range s.Flashes(flashSessionKey) {
@@ -198,14 +185,14 @@ func (c *Ctx) loadSession() error {
 }
 
 // TODO register error handlers
-func (c *Ctx) handleError(err error) {
+func (c *Ctx[U]) handleError(err error) {
 	if err == models.ErrNotFound {
-		err = &HTTPError{Code: http.StatusNotFound}
+		err = httperror.NotFound
 	}
 
-	var httpErr *HTTPError
+	var httpErr *httperror.Error
 	if !errors.As(err, &httpErr) {
-		httpErr = &HTTPError{Code: http.StatusInternalServerError}
+		httpErr = httperror.InternalServerError
 	}
 
 	switch httpErr.Code {

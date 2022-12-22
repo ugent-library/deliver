@@ -3,6 +3,8 @@ package controllers
 import (
 	"context"
 
+	"github.com/ugent-library/dilliver/handler"
+	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
 )
@@ -25,9 +27,9 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
-func (c *Spaces) List(ctx *Ctx) error {
+func (c *Spaces) List(ctx Ctx) error {
 	if ctx.User() == nil {
-		return ErrUnauthorized
+		return httperror.Unauthorized
 	}
 
 	spaces, err := c.repo.Spaces(ctx.Context())
@@ -39,9 +41,9 @@ func (c *Spaces) List(ctx *Ctx) error {
 	}))
 }
 
-func (c *Spaces) Show(ctx *Ctx) error {
+func (c *Spaces) Show(ctx Ctx) error {
 	if ctx.User() == nil {
-		return ErrUnauthorized
+		return httperror.Unauthorized
 	}
 
 	spaceID := ctx.Path("spaceID")
@@ -54,9 +56,9 @@ func (c *Spaces) Show(ctx *Ctx) error {
 	}))
 }
 
-func (c *Spaces) Create(ctx *Ctx) error {
+func (c *Spaces) Create(ctx Ctx) error {
 	if ctx.User() == nil {
-		return ErrUnauthorized
+		return httperror.Unauthorized
 	}
 
 	b := SpaceForm{}
@@ -71,7 +73,7 @@ func (c *Spaces) Create(ctx *Ctx) error {
 		return err
 	}
 
-	ctx.PersistFlash(Flash{
+	ctx.PersistFlash(handler.Flash{
 		Type: "info",
 		Body: "Space created succesfully",
 	})

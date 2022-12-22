@@ -13,6 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 	c "github.com/ugent-library/dilliver/controllers"
+	"github.com/ugent-library/dilliver/handler"
 	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/oidc"
@@ -81,7 +82,7 @@ var appCmd = &cobra.Command{
 		sessionStore.Options.HttpOnly = true
 		sessionStore.Options.Secure = config.Production
 		// register types so CookieStore can serialize it
-		gob.Register(c.Flash{})
+		gob.Register(handler.Flash{})
 		gob.Register(&models.User{})
 
 		// setup auth
@@ -105,7 +106,7 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := c.Wrapper(c.Config{
+		wrap := handler.Wrapper[models.User](handler.Config{
 			Log:          logger,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,

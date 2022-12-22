@@ -16,10 +16,10 @@ func NewPages() *Pages {
 	}
 }
 
-func (c *Pages) Home(ctx *Ctx) error {
+func (c *Pages) Home(ctx Ctx) error {
 	return c.homeView.Render(ctx.Res, ctx)
 }
 
-func (c *Pages) NotFound(ctx *Ctx) error {
+func (c *Pages) NotFound(ctx Ctx) error {
 	return c.notFoundView.Render(ctx.Res, ctx)
 }

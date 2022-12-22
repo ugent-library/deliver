@@ -3,6 +3,8 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/ugent-library/dilliver/handler"
+	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
@@ -26,7 +28,7 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	}
 }
 
-func (c *Folders) Show(ctx *Ctx) error {
+func (c *Folders) Show(ctx Ctx) error {
 	folderID := ctx.Path("folderID")
 	folder, err := c.repo.Folder(ctx.Context(), folderID)
 	if err != nil {
@@ -37,9 +39,9 @@ func (c *Folders) Show(ctx *Ctx) error {
 	}))
 }
 
-func (c *Folders) Create(ctx *Ctx) error {
+func (c *Folders) Create(ctx Ctx) error {
 	if ctx.User() == nil {
-		return ErrUnauthorized
+		return httperror.Unauthorized
 	}
 
 	spaceID := ctx.Path("spaceID")
@@ -56,8 +58,8 @@ func (c *Folders) Create(ctx *Ctx) error {
 		return err
 	}
 
-	ctx.PersistFlash(Flash{
-		Type: Info,
+	ctx.PersistFlash(handler.Flash{
+		Type: handler.Info,
 		Body: "Folder created succesfully",
 	})
 	ctx.Redirect("folder", "folderID", folder.ID)
@@ -66,9 +68,9 @@ func (c *Folders) Create(ctx *Ctx) error {
 }
 
 // TODO remove files
-func (c *Folders) Delete(ctx *Ctx) error {
+func (c *Folders) Delete(ctx Ctx) error {
 	if ctx.User() == nil {
-		return ErrUnauthorized
+		return httperror.Unauthorized
 	}
 
 	folderID := ctx.Path("folderID")
@@ -82,8 +84,8 @@ func (c *Folders) Delete(ctx *Ctx) error {
 		return err
 	}
 
-	ctx.PersistFlash(Flash{
-		Type: Info,
+	ctx.PersistFlash(handler.Flash{
+		Type: handler.Info,
 		Body: "Folder deleted succesfully",
 	})
 	ctx.Redirect("space", "spaceID", folder.SpaceID)
@@ -91,9 +93,9 @@ func (c *Folders) Delete(ctx *Ctx) error {
 	return nil
 }
 
-func (c *Folders) UploadFile(ctx *Ctx) error {
+func (c *Folders) UploadFile(ctx Ctx) error {
 	if ctx.User() == nil {
-		return ErrUnauthorized
+		return httperror.Unauthorized
 	}
 
 	folderID := ctx.Path("folderID")
@@ -138,8 +140,8 @@ func (c *Folders) UploadFile(ctx *Ctx) error {
 		}
 	}
 
-	ctx.PersistFlash(Flash{
-		Type: Info,
+	ctx.PersistFlash(handler.Flash{
+		Type: handler.Info,
 		Body: "File added succesfully",
 	})
 	ctx.Redirect("folder", "folderID", folderID)
