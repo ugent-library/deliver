@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
@@ -26,42 +25,42 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
-func (c *Spaces) List(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+func (c *Spaces) List(ctx *Ctx) error {
 	if ctx.User() == nil {
 		return ErrUnauthorized
 	}
 
-	spaces, err := c.repo.Spaces(r.Context())
+	spaces, err := c.repo.Spaces(ctx.Context())
 	if err != nil {
 		return err
 	}
-	return c.listView.Render(w, ctx.Yield(Var{
+	return c.listView.Render(ctx.Res, ctx.Yield(Var{
 		"spaces": spaces,
 	}))
 }
 
-func (c *Spaces) Show(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+func (c *Spaces) Show(ctx *Ctx) error {
 	if ctx.User() == nil {
 		return ErrUnauthorized
 	}
 
 	spaceID := ctx.Path("spaceID")
-	space, err := c.repo.Space(r.Context(), spaceID)
+	space, err := c.repo.Space(ctx.Req.Context(), spaceID)
 	if err != nil {
 		return err
 	}
-	return c.showView.Render(w, ctx.Yield(Var{
+	return c.showView.Render(ctx.Res, ctx.Yield(Var{
 		"space": space,
 	}))
 }
 
-func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+func (c *Spaces) Create(ctx *Ctx) error {
 	if ctx.User() == nil {
 		return ErrUnauthorized
 	}
 
 	b := SpaceForm{}
-	if err := bindForm(r, &b); err != nil {
+	if err := bindForm(ctx.Req, &b); err != nil {
 		return err
 	}
 
@@ -72,11 +71,11 @@ func (c *Spaces) Create(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
 		return err
 	}
 
-	ctx.PersistFlash(w, r, Flash{
+	ctx.PersistFlash(Flash{
 		Type: "info",
 		Body: "Space created succesfully",
 	})
-	ctx.Redirect(w, r, "space", "spaceID", space.ID)
+	ctx.Redirect("space", "spaceID", space.ID)
 
 	return nil
 }

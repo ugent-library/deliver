@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html/template"
@@ -21,24 +22,24 @@ const (
 	userSessionKey  = "user"
 )
 
-// TODO use a pointer to Ctx?
-// TODO turn wrapper into an object?
-func Wrapper(c Config) func(func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
-	return func(fn func(http.ResponseWriter, *http.Request, Ctx) error) http.HandlerFunc {
+// TODO turn wrapper into an object
+func Wrapper(c Config) func(func(*Ctx) error) http.HandlerFunc {
+	return func(fn func(*Ctx) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			ctx := Ctx{
+			ctx := &Ctx{
 				Config:    c,
-				Request:   r,
+				Res:       w,
+				Req:       r,
 				path:      mux.Vars(r),
 				CSRFToken: csrf.Token(r),
 				CSRFTag:   csrf.TemplateField(r),
 			}
-			if err := ctx.loadSession(w, r); err != nil {
-				ctx.handleError(w, r, err)
+			if err := ctx.loadSession(); err != nil {
+				ctx.handleError(err)
 				return
 			}
-			if err := fn(w, r, ctx); err != nil {
-				ctx.handleError(w, r, err)
+			if err := fn(ctx); err != nil {
+				ctx.handleError(err)
 			}
 		}
 	}
@@ -73,7 +74,8 @@ type Var map[string]any
 
 type Ctx struct {
 	Config
-	Request   *http.Request
+	Res       http.ResponseWriter
+	Req       *http.Request
 	path      map[string]string
 	CSRFToken string
 	CSRFTag   template.HTML
@@ -82,16 +84,20 @@ type Ctx struct {
 	user      *models.User
 }
 
-func (c Ctx) Path(k string) string {
+func (c *Ctx) Context() context.Context {
+	return c.Req.Context()
+}
+
+func (c *Ctx) Path(k string) string {
 	return c.path[k]
 }
 
-func (c Ctx) Yield(v any) Ctx {
+func (c *Ctx) Yield(v any) *Ctx {
 	c.Var = v
 	return c
 }
 
-func (c Ctx) URL(route string, pairs ...string) *url.URL {
+func (c *Ctx) URL(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -101,10 +107,10 @@ func (c Ctx) URL(route string, pairs ...string) *url.URL {
 		panic(fmt.Errorf("can't reverse route '%s': %w", route, err))
 	}
 	if u.Host == "" {
-		u.Host = c.Request.Host
+		u.Host = c.Req.Host
 	}
 	if u.Scheme == "" {
-		u.Scheme = c.Request.URL.Scheme
+		u.Scheme = c.Req.URL.Scheme
 	}
 	if u.Scheme == "" {
 		u.Scheme = "http"
@@ -112,7 +118,7 @@ func (c Ctx) URL(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
+func (c *Ctx) URLPath(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -124,54 +130,54 @@ func (c Ctx) URLPath(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c Ctx) Redirect(w http.ResponseWriter, r *http.Request, route string, pairs ...string) {
-	http.Redirect(w, r, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
+func (c *Ctx) Redirect(route string, pairs ...string) {
+	http.Redirect(c.Res, c.Req, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
 }
 
-func (c Ctx) User() *models.User {
+func (c *Ctx) User() *models.User {
 	return c.user
 }
 
-func (c *Ctx) SetUser(w http.ResponseWriter, r *http.Request, u *models.User) error {
-	s, err := c.SessionStore.Get(r, c.SessionName)
+func (c *Ctx) SetUser(u *models.User) error {
+	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
 	s.Values[userSessionKey] = u
-	if err := s.Save(r, w); err != nil {
+	if err := s.Save(c.Req, c.Res); err != nil {
 		return fmt.Errorf("couldn't save session data: %w", err)
 	}
 	c.user = u
 	return nil
 }
 
-func (c *Ctx) DeleteUser(w http.ResponseWriter, r *http.Request) error {
-	s, err := c.SessionStore.Get(r, c.SessionName)
+func (c *Ctx) DeleteUser() error {
+	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
 	delete(s.Values, userSessionKey)
-	if err := s.Save(r, w); err != nil {
+	if err := s.Save(c.Req, c.Res); err != nil {
 		return fmt.Errorf("couldn't save session data: %w", err)
 	}
 	c.user = nil
 	return nil
 }
 
-func (c Ctx) PersistFlash(w http.ResponseWriter, r *http.Request, f Flash) error {
-	s, err := c.SessionStore.Get(r, c.SessionName)
+func (c *Ctx) PersistFlash(f Flash) error {
+	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
 	s.AddFlash(f, flashSessionKey)
-	if err := s.Save(r, w); err != nil {
+	if err := s.Save(c.Req, c.Res); err != nil {
 		return fmt.Errorf("couldn't save session data: %w", err)
 	}
 	return nil
 }
 
-func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
-	s, err := c.SessionStore.Get(r, c.SessionName)
+func (c *Ctx) loadSession() error {
+	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
 	}
@@ -184,7 +190,7 @@ func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
 		c.Flash = append(c.Flash, f.(Flash))
 	}
 
-	if err := s.Save(r, w); err != nil {
+	if err := s.Save(c.Req, c.Res); err != nil {
 		return fmt.Errorf("couldn't save session data: %w", err)
 	}
 
@@ -192,7 +198,7 @@ func (c *Ctx) loadSession(w http.ResponseWriter, r *http.Request) error {
 }
 
 // TODO register error handlers
-func (c *Ctx) handleError(w http.ResponseWriter, r *http.Request, err error) {
+func (c *Ctx) handleError(err error) {
 	if err == models.ErrNotFound {
 		err = &HTTPError{Code: http.StatusNotFound}
 	}
@@ -204,10 +210,11 @@ func (c *Ctx) handleError(w http.ResponseWriter, r *http.Request, err error) {
 
 	switch httpErr.Code {
 	case http.StatusNotFound:
-		c.Router.NotFoundHandler.ServeHTTP(w, r)
+		// TODO use controller action directly
+		c.Router.NotFoundHandler.ServeHTTP(c.Res, c.Req)
 	case http.StatusUnauthorized:
-		c.Redirect(w, r, "login")
+		c.Redirect("login")
 	default:
-		http.Error(w, http.StatusText(httpErr.Code), httpErr.Code)
+		http.Error(c.Res, http.StatusText(httpErr.Code), httpErr.Code)
 	}
 }

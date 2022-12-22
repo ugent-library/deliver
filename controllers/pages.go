@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/ugent-library/dilliver/view"
 )
 
@@ -18,10 +16,10 @@ func NewPages() *Pages {
 	}
 }
 
-func (c *Pages) Home(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	return c.homeView.Render(w, ctx)
+func (c *Pages) Home(ctx *Ctx) error {
+	return c.homeView.Render(ctx.Res, ctx)
 }
 
-func (c *Pages) NotFound(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	return c.notFoundView.Render(w, ctx)
+func (c *Pages) NotFound(ctx *Ctx) error {
+	return c.notFoundView.Render(ctx.Res, ctx)
 }

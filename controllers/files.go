@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/ugent-library/dilliver/models"
 )
 
@@ -18,36 +16,36 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-func (c *Files) Download(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+func (c *Files) Download(ctx *Ctx) error {
 	fileID := ctx.Path("fileID")
-	if _, err := c.repo.File(r.Context(), fileID); err != nil {
+	if _, err := c.repo.File(ctx.Context(), fileID); err != nil {
 		return err
 	}
-	return c.file.Get(r.Context(), fileID, w)
+	return c.file.Get(ctx.Context(), fileID, ctx.Res)
 }
 
-func (c *Files) Delete(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+func (c *Files) Delete(ctx *Ctx) error {
 	if ctx.User() == nil {
 		return ErrUnauthorized
 	}
 
 	fileID := ctx.Path("fileID")
-	file, err := c.repo.File(r.Context(), fileID)
+	file, err := c.repo.File(ctx.Context(), fileID)
 	if err != nil {
 		return err
 	}
-	if err := c.repo.DeleteFile(r.Context(), fileID); err != nil {
+	if err := c.repo.DeleteFile(ctx.Context(), fileID); err != nil {
 		return err
 	}
-	if err := c.file.Delete(r.Context(), fileID); err != nil {
+	if err := c.file.Delete(ctx.Context(), fileID); err != nil {
 		return err
 	}
 
-	ctx.PersistFlash(w, r, Flash{
+	ctx.PersistFlash(Flash{
 		Type: Info,
 		Body: "File deleted succesfully",
 	})
-	ctx.Redirect(w, r, "folder", "folderID", file.FolderID)
+	ctx.Redirect("folder", "folderID", file.FolderID)
 
 	return nil
 }

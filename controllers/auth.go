@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/oidc"
 )
@@ -17,30 +15,30 @@ func NewAuth(oidcAuth *oidc.Auth) *Auth {
 	}
 }
 
-func (c *Auth) Callback(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
+func (c *Auth) Callback(ctx *Ctx) error {
 	claims := oidc.Claims{}
-	if err := c.oidcAuth.CompleteAuth(w, r, &claims); err != nil {
+	if err := c.oidcAuth.CompleteAuth(ctx.Res, ctx.Req, &claims); err != nil {
 		return err
 	}
-	if err := ctx.SetUser(w, r, &models.User{
+	if err := ctx.SetUser(&models.User{
 		Username: claims.PreferredUsername,
 		Name:     claims.Name,
 		Email:    claims.Email,
 	}); err != nil {
 		return err
 	}
-	ctx.Redirect(w, r, "spaces")
+	ctx.Redirect("spaces")
 	return nil
 }
 
-func (c *Auth) Login(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	return c.oidcAuth.BeginAuth(w, r)
+func (c *Auth) Login(ctx *Ctx) error {
+	return c.oidcAuth.BeginAuth(ctx.Res, ctx.Req)
 }
 
-func (c *Auth) Logout(w http.ResponseWriter, r *http.Request, ctx Ctx) error {
-	if err := ctx.DeleteUser(w, r); err != nil {
+func (c *Auth) Logout(ctx *Ctx) error {
+	if err := ctx.DeleteUser(); err != nil {
 		return err
 	}
-	ctx.Redirect(w, r, "home")
+	ctx.Redirect("home")
 	return nil
 }
