@@ -7,6 +7,4 @@ import (
 
 type (
 	Ctx = *handler.Ctx[models.User]
-
-	Data = map[string]any
 )

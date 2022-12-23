@@ -22,6 +22,8 @@ var (
 	}
 )
 
+type Data = map[string]any
+
 type View struct {
 	Template *template.Template
 	status   int
