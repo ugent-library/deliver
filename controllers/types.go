@@ -8,5 +8,5 @@ import (
 type (
 	Ctx = *handler.Ctx[models.User]
 
-	Var = map[string]any
+	Data = map[string]any
 )

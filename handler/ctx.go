@@ -23,7 +23,7 @@ const (
 	userSessionKey  = "user"
 )
 
-// TODO turn wrapper into an object
+// TODO turn wrapper into an object?
 func Wrapper[U any](c Config) func(func(*Ctx[U]) error) http.HandlerFunc {
 	return func(fn func(*Ctx[U]) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +53,7 @@ type Config struct {
 	Router       *mux.Router
 }
 
+// TODO remove
 type Flash struct {
 	Type  string
 	Title string
@@ -67,7 +68,6 @@ type Ctx[U any] struct {
 	CSRFToken string
 	CSRFTag   template.HTML
 	Flash     []Flash
-	Var       any
 	user      *U
 }
 
@@ -77,11 +77,6 @@ func (c *Ctx[U]) Context() context.Context {
 
 func (c *Ctx[U]) Path(k string) string {
 	return c.path[k]
-}
-
-func (c *Ctx[U]) Yield(v any) *Ctx[U] {
-	c.Var = v
-	return c
 }
 
 func (c *Ctx[U]) URL(route string, pairs ...string) *url.URL {
@@ -115,6 +110,19 @@ func (c *Ctx[U]) URLPath(route string, pairs ...string) *url.URL {
 		panic(fmt.Errorf("can't reverse route '%s': %w", route, err))
 	}
 	return u
+}
+
+type Renderer interface {
+	Render(http.ResponseWriter, any) error
+}
+
+type RenderData[U any] struct {
+	*Ctx[U]
+	Data any
+}
+
+func (c *Ctx[U]) Render(r Renderer, data any) error {
+	return r.Render(c.Res, RenderData[U]{c, data})
 }
 
 func (c *Ctx[U]) Redirect(route string, pairs ...string) {

@@ -1,4 +1,4 @@
-{{define "page_title"}}{{.Var.folder.Name}}{{end}}
+{{define "page_title"}}{{.Data.folder.Name}}{{end}}
 {{define "body"}}
 <div class="w-100 u-scroll-wrapper">
     <div class="bg-white">
@@ -6,7 +6,7 @@
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
                     <div class="bc-toolbar-item">
-                        <h4 class="bc-toolbar-title">{{.Var.folder.Name}}</h4>
+                        <h4 class="bc-toolbar-title">{{.Data.folder.Name}}</h4>
                     </div>
                 </div>
             </div>
@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 <form class="change-submit"
-                    action="{{.URLPath "upload_file" "folderID" .Var.folder.ID}}"
+                    action="{{.URLPath "upload_file" "folderID" .Data.folder.ID}}"
                     enctype="multipart/form-data"
                     method="POST"
                 >
@@ -50,7 +50,7 @@
                     </div>
                     <div class="bc-toolbar-right">
                         <div class="bc-toolbar-item">
-                            <p>{{len .Var.folder.Edges.Files}} items</p>
+                            <p>{{len .Data.folder.Edges.Files}} items</p>
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{range .Var.folder.Edges.Files}}
+                        {{range .Data.folder.Edges.Files}}
                         <tr class="clickable-table-row">
                             <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                                 <a href="{{$.URLPath "download_file" "fileID" .ID}}">

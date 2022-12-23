@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// 4xx
 	BadRequest                   = New(http.StatusBadRequest)
 	Unauthorized                 = New(http.StatusUnauthorized)
 	PaymentRequired              = New(http.StatusPaymentRequired)
@@ -35,7 +36,7 @@ var (
 	TooManyRequests              = New(http.StatusTooManyRequests)
 	RequestHeaderFieldsTooLarge  = New(http.StatusRequestHeaderFieldsTooLarge)
 	UnavailableForLegalReasons   = New(http.StatusUnavailableForLegalReasons)
-
+	// 5xx
 	InternalServerError           = New(http.StatusInternalServerError)
 	NotImplemented                = New(http.StatusNotImplemented)
 	BadGateway                    = New(http.StatusBadGateway)

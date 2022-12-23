@@ -1,4 +1,4 @@
-{{define "page_title"}}{{.Var.space.Name}}{{end}}
+{{define "page_title"}}{{.Data.space.Name}}{{end}}
 {{define "body"}}
 <div class="c-sub-sidebar c-sidebar--bordered">
     <div class="bc-navbar bc-navbar--xlarge bc-navbar--bordered-bottom">
@@ -14,8 +14,8 @@
         <nav>
             <ul class="c-sub-sidebar-menu">
                 <li class="c-sub-sidebar__item c-sub-sidebar__item--active">
-                    <a href="{{.URLPath "space" "spaceID" .Var.space.ID}}">
-                        <span class="c-sidebar__label">{{.Var.space.Name}}</span>
+                    <a href="{{.URLPath "space" "spaceID" .Data.space.ID}}">
+                        <span class="c-sidebar__label">{{.Data.space.Name}}</span>
                     </a>
                 </li>
                 <li class="c-sub-sidebar__item">
@@ -34,7 +34,7 @@
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
                     <div class="bc-toolbar-item">
-                        <h4 class="bc-toolbar-title">{{.Var.space.Name}} folders</h4>
+                        <h4 class="bc-toolbar-title">{{.Data.space.Name}} folders</h4>
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{.URLPath "create_folder" "spaceID" .Var.space.ID}}" method="POST">
+                <form action="{{.URLPath "create_folder" "spaceID" .Data.space.ID}}" method="POST">
                     {{.CSRFTag}}
                     <div class="form-group">
                         <div class="form-row form-group">
@@ -86,7 +86,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{range .Var.space.Edges.Folders}}
+                        {{range .Data.space.Edges.Folders}}
                         <tr>
                             <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                                 <a href="{{$.URLPath "folder" "folderID" .ID}}">{{.Name}}</a>

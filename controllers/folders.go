@@ -34,9 +34,9 @@ func (c *Folders) Show(ctx Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.showView.Render(ctx.Res, ctx.Yield(Var{
+	return ctx.Render(c.showView, Data{
 		"folder": folder,
-	}))
+	})
 }
 
 func (c *Folders) Create(ctx Ctx) error {
