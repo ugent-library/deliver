@@ -27,57 +27,57 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
-func (c *Spaces) List(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Spaces) List(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
-	spaces, err := c.repo.Spaces(ctx.Context())
+	spaces, err := h.repo.Spaces(c.Context())
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c.listView, Map{
+	return c.Render(h.listView, Map{
 		"spaces": spaces,
 	})
 }
 
-func (c *Spaces) Show(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Spaces) Show(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
-	spaceID := ctx.Path("spaceID")
-	space, err := c.repo.Space(ctx.Req.Context(), spaceID)
+	spaceID := c.Path("spaceID")
+	space, err := h.repo.Space(c.Req.Context(), spaceID)
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c.showView, Map{
+	return c.Render(h.showView, Map{
 		"space": space,
 	})
 }
 
-func (c *Spaces) Create(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Spaces) Create(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
 	b := SpaceForm{}
-	if err := bindForm(ctx.Req, &b); err != nil {
+	if err := bindForm(c.Req, &b); err != nil {
 		return err
 	}
 
 	space := &models.Space{
 		Name: b.Name,
 	}
-	if err := c.repo.CreateSpace(context.TODO(), space); err != nil {
+	if err := h.repo.CreateSpace(context.TODO(), space); err != nil {
 		return err
 	}
 
-	ctx.PersistFlash(handler.Flash{
+	c.PersistFlash(handler.Flash{
 		Type: "info",
 		Body: "Space created succesfully",
 	})
-	ctx.Redirect("space", "spaceID", space.ID)
+	c.Redirect("space", "spaceID", space.ID)
 
 	return nil
 }

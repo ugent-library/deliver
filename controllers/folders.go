@@ -28,25 +28,25 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	}
 }
 
-func (c *Folders) Show(ctx Ctx) error {
-	folderID := ctx.Path("folderID")
-	folder, err := c.repo.Folder(ctx.Context(), folderID)
+func (h *Folders) Show(c Ctx) error {
+	folderID := c.Path("folderID")
+	folder, err := h.repo.Folder(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c.showView, Map{
+	return c.Render(h.showView, Map{
 		"folder": folder,
 	})
 }
 
-func (c *Folders) Create(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Folders) Create(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
-	spaceID := ctx.Path("spaceID")
+	spaceID := c.Path("spaceID")
 	b := FolderForm{}
-	if err := bindForm(ctx.Req, &b); err != nil {
+	if err := bindForm(c.Req, &b); err != nil {
 		return err
 	}
 
@@ -54,60 +54,60 @@ func (c *Folders) Create(ctx Ctx) error {
 		SpaceID: spaceID,
 		Name:    b.Name,
 	}
-	if err := c.repo.CreateFolder(ctx.Context(), folder); err != nil {
+	if err := h.repo.CreateFolder(c.Context(), folder); err != nil {
 		return err
 	}
 
-	ctx.PersistFlash(handler.Flash{
+	c.PersistFlash(handler.Flash{
 		Type: handler.Info,
 		Body: "Folder created succesfully",
 	})
-	ctx.Redirect("folder", "folderID", folder.ID)
+	c.Redirect("folder", "folderID", folder.ID)
 
 	return nil
 }
 
 // TODO remove files
-func (c *Folders) Delete(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Folders) Delete(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
-	folderID := ctx.Path("folderID")
+	folderID := c.Path("folderID")
 
-	folder, err := c.repo.Folder(ctx.Context(), folderID)
+	folder, err := h.repo.Folder(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
 
-	if err := c.repo.DeleteFolder(ctx.Context(), folderID); err != nil {
+	if err := h.repo.DeleteFolder(c.Context(), folderID); err != nil {
 		return err
 	}
 
-	ctx.PersistFlash(handler.Flash{
+	c.PersistFlash(handler.Flash{
 		Type: handler.Info,
 		Body: "Folder deleted succesfully",
 	})
-	ctx.Redirect("space", "spaceID", folder.SpaceID)
+	c.Redirect("space", "spaceID", folder.SpaceID)
 
 	return nil
 }
 
-func (c *Folders) UploadFile(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Folders) UploadFile(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
-	folderID := ctx.Path("folderID")
+	folderID := c.Path("folderID")
 
 	// 2GB limit on request body
-	ctx.Req.Body = http.MaxBytesReader(ctx.Res, ctx.Req.Body, 2_000_000_000)
+	c.Req.Body = http.MaxBytesReader(c.Res, c.Req.Body, 2_000_000_000)
 	// buffer limit of 32MB
-	if err := ctx.Req.ParseMultipartForm(32_000_000); err != nil {
+	if err := c.Req.ParseMultipartForm(32_000_000); err != nil {
 		return err
 	}
 
-	for _, fileHeader := range ctx.Req.MultipartForm.File["file"] {
+	for _, fileHeader := range c.Req.MultipartForm.File["file"] {
 		f, err := fileHeader.Open()
 		if err != nil {
 			return err
@@ -128,23 +128,23 @@ func (c *Folders) UploadFile(ctx Ctx) error {
 		}
 
 		// TODO get size
-		md5, err := c.file.Add(ctx.Context(), file.ID, f)
+		md5, err := h.file.Add(c.Context(), file.ID, f)
 		if err != nil {
 			return err
 		}
 
 		file.Md5 = md5
 
-		if err = c.repo.CreateFile(ctx.Context(), file); err != nil {
+		if err = h.repo.CreateFile(c.Context(), file); err != nil {
 			return err
 		}
 	}
 
-	ctx.PersistFlash(handler.Flash{
+	c.PersistFlash(handler.Flash{
 		Type: handler.Info,
 		Body: "File added succesfully",
 	})
-	ctx.Redirect("folder", "folderID", folderID)
+	c.Redirect("folder", "folderID", folderID)
 
 	return nil
 }

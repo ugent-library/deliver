@@ -18,36 +18,36 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-func (c *Files) Download(ctx Ctx) error {
-	fileID := ctx.Path("fileID")
-	if _, err := c.repo.File(ctx.Context(), fileID); err != nil {
+func (h *Files) Download(c Ctx) error {
+	fileID := c.Path("fileID")
+	if _, err := h.repo.File(c.Context(), fileID); err != nil {
 		return err
 	}
-	return c.file.Get(ctx.Context(), fileID, ctx.Res)
+	return h.file.Get(c.Context(), fileID, c.Res)
 }
 
-func (c *Files) Delete(ctx Ctx) error {
-	if ctx.User() == nil {
+func (h *Files) Delete(c Ctx) error {
+	if c.User() == nil {
 		return httperror.Unauthorized
 	}
 
-	fileID := ctx.Path("fileID")
-	file, err := c.repo.File(ctx.Context(), fileID)
+	fileID := c.Path("fileID")
+	file, err := h.repo.File(c.Context(), fileID)
 	if err != nil {
 		return err
 	}
-	if err := c.repo.DeleteFile(ctx.Context(), fileID); err != nil {
+	if err := h.repo.DeleteFile(c.Context(), fileID); err != nil {
 		return err
 	}
-	if err := c.file.Delete(ctx.Context(), fileID); err != nil {
+	if err := h.file.Delete(c.Context(), fileID); err != nil {
 		return err
 	}
 
-	ctx.PersistFlash(handler.Flash{
+	c.PersistFlash(handler.Flash{
 		Type: handler.Info,
 		Body: "File deleted succesfully",
 	})
-	ctx.Redirect("folder", "folderID", file.FolderID)
+	c.Redirect("folder", "folderID", file.FolderID)
 
 	return nil
 }

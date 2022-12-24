@@ -15,30 +15,30 @@ func NewAuth(oidcAuth *oidc.Auth) *Auth {
 	}
 }
 
-func (c *Auth) Callback(ctx Ctx) error {
+func (h *Auth) Callback(c Ctx) error {
 	claims := oidc.Claims{}
-	if err := c.oidcAuth.CompleteAuth(ctx.Res, ctx.Req, &claims); err != nil {
+	if err := h.oidcAuth.CompleteAuth(c.Res, c.Req, &claims); err != nil {
 		return err
 	}
-	if err := ctx.SetUser(&models.User{
+	if err := c.SetUser(&models.User{
 		Username: claims.PreferredUsername,
 		Name:     claims.Name,
 		Email:    claims.Email,
 	}); err != nil {
 		return err
 	}
-	ctx.Redirect("spaces")
+	c.Redirect("spaces")
 	return nil
 }
 
-func (c *Auth) Login(ctx Ctx) error {
-	return c.oidcAuth.BeginAuth(ctx.Res, ctx.Req)
+func (h *Auth) Login(c Ctx) error {
+	return h.oidcAuth.BeginAuth(c.Res, c.Req)
 }
 
-func (c *Auth) Logout(ctx Ctx) error {
-	if err := ctx.DeleteUser(); err != nil {
+func (h *Auth) Logout(c Ctx) error {
+	if err := c.DeleteUser(); err != nil {
 		return err
 	}
-	ctx.Redirect("home")
+	c.Redirect("home")
 	return nil
 }
