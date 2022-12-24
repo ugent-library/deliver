@@ -34,7 +34,7 @@ func (c *Folders) Show(ctx Ctx) error {
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c.showView, view.Data{
+	return ctx.Render(c.showView, Map{
 		"folder": folder,
 	})
 }

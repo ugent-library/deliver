@@ -36,7 +36,7 @@ func (c *Spaces) List(ctx Ctx) error {
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c.listView, view.Data{
+	return ctx.Render(c.listView, Map{
 		"spaces": spaces,
 	})
 }
@@ -51,7 +51,7 @@ func (c *Spaces) Show(ctx Ctx) error {
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c.showView, view.Data{
+	return ctx.Render(c.showView, Map{
 		"space": space,
 	})
 }
