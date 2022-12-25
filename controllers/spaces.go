@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/ugent-library/dilliver/handler"
-	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
 )
@@ -28,10 +27,6 @@ type SpaceForm struct {
 }
 
 func (h *Spaces) List(c Ctx) error {
-	if c.User() == nil {
-		return httperror.Unauthorized
-	}
-
 	spaces, err := h.repo.Spaces(c.Context())
 	if err != nil {
 		return err
@@ -42,10 +37,6 @@ func (h *Spaces) List(c Ctx) error {
 }
 
 func (h *Spaces) Show(c Ctx) error {
-	if c.User() == nil {
-		return httperror.Unauthorized
-	}
-
 	spaceID := c.Path("spaceID")
 	space, err := h.repo.Space(c.Req.Context(), spaceID)
 	if err != nil {
@@ -57,10 +48,6 @@ func (h *Spaces) Show(c Ctx) error {
 }
 
 func (h *Spaces) Create(c Ctx) error {
-	if c.User() == nil {
-		return httperror.Unauthorized
-	}
-
 	b := SpaceForm{}
 	if err := bindForm(c.Req, &b); err != nil {
 		return err

@@ -106,7 +106,7 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := handler.Wrapper[models.User](handler.Config{
+		wrap := handler.Wrapper[models.User, handler.Empty](handler.Config{
 			Log:          logger,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
@@ -120,15 +120,15 @@ var appCmd = &cobra.Command{
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
-		r.HandleFunc("/spaces", wrap(spaces.List)).Methods("GET").Name("spaces")
-		r.HandleFunc("/spaces", wrap(spaces.Create)).Methods("POST").Name("create_space")
-		r.HandleFunc("/spaces/{spaceID}", wrap(spaces.Show)).Methods("GET").Name("space")
-		r.HandleFunc("/spaces/{spaceID}/folders", wrap(folders.Create)).Methods("POST").Name("create_folder")
-		r.HandleFunc("/folders/{folderID}", wrap(folders.Show)).Methods("GET").Name("folder")
-		r.HandleFunc("/folders/{folderID}", wrap(folders.Delete)).Methods("DELETE").Name("delete_folder")
-		r.HandleFunc("/folders/{folderID}/files", wrap(folders.UploadFile)).Methods("POST").Name("upload_file")
+		r.HandleFunc("/spaces", wrap(c.RequireUser, spaces.List)).Methods("GET").Name("spaces")
+		r.HandleFunc("/spaces", wrap(c.RequireUser, spaces.Create)).Methods("POST").Name("create_space")
+		r.HandleFunc("/spaces/{spaceID}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
+		r.HandleFunc("/spaces/{spaceID}/folders", wrap(c.RequireUser, folders.Create)).Methods("POST").Name("create_folder")
+		r.HandleFunc("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
+		r.HandleFunc("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
+		r.HandleFunc("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
 		r.HandleFunc("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
-		r.Handle("/files/{fileID}", wrap(files.Delete)).Methods("DELETE").Name("delete_file")
+		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 
 		// apply method overwrite and logging handlers before request reaches the router
 		var handler http.Handler = r

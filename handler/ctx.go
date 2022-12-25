@@ -23,11 +23,15 @@ const (
 	userSessionKey  = "user"
 )
 
+type Empty struct{}
+
 // TODO turn wrapper into an object?
-func Wrapper[U any](c Config) func(func(*Ctx[U]) error) http.HandlerFunc {
-	return func(fn func(*Ctx[U]) error) http.HandlerFunc {
+// TODO instead of Config, make the argument a constructor function? (this also allows type inference)
+// TODO make flash a generic type
+func Wrapper[U, V any](c Config) func(fns ...func(*Ctx[U, V]) error) http.HandlerFunc {
+	return func(fns ...func(*Ctx[U, V]) error) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			ctx := &Ctx[U]{
+			ctx := &Ctx[U, V]{
 				Config:    c,
 				Res:       w,
 				Req:       r,
@@ -39,8 +43,11 @@ func Wrapper[U any](c Config) func(func(*Ctx[U]) error) http.HandlerFunc {
 				ctx.handleError(err)
 				return
 			}
-			if err := fn(ctx); err != nil {
-				ctx.handleError(err)
+			for _, fn := range fns {
+				if err := fn(ctx); err != nil {
+					ctx.handleError(err)
+					return
+				}
 			}
 		}
 	}
@@ -53,14 +60,40 @@ type Config struct {
 	Router       *mux.Router
 }
 
-// TODO remove
+// func Wrap[U any](c Config, fn func(*Ctx[U,V]) error) *Handler[U] {
+// 	return &Handler[U]{c, fn}
+// }
+
+// type Handler[U any] struct {
+// 	c  Config
+// 	fn func(*Ctx[U,V]) error
+// }
+
+// func (h *Handler[U]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	ctx := &Ctx[U]{
+// 		Config:    h.c,
+// 		Res:       w,
+// 		Req:       r,
+// 		path:      mux.Vars(r),
+// 		CSRFToken: csrf.Token(r),
+// 		CSRFTag:   csrf.TemplateField(r),
+// 	}
+// 	if err := ctx.loadSession(); err != nil {
+// 		ctx.handleError(err)
+// 		return
+// 	}
+// 	if err := h.fn(ctx); err != nil {
+// 		ctx.handleError(err)
+// 	}
+// }
+
 type Flash struct {
 	Type  string
 	Title string
 	Body  template.HTML
 }
 
-type Ctx[U any] struct {
+type Ctx[U, V any] struct {
 	Config
 	Res       http.ResponseWriter
 	Req       *http.Request
@@ -69,17 +102,18 @@ type Ctx[U any] struct {
 	CSRFTag   template.HTML
 	Flash     []Flash
 	user      *U
+	Var       V
 }
 
-func (c *Ctx[U]) Context() context.Context {
+func (c *Ctx[U, V]) Context() context.Context {
 	return c.Req.Context()
 }
 
-func (c *Ctx[U]) Path(k string) string {
+func (c *Ctx[U, V]) Path(k string) string {
 	return c.path[k]
 }
 
-func (c *Ctx[U]) URL(route string, pairs ...string) *url.URL {
+func (c *Ctx[U, V]) URL(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -100,7 +134,7 @@ func (c *Ctx[U]) URL(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c *Ctx[U]) URLPath(route string, pairs ...string) *url.URL {
+func (c *Ctx[U, V]) URLPath(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -116,24 +150,24 @@ type Renderer interface {
 	Render(http.ResponseWriter, any) error
 }
 
-type RenderData[U any] struct {
-	*Ctx[U]
+type RenderData[U, V any] struct {
+	*Ctx[U, V]
 	Data any
 }
 
-func (c *Ctx[U]) Render(r Renderer, data any) error {
-	return r.Render(c.Res, RenderData[U]{c, data})
+func (c *Ctx[U, V]) Render(r Renderer, data any) error {
+	return r.Render(c.Res, RenderData[U, V]{c, data})
 }
 
-func (c *Ctx[U]) Redirect(route string, pairs ...string) {
+func (c *Ctx[U, V]) Redirect(route string, pairs ...string) {
 	http.Redirect(c.Res, c.Req, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
 }
 
-func (c *Ctx[U]) User() *U {
+func (c *Ctx[U, V]) User() *U {
 	return c.user
 }
 
-func (c *Ctx[U]) SetUser(u *U) error {
+func (c *Ctx[U, V]) SetUser(u *U) error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -146,7 +180,7 @@ func (c *Ctx[U]) SetUser(u *U) error {
 	return nil
 }
 
-func (c *Ctx[U]) DeleteUser() error {
+func (c *Ctx[U, V]) DeleteUser() error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -159,7 +193,7 @@ func (c *Ctx[U]) DeleteUser() error {
 	return nil
 }
 
-func (c *Ctx[U]) PersistFlash(f Flash) error {
+func (c *Ctx[U, V]) PersistFlash(f Flash) error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -171,7 +205,7 @@ func (c *Ctx[U]) PersistFlash(f Flash) error {
 	return nil
 }
 
-func (c *Ctx[U]) loadSession() error {
+func (c *Ctx[U, V]) loadSession() error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -193,7 +227,7 @@ func (c *Ctx[U]) loadSession() error {
 }
 
 // TODO register error handlers
-func (c *Ctx[U]) handleError(err error) {
+func (c *Ctx[U, V]) handleError(err error) {
 	if err == models.ErrNotFound {
 		err = httperror.NotFound
 	}

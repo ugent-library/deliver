@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/ugent-library/dilliver/handler"
-	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
@@ -40,10 +39,6 @@ func (h *Folders) Show(c Ctx) error {
 }
 
 func (h *Folders) Create(c Ctx) error {
-	if c.User() == nil {
-		return httperror.Unauthorized
-	}
-
 	spaceID := c.Path("spaceID")
 	b := FolderForm{}
 	if err := bindForm(c.Req, &b); err != nil {
@@ -69,10 +64,6 @@ func (h *Folders) Create(c Ctx) error {
 
 // TODO remove files
 func (h *Folders) Delete(c Ctx) error {
-	if c.User() == nil {
-		return httperror.Unauthorized
-	}
-
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.Folder(c.Context(), folderID)
@@ -94,10 +85,6 @@ func (h *Folders) Delete(c Ctx) error {
 }
 
 func (h *Folders) UploadFile(c Ctx) error {
-	if c.User() == nil {
-		return httperror.Unauthorized
-	}
-
 	folderID := c.Path("folderID")
 
 	// 2GB limit on request body
