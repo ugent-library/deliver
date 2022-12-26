@@ -24,7 +24,7 @@ type Unused struct{}
 
 // TODO make flash a generic type
 // TODO constructor function that allows type inference?
-// TODO hide session, router, ... fields
+// TODO don't pass whole wrapper to ctx
 type Wrapper[U, V any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
