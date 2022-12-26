@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -11,8 +10,6 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/ugent-library/dilliver/httperror"
-	"github.com/ugent-library/dilliver/models"
 	"go.uber.org/zap"
 )
 
@@ -23,69 +20,47 @@ const (
 	userSessionKey  = "user"
 )
 
-type Empty struct{}
+type Unused struct{}
 
-// TODO turn wrapper into an object?
-// TODO instead of Config, make the argument a constructor function? (this also allows type inference)
 // TODO make flash a generic type
-func Wrapper[U, V any](c Config) func(fns ...func(*Ctx[U, V]) error) http.HandlerFunc {
-	return func(fns ...func(*Ctx[U, V]) error) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			ctx := &Ctx[U, V]{
-				Config:    c,
-				Res:       w,
-				Req:       r,
-				path:      mux.Vars(r),
-				CSRFToken: csrf.Token(r),
-				CSRFTag:   csrf.TemplateField(r),
-			}
-			if err := ctx.loadSession(); err != nil {
-				ctx.handleError(err)
-				return
-			}
-			for _, fn := range fns {
-				if err := fn(ctx); err != nil {
-					ctx.handleError(err)
-					return
-				}
-			}
-		}
-	}
-}
-
-type Config struct {
+// TODO constructor function that allows type inference?
+// TODO hide session, router, ... fields
+type Wrapper[U, V any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
 	SessionName  string
 	Router       *mux.Router
+	ErrorHandler func(*Ctx[U, V], error)
 }
 
-// func Wrap[U any](c Config, fn func(*Ctx[U,V]) error) *Handler[U] {
-// 	return &Handler[U]{c, fn}
-// }
+func (c Wrapper[U, V]) Wrap(handlers ...func(*Ctx[U, V]) error) http.HandlerFunc {
+	if c.ErrorHandler == nil {
+		c.ErrorHandler = func(c *Ctx[U, V], err error) {
+			http.Error(c.Res, err.Error(), http.StatusInternalServerError)
+		}
+	}
 
-// type Handler[U any] struct {
-// 	c  Config
-// 	fn func(*Ctx[U,V]) error
-// }
-
-// func (h *Handler[U]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-// 	ctx := &Ctx[U]{
-// 		Config:    h.c,
-// 		Res:       w,
-// 		Req:       r,
-// 		path:      mux.Vars(r),
-// 		CSRFToken: csrf.Token(r),
-// 		CSRFTag:   csrf.TemplateField(r),
-// 	}
-// 	if err := ctx.loadSession(); err != nil {
-// 		ctx.handleError(err)
-// 		return
-// 	}
-// 	if err := h.fn(ctx); err != nil {
-// 		ctx.handleError(err)
-// 	}
-// }
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := &Ctx[U, V]{
+			Wrapper:   c,
+			Res:       w,
+			Req:       r,
+			path:      mux.Vars(r),
+			CSRFToken: csrf.Token(r),
+			CSRFTag:   csrf.TemplateField(r),
+		}
+		if err := ctx.loadSession(); err != nil {
+			c.ErrorHandler(ctx, err)
+			return
+		}
+		for _, fn := range handlers {
+			if err := fn(ctx); err != nil {
+				c.ErrorHandler(ctx, err)
+				return
+			}
+		}
+	}
+}
 
 type Flash struct {
 	Type  string
@@ -94,7 +69,7 @@ type Flash struct {
 }
 
 type Ctx[U, V any] struct {
-	Config
+	Wrapper[U, V]
 	Res       http.ResponseWriter
 	Req       *http.Request
 	path      map[string]string
@@ -224,26 +199,4 @@ func (c *Ctx[U, V]) loadSession() error {
 	}
 
 	return nil
-}
-
-// TODO register error handlers
-func (c *Ctx[U, V]) handleError(err error) {
-	if err == models.ErrNotFound {
-		err = httperror.NotFound
-	}
-
-	var httpErr *httperror.Error
-	if !errors.As(err, &httpErr) {
-		httpErr = httperror.InternalServerError
-	}
-
-	switch httpErr.Code {
-	case http.StatusNotFound:
-		// TODO use controller action directly
-		c.Router.NotFoundHandler.ServeHTTP(c.Res, c.Req)
-	case http.StatusUnauthorized:
-		c.Redirect("login")
-	default:
-		http.Error(c.Res, http.StatusText(httpErr.Code), httpErr.Code)
-	}
 }

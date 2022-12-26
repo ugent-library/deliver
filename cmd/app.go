@@ -106,28 +106,29 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := handler.Wrapper[models.User, handler.Empty](handler.Config{
+		wrap := handler.Wrapper[models.User, handler.Unused]{
 			Log:          logger,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
 			Router:       r,
-		})
+			ErrorHandler: c.HandleError,
+		}.Wrap
 
 		// routes
 		r.NotFoundHandler = wrap(pages.NotFound)
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-		r.HandleFunc("/", wrap(pages.Home)).Methods("GET").Name("home")
+		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
-		r.HandleFunc("/spaces", wrap(c.RequireUser, spaces.List)).Methods("GET").Name("spaces")
-		r.HandleFunc("/spaces", wrap(c.RequireUser, spaces.Create)).Methods("POST").Name("create_space")
-		r.HandleFunc("/spaces/{spaceID}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
-		r.HandleFunc("/spaces/{spaceID}/folders", wrap(c.RequireUser, folders.Create)).Methods("POST").Name("create_folder")
-		r.HandleFunc("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
-		r.HandleFunc("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
-		r.HandleFunc("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
-		r.HandleFunc("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
+		r.Handle("/spaces", wrap(c.RequireUser, spaces.List)).Methods("GET").Name("spaces")
+		r.Handle("/spaces", wrap(c.RequireUser, spaces.Create)).Methods("POST").Name("create_space")
+		r.Handle("/spaces/{spaceID}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
+		r.Handle("/spaces/{spaceID}/folders", wrap(c.RequireUser, folders.Create)).Methods("POST").Name("create_folder")
+		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
+		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
+		r.Handle("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
+		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 
 		// apply method overwrite and logging handlers before request reaches the router
