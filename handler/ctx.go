@@ -22,26 +22,25 @@ const (
 
 type Unused struct{}
 
-// TODO make flash a generic type
 // TODO constructor function that allows type inference?
 // TODO don't pass whole wrapper to ctx
-type Wrapper[U, V any] struct {
+type Wrapper[U, V, F any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
 	SessionName  string
 	Router       *mux.Router
-	ErrorHandler func(*Ctx[U, V], error)
+	ErrorHandler func(*Ctx[U, V, F], error)
 }
 
-func (c Wrapper[U, V]) Wrap(handlers ...func(*Ctx[U, V]) error) http.HandlerFunc {
+func (c Wrapper[U, V, F]) Wrap(handlers ...func(*Ctx[U, V, F]) error) http.HandlerFunc {
 	if c.ErrorHandler == nil {
-		c.ErrorHandler = func(c *Ctx[U, V], err error) {
+		c.ErrorHandler = func(c *Ctx[U, V, F], err error) {
 			http.Error(c.Res, err.Error(), http.StatusInternalServerError)
 		}
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := &Ctx[U, V]{
+		ctx := &Ctx[U, V, F]{
 			Wrapper:   c,
 			Res:       w,
 			Req:       r,
@@ -62,33 +61,27 @@ func (c Wrapper[U, V]) Wrap(handlers ...func(*Ctx[U, V]) error) http.HandlerFunc
 	}
 }
 
-type Flash struct {
-	Type  string
-	Title string
-	Body  template.HTML
-}
-
-type Ctx[U, V any] struct {
-	Wrapper[U, V]
+type Ctx[U, V, F any] struct {
+	Wrapper[U, V, F]
 	Res       http.ResponseWriter
 	Req       *http.Request
 	path      map[string]string
 	CSRFToken string
 	CSRFTag   template.HTML
-	Flash     []Flash
+	Flash     []F
 	user      *U
 	Var       V
 }
 
-func (c *Ctx[U, V]) Context() context.Context {
+func (c *Ctx[U, V, F]) Context() context.Context {
 	return c.Req.Context()
 }
 
-func (c *Ctx[U, V]) Path(k string) string {
+func (c *Ctx[U, V, F]) Path(k string) string {
 	return c.path[k]
 }
 
-func (c *Ctx[U, V]) URL(route string, pairs ...string) *url.URL {
+func (c *Ctx[U, V, F]) URL(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -109,7 +102,7 @@ func (c *Ctx[U, V]) URL(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c *Ctx[U, V]) URLPath(route string, pairs ...string) *url.URL {
+func (c *Ctx[U, V, F]) URLPath(route string, pairs ...string) *url.URL {
 	r := c.Router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
@@ -125,24 +118,24 @@ type Renderer interface {
 	Render(http.ResponseWriter, any) error
 }
 
-type RenderData[U, V any] struct {
-	*Ctx[U, V]
+type RenderData[U, V, F any] struct {
+	*Ctx[U, V, F]
 	Data any
 }
 
-func (c *Ctx[U, V]) Render(r Renderer, data any) error {
-	return r.Render(c.Res, RenderData[U, V]{c, data})
+func (c *Ctx[U, V, F]) Render(r Renderer, data any) error {
+	return r.Render(c.Res, RenderData[U, V, F]{c, data})
 }
 
-func (c *Ctx[U, V]) Redirect(route string, pairs ...string) {
+func (c *Ctx[U, V, F]) Redirect(route string, pairs ...string) {
 	http.Redirect(c.Res, c.Req, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
 }
 
-func (c *Ctx[U, V]) User() *U {
+func (c *Ctx[U, V, F]) User() *U {
 	return c.user
 }
 
-func (c *Ctx[U, V]) SetUser(u *U) error {
+func (c *Ctx[U, V, F]) SetUser(u *U) error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -155,7 +148,7 @@ func (c *Ctx[U, V]) SetUser(u *U) error {
 	return nil
 }
 
-func (c *Ctx[U, V]) DeleteUser() error {
+func (c *Ctx[U, V, F]) DeleteUser() error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -168,7 +161,7 @@ func (c *Ctx[U, V]) DeleteUser() error {
 	return nil
 }
 
-func (c *Ctx[U, V]) PersistFlash(f Flash) error {
+func (c *Ctx[U, V, F]) PersistFlash(f F) error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -180,7 +173,7 @@ func (c *Ctx[U, V]) PersistFlash(f Flash) error {
 	return nil
 }
 
-func (c *Ctx[U, V]) loadSession() error {
+func (c *Ctx[U, V, F]) loadSession() error {
 	s, err := c.SessionStore.Get(c.Req, c.SessionName)
 	if err != nil {
 		return fmt.Errorf("couldn't get session data: %w", err)
@@ -191,7 +184,7 @@ func (c *Ctx[U, V]) loadSession() error {
 	}
 
 	for _, f := range s.Flashes(flashSessionKey) {
-		c.Flash = append(c.Flash, f.(Flash))
+		c.Flash = append(c.Flash, f.(F))
 	}
 
 	if err := s.Save(c.Req, c.Res); err != nil {

@@ -82,8 +82,8 @@ var appCmd = &cobra.Command{
 		sessionStore.Options.HttpOnly = true
 		sessionStore.Options.Secure = config.Production
 		// register types so CookieStore can serialize it
-		gob.Register(handler.Flash{})
 		gob.Register(&models.User{})
+		gob.Register(c.Flash{})
 
 		// setup auth
 		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
@@ -106,7 +106,7 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := handler.Wrapper[models.User, handler.Unused]{
+		wrap := handler.Wrapper[models.User, handler.Unused, c.Flash]{
 			Log:          logger,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,

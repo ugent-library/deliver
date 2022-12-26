@@ -53,7 +53,7 @@ func (h *Folders) Create(c Ctx) error {
 		return err
 	}
 
-	c.PersistFlash(handler.Flash{
+	c.PersistFlash(Flash{
 		Type: handler.Info,
 		Body: "Folder created succesfully",
 	})
@@ -75,7 +75,7 @@ func (h *Folders) Delete(c Ctx) error {
 		return err
 	}
 
-	c.PersistFlash(handler.Flash{
+	c.PersistFlash(Flash{
 		Type: handler.Info,
 		Body: "Folder deleted succesfully",
 	})
@@ -127,7 +127,7 @@ func (h *Folders) UploadFile(c Ctx) error {
 		}
 	}
 
-	c.PersistFlash(handler.Flash{
+	c.PersistFlash(Flash{
 		Type: handler.Info,
 		Body: "File added succesfully",
 	})

@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 
-	"github.com/ugent-library/dilliver/handler"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
 )
@@ -60,7 +59,7 @@ func (h *Spaces) Create(c Ctx) error {
 		return err
 	}
 
-	c.PersistFlash(handler.Flash{
+	c.PersistFlash(Flash{
 		Type: "info",
 		Body: "Space created succesfully",
 	})

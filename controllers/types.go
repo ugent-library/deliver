@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"html/template"
 	"net/http"
 
 	"github.com/ugent-library/dilliver/handler"
@@ -10,9 +11,15 @@ import (
 )
 
 type (
-	Ctx = *handler.Ctx[models.User, handler.Unused]
+	Ctx = *handler.Ctx[models.User, handler.Unused, Flash]
 	Map = map[string]any
 )
+
+type Flash struct {
+	Type  string
+	Title string
+	Body  template.HTML
+}
 
 func RequireUser(c Ctx) error {
 	if c.User() == nil {

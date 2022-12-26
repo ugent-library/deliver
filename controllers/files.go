@@ -38,7 +38,7 @@ func (h *Files) Delete(c Ctx) error {
 		return err
 	}
 
-	c.PersistFlash(handler.Flash{
+	c.PersistFlash(Flash{
 		Type: handler.Info,
 		Body: "File deleted succesfully",
 	})
