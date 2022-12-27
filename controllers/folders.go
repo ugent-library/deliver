@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/ugent-library/dilliver/handler"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
@@ -54,7 +53,7 @@ func (h *Folders) Create(c Ctx) error {
 	}
 
 	c.PersistFlash(Flash{
-		Type: handler.Info,
+		Type: Info,
 		Body: "Folder created succesfully",
 	})
 	c.Redirect("folder", "folderID", folder.ID)
@@ -76,7 +75,7 @@ func (h *Folders) Delete(c Ctx) error {
 	}
 
 	c.PersistFlash(Flash{
-		Type: handler.Info,
+		Type: Info,
 		Body: "Folder deleted succesfully",
 	})
 	c.Redirect("space", "spaceID", folder.SpaceID)
@@ -128,7 +127,7 @@ func (h *Folders) UploadFile(c Ctx) error {
 	}
 
 	c.PersistFlash(Flash{
-		Type: handler.Info,
+		Type: Info,
 		Body: "File added succesfully",
 	})
 	c.Redirect("folder", "folderID", folderID)

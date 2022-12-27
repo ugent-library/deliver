@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/ugent-library/dilliver/handler"
 	"github.com/ugent-library/dilliver/models"
 )
 
@@ -39,7 +38,7 @@ func (h *Files) Delete(c Ctx) error {
 	}
 
 	c.PersistFlash(Flash{
-		Type: handler.Info,
+		Type: Info,
 		Body: "File deleted succesfully",
 	})
 	c.Redirect("folder", "folderID", file.FolderID)

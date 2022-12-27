@@ -12,6 +12,10 @@ type (
 	Map = map[string]any
 )
 
+const (
+	Info = "info"
+)
+
 type Flash struct {
 	Type  string
 	Title string

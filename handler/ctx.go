@@ -14,8 +14,6 @@ import (
 )
 
 const (
-	Info = "info"
-
 	flashSessionKey = "flash"
 	userSessionKey  = "user"
 )
@@ -25,7 +23,6 @@ type Unused struct{}
 // TODO constructor function that allows type inference?
 // TODO don't pass whole Config to ctx
 // TODO make Router and Session Interfaces
-// TODO view package: DefaultConfig object
 type Config[U, V, F any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
@@ -70,9 +67,9 @@ type Ctx[U, V, F any] struct {
 	path      map[string]string
 	CSRFToken string
 	CSRFTag   template.HTML
-	Flash     []F
 	user      *U
 	Var       V
+	Flash     []F
 }
 
 func (c *Ctx[U, V, F]) Context() context.Context {
@@ -133,13 +130,13 @@ type Renderer interface {
 	Render(http.ResponseWriter, any) error
 }
 
-type RenderData[U, V, F any] struct {
+type renderData[U, V, F any] struct {
 	*Ctx[U, V, F]
 	Data any
 }
 
 func (c *Ctx[U, V, F]) Render(r Renderer, data any) error {
-	return r.Render(c.Res, RenderData[U, V, F]{c, data})
+	return r.Render(c.Res, renderData[U, V, F]{c, data})
 }
 
 func (c *Ctx[U, V, F]) User() *U {
