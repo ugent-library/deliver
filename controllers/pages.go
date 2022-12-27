@@ -4,22 +4,15 @@ import (
 	"github.com/ugent-library/dilliver/view"
 )
 
-type Pages struct {
-	homeView     view.View
-	notFoundView view.View
+var (
+	HomeView     = view.MustNew("page", "home")
+	NotFoundView = view.MustNew("page", "not_found").Status(404)
+)
+
+func Home(c Ctx) error {
+	return HomeView.Render(c.Res, c)
 }
 
-func NewPages() *Pages {
-	return &Pages{
-		homeView:     view.MustNew("page", "home"),
-		notFoundView: view.MustNew("page", "not_found").Status(404),
-	}
-}
-
-func (h *Pages) Home(c Ctx) error {
-	return h.homeView.Render(c.Res, c)
-}
-
-func (h *Pages) NotFound(c Ctx) error {
-	return h.notFoundView.Render(c.Res, c)
+func NotFound(c Ctx) error {
+	return NotFoundView.Render(c.Res, c)
 }

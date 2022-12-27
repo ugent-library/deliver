@@ -39,11 +39,12 @@ func HandleError(c Ctx, err error) {
 	}
 
 	switch httpErr.Code {
-	case http.StatusNotFound:
-		// TODO use controller action directly
-		c.Router.NotFoundHandler.ServeHTTP(c.Res, c.Req)
 	case http.StatusUnauthorized:
 		c.Redirect("login")
+	case http.StatusNotFound:
+		if err := NotFound(c); err != nil {
+			HandleError(c, err)
+		}
 	default:
 		http.Error(c.Res, http.StatusText(httpErr.Code), httpErr.Code)
 	}

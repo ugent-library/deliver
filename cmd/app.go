@@ -70,7 +70,7 @@ var appCmd = &cobra.Command{
 		))
 
 		// setup views
-		view.FuncMap = template.FuncMap{
+		view.DefaultConfig.Funcs = template.FuncMap{
 			"assetPath": assets.AssetPath,
 		}
 
@@ -100,13 +100,12 @@ var appCmd = &cobra.Command{
 
 		// controllers
 		auth := c.NewAuth(oidcAuth)
-		pages := c.NewPages()
 		spaces := c.NewSpaces(services.Repository)
 		folders := c.NewFolders(services.Repository, services.File)
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := handler.Wrapper[models.User, handler.Unused, c.Flash]{
+		wrap := handler.Config[models.User, handler.Unused, c.Flash]{
 			Log:          logger,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
@@ -115,9 +114,9 @@ var appCmd = &cobra.Command{
 		}.Wrap
 
 		// routes
-		r.NotFoundHandler = wrap(pages.NotFound)
+		r.NotFoundHandler = wrap(c.NotFound)
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
+		r.Handle("/", wrap(c.Home)).Methods("GET").Name("home")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
