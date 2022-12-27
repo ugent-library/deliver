@@ -78,8 +78,9 @@ func (v View) ContentType(ct string) View {
 }
 
 func (v View) Render(w http.ResponseWriter, data any) error {
-	if w.Header().Get("Content-Type") == "" {
-		w.Header().Set("Content-Type", v.contentType)
+	header := w.Header()
+	if header.Get("Content-Type") == "" {
+		header.Set("Content-Type", v.contentType)
 	}
 
 	buf := bufPool.Get().(*bytes.Buffer)

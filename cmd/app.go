@@ -99,7 +99,9 @@ var appCmd = &cobra.Command{
 		}
 
 		// controllers
+		errs := c.NewErrors()
 		auth := c.NewAuth(oidcAuth)
+		pages := c.NewPages()
 		spaces := c.NewSpaces(services.Repository)
 		folders := c.NewFolders(services.Repository, services.File)
 		files := c.NewFiles(services.Repository, services.File)
@@ -110,13 +112,13 @@ var appCmd = &cobra.Command{
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
 			Router:       r,
-			ErrorHandler: c.HandleError,
+			ErrorHandler: errs.HandleError,
 		}.Wrap
 
 		// routes
-		r.NotFoundHandler = wrap(c.NotFound)
+		r.NotFoundHandler = wrap(errs.NotFound)
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-		r.Handle("/", wrap(c.Home)).Methods("GET").Name("home")
+		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
