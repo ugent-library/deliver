@@ -6,7 +6,9 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+	"strings"
 
+	"github.com/go-playground/form/v4"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -20,15 +22,24 @@ const (
 
 type Unused struct{}
 
+type Flag int
+
+const (
+	Vacuum Flag = iota
+)
+
 // TODO constructor function that allows type inference?
 // TODO don't pass whole Config to ctx
 // TODO make Router and Session Interfaces
+// TODO remove user and replace with generic Session field
 type Config[U, V, F any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
 	SessionName  string
 	Router       *mux.Router
 	ErrorHandler func(*Ctx[U, V, F], error)
+	formDecoder  *form.Decoder
+	queryDecoder *form.Decoder
 }
 
 func (c Config[U, V, F]) Wrap(handlers ...func(*Ctx[U, V, F]) error) http.HandlerFunc {
@@ -37,6 +48,13 @@ func (c Config[U, V, F]) Wrap(handlers ...func(*Ctx[U, V, F]) error) http.Handle
 			http.Error(c.Res, err.Error(), http.StatusInternalServerError)
 		}
 	}
+
+	c.formDecoder = form.NewDecoder()
+	c.formDecoder.SetTagName("form")
+	c.formDecoder.SetMode(form.ModeExplicit)
+	c.queryDecoder = form.NewDecoder()
+	c.queryDecoder.SetTagName("query")
+	c.queryDecoder.SetMode(form.ModeExplicit)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := &Ctx[U, V, F]{
@@ -200,4 +218,56 @@ func (c *Ctx[U, V, F]) loadSession() error {
 	}
 
 	return nil
+}
+
+// TODO return httperror, embed err in httperror
+func (c *Ctx[U, V, F]) Bind(v any, flags ...Flag) error {
+	m := c.Req.Method
+	if m == http.MethodGet || m == http.MethodDelete || m == http.MethodHead {
+		return c.BindQuery(v, flags...)
+	}
+	return c.BindForm(v, flags...)
+}
+
+func (c *Ctx[U, V, F]) BindQuery(v any, flags ...Flag) error {
+	vals := c.Req.URL.Query()
+	if hasFlag(flags, Vacuum) {
+		vacuum(vals)
+	}
+	return c.config.queryDecoder.Decode(v, vals)
+}
+
+func (c *Ctx[U, V, F]) BindForm(v any, flags ...Flag) error {
+	c.Req.ParseForm()
+	vals := c.Req.Form
+	if hasFlag(flags, Vacuum) {
+		vacuum(vals)
+	}
+	return c.config.formDecoder.Decode(v, vals)
+}
+
+func vacuum(values url.Values) {
+	for key, vals := range values {
+		var tmp []string
+		for _, val := range vals {
+			val = strings.TrimSpace(val)
+			if val != "" {
+				tmp = append(tmp, val)
+			}
+		}
+		if len(tmp) > 0 {
+			values[key] = tmp
+		} else {
+			delete(values, key)
+		}
+	}
+}
+
+func hasFlag(flags []Flag, flag Flag) bool {
+	for _, f := range flags {
+		if f == flag {
+			return true
+		}
+	}
+	return false
 }

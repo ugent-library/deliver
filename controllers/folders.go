@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/ugent-library/dilliver/bind"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
@@ -41,7 +40,7 @@ func (h *Folders) Show(c Ctx) error {
 func (h *Folders) Create(c Ctx) error {
 	spaceID := c.Path("spaceID")
 	b := FolderForm{}
-	if err := bind.DecodeForm(c.Req, &b); err != nil {
+	if err := c.BindForm(&b); err != nil {
 		return err
 	}
 
