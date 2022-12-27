@@ -20,11 +20,13 @@ func (h *Auth) Callback(c Ctx) error {
 	if err := h.oidcAuth.CompleteAuth(c.Res, c.Req, &claims); err != nil {
 		return err
 	}
-	if err := c.SetUser(&models.User{
+	c.Var.User = &models.User{
 		Username: claims.PreferredUsername,
 		Name:     claims.Name,
 		Email:    claims.Email,
-	}); err != nil {
+	}
+	c.Session.Set(userKey, c.Var.User)
+	if err := c.Session.Save(); err != nil {
 		return err
 	}
 	c.Redirect("spaces")
@@ -36,7 +38,8 @@ func (h *Auth) Login(c Ctx) error {
 }
 
 func (h *Auth) Logout(c Ctx) error {
-	if err := c.DeleteUser(); err != nil {
+	c.Session.Delete(userKey)
+	if err := c.Session.Save(); err != nil {
 		return err
 	}
 	c.Redirect("home")

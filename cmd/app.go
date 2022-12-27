@@ -107,11 +107,14 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := handler.Config[models.User, handler.Unused, c.Flash]{
+		wrap := handler.Config[c.Var]{
 			Log:          logger,
 			SessionStore: sessionStore,
 			SessionName:  sessionName,
 			Router:       r,
+			Before: []func(c.Ctx) error{
+				c.LoadSession,
+			},
 			ErrorHandler: errs.HandleError,
 		}.Wrap
 

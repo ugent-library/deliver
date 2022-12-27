@@ -41,6 +41,7 @@ func (h *Errors) HandleError(c Ctx, err error) {
 			h.HandleError(c, err)
 		}
 	default:
+		c.Log.Error(err)
 		http.Error(c.Res, http.StatusText(httpErr.Code), httpErr.Code)
 	}
 }

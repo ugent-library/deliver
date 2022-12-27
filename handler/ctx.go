@@ -15,91 +15,164 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	flashSessionKey = "flash"
-	userSessionKey  = "user"
-)
-
-type Unused struct{}
-
 type Flag int
 
 const (
 	Vacuum Flag = iota
 )
 
-// TODO constructor function that allows type inference?
-// TODO don't pass whole Config to ctx
-// TODO make Router and Session Interfaces
-// TODO remove user and replace with generic Session field
-type Config[U, V, F any] struct {
+// TODO add Flash methods instead of Pop, Append?
+type Session interface {
+	Get(string) any
+	Pop(string) any
+	Set(string, any)
+	Append(string, any)
+	Delete(string)
+	Clear()
+	Save() error
+}
+
+type gorillaSession struct {
+	session *sessions.Session
+	changed bool
+	req     *http.Request
+	res     http.ResponseWriter
+}
+
+func (s *gorillaSession) Get(k string) any {
+	return s.session.Values[k]
+}
+
+func (s *gorillaSession) Pop(k string) any {
+	if v, ok := s.session.Values[k]; ok {
+		delete(s.session.Values, k)
+		s.changed = true
+		return v
+	}
+	return nil
+}
+
+func (s *gorillaSession) Set(k string, v any) {
+	s.session.Values[k] = v
+	s.changed = true
+}
+
+func (s *gorillaSession) Append(k string, v any) {
+	if vals, ok := s.session.Values[k]; ok {
+		s.session.Values[k] = append(vals.([]any), v)
+	}
+	s.session.Values[k] = []any{v}
+	s.changed = true
+}
+
+func (s *gorillaSession) Delete(k string) {
+	delete(s.session.Values, k)
+	s.changed = true
+}
+
+func (s *gorillaSession) Clear() {
+	for k := range s.session.Values {
+		delete(s.session.Values, k)
+	}
+	s.changed = true
+}
+
+func (s *gorillaSession) Save() error {
+	if s.changed {
+		return s.session.Save(s.req, s.res)
+	}
+	return nil
+}
+
+// TODO Var constructor function that allows type inference?
+// TODO make Routes interface
+// TODO make a strongly typed session using mapstructure?
+// TODO request ID and request scoped logger
+// TODO pass error in httperror
+type Config[V any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
 	SessionName  string
 	Router       *mux.Router
-	ErrorHandler func(*Ctx[U, V, F], error)
-	formDecoder  *form.Decoder
-	queryDecoder *form.Decoder
+	Before       []func(*Ctx[V]) error
+	ErrorHandler func(*Ctx[V], error)
 }
 
-func (c Config[U, V, F]) Wrap(handlers ...func(*Ctx[U, V, F]) error) http.HandlerFunc {
-	if c.ErrorHandler == nil {
-		c.ErrorHandler = func(c *Ctx[U, V, F], err error) {
+func (config Config[V]) Wrap(handlers ...func(*Ctx[V]) error) http.HandlerFunc {
+	if config.ErrorHandler == nil {
+		config.ErrorHandler = func(c *Ctx[V], err error) {
 			http.Error(c.Res, err.Error(), http.StatusInternalServerError)
 		}
 	}
 
-	c.formDecoder = form.NewDecoder()
-	c.formDecoder.SetTagName("form")
-	c.formDecoder.SetMode(form.ModeExplicit)
-	c.queryDecoder = form.NewDecoder()
-	c.queryDecoder.SetTagName("query")
-	c.queryDecoder.SetMode(form.ModeExplicit)
+	formDecoder := form.NewDecoder()
+	formDecoder.SetTagName("form")
+	formDecoder.SetMode(form.ModeExplicit)
+	queryDecoder := form.NewDecoder()
+	queryDecoder.SetTagName("query")
+	queryDecoder.SetMode(form.ModeExplicit)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := &Ctx[U, V, F]{
-			config:    c,
-			Res:       w,
-			Req:       r,
-			path:      mux.Vars(r),
-			CSRFToken: csrf.Token(r),
-			CSRFTag:   csrf.TemplateField(r),
+		c := &Ctx[V]{
+			Log:          config.Log,
+			Res:          w,
+			Req:          r,
+			path:         mux.Vars(r),
+			CSRFToken:    csrf.Token(r),
+			CSRFTag:      csrf.TemplateField(r),
+			router:       config.Router,
+			formDecoder:  formDecoder,
+			queryDecoder: queryDecoder,
 		}
-		if err := ctx.loadSession(); err != nil {
-			c.ErrorHandler(ctx, err)
+		session, err := config.SessionStore.Get(r, config.SessionName)
+		if err != nil {
+			config.ErrorHandler(c, err)
 			return
 		}
+		c.Session = &gorillaSession{
+			req:     r,
+			res:     w,
+			session: session,
+		}
+		for _, fn := range config.Before {
+			if err := fn(c); err != nil {
+				config.ErrorHandler(c, err)
+				return
+			}
+		}
 		for _, fn := range handlers {
-			if err := fn(ctx); err != nil {
-				c.ErrorHandler(ctx, err)
+			if err := fn(c); err != nil {
+				config.ErrorHandler(c, err)
 				return
 			}
 		}
 	}
 }
 
-type Ctx[U, V, F any] struct {
-	config    Config[U, V, F]
-	Res       http.ResponseWriter
-	Req       *http.Request
-	path      map[string]string
-	CSRFToken string
-	CSRFTag   template.HTML
-	user      *U
-	Var       V
-	Flash     []F
+type Ctx[V any] struct {
+	Log          *zap.SugaredLogger
+	Req          *http.Request
+	Res          http.ResponseWriter
+	Session      Session
+	path         map[string]string
+	CSRFToken    string
+	CSRFTag      template.HTML
+	Var          V
+	router       *mux.Router
+	formDecoder  *form.Decoder
+	queryDecoder *form.Decoder
 }
 
-func (c *Ctx[U, V, F]) Context() context.Context {
+func (c *Ctx[V]) Context() context.Context {
 	return c.Req.Context()
 }
 
-func (c *Ctx[U, V, F]) Path(k string) string {
+func (c *Ctx[V]) Path(k string) string {
 	return c.path[k]
 }
 
-func (c *Ctx[U, V, F]) URL(route string, pairs ...string) *url.URL {
-	r := c.config.Router.Get(route)
+func (c *Ctx[V]) URL(route string, pairs ...string) *url.URL {
+	r := c.router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
 	}
@@ -119,8 +192,8 @@ func (c *Ctx[U, V, F]) URL(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c *Ctx[U, V, F]) URLPath(route string, pairs ...string) *url.URL {
-	r := c.config.Router.Get(route)
+func (c *Ctx[V]) URLPath(route string, pairs ...string) *url.URL {
+	r := c.router.Get(route)
 	if r == nil {
 		panic(fmt.Errorf("unknown route '%s'", route))
 	}
@@ -131,8 +204,8 @@ func (c *Ctx[U, V, F]) URLPath(route string, pairs ...string) *url.URL {
 	return u
 }
 
-func (c *Ctx[U, V, F]) ExecuteHandler(route string) error {
-	r := c.config.Router.Get(route)
+func (c *Ctx[V]) ExecuteHandler(route string) error {
+	r := c.router.Get(route)
 	if r == nil {
 		return fmt.Errorf("unknown route '%s'", route)
 	}
@@ -140,7 +213,7 @@ func (c *Ctx[U, V, F]) ExecuteHandler(route string) error {
 	return nil
 }
 
-func (c *Ctx[U, V, F]) Redirect(route string, pairs ...string) {
+func (c *Ctx[V]) Redirect(route string, pairs ...string) {
 	http.Redirect(c.Res, c.Req, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
 }
 
@@ -148,80 +221,17 @@ type Renderer interface {
 	Render(http.ResponseWriter, any) error
 }
 
-type renderData[U, V, F any] struct {
-	*Ctx[U, V, F]
+type renderData[V any] struct {
+	*Ctx[V]
 	Data any
 }
 
-func (c *Ctx[U, V, F]) Render(r Renderer, data any) error {
-	return r.Render(c.Res, renderData[U, V, F]{c, data})
-}
-
-func (c *Ctx[U, V, F]) User() *U {
-	return c.user
-}
-
-func (c *Ctx[U, V, F]) SetUser(u *U) error {
-	s, err := c.config.SessionStore.Get(c.Req, c.config.SessionName)
-	if err != nil {
-		return fmt.Errorf("couldn't get session data: %w", err)
-	}
-	s.Values[userSessionKey] = u
-	if err := s.Save(c.Req, c.Res); err != nil {
-		return fmt.Errorf("couldn't save session data: %w", err)
-	}
-	c.user = u
-	return nil
-}
-
-func (c *Ctx[U, V, F]) DeleteUser() error {
-	s, err := c.config.SessionStore.Get(c.Req, c.config.SessionName)
-	if err != nil {
-		return fmt.Errorf("couldn't get session data: %w", err)
-	}
-	delete(s.Values, userSessionKey)
-	if err := s.Save(c.Req, c.Res); err != nil {
-		return fmt.Errorf("couldn't save session data: %w", err)
-	}
-	c.user = nil
-	return nil
-}
-
-func (c *Ctx[U, V, F]) PersistFlash(f F) error {
-	s, err := c.config.SessionStore.Get(c.Req, c.config.SessionName)
-	if err != nil {
-		return fmt.Errorf("couldn't get session data: %w", err)
-	}
-	s.AddFlash(f, flashSessionKey)
-	if err := s.Save(c.Req, c.Res); err != nil {
-		return fmt.Errorf("couldn't save session data: %w", err)
-	}
-	return nil
-}
-
-func (c *Ctx[U, V, F]) loadSession() error {
-	s, err := c.config.SessionStore.Get(c.Req, c.config.SessionName)
-	if err != nil {
-		return fmt.Errorf("couldn't get session data: %w", err)
-	}
-
-	if user := s.Values[userSessionKey]; user != nil {
-		c.user = user.(*U)
-	}
-
-	for _, f := range s.Flashes(flashSessionKey) {
-		c.Flash = append(c.Flash, f.(F))
-	}
-
-	if err := s.Save(c.Req, c.Res); err != nil {
-		return fmt.Errorf("couldn't save session data: %w", err)
-	}
-
-	return nil
+func (c *Ctx[V]) Render(r Renderer, data any) error {
+	return r.Render(c.Res, renderData[V]{c, data})
 }
 
 // TODO return httperror, embed err in httperror
-func (c *Ctx[U, V, F]) Bind(v any, flags ...Flag) error {
+func (c *Ctx[V]) Bind(v any, flags ...Flag) error {
 	m := c.Req.Method
 	if m == http.MethodGet || m == http.MethodDelete || m == http.MethodHead {
 		return c.BindQuery(v, flags...)
@@ -229,21 +239,21 @@ func (c *Ctx[U, V, F]) Bind(v any, flags ...Flag) error {
 	return c.BindForm(v, flags...)
 }
 
-func (c *Ctx[U, V, F]) BindQuery(v any, flags ...Flag) error {
+func (c *Ctx[V]) BindQuery(v any, flags ...Flag) error {
 	vals := c.Req.URL.Query()
 	if hasFlag(flags, Vacuum) {
 		vacuum(vals)
 	}
-	return c.config.queryDecoder.Decode(v, vals)
+	return c.queryDecoder.Decode(v, vals)
 }
 
-func (c *Ctx[U, V, F]) BindForm(v any, flags ...Flag) error {
+func (c *Ctx[V]) BindForm(v any, flags ...Flag) error {
 	c.Req.ParseForm()
 	vals := c.Req.Form
 	if hasFlag(flags, Vacuum) {
 		vacuum(vals)
 	}
-	return c.config.formDecoder.Decode(v, vals)
+	return c.formDecoder.Decode(v, vals)
 }
 
 func vacuum(values url.Values) {
