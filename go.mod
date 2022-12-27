@@ -61,11 +61,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.29.6
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/go-openapi/inflect v0.19.0 // indirect
+	github.com/go-playground/form/v4 v4.2.0
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/hashicorp/hcl/v2 v2.15.0 // indirect
 	github.com/jackc/pgx/v5 v5.2.0
