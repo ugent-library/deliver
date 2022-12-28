@@ -136,8 +136,11 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 
 		// apply method overwrite and logging handlers before request reaches the router
+		// TODO Chain function to make this more readable
 		var handler http.Handler = r
-		handler = zaphttp.Handler("app", logger.Desugar())(handler)
+		handler = zaphttp.LogRequests(handler)
+		handler = zaphttp.SetLogger(logger.Desugar())(handler)
+		handler = c.SetRequestID(handler)
 		handler = handlers.HTTPMethodOverrideHandler(handler)
 		if config.Production {
 			handler = handlers.ProxyHeaders(handler)

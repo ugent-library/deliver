@@ -74,6 +74,7 @@ func (config Config[V]) Wrap(handlers ...func(*Ctx[V]) error) http.HandlerFunc {
 			session: session,
 		})
 		// TODO only if AutoSaveSession true
+		// TODO refactor into middleware?
 		c.Res = httpsnoop.Wrap(c.Res, httpsnoop.Hooks{
 			WriteHeader: func(next httpsnoop.WriteHeaderFunc) httpsnoop.WriteHeaderFunc {
 				return func(code int) {
@@ -170,7 +171,7 @@ func (c *Ctx[V]) ExecuteHandler(route string) error {
 	return nil
 }
 
-func (c *Ctx[V]) Redirect(route string, pairs ...string) {
+func (c *Ctx[V]) RedirectTo(route string, pairs ...string) {
 	http.Redirect(c.Res, c.Req, c.URLPath(route, pairs...).String(), http.StatusSeeOther)
 }
 

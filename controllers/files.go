@@ -41,7 +41,7 @@ func (h *Files) Delete(c Ctx) error {
 		Type: infoFlash,
 		Body: "File deleted succesfully",
 	})
-	c.Redirect("folder", "folderID", file.FolderID)
+	c.RedirectTo("folder", "folderID", file.FolderID)
 
 	return nil
 }

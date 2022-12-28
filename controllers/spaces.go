@@ -63,7 +63,7 @@ func (h *Spaces) Create(c Ctx) error {
 		Type: infoFlash,
 		Body: "Space created succesfully",
 	})
-	c.Redirect("space", "spaceID", space.ID)
+	c.RedirectTo("space", "spaceID", space.ID)
 
 	return nil
 }

@@ -35,7 +35,7 @@ func (h *Errors) HandleError(c Ctx, err error) {
 
 	switch httpErr.Code {
 	case http.StatusUnauthorized:
-		c.Redirect("login")
+		c.RedirectTo("login")
 	case http.StatusNotFound:
 		if err := h.NotFound(c); err != nil {
 			h.HandleError(c, err)

@@ -56,7 +56,7 @@ func (h *Folders) Create(c Ctx) error {
 		Type: infoFlash,
 		Body: "Folder created succesfully",
 	})
-	c.Redirect("folder", "folderID", folder.ID)
+	c.RedirectTo("folder", "folderID", folder.ID)
 
 	return nil
 }
@@ -74,11 +74,11 @@ func (h *Folders) Delete(c Ctx) error {
 		return err
 	}
 
-	c.Session.Set(flashKey, []Flash{{
+	c.Session.Append(flashKey, Flash{
 		Type: infoFlash,
 		Body: "Folder deleted succesfully",
-	}})
-	c.Redirect("space", "spaceID", folder.SpaceID)
+	})
+	c.RedirectTo("space", "spaceID", folder.SpaceID)
 
 	return nil
 }
@@ -131,7 +131,7 @@ func (h *Folders) UploadFile(c Ctx) error {
 		Body: "File added succesfully",
 	})
 
-	c.Redirect("folder", "folderID", folderID)
+	c.RedirectTo("folder", "folderID", folderID)
 
 	return nil
 }
