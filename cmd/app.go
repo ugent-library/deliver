@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/sessions"
 
 	"github.com/spf13/cobra"
+	"github.com/ugent-library/dilliver/autosession"
 	c "github.com/ugent-library/dilliver/controllers"
 	"github.com/ugent-library/dilliver/handler"
 	"github.com/ugent-library/dilliver/middleware"
@@ -53,24 +54,6 @@ var appCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
-		// setup router
-		r := mux.NewRouter()
-		r.StrictSlash(true)
-		r.UseEncodedPath()
-		r.Use(handlers.RecoveryHandler(
-			handlers.PrintRecoveryStack(true),
-			// TODO
-			// handlers.RecoveryLogger(&recoveryLogger{logger}),
-		))
-		r.Use(csrf.Protect(
-			[]byte(config.Session.Secret),
-			csrf.CookieName(config.Session.Name+".csrf"),
-			csrf.Path("/"),
-			csrf.Secure(config.Production),
-			csrf.SameSite(csrf.SameSiteStrictMode),
-			csrf.FieldName("csrf_token"),
-		))
-
 		// setup views
 		view.DefaultConfig.Funcs = template.FuncMap{
 			"assetPath": assets.AssetPath,
@@ -100,6 +83,27 @@ var appCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
+		// setup router
+		r := mux.NewRouter()
+		r.StrictSlash(true)
+		r.UseEncodedPath()
+		r.Use(handlers.RecoveryHandler(
+			handlers.PrintRecoveryStack(true),
+			// TODO
+			// handlers.RecoveryLogger(&recoveryLogger{logger}),
+		))
+		r.Use(csrf.Protect(
+			[]byte(config.Session.Secret),
+			csrf.CookieName(config.Session.Name+".csrf"),
+			csrf.Path("/"),
+			csrf.Secure(config.Production),
+			csrf.SameSite(csrf.SameSiteStrictMode),
+			csrf.FieldName("csrf_token"),
+		))
+		r.Use(autosession.Enable(
+			autosession.GorillaSession(sessionStore, sessionName),
+		))
+
 		// controllers
 		errs := c.NewErrors()
 		auth := c.NewAuth(oidcAuth)
@@ -110,10 +114,8 @@ var appCmd = &cobra.Command{
 
 		// request context wrapper
 		wrap := handler.Config[c.Var]{
-			Log:          logger,
-			SessionStore: sessionStore,
-			SessionName:  sessionName,
-			Router:       r,
+			Log:    logger,
+			Router: r,
 			Before: []func(c.Ctx) error{
 				c.LoadSession,
 			},
@@ -122,6 +124,7 @@ var appCmd = &cobra.Command{
 
 		// routes
 		r.NotFoundHandler = wrap(errs.NotFound)
+		// TODO don't apply all middleware to static file server
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
@@ -143,13 +146,13 @@ var appCmd = &cobra.Command{
 		handler = zaphttp.LogRequests(handler)
 		handler = zaphttp.SetLogger(logger.Desugar())(handler)
 		handler = middleware.SetRequestID(ulid.MustGenerate)(handler)
-		handler = handlers.HTTPMethodOverrideHandler(handler)
 		if config.Production {
 			handler = handlers.ProxyHeaders(handler)
 		}
+		handler = handlers.HTTPMethodOverrideHandler(handler)
 
 		// start server
-		// TODO timemouts, graceful shutdown?
+		// TODO timeouts, graceful shutdown
 		if err = http.ListenAndServe(config.Addr, handler); err != nil {
 			logger.Fatal(err)
 		}

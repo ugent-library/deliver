@@ -7,22 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/felixge/httpsnoop"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
+	"github.com/ugent-library/dilliver/autosession"
 	"go.uber.org/zap"
 )
 
 // TODO Var constructor function that allows type inference?
 // TODO make Routes interface
-// TODO make a strongly typed session using mapstructure?
 // TODO get request scoped logger from context
 // TODO embed original error in httperror
 type Config[V any] struct {
 	Log          *zap.SugaredLogger
-	SessionStore sessions.Store
-	SessionName  string
 	Router       *mux.Router
 	Before       []func(*Ctx[V]) error
 	ErrorHandler func(*Ctx[V], error)
@@ -40,41 +36,12 @@ func (config Config[V]) Wrap(handlers ...func(*Ctx[V]) error) http.HandlerFunc {
 			Log:       config.Log,
 			Res:       w,
 			Req:       r,
+			Session:   autosession.Get(r.Context()),
 			path:      mux.Vars(r),
 			CSRFToken: csrf.Token(r),
 			CSRFTag:   csrf.TemplateField(r),
 			router:    config.Router,
 		}
-
-		session, err := config.SessionStore.Get(r, config.SessionName)
-		if err != nil {
-			config.ErrorHandler(c, err)
-			return
-		}
-		c.Session = NewSugaredSession(&gorillaSession{
-			req:     r,
-			res:     w,
-			session: session,
-		})
-		// TODO only if AutoSaveSession true
-		// TODO refactor into middleware?
-		c.Res = httpsnoop.Wrap(c.Res, httpsnoop.Hooks{
-			WriteHeader: func(next httpsnoop.WriteHeaderFunc) httpsnoop.WriteHeaderFunc {
-				return func(code int) {
-					// TODO catch error
-					c.Session.Save()
-					next(code)
-				}
-			},
-			Write: func(next httpsnoop.WriteFunc) httpsnoop.WriteFunc {
-				return func(b []byte) (int, error) {
-					// TODO catch error
-					c.Session.Save()
-					return next(b)
-				}
-			},
-		})
-
 		for _, fn := range config.Before {
 			if err := fn(c); err != nil {
 				config.ErrorHandler(c, err)
@@ -94,7 +61,7 @@ type Ctx[V any] struct {
 	Log       *zap.SugaredLogger
 	Req       *http.Request
 	Res       http.ResponseWriter
-	Session   *SugaredSession
+	Session   autosession.Session
 	path      map[string]string
 	CSRFToken string
 	CSRFTag   template.HTML
