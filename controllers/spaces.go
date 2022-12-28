@@ -60,12 +60,9 @@ func (h *Spaces) Create(c Ctx) error {
 	}
 
 	c.Session.Append(flashKey, Flash{
-		Type: flashTypeInfo,
+		Type: infoFlash,
 		Body: "Space created succesfully",
 	})
-	if err := c.Session.Save(); err != nil {
-		return err
-	}
 	c.Redirect("space", "spaceID", space.ID)
 
 	return nil

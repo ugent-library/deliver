@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/felixge/httpsnoop"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -20,69 +21,6 @@ type Flag int
 const (
 	Vacuum Flag = iota
 )
-
-// TODO add Flash methods instead of Pop, Append?
-type Session interface {
-	Get(string) any
-	Pop(string) any
-	Set(string, any)
-	Append(string, any)
-	Delete(string)
-	Clear()
-	Save() error
-}
-
-type gorillaSession struct {
-	session *sessions.Session
-	changed bool
-	req     *http.Request
-	res     http.ResponseWriter
-}
-
-func (s *gorillaSession) Get(k string) any {
-	return s.session.Values[k]
-}
-
-func (s *gorillaSession) Pop(k string) any {
-	if v, ok := s.session.Values[k]; ok {
-		delete(s.session.Values, k)
-		s.changed = true
-		return v
-	}
-	return nil
-}
-
-func (s *gorillaSession) Set(k string, v any) {
-	s.session.Values[k] = v
-	s.changed = true
-}
-
-func (s *gorillaSession) Append(k string, v any) {
-	if vals, ok := s.session.Values[k]; ok {
-		s.session.Values[k] = append(vals.([]any), v)
-	}
-	s.session.Values[k] = []any{v}
-	s.changed = true
-}
-
-func (s *gorillaSession) Delete(k string) {
-	delete(s.session.Values, k)
-	s.changed = true
-}
-
-func (s *gorillaSession) Clear() {
-	for k := range s.session.Values {
-		delete(s.session.Values, k)
-	}
-	s.changed = true
-}
-
-func (s *gorillaSession) Save() error {
-	if s.changed {
-		return s.session.Save(s.req, s.res)
-	}
-	return nil
-}
 
 // TODO Var constructor function that allows type inference?
 // TODO make Routes interface
@@ -124,16 +62,35 @@ func (config Config[V]) Wrap(handlers ...func(*Ctx[V]) error) http.HandlerFunc {
 			formDecoder:  formDecoder,
 			queryDecoder: queryDecoder,
 		}
+
 		session, err := config.SessionStore.Get(r, config.SessionName)
 		if err != nil {
 			config.ErrorHandler(c, err)
 			return
 		}
-		c.Session = &gorillaSession{
+		c.Session = NewSugaredSession(&gorillaSession{
 			req:     r,
 			res:     w,
 			session: session,
-		}
+		})
+		// TODO only if AutoSaveSession true
+		c.Res = httpsnoop.Wrap(c.Res, httpsnoop.Hooks{
+			WriteHeader: func(next httpsnoop.WriteHeaderFunc) httpsnoop.WriteHeaderFunc {
+				return func(code int) {
+					// TODO catch error
+					c.Session.Save()
+					next(code)
+				}
+			},
+			Write: func(next httpsnoop.WriteFunc) httpsnoop.WriteFunc {
+				return func(b []byte) (int, error) {
+					// TODO catch error
+					c.Session.Save()
+					return next(b)
+				}
+			},
+		})
+
 		for _, fn := range config.Before {
 			if err := fn(c); err != nil {
 				config.ErrorHandler(c, err)
@@ -153,7 +110,7 @@ type Ctx[V any] struct {
 	Log          *zap.SugaredLogger
 	Req          *http.Request
 	Res          http.ResponseWriter
-	Session      Session
+	Session      *SugaredSession
 	path         map[string]string
 	CSRFToken    string
 	CSRFTag      template.HTML

@@ -38,12 +38,9 @@ func (h *Files) Delete(c Ctx) error {
 	}
 
 	c.Session.Append(flashKey, Flash{
-		Type: flashTypeInfo,
+		Type: infoFlash,
 		Body: "File deleted succesfully",
 	})
-	if err := c.Session.Save(); err != nil {
-		return err
-	}
 	c.Redirect("folder", "folderID", file.FolderID)
 
 	return nil

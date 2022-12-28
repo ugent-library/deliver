@@ -12,7 +12,7 @@ const (
 	userKey  = "user"
 	flashKey = "flash"
 
-	flashTypeInfo = "info"
+	infoFlash = "info"
 )
 
 type (
@@ -32,13 +32,17 @@ type (
 )
 
 func LoadSession(c Ctx) error {
-	if user := c.Session.Get(userKey); user != nil {
-		c.Var.User = user.(*models.User)
+	if val := c.Session.Get(userKey); val != nil {
+		c.Var.User = val.(*models.User)
 	}
-	if flash := c.Session.Pop(flashKey); flash != nil {
-		c.Var.Flash = flash.([]Flash)
+	if vals := c.Session.Pop(flashKey); vals != nil {
+		flash := make([]Flash, len(vals.([]any)))
+		for i, v := range vals.([]any) {
+			flash[i] = v.(Flash)
+		}
+		c.Var.Flash = flash
 	}
-	return c.Session.Save()
+	return nil
 }
 
 func RequireUser(c Ctx) error {

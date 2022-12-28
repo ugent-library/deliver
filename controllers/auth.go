@@ -26,9 +26,6 @@ func (h *Auth) Callback(c Ctx) error {
 		Email:    claims.Email,
 	}
 	c.Session.Set(userKey, c.Var.User)
-	if err := c.Session.Save(); err != nil {
-		return err
-	}
 	c.Redirect("spaces")
 	return nil
 }
@@ -39,9 +36,6 @@ func (h *Auth) Login(c Ctx) error {
 
 func (h *Auth) Logout(c Ctx) error {
 	c.Session.Delete(userKey)
-	if err := c.Session.Save(); err != nil {
-		return err
-	}
 	c.Redirect("home")
 	return nil
 }
