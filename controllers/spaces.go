@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 
+	"github.com/ugent-library/dilliver/bind"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
 )
@@ -48,7 +49,8 @@ func (h *Spaces) Show(c Ctx) error {
 
 func (h *Spaces) Create(c Ctx) error {
 	b := SpaceForm{}
-	if err := c.BindForm(&b); err != nil {
+	// TODO return ErrBadRequest
+	if err := bind.Form(c.Req, &b); err != nil {
 		return err
 	}
 

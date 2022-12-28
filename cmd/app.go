@@ -14,9 +14,11 @@ import (
 	"github.com/spf13/cobra"
 	c "github.com/ugent-library/dilliver/controllers"
 	"github.com/ugent-library/dilliver/handler"
+	"github.com/ugent-library/dilliver/middleware"
 	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/oidc"
+	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
 	"github.com/ugent-library/dilliver/zaphttp"
 )
@@ -140,7 +142,7 @@ var appCmd = &cobra.Command{
 		var handler http.Handler = r
 		handler = zaphttp.LogRequests(handler)
 		handler = zaphttp.SetLogger(logger.Desugar())(handler)
-		handler = c.SetRequestID(handler)
+		handler = middleware.SetRequestID(ulid.MustGenerate)(handler)
 		handler = handlers.HTTPMethodOverrideHandler(handler)
 		if config.Production {
 			handler = handlers.ProxyHeaders(handler)

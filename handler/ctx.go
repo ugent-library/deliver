@@ -6,27 +6,19 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/felixge/httpsnoop"
-	"github.com/go-playground/form/v4"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"go.uber.org/zap"
 )
 
-type Flag int
-
-const (
-	Vacuum Flag = iota
-)
-
 // TODO Var constructor function that allows type inference?
 // TODO make Routes interface
 // TODO make a strongly typed session using mapstructure?
-// TODO request ID and request scoped logger
-// TODO pass error in httperror
+// TODO get request scoped logger from context
+// TODO embed original error in httperror
 type Config[V any] struct {
 	Log          *zap.SugaredLogger
 	SessionStore sessions.Store
@@ -43,24 +35,15 @@ func (config Config[V]) Wrap(handlers ...func(*Ctx[V]) error) http.HandlerFunc {
 		}
 	}
 
-	formDecoder := form.NewDecoder()
-	formDecoder.SetTagName("form")
-	formDecoder.SetMode(form.ModeExplicit)
-	queryDecoder := form.NewDecoder()
-	queryDecoder.SetTagName("query")
-	queryDecoder.SetMode(form.ModeExplicit)
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := &Ctx[V]{
-			Log:          config.Log,
-			Res:          w,
-			Req:          r,
-			path:         mux.Vars(r),
-			CSRFToken:    csrf.Token(r),
-			CSRFTag:      csrf.TemplateField(r),
-			router:       config.Router,
-			formDecoder:  formDecoder,
-			queryDecoder: queryDecoder,
+			Log:       config.Log,
+			Res:       w,
+			Req:       r,
+			path:      mux.Vars(r),
+			CSRFToken: csrf.Token(r),
+			CSRFTag:   csrf.TemplateField(r),
+			router:    config.Router,
 		}
 
 		session, err := config.SessionStore.Get(r, config.SessionName)
@@ -108,17 +91,15 @@ func (config Config[V]) Wrap(handlers ...func(*Ctx[V]) error) http.HandlerFunc {
 }
 
 type Ctx[V any] struct {
-	Log          *zap.SugaredLogger
-	Req          *http.Request
-	Res          http.ResponseWriter
-	Session      *SugaredSession
-	path         map[string]string
-	CSRFToken    string
-	CSRFTag      template.HTML
-	Var          V
-	router       *mux.Router
-	formDecoder  *form.Decoder
-	queryDecoder *form.Decoder
+	Log       *zap.SugaredLogger
+	Req       *http.Request
+	Res       http.ResponseWriter
+	Session   *SugaredSession
+	path      map[string]string
+	CSRFToken string
+	CSRFTag   template.HTML
+	Var       V
+	router    *mux.Router
 }
 
 func (c *Ctx[V]) Context() context.Context {
@@ -186,56 +167,4 @@ type renderData[V any] struct {
 
 func (c *Ctx[V]) Render(r Renderer, data any) error {
 	return r.Render(c.Res, renderData[V]{c, data})
-}
-
-// TODO return httperror, embed err in httperror
-func (c *Ctx[V]) Bind(v any, flags ...Flag) error {
-	m := c.Req.Method
-	if m == http.MethodGet || m == http.MethodDelete || m == http.MethodHead {
-		return c.BindQuery(v, flags...)
-	}
-	return c.BindForm(v, flags...)
-}
-
-func (c *Ctx[V]) BindQuery(v any, flags ...Flag) error {
-	vals := c.Req.URL.Query()
-	if hasFlag(flags, Vacuum) {
-		vacuum(vals)
-	}
-	return c.queryDecoder.Decode(v, vals)
-}
-
-func (c *Ctx[V]) BindForm(v any, flags ...Flag) error {
-	c.Req.ParseForm()
-	vals := c.Req.Form
-	if hasFlag(flags, Vacuum) {
-		vacuum(vals)
-	}
-	return c.formDecoder.Decode(v, vals)
-}
-
-func vacuum(values url.Values) {
-	for key, vals := range values {
-		var tmp []string
-		for _, val := range vals {
-			val = strings.TrimSpace(val)
-			if val != "" {
-				tmp = append(tmp, val)
-			}
-		}
-		if len(tmp) > 0 {
-			values[key] = tmp
-		} else {
-			delete(values, key)
-		}
-	}
-}
-
-func hasFlag(flags []Flag, flag Flag) bool {
-	for _, f := range flags {
-		if f == flag {
-			return true
-		}
-	}
-	return false
 }
