@@ -14,6 +14,6 @@ func NewPages() *Pages {
 	}
 }
 
-func (h *Pages) Home(c Ctx) error {
+func (h *Pages) Home(c *Ctx) error {
 	return h.homeView.Render(c.Res, c)
 }

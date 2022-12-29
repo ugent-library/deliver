@@ -19,7 +19,7 @@
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item">
-                                    <a href="{{.URLPath "home"}}">
+                                    <a href="{{.PathTo "home"}}">
                                         <img class="d-none d-lg-inline-block" src="{{assetPath "/images/ghent-university-library-logo.svg"}}" alt="Ghent University Library">
                                         <img class="d-inline-block d-lg-none" src="{{assetPath "/images/ghent-university-library-mark.svg"}}" alt="Ghent University Library">
                                     </a>
@@ -34,7 +34,7 @@
                         <div id="side-panels">
                             <ul class="nav nav-main">
                                 <li class="nav-item">
-                                    {{with .Var.User}}
+                                    {{with .User}}
                                     <div class="dropdown position-static">
                                         <button class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <div class="bc-avatar-and-text">
@@ -55,14 +55,14 @@
                                                 </div>
                                             </div>
                                             <hr class="dropdown-divider">
-                                            <a class="dropdown-item" href="{{$.URLPath "logout"}}">
+                                            <a class="dropdown-item" href="{{$.PathTo "logout"}}">
                                                 <i class="if if-log-out"></i>
                                                 <span>Log out</span>
                                             </a>
                                         </div>
                                     </div>
                                     {{else}}
-                                    <a class="btn btn-primary btn-sm" href="{{$.URLPath "login"}}">
+                                    <a class="btn btn-primary btn-sm" href="{{$.PathTo "login"}}">
                                         <i class="if if-arrow-right ml-0"></i>
                                         <span class="btn-text mr-2">Log in</span>
                                     </a>
@@ -82,7 +82,7 @@
                     <nav>
                         <ul class="c-sidebar-menu">
                             <li class="c-sidebar__item c-sidebar__item--active">
-                                <a href="{{.URLPath "home"}}">
+                                <a href="{{.PathTo "home"}}">
                                     <span class="c-sidebar__icon">
                                         <i class="if if-file"></i>
                                     </span>
@@ -102,7 +102,7 @@
     </main>
 
     <div id="flash-messages">
-        {{range .Var.Flash}}
+        {{range .Flash}}
         <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
             <div class="toast-body">
                 {{if eq .Type "success"}}

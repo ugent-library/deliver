@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 <form class="change-submit"
-                    action="{{.URLPath "upload_file" "folderID" .Data.folder.ID}}"
+                    action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
                     enctype="multipart/form-data"
                     method="POST"
                 >
@@ -70,7 +70,7 @@
                         {{range .Data.folder.Edges.Files}}
                         <tr class="clickable-table-row">
                             <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                <a href="{{$.URLPath "download_file" "fileID" .ID}}">
+                                <a href="{{$.PathTo "download_file" "fileID" .ID}}">
                                     <i class="if if-download"></i>
                                     <span>{{.Name}}</span>
                                 </a>
@@ -88,7 +88,7 @@
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                 <div class="c-button-toolbar flex-nowrap">
-                                    <form action="{{$.URLPath "delete_file" "fileID" .ID}}" method="POST">
+                                    <form action="{{$.PathTo "delete_file" "fileID" .ID}}" method="POST">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{$.CSRFTag}}
                                         <button class="btn btn-icon-only btn-link" type="submit">

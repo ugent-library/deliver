@@ -19,11 +19,11 @@ func NewErrors() *Errors {
 	}
 }
 
-func (h *Errors) NotFound(c Ctx) error {
+func (h *Errors) NotFound(c *Ctx) error {
 	return h.notFoundView.Render(c.Res, c)
 }
 
-func (h *Errors) HandleError(c Ctx, err error) {
+func (h *Errors) HandleError(c *Ctx, err error) {
 	if err == models.ErrNotFound {
 		err = httperror.NotFound
 	}

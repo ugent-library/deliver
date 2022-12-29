@@ -27,8 +27,8 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	}
 }
 
-func (h *Folders) Show(c Ctx) error {
-	folderID := c.Path("folderID")
+func (h *Folders) Show(c *Ctx) error {
+	folderID := c.Path["folderID"]
 	folder, err := h.repo.Folder(c.Context(), folderID)
 	if err != nil {
 		return err
@@ -38,8 +38,8 @@ func (h *Folders) Show(c Ctx) error {
 	})
 }
 
-func (h *Folders) Create(c Ctx) error {
-	spaceID := c.Path("spaceID")
+func (h *Folders) Create(c *Ctx) error {
+	spaceID := c.Path["spaceID"]
 	b := FolderForm{}
 	// TODO return ErrBadRequest
 	if err := bind.Form(c.Req, &b); err != nil {
@@ -64,8 +64,8 @@ func (h *Folders) Create(c Ctx) error {
 }
 
 // TODO remove files
-func (h *Folders) Delete(c Ctx) error {
-	folderID := c.Path("folderID")
+func (h *Folders) Delete(c *Ctx) error {
+	folderID := c.Path["folderID"]
 
 	folder, err := h.repo.Folder(c.Context(), folderID)
 	if err != nil {
@@ -85,8 +85,8 @@ func (h *Folders) Delete(c Ctx) error {
 	return nil
 }
 
-func (h *Folders) UploadFile(c Ctx) error {
-	folderID := c.Path("folderID")
+func (h *Folders) UploadFile(c *Ctx) error {
+	folderID := c.Path["folderID"]
 
 	// 2GB limit on request body
 	c.Req.Body = http.MaxBytesReader(c.Res, c.Req.Body, 2_000_000_000)

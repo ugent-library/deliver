@@ -14,7 +14,7 @@
         <nav>
             <ul class="c-sub-sidebar-menu">
                 <li class="c-sub-sidebar__item c-sub-sidebar__item--active">
-                    <a href="{{.URLPath "space" "spaceID" .Data.space.ID}}">
+                    <a href="{{.PathTo "space" "spaceID" .Data.space.ID}}">
                         <span class="c-sidebar__label">{{.Data.space.Name}}</span>
                     </a>
                 </li>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{.URLPath "create_folder" "spaceID" .Data.space.ID}}" method="POST">
+                <form action="{{.PathTo "create_folder" "spaceID" .Data.space.ID}}" method="POST">
                     {{.CSRFTag}}
                     <div class="form-group">
                         <div class="form-row form-group">
@@ -89,11 +89,11 @@
                         {{range .Data.space.Edges.Folders}}
                         <tr>
                             <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                <a href="{{$.URLPath "folder" "folderID" .ID}}">{{.Name}}</a>
+                                <a href="{{$.PathTo "folder" "folderID" .ID}}">{{.Name}}</a>
                             </td>
                             <td class="text-nowrap">
                                 <code class="c-code">
-                                    <a href="{{$.URLPath "folder" "folderID" .ID}}" target="_blank">{{$.URL "folder" "folderID" .ID}}</a>
+                                    <a href="{{$.PathTo "folder" "folderID" .ID}}" target="_blank">{{$.URLTo "folder" "folderID" .ID}}</a>
                                 </code>
                             </td>
                             <td class="text-nowrap">
@@ -114,7 +114,7 @@
                                         <i class="if if-edit"></i>
                                         <div class="sr-only">Edit folder</div>
                                     </button>
-                                    <form action="{{$.URLPath "delete_folder" "folderID" .ID}}" method="POST">
+                                    <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{$.CSRFTag}}
                                         <button class="btn btn-icon-only btn-link" type="submit">

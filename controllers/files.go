@@ -16,16 +16,16 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-func (h *Files) Download(c Ctx) error {
-	fileID := c.Path("fileID")
+func (h *Files) Download(c *Ctx) error {
+	fileID := c.Path["fileID"]
 	if _, err := h.repo.File(c.Context(), fileID); err != nil {
 		return err
 	}
 	return h.file.Get(c.Context(), fileID, c.Res)
 }
 
-func (h *Files) Delete(c Ctx) error {
-	fileID := c.Path("fileID")
+func (h *Files) Delete(c *Ctx) error {
+	fileID := c.Path["fileID"]
 	file, err := h.repo.File(c.Context(), fileID)
 	if err != nil {
 		return err

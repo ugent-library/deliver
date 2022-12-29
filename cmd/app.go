@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/dilliver/autosession"
 	c "github.com/ugent-library/dilliver/controllers"
-	"github.com/ugent-library/dilliver/handler"
 	"github.com/ugent-library/dilliver/middleware"
 	"github.com/ugent-library/dilliver/mix"
 	"github.com/ugent-library/dilliver/models"
@@ -100,9 +99,6 @@ var appCmd = &cobra.Command{
 			csrf.SameSite(csrf.SameSiteStrictMode),
 			csrf.FieldName("csrf_token"),
 		))
-		r.Use(autosession.Enable(
-			autosession.GorillaSession(sessionStore, sessionName),
-		))
 
 		// controllers
 		errs := c.NewErrors()
@@ -113,14 +109,7 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := handler.Config[c.Var]{
-			Log:    logger,
-			Router: r,
-			Before: []func(c.Ctx) error{
-				c.LoadSession,
-			},
-			ErrorHandler: errs.HandleError,
-		}.Wrap
+		wrap := c.Wrapper(r, errs.HandleError)
 
 		// routes
 		r.NotFoundHandler = wrap(errs.NotFound)
@@ -140,9 +129,12 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 
-		// apply method overwrite and logging handlers before request reaches the router
+		// apply these before request reaches the router
 		// TODO Chain function to make this more readable
 		var handler http.Handler = r
+		handler = autosession.Enable(
+			autosession.GorillaSession(sessionStore, sessionName),
+		)(handler)
 		handler = zaphttp.LogRequests(handler)
 		handler = zaphttp.SetLogger(logger.Desugar())(handler)
 		handler = middleware.SetRequestID(ulid.MustGenerate)(handler)

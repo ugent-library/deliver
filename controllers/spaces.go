@@ -26,7 +26,7 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
-func (h *Spaces) List(c Ctx) error {
+func (h *Spaces) List(c *Ctx) error {
 	spaces, err := h.repo.Spaces(c.Context())
 	if err != nil {
 		return err
@@ -36,9 +36,9 @@ func (h *Spaces) List(c Ctx) error {
 	})
 }
 
-func (h *Spaces) Show(c Ctx) error {
-	spaceID := c.Path("spaceID")
-	space, err := h.repo.Space(c.Req.Context(), spaceID)
+func (h *Spaces) Show(c *Ctx) error {
+	spaceID := c.Path["spaceID"]
+	space, err := h.repo.Space(c.Context(), spaceID)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (h *Spaces) Show(c Ctx) error {
 	})
 }
 
-func (h *Spaces) Create(c Ctx) error {
+func (h *Spaces) Create(c *Ctx) error {
 	b := SpaceForm{}
 	// TODO return ErrBadRequest
 	if err := bind.Form(c.Req, &b); err != nil {

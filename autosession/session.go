@@ -22,7 +22,7 @@ type SessionFunc func(http.ResponseWriter, *http.Request) Session
 
 func GorillaSession(store sessions.Store, name string) SessionFunc {
 	return func(w http.ResponseWriter, r *http.Request) Session {
-		// TODO handle error
+		// TODO handle error?
 		s, _ := store.Get(r, name)
 		return &gorillaSession{
 			session: s,

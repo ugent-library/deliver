@@ -17,7 +17,7 @@ func (c contextKey) String() string {
 
 var loggerKey = contextKey("logger")
 
-func GetLogger(c context.Context) *zap.Logger {
+func Logger(c context.Context) *zap.Logger {
 	if l := c.Value(loggerKey); l != nil {
 		return l.(*zap.Logger)
 	}
@@ -39,7 +39,7 @@ func SetLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 
 func LogRequests(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		l := GetLogger(r.Context())
+		l := Logger(r.Context())
 
 		if l == nil {
 			next.ServeHTTP(w, r)

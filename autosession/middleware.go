@@ -15,8 +15,8 @@ func (c contextKey) String() string {
 
 var sessionKey = contextKey("session")
 
-func Get(c context.Context) Session {
-	if l := c.Value(sessionKey); l != nil {
+func Get(r *http.Request) Session {
+	if l := r.Context().Value(sessionKey); l != nil {
 		return l.(Session)
 	}
 	return nil
