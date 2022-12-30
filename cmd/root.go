@@ -19,6 +19,9 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	cobra.OnInitialize(initConfig, initLogger)
+	cobra.OnFinalize(func() {
+		logger.Sync()
+	})
 
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file")
 
