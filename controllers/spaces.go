@@ -37,7 +37,7 @@ func (h *Spaces) List(c *Ctx) error {
 }
 
 func (h *Spaces) Show(c *Ctx) error {
-	spaceID := c.Path["spaceID"]
+	spaceID := c.Path("spaceID")
 	space, err := h.repo.Space(c.Context(), spaceID)
 	if err != nil {
 		return err

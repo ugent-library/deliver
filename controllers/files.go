@@ -17,7 +17,7 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 }
 
 func (h *Files) Download(c *Ctx) error {
-	fileID := c.Path["fileID"]
+	fileID := c.Path("fileID")
 	if _, err := h.repo.File(c.Context(), fileID); err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (h *Files) Download(c *Ctx) error {
 }
 
 func (h *Files) Delete(c *Ctx) error {
-	fileID := c.Path["fileID"]
+	fileID := c.Path("fileID")
 	file, err := h.repo.File(c.Context(), fileID)
 	if err != nil {
 		return err
