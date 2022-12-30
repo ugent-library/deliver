@@ -65,7 +65,7 @@ var appCmd = &cobra.Command{
 		sessionStore.Options.Path = "/"
 		sessionStore.Options.HttpOnly = true
 		sessionStore.Options.Secure = config.Production
-		// register types so CookieStore can serialize it
+		// register types so CookieStore can serialize them
 		gob.Register(&models.User{})
 		gob.Register(c.Flash{})
 
@@ -130,18 +130,14 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 
 		// apply these before request reaches the router
-		// TODO Chain function to make this more readable
-		var handler http.Handler = r
-		handler = autosession.Enable(
-			autosession.GorillaSession(sessionStore, sessionName),
-		)(handler)
-		handler = zaphttp.LogRequests(handler)
-		handler = zaphttp.SetLogger(logger.Desugar())(handler)
-		handler = middleware.SetRequestID(ulid.MustGenerate)(handler)
-		if config.Production {
-			handler = handlers.ProxyHeaders(handler)
-		}
-		handler = handlers.HTTPMethodOverrideHandler(handler)
+		handler := middleware.Apply(r,
+			handlers.HTTPMethodOverrideHandler,
+			middleware.If(config.Production, handlers.ProxyHeaders),
+			middleware.SetRequestID(ulid.MustGenerate),
+			zaphttp.SetLogger(logger.Desugar()),
+			zaphttp.LogRequests,
+			autosession.Enable(autosession.GorillaSession(sessionStore, sessionName)),
+		)
 
 		// start server
 		// TODO timeouts, graceful shutdown
