@@ -25,6 +25,7 @@ require (
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -67,9 +68,11 @@ require (
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/sessions v1.2.1
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/hcl/v2 v2.15.0 // indirect
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
+	github.com/ory/graceful v0.1.3
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
 	github.com/zclconf/go-cty v1.12.1 // indirect

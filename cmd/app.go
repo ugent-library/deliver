@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-
+	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/dilliver/autosession"
 	c "github.com/ugent-library/dilliver/controllers"
@@ -21,6 +21,7 @@ import (
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/view"
 	"github.com/ugent-library/dilliver/zaphttp"
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -86,11 +87,6 @@ var appCmd = &cobra.Command{
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
-		r.Use(handlers.RecoveryHandler(
-			handlers.PrintRecoveryStack(true),
-			// TODO
-			// handlers.RecoveryLogger(&recoveryLogger{logger}),
-		))
 		r.Use(csrf.Protect(
 			[]byte(config.Session.Secret),
 			csrf.CookieName(config.Session.Name+".csrf"),
@@ -131,6 +127,13 @@ var appCmd = &cobra.Command{
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,
+			middleware.Recover(func(err any) {
+				if config.Production {
+					logger.With(zap.Stack("stack")).Error(err)
+				} else {
+					logger.Error(err)
+				}
+			}),
 			handlers.HTTPMethodOverrideHandler,
 			middleware.If(config.Production, handlers.ProxyHeaders),
 			middleware.SetRequestID(ulid.MustGenerate),
@@ -140,18 +143,14 @@ var appCmd = &cobra.Command{
 		)
 
 		// start server
-		// TODO timeouts, graceful shutdown
-		if err = http.ListenAndServe(config.Addr, handler); err != nil {
+		server := graceful.WithDefaults(&http.Server{
+			Addr:    config.Addr,
+			Handler: handler,
+		})
+		logger.Infof("starting server at %s", config.Addr)
+		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
 			logger.Fatal(err)
 		}
+		logger.Info("gracefully stopped server")
 	},
 }
-
-// implement handlers.RecoveryHandlerLogger for zap logger
-// type recoveryLogger struct {
-// 	l *zap.SugaredLogger
-// }
-
-// func (p *recoveryLogger) Println(args ...any) {
-// 	p.l.Error(args...)
-// }
