@@ -83,6 +83,9 @@ func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, 
 }
 
 func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
 	row, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
 	if err != nil {
 		return err
@@ -108,6 +111,9 @@ func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folde
 }
 
 func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
+	if err := f.Validate(); err != nil {
+		return err
+	}
 	row, err := r.db.Folder.Create().
 		SetSpaceID(f.SpaceID).
 		SetName(f.Name).
@@ -127,6 +133,9 @@ func (r *repositoryService) DeleteFolder(ctx context.Context, folderID string) e
 }
 
 func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
+	if err := f.Validate(); err != nil {
+		return err
+	}
 	row, err := r.db.File.Create().
 		SetID(f.ID).
 		SetFolderID(f.FolderID).

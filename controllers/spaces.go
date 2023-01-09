@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"context"
+	"errors"
 
+	"github.com/jellydator/validation"
 	"github.com/ugent-library/dilliver/bind"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/view"
@@ -27,13 +28,7 @@ type SpaceForm struct {
 }
 
 func (h *Spaces) List(c *Ctx) error {
-	spaces, err := h.repo.Spaces(c.Context())
-	if err != nil {
-		return err
-	}
-	return c.Render(h.listView, Map{
-		"spaces": spaces,
-	})
+	return h.list(c, nil)
 }
 
 func (h *Spaces) Show(c *Ctx) error {
@@ -57,8 +52,9 @@ func (h *Spaces) Create(c *Ctx) error {
 	space := &models.Space{
 		Name: b.Name,
 	}
-	if err := h.repo.CreateSpace(context.TODO(), space); err != nil {
-		return err
+
+	if err := h.repo.CreateSpace(c.Context(), space); err != nil {
+		return h.list(c, err)
 	}
 
 	c.Session.Append(flashKey, Flash{
@@ -68,4 +64,24 @@ func (h *Spaces) Create(c *Ctx) error {
 	c.RedirectTo("space", "spaceID", space.ID)
 
 	return nil
+}
+
+func (h *Spaces) list(c *Ctx, err error) error {
+	var validationErrors validation.Errors
+	if err != nil {
+		validationErrors = make(validation.Errors)
+		if !errors.As(err, &validationErrors) {
+			return err
+		}
+	}
+
+	spaces, err := h.repo.Spaces(c.Context())
+	if err != nil {
+		return err
+	}
+
+	return c.Render(h.listView, Map{
+		"spaces":           spaces,
+		"validationErrors": validationErrors,
+	})
 }

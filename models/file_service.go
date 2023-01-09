@@ -64,7 +64,7 @@ func (f *fileService) Add(ctx context.Context, id string, b io.ReadSeekCloser) (
 func (f *fileService) Get(ctx context.Context, id string, b io.Writer) error {
 	downloader := manager.NewDownloader(f.client)
 	downloader.Concurrency = 1
-	_, err := downloader.Download(context.TODO(), fakeWriterAt{b}, &s3.GetObjectInput{
+	_, err := downloader.Download(ctx, fakeWriterAt{b}, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucket),
 		Key:    aws.String(id),
 	})

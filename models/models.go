@@ -42,19 +42,19 @@ type File struct {
 
 func (s *Space) Validate() error {
 	return validation.ValidateStruct(s,
-		validation.Field(s.Name, validation.Required, validation.Length(1, 256)),
+		validation.Field(&s.Name, validation.Required, validation.Length(1, 256)),
 	)
 }
 
 func (f *Folder) Validate() error {
 	return validation.ValidateStruct(f,
-		validation.Field(f.Name, validation.Required, validation.Length(1, 256)),
+		validation.Field(&f.Name, validation.Required, validation.Length(1, 256)),
 	)
 }
 
 func (f *File) Validate() error {
 	return validation.ValidateStruct(f,
-		validation.Field(f.Name, validation.Required),
-		validation.Field(f.Size, validation.Min(1)),
+		validation.Field(&f.Name, validation.Required),
+		validation.Field(&f.Size, validation.Min(1)),
 	)
 }

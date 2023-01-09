@@ -1,6 +1,9 @@
 {{define "page_title"}}Spaces{{end}}
 {{define "body"}}
 <div class="w-100 u-scroll-wrapper">
+    {{if .Data.validationErrors}}
+        <p>{{.Data.validationErrors.Error}}</p>
+    {{end}}
     <form action="{{.PathTo "create_space"}}" method="POST">
         {{.CSRFTag}}
         <input type="text" name="name">
