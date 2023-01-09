@@ -86,7 +86,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{range .Data.space.Edges.Folders}}
+                        {{range .Data.space.Folders}}
                         <tr>
                             <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                                 <a href="{{$.PathTo "folder" "folderID" .ID}}">{{.Name}}</a>

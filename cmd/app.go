@@ -143,6 +143,7 @@ var appCmd = &cobra.Command{
 		)
 
 		// start server
+		// TODO make timeouts configurable
 		server := graceful.WithDefaults(&http.Server{
 			Addr:    config.Addr,
 			Handler: handler,

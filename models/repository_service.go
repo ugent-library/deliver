@@ -18,10 +18,6 @@ import (
 
 var ErrNotFound = errors.New("not found")
 
-type Space = ent.Space
-type Folder = ent.Folder
-type File = ent.File
-
 type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
 	Space(context.Context, string) (*Space, error)
@@ -64,7 +60,11 @@ func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
 	if err != nil {
 		return nil, err
 	}
-	return rows, nil
+	spaces := make([]*Space, len(rows))
+	for i, row := range rows {
+		spaces[i] = rowToSpace(row)
+	}
+	return spaces, nil
 }
 
 func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, error) {
@@ -79,7 +79,7 @@ func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, 
 		}
 		return nil, err
 	}
-	return row, nil
+	return rowToSpace(row), nil
 }
 
 func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
@@ -87,7 +87,7 @@ func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	if err != nil {
 		return err
 	}
-	*s = *row
+	*s = *rowToSpace(row)
 	return nil
 }
 
@@ -104,7 +104,7 @@ func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folde
 		}
 		return nil, err
 	}
-	return row, nil
+	return rowToFolder(row), nil
 }
 
 func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
@@ -115,7 +115,7 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 	if err != nil {
 		return err
 	}
-	*f = *row
+	*f = *rowToFolder(row)
 	return nil
 }
 
@@ -130,7 +130,7 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	row, err := r.db.File.Create().
 		SetID(f.ID).
 		SetFolderID(f.FolderID).
-		SetMd5(f.Md5).
+		SetMd5(f.MD5).
 		SetName(f.Name).
 		SetContentType(f.ContentType).
 		SetSize(f.Size).
@@ -138,7 +138,7 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	if err != nil {
 		return err
 	}
-	*f = *row
+	*f = *rowToFile(row)
 	return nil
 }
 
@@ -154,7 +154,7 @@ func (r *repositoryService) File(ctx context.Context, fileID string) (*File, err
 		}
 		return nil, err
 	}
-	return row, nil
+	return rowToFile(row), nil
 }
 
 func (r *repositoryService) DeleteFile(ctx context.Context, fileID string) error {
@@ -162,4 +162,58 @@ func (r *repositoryService) DeleteFile(ctx context.Context, fileID string) error
 		DeleteOneID(fileID).
 		Exec(ctx)
 	return err
+}
+
+func rowToSpace(row *ent.Space) *Space {
+	s := &Space{
+		ID:        row.ID,
+		Name:      row.Name,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+	}
+	if row.Edges.Folders != nil {
+		s.Folders = make([]*Folder, len(row.Edges.Folders))
+		for i, r := range row.Edges.Folders {
+			s.Folders[i] = rowToFolder(r)
+		}
+	}
+	return s
+}
+
+func rowToFolder(row *ent.Folder) *Folder {
+	f := &Folder{
+		ID:        row.ID,
+		SpaceID:   row.SpaceID,
+		Name:      row.Name,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		ExpiresAt: row.ExpiresAt,
+	}
+	if row.Edges.Space != nil {
+		f.Space = rowToSpace(row.Edges.Space)
+	}
+	if row.Edges.Files != nil {
+		f.Files = make([]*File, len(row.Edges.Files))
+		for i, r := range row.Edges.Files {
+			f.Files[i] = rowToFile(r)
+		}
+	}
+	return f
+}
+
+func rowToFile(row *ent.File) *File {
+	f := &File{
+		ID:          row.ID,
+		FolderID:    row.FolderID,
+		MD5:         row.Md5,
+		Name:        row.Name,
+		Size:        row.Size,
+		ContentType: row.ContentType,
+		CreatedAt:   row.CreatedAt,
+		UpdatedAt:   row.UpdatedAt,
+	}
+	if row.Edges.Folder != nil {
+		f.Folder = rowToFolder(row.Edges.Folder)
+	}
+	return f
 }

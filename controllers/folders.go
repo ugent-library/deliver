@@ -121,7 +121,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 			return err
 		}
 
-		file.Md5 = md5
+		file.MD5 = md5
 
 		if err = h.repo.CreateFile(c.Context(), file); err != nil {
 			return err

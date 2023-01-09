@@ -50,7 +50,7 @@
                     </div>
                     <div class="bc-toolbar-right">
                         <div class="bc-toolbar-item">
-                            <p>{{len .Data.folder.Edges.Files}} items</p>
+                            <p>{{len .Data.folder.Files}} items</p>
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{range .Data.folder.Edges.Files}}
+                        {{range .Data.folder.Files}}
                         <tr class="clickable-table-row">
                             <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                                 <a href="{{$.PathTo "download_file" "fileID" .ID}}">
@@ -75,7 +75,7 @@
                                     <span>{{.Name}}</span>
                                 </a>
                                 <br>
-                                <small>md5 checksum: {{.Md5}}</small>
+                                <small>md5 checksum: {{.MD5}}</small>
                             </td>
                             <td class="text-nowrap">
                                 <p>{{.Size}}</p>
