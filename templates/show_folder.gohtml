@@ -1,109 +1,118 @@
 {{define "page_title"}}{{.Data.folder.Name}}{{end}}
 {{define "body"}}
-<div class="w-100 u-scroll-wrapper">
-    <div class="bg-white">
-        <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
-            <div class="bc-toolbar">
-                <div class="bc-toolbar-left">
-                    <div class="bc-toolbar-item">
-                        <h4 class="bc-toolbar-title">{{.Data.folder.Name}}</h4>
+    {{$isAdmin := .IsSpaceAdmin .Data.folder.SpaceID .User}}
+
+    <div class="w-100 u-scroll-wrapper">
+        <div class="bg-white">
+            <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <h4 class="bc-toolbar-title">{{.Data.folder.Name}}</h4>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="u-scroll-wrapper__body p-6">
+            {{if $isAdmin}}
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">Upload files</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form class="change-submit"
+                        action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
+                        enctype="multipart/form-data"
+                        method="POST"
+                    >
+                        {{.CSRFTag}}
+                        <div class="c-file-upload">
+                            <input type="file" name="file" multiple>
+                            <div class="c-file-upload__content">
+                                <p>Drag and drop or</p>
+                                <button class="btn btn-outline-primary" type="submit" data-loading="Uploading...">
+                                    Upload files
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">
+                                <h5>Available files</h5>
+                            </div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item">
+                                <p>{{len .Data.folder.Files}} items</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
+                                <th class="text-nowrap">Size</th>
+                                <th class="text-nowrap">Type</th>
+                                <th class="text-nowrap">Created at</th>
+                                {{if $isAdmin}}
+                                <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
+                                {{end}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range .Data.folder.Files}}
+                            <tr class="clickable-table-row">
+                                <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                                    <a href="{{$.PathTo "download_file" "fileID" .ID}}">
+                                        <i class="if if-download"></i>
+                                        <span>{{.Name}}</span>
+                                    </a>
+                                    <br>
+                                    <small>md5 checksum: {{.MD5}}</small>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.Size}}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.ContentType}}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>
+                                </td>
+                                {{if $isAdmin}}
+                                <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                                    <div class="c-button-toolbar flex-nowrap">
+                                        <form action="{{$.PathTo "delete_file" "fileID" .ID}}" method="POST">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            {{$.CSRFTag}}
+                                            <button class="btn btn-icon-only btn-link" type="submit">
+                                                <i class="if if-delete"></i>
+                                                <div class="sr-only">Delete file</div>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                                {{end}}
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <div class="u-scroll-wrapper__body p-6">
-        <div class="card w-100 mb-6">
-            <div class="card-header">
-                <div class="bc-toolbar">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">Upload files</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <form class="change-submit"
-                    action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
-                    enctype="multipart/form-data"
-                    method="POST"
-                >
-                    {{.CSRFTag}}
-                    <div class="c-file-upload">
-                        <input type="file" name="file" multiple>
-                        <div class="c-file-upload__content">
-                            <p>Drag and drop or</p>
-                            <button class="btn btn-outline-primary" type="submit" data-loading="Uploading...">
-                                Upload files
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="card w-100 mb-6">
-            <div class="card-header">
-                <div class="bc-toolbar">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">
-                            <h5>Available files</h5>
-                        </div>
-                    </div>
-                    <div class="bc-toolbar-right">
-                        <div class="bc-toolbar-item">
-                            <p>{{len .Data.folder.Files}} items</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
-                            <th class="text-nowrap">Size</th>
-                            <th class="text-nowrap">Type</th>
-                            <th class="text-nowrap">Created at</th>
-                            <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{range .Data.folder.Files}}
-                        <tr class="clickable-table-row">
-                            <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                <a href="{{$.PathTo "download_file" "fileID" .ID}}">
-                                    <i class="if if-download"></i>
-                                    <span>{{.Name}}</span>
-                                </a>
-                                <br>
-                                <small>md5 checksum: {{.MD5}}</small>
-                            </td>
-                            <td class="text-nowrap">
-                                <p>{{.Size}}</p>
-                            </td>
-                            <td class="text-nowrap">
-                                <p>{{.ContentType}}</p>
-                            </td>
-                            <td class="text-nowrap">
-                                <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>
-                            </td>
-                            <td class="table-col-sm-fixed table-col-sm-fixed-right">
-                                <div class="c-button-toolbar flex-nowrap">
-                                    <form action="{{$.PathTo "delete_file" "fileID" .ID}}" method="POST">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        {{$.CSRFTag}}
-                                        <button class="btn btn-icon-only btn-link" type="submit">
-                                            <i class="if if-delete"></i>
-                                            <div class="sr-only">Delete file</div>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {{end}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
 {{end}}

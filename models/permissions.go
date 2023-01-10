@@ -6,6 +6,9 @@ type Permissions struct {
 }
 
 func (p *Permissions) IsAdmin(user *User) bool {
+	if user == nil {
+		return false
+	}
 	for _, id := range p.Admins {
 		if user.Username == id {
 			return true
@@ -15,6 +18,9 @@ func (p *Permissions) IsAdmin(user *User) bool {
 }
 
 func (p *Permissions) IsSpaceAdmin(spaceID string, user *User) bool {
+	if user == nil {
+		return false
+	}
 	if p.IsAdmin(user) {
 		return true
 	}

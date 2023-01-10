@@ -26,7 +26,7 @@ func (h *Auth) Callback(c *Ctx) error {
 		Email:    claims.Email,
 	}
 	c.Session.Set(userKey, c.User)
-	c.RedirectTo("spaces")
+	c.RedirectTo("home")
 	return nil
 }
 
