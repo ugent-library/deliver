@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/ugent-library/dilliver/bind"
+	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/validate"
 	"github.com/ugent-library/dilliver/view"
@@ -61,6 +62,11 @@ func (h *Spaces) Create(c *Ctx) error {
 
 func (h *Spaces) CreateFolder(c *Ctx) error {
 	spaceID := c.Path("spaceID")
+
+	if !c.IsSpaceAdmin(spaceID, c.User) {
+		return httperror.Forbidden
+	}
+
 	b := FolderForm{}
 	// TODO return ErrBadRequest
 	if err := bind.Form(c.Req, &b); err != nil {

@@ -2,19 +2,19 @@ package cmd
 
 type Config struct {
 	Production bool
-	Admin      []string
+	Admins     []string
 	Spaces     []SpacesConfig
 	DB         string
 	S3         S3Config
 	Addr       string
-	Oidc       OidcConfig
+	OIDC       OIDCConfig
 	Session    SessionConfig
-	Csrf       CsrfConfig
+	CSRF       CSRFConfig
 }
 
 type SpacesConfig struct {
-	ID    string
-	Admin []string
+	ID     string
+	Admins []string
 }
 
 type S3Config struct {
@@ -25,19 +25,19 @@ type S3Config struct {
 	Bucket string
 }
 
-type OidcConfig struct {
+type OIDCConfig struct {
 	URL         string
 	ID          string
 	Secret      string
-	RedirectURL string
+	RedirectURL string `mapstructure:"redirect_url"`
 }
 
 type SessionConfig struct {
 	Name   string
-	MaxAge int
+	MaxAge int `mapstructure:"max_age"`
 	Secret string
 }
 
-type CsrfConfig struct {
+type CSRFConfig struct {
 	Secret string
 }

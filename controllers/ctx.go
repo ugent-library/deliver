@@ -32,7 +32,8 @@ type Ctx struct {
 	Res     http.ResponseWriter
 	Session autosession.Session
 	User    *models.User
-	Flash   []Flash
+	*models.Permissions
+	Flash []Flash
 }
 
 type Flash struct {
@@ -50,28 +51,36 @@ type ViewData struct {
 	CSRFToken string
 	CSRFTag   template.HTML
 	User      *models.User
-	Flash     []Flash
-	Data      any
+	*models.Permissions
+	Flash []Flash
+	Data  any
 }
 
-func Wrapper(router *mux.Router, errorHandler func(*Ctx, error)) func(...func(*Ctx) error) http.Handler {
+type Config struct {
+	Router       *mux.Router
+	ErrorHandler func(*Ctx, error)
+	Permissions  *models.Permissions
+}
+
+func Wrapper(config Config) func(...func(*Ctx) error) http.Handler {
 	return func(handlers ...func(*Ctx) error) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := &Ctx{
-				HandlerHelpers: routes.NewHandlerHelpers(router, w, r),
-				URLHelpers:     routes.NewURLHelpers(router, r),
+				HandlerHelpers: routes.NewHandlerHelpers(config.Router, w, r),
+				URLHelpers:     routes.NewURLHelpers(config.Router, r),
 				Log:            zaphttp.Logger(r.Context()).Sugar(),
 				Res:            w,
 				Req:            r,
 				Session:        autosession.Get(r),
+				Permissions:    config.Permissions,
 			}
 			if err := LoadSession(c); err != nil {
-				errorHandler(c, err)
+				config.ErrorHandler(c, err)
 				return
 			}
 			for _, fn := range handlers {
 				if err := fn(c); err != nil {
-					errorHandler(c, err)
+					config.ErrorHandler(c, err)
 					return
 				}
 			}
@@ -85,12 +94,13 @@ func (c *Ctx) Context() context.Context {
 
 func (c *Ctx) Render(r Renderer, data any) error {
 	return r.Render(c.Res, ViewData{
-		URLHelpers: c.URLHelpers,
-		CSRFToken:  csrf.Token(c.Req),
-		CSRFTag:    csrf.TemplateField(c.Req),
-		User:       c.User,
-		Flash:      c.Flash,
-		Data:       data,
+		URLHelpers:  c.URLHelpers,
+		CSRFToken:   csrf.Token(c.Req),
+		CSRFTag:     csrf.TemplateField(c.Req),
+		User:        c.User,
+		Permissions: c.Permissions,
+		Flash:       c.Flash,
+		Data:        data,
 	})
 }
 
@@ -111,6 +121,16 @@ func LoadSession(c *Ctx) error {
 func RequireUser(c *Ctx) error {
 	if c.User == nil {
 		return httperror.Unauthorized
+	}
+	return nil
+}
+
+func RequireAdmin(c *Ctx) error {
+	if c.User == nil {
+		return httperror.Unauthorized
+	}
+	if !c.IsAdmin(c.User) {
+		return httperror.Forbidden
 	}
 	return nil
 }

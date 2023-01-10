@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
 	"github.com/ugent-library/dilliver/validate"
@@ -41,6 +42,10 @@ func (h *Folders) Delete(c *Ctx) error {
 		return err
 	}
 
+	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+		return httperror.Forbidden
+	}
+
 	if err := h.repo.DeleteFolder(c.Context(), folderID); err != nil {
 		return err
 	}
@@ -56,6 +61,15 @@ func (h *Folders) Delete(c *Ctx) error {
 
 func (h *Folders) UploadFile(c *Ctx) error {
 	folderID := c.Path("folderID")
+
+	folder, err := h.repo.Folder(c.Context(), folderID)
+	if err != nil {
+		return err
+	}
+
+	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+		return httperror.Forbidden
+	}
 
 	// 2GB limit on request body
 	c.Req.Body = http.MaxBytesReader(c.Res, c.Req.Body, 2_000_000_000)

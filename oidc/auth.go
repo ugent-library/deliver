@@ -24,7 +24,7 @@ type Config struct {
 }
 
 type Auth struct {
-	oauthClient   *oauth2.Config
+	oauthConfig   *oauth2.Config
 	tokenVerifier *oidc.IDTokenVerifier
 	secureCookie  *securecookie.SecureCookie
 	cookieName    string
@@ -37,7 +37,7 @@ func NewAuth(ctx context.Context, c Config) (*Auth, error) {
 	}
 
 	// configure an oidc aware oauth2 client
-	oauthClient := &oauth2.Config{
+	oauthConfig := &oauth2.Config{
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		RedirectURL:  c.RedirectURL,
@@ -46,15 +46,15 @@ func NewAuth(ctx context.Context, c Config) (*Auth, error) {
 	}
 
 	if c.AdditionalScopes != nil {
-		oauthClient.Scopes = append(oauthClient.Scopes, c.AdditionalScopes...)
+		oauthConfig.Scopes = append(oauthConfig.Scopes, c.AdditionalScopes...)
 	} else {
-		oauthClient.Scopes = append(oauthClient.Scopes, "profile")
+		oauthConfig.Scopes = append(oauthConfig.Scopes, "profile")
 	}
 
 	tokenVerifier := oidcProvider.Verifier(&oidc.Config{ClientID: c.ClientID})
 
 	auth := &Auth{
-		oauthClient:   oauthClient,
+		oauthConfig:   oauthConfig,
 		tokenVerifier: tokenVerifier,
 		secureCookie:  securecookie.New(c.CookieSecret, nil),
 		cookieName:    c.CookieName,
@@ -86,7 +86,7 @@ func (a *Auth) BeginAuth(w http.ResponseWriter, r *http.Request) error {
 		HttpOnly: true,
 	})
 
-	http.Redirect(w, r, a.oauthClient.AuthCodeURL(state), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, a.oauthConfig.AuthCodeURL(state), http.StatusTemporaryRedirect)
 
 	return nil
 }
@@ -106,7 +106,7 @@ func (a *Auth) CompleteAuth(w http.ResponseWriter, r *http.Request, claims any) 
 		return errors.New("oidc: invalid state parameter")
 	}
 
-	oauthToken, err := a.oauthClient.Exchange(r.Context(), r.URL.Query().Get("code"))
+	oauthToken, err := a.oauthConfig.Exchange(r.Context(), r.URL.Query().Get("code"))
 	if err != nil {
 		return fmt.Errorf("oidc: %w", err)
 	}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
 )
 
@@ -26,10 +27,16 @@ func (h *Files) Download(c *Ctx) error {
 
 func (h *Files) Delete(c *Ctx) error {
 	fileID := c.Path("fileID")
+
 	file, err := h.repo.File(c.Context(), fileID)
 	if err != nil {
 		return err
 	}
+
+	if !c.IsSpaceAdmin(file.Folder.SpaceID, c.User) {
+		return httperror.Forbidden
+	}
+
 	if err := h.repo.DeleteFile(c.Context(), fileID); err != nil {
 		return err
 	}

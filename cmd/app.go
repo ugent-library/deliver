@@ -72,15 +72,25 @@ var appCmd = &cobra.Command{
 
 		// setup auth
 		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
-			URL:          config.Oidc.URL,
-			ClientID:     config.Oidc.ID,
-			ClientSecret: config.Oidc.Secret,
-			RedirectURL:  config.Oidc.RedirectURL,
+			URL:          config.OIDC.URL,
+			ClientID:     config.OIDC.ID,
+			ClientSecret: config.OIDC.Secret,
+			RedirectURL:  config.OIDC.RedirectURL,
 			CookieName:   config.Session.Name + ".state",
 			CookieSecret: []byte(config.Session.Secret),
 		})
 		if err != nil {
 			logger.Fatal(err)
+		}
+
+		// setup permissions
+		// TODO cleanup, service interface
+		permissions := &models.Permissions{
+			Admins:      config.Admins,
+			SpaceAdmins: make(map[string][]string),
+		}
+		for _, s := range config.Spaces {
+			permissions.SpaceAdmins[s.ID] = s.Admins
 		}
 
 		// setup router
@@ -105,7 +115,11 @@ var appCmd = &cobra.Command{
 		files := c.NewFiles(services.Repository, services.File)
 
 		// request context wrapper
-		wrap := c.Wrapper(r, errs.HandleError)
+		wrap := c.Wrapper(c.Config{
+			Router:       r,
+			ErrorHandler: errs.HandleError,
+			Permissions:  permissions,
+		})
 
 		// routes
 		r.NotFoundHandler = wrap(errs.NotFound)
@@ -115,8 +129,8 @@ var appCmd = &cobra.Command{
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
-		r.Handle("/spaces", wrap(c.RequireUser, spaces.List)).Methods("GET").Name("spaces")
-		r.Handle("/spaces", wrap(c.RequireUser, spaces.Create)).Methods("POST").Name("create_space")
+		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.List)).Methods("GET").Name("spaces")
+		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.Create)).Methods("POST").Name("create_space")
 		r.Handle("/spaces/{spaceID}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
 		r.Handle("/spaces/{spaceID}/folders", wrap(c.RequireUser, spaces.CreateFolder)).Methods("POST").Name("create_folder")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
