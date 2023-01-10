@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/jellydator/validation"
 	"github.com/ugent-library/dilliver/autosession"
 	"github.com/ugent-library/dilliver/httperror"
 	"github.com/ugent-library/dilliver/models"
@@ -92,6 +93,24 @@ func (c *Ctx) Render(r Renderer, data any) error {
 		Flash:      c.Flash,
 		Data:       data,
 	})
+}
+
+func (v ViewData) ErrorFor(errs validation.Errors, keys ...string) string {
+	if len(keys) == 0 {
+		return ""
+	}
+	for _, key := range keys[:len(keys)-1] {
+		if e, ok := errs[key].(validation.Errors); ok {
+			errs = e
+		} else {
+			return ""
+		}
+	}
+	key := keys[len(keys)-1]
+	if e, ok := errs[key].(validation.ErrorObject); ok {
+		return key + " " + e.Error()
+	}
+	return ""
 }
 
 func LoadSession(c *Ctx) error {
