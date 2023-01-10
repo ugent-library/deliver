@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 
-	"github.com/jellydator/validation"
 	"github.com/ugent-library/dilliver/bind"
 	"github.com/ugent-library/dilliver/models"
+	"github.com/ugent-library/dilliver/validate"
 	"github.com/ugent-library/dilliver/view"
 )
 
@@ -67,12 +67,9 @@ func (h *Spaces) Create(c *Ctx) error {
 }
 
 func (h *Spaces) list(c *Ctx, err error) error {
-	var validationErrors validation.Errors
-	if err != nil {
-		validationErrors = make(validation.Errors)
-		if !errors.As(err, &validationErrors) {
-			return err
-		}
+	validationErrors := validate.NewErrors()
+	if err != nil && !errors.As(err, &validationErrors) {
+		return err
 	}
 
 	spaces, err := h.repo.Spaces(c.Context())

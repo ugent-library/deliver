@@ -65,7 +65,7 @@ func (e *Errors) WithPrefix(prefix string) *Errors {
 	return ee
 }
 
-func (e *Errors) OrNil() *Errors {
+func (e *Errors) ErrorOrNil() error {
 	if len(e.Errors) > 0 {
 		return e
 	}

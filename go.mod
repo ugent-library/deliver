@@ -9,7 +9,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/securecookie v1.1.1
-	github.com/jellydator/validation v1.0.0
 	github.com/oklog/ulid v1.3.1
 	golang.org/x/oauth2 v0.4.0
 )

@@ -4,7 +4,7 @@
     <form action="{{.PathTo "create_space"}}" method="POST">
         {{.CSRFTag}}
         <input type="text" name="name">
-        {{with .ErrorFor .Data.validationErrors "name"}}
+        {{with .Data.validationErrors.Get "name"}}
             <p>{{.}}</p>
         {{end}}
         <button type="submit">Create</button>

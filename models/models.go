@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/jellydator/validation"
+	"github.com/ugent-library/dilliver/validate"
 )
 
 type Space struct {
@@ -41,20 +41,22 @@ type File struct {
 }
 
 func (s *Space) Validate() error {
-	return validation.ValidateStruct(s,
-		validation.Field(&s.Name, validation.Required, validation.Length(1, 256)),
-	)
+	return validate.NewErrors(
+		validate.NotEmpty("name", s.Name),
+		validate.LengthIn("name", s.Name, 1, 256),
+	).ErrorOrNil()
 }
 
 func (f *Folder) Validate() error {
-	return validation.ValidateStruct(f,
-		validation.Field(&f.Name, validation.Required, validation.Length(1, 256)),
-	)
+	return validate.NewErrors(
+		validate.NotEmpty("name", f.Name),
+		validate.LengthIn("name", f.Name, 1, 256),
+	).ErrorOrNil()
 }
 
 func (f *File) Validate() error {
-	return validation.ValidateStruct(f,
-		validation.Field(&f.Name, validation.Required),
-		validation.Field(&f.Size, validation.Min(1)),
-	)
+	return validate.NewErrors(
+		validate.NotEmpty("name", f.Name),
+		validate.Min("size", f.Size, 1),
+	).ErrorOrNil()
 }
