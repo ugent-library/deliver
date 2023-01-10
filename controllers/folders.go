@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 
-	"github.com/ugent-library/dilliver/bind"
 	"github.com/ugent-library/dilliver/models"
 	"github.com/ugent-library/dilliver/ulid"
+	"github.com/ugent-library/dilliver/validate"
 	"github.com/ugent-library/dilliver/view"
 )
 
@@ -28,39 +29,7 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 }
 
 func (h *Folders) Show(c *Ctx) error {
-	folderID := c.Path("folderID")
-	folder, err := h.repo.Folder(c.Context(), folderID)
-	if err != nil {
-		return err
-	}
-	return c.Render(h.showView, Map{
-		"folder": folder,
-	})
-}
-
-func (h *Folders) Create(c *Ctx) error {
-	spaceID := c.Path("spaceID")
-	b := FolderForm{}
-	// TODO return ErrBadRequest
-	if err := bind.Form(c.Req, &b); err != nil {
-		return err
-	}
-
-	folder := &models.Folder{
-		SpaceID: spaceID,
-		Name:    b.Name,
-	}
-	if err := h.repo.CreateFolder(c.Context(), folder); err != nil {
-		return err
-	}
-
-	c.Session.Append(flashKey, Flash{
-		Type: infoFlash,
-		Body: "Folder created succesfully",
-	})
-	c.RedirectTo("folder", "folderID", folder.ID)
-
-	return nil
+	return h.show(c, nil)
 }
 
 // TODO remove files
@@ -124,7 +93,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		file.MD5 = md5
 
 		if err = h.repo.CreateFile(c.Context(), file); err != nil {
-			return err
+			return h.show(c, err)
 		}
 	}
 
@@ -136,4 +105,21 @@ func (h *Folders) UploadFile(c *Ctx) error {
 	c.RedirectTo("folder", "folderID", folderID)
 
 	return nil
+}
+
+func (h *Folders) show(c *Ctx, err error) error {
+	validationErrors := validate.NewErrors()
+	if err != nil && !errors.As(err, &validationErrors) {
+		return err
+	}
+
+	folderID := c.Path("folderID")
+	folder, err := h.repo.Folder(c.Context(), folderID)
+	if err != nil {
+		return err
+	}
+	return c.Render(h.showView, Map{
+		"folder":           folder,
+		"validationErrors": validationErrors,
+	})
 }

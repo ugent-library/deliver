@@ -58,6 +58,9 @@
                             <div class="col-lg-5 col-xl-4">
                                 <input class="form-control" type="text" name="name" id="folder-name">
                             </div>
+                            {{with .Data.validationErrors.Get "name"}}
+                                <p>{{.}}</p>
+                            {{end}}
                         </div>
                         <div class="form-row">
                             <div class="offset-lg-3 offset-xl-2">

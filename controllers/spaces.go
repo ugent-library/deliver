@@ -32,14 +32,7 @@ func (h *Spaces) List(c *Ctx) error {
 }
 
 func (h *Spaces) Show(c *Ctx) error {
-	spaceID := c.Path("spaceID")
-	space, err := h.repo.Space(c.Context(), spaceID)
-	if err != nil {
-		return err
-	}
-	return c.Render(h.showView, Map{
-		"space": space,
-	})
+	return h.show(c, nil)
 }
 
 func (h *Spaces) Create(c *Ctx) error {
@@ -66,6 +59,32 @@ func (h *Spaces) Create(c *Ctx) error {
 	return nil
 }
 
+func (h *Spaces) CreateFolder(c *Ctx) error {
+	spaceID := c.Path("spaceID")
+	b := FolderForm{}
+	// TODO return ErrBadRequest
+	if err := bind.Form(c.Req, &b); err != nil {
+		return err
+	}
+
+	folder := &models.Folder{
+		SpaceID: spaceID,
+		Name:    b.Name,
+	}
+
+	if err := h.repo.CreateFolder(c.Context(), folder); err != nil {
+		return h.show(c, err)
+	}
+
+	c.Session.Append(flashKey, Flash{
+		Type: infoFlash,
+		Body: "Folder created succesfully",
+	})
+	c.RedirectTo("folder", "folderID", folder.ID)
+
+	return nil
+}
+
 func (h *Spaces) list(c *Ctx, err error) error {
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
@@ -79,6 +98,23 @@ func (h *Spaces) list(c *Ctx, err error) error {
 
 	return c.Render(h.listView, Map{
 		"spaces":           spaces,
+		"validationErrors": validationErrors,
+	})
+}
+
+func (h *Spaces) show(c *Ctx, err error) error {
+	validationErrors := validate.NewErrors()
+	if err != nil && !errors.As(err, &validationErrors) {
+		return err
+	}
+
+	spaceID := c.Path("spaceID")
+	space, err := h.repo.Space(c.Context(), spaceID)
+	if err != nil {
+		return err
+	}
+	return c.Render(h.showView, Map{
+		"space":            space,
 		"validationErrors": validationErrors,
 	})
 }
