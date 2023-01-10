@@ -117,6 +117,7 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 	row, err := r.db.Folder.Create().
 		SetSpaceID(f.SpaceID).
 		SetName(f.Name).
+		SetExpiresAt(f.ExpiresAt).
 		Save(ctx)
 	if err != nil {
 		return err

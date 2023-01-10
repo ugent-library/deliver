@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"time"
 
 	"github.com/ugent-library/dilliver/bind"
 	"github.com/ugent-library/dilliver/httperror"
@@ -74,8 +75,9 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	}
 
 	folder := &models.Folder{
-		SpaceID: spaceID,
-		Name:    b.Name,
+		SpaceID:   spaceID,
+		Name:      b.Name,
+		ExpiresAt: time.Now().AddDate(0, 1, 0),
 	}
 
 	if err := h.repo.CreateFolder(c.Context(), folder); err != nil {
@@ -109,12 +111,17 @@ func (h *Spaces) list(c *Ctx, err error) error {
 }
 
 func (h *Spaces) show(c *Ctx, err error) error {
+	spaceID := c.Path("spaceID")
+
+	if !c.IsSpaceAdmin(spaceID, c.User) {
+		return httperror.Forbidden
+	}
+
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
 		return err
 	}
 
-	spaceID := c.Path("spaceID")
 	space, err := h.repo.Space(c.Context(), spaceID)
 	if err != nil {
 		return err
