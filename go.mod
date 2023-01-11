@@ -1,4 +1,4 @@
-module github.com/ugent-library/dilliver
+module github.com/ugent-library/deliver
 
 go 1.19
 

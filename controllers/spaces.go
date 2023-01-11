@@ -4,11 +4,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ugent-library/dilliver/bind"
-	"github.com/ugent-library/dilliver/httperror"
-	"github.com/ugent-library/dilliver/models"
-	"github.com/ugent-library/dilliver/validate"
-	"github.com/ugent-library/dilliver/view"
+	"github.com/ugent-library/deliver/bind"
+	"github.com/ugent-library/deliver/httperror"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/deliver/view"
 )
 
 type Spaces struct {

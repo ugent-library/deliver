@@ -14,7 +14,7 @@ var (
 var logger *zap.SugaredLogger
 
 var rootCmd = &cobra.Command{
-	Use: "dilliver",
+	Use: "deliver",
 }
 
 func init() {
@@ -25,11 +25,11 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file")
 
-	viper.SetEnvPrefix("dilliver")
+	viper.SetEnvPrefix("deliver")
 	viper.SetDefault("s3.region", "us-east-1")
-	viper.SetDefault("s3.bucket", "dilliver")
+	viper.SetDefault("s3.bucket", "deliver")
 	viper.SetDefault("addr", "localhost:3002")
-	viper.SetDefault("session.name", "dilliver")
+	viper.SetDefault("session.name", "deliver")
 	viper.SetDefault("session.max_age", 86400*30) // 30 days
 }
 

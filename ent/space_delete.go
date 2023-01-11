@@ -4,13 +4,12 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/dilliver/ent/predicate"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/predicate"
+	"github.com/ugent-library/deliver/ent/space"
 )
 
 // SpaceDelete is the builder for deleting a Space entity.
@@ -28,34 +27,7 @@ func (sd *SpaceDelete) Where(ps ...predicate.Space) *SpaceDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (sd *SpaceDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(sd.hooks) == 0 {
-		affected, err = sd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*SpaceMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			sd.mutation = mutation
-			affected, err = sd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(sd.hooks) - 1; i >= 0; i-- {
-			if sd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = sd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, sd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, SpaceMutation](ctx, sd.sqlExec, sd.mutation, sd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -88,6 +60,7 @@ func (sd *SpaceDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	sd.mutation.done = true
 	return affected, err
 }
 

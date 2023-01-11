@@ -9,12 +9,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ugent-library/dilliver/ent/file"
-	"github.com/ugent-library/dilliver/ent/folder"
-	"github.com/ugent-library/dilliver/ent/predicate"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/file"
+	"github.com/ugent-library/deliver/ent/folder"
+	"github.com/ugent-library/deliver/ent/predicate"
+	"github.com/ugent-library/deliver/ent/space"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -459,9 +460,24 @@ func (m *FileMutation) Where(ps ...predicate.File) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the FileMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *FileMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.File, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *FileMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *FileMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (File).
@@ -1164,9 +1180,24 @@ func (m *FolderMutation) Where(ps ...predicate.Folder) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the FolderMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *FolderMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Folder, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *FolderMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *FolderMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Folder).
@@ -1743,9 +1774,24 @@ func (m *SpaceMutation) Where(ps ...predicate.Space) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the SpaceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SpaceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Space, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *SpaceMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SpaceMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Space).

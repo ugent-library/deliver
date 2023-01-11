@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/ugent-library/dilliver/httperror"
-	"github.com/ugent-library/dilliver/models"
+	"github.com/ugent-library/deliver/httperror"
+	"github.com/ugent-library/deliver/models"
 )
 
 type Files struct {

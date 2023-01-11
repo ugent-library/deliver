@@ -5,10 +5,10 @@ package ent
 import (
 	"time"
 
-	"github.com/ugent-library/dilliver/ent/file"
-	"github.com/ugent-library/dilliver/ent/folder"
-	"github.com/ugent-library/dilliver/ent/schema"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/file"
+	"github.com/ugent-library/deliver/ent/folder"
+	"github.com/ugent-library/deliver/ent/schema"
+	"github.com/ugent-library/deliver/ent/space"
 )
 
 // The init function reads all schema descriptors with runtime code

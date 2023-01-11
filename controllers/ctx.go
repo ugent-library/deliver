@@ -7,11 +7,11 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/ugent-library/dilliver/autosession"
-	"github.com/ugent-library/dilliver/httperror"
-	"github.com/ugent-library/dilliver/models"
-	"github.com/ugent-library/dilliver/routes"
-	"github.com/ugent-library/dilliver/zaphttp"
+	"github.com/ugent-library/deliver/autosession"
+	"github.com/ugent-library/deliver/httperror"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/routes"
+	"github.com/ugent-library/deliver/zaphttp"
 	"go.uber.org/zap"
 )
 

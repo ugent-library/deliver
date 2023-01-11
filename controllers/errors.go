@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/ugent-library/dilliver/httperror"
-	"github.com/ugent-library/dilliver/models"
-	"github.com/ugent-library/dilliver/view"
+	"github.com/ugent-library/deliver/httperror"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/view"
 )
 
 type Errors struct {

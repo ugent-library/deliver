@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/ugent-library/dilliver/validate"
+	"github.com/ugent-library/deliver/validate"
 )
 
 type Space struct {

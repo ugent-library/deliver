@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/ugent-library/dilliver/ent/folder"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/folder"
+	"github.com/ugent-library/deliver/ent/space"
 )
 
 // Folder is the model entity for the Folder schema.

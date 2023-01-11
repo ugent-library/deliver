@@ -7,517 +7,337 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/ugent-library/dilliver/ent/predicate"
+	"github.com/ugent-library/deliver/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
 func ID(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Folder(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Folder(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Folder(sql.FieldLTE(FieldID, id))
 }
 
 // SpaceID applies equality check predicate on the "space_id" field. It's identical to SpaceIDEQ.
 func SpaceID(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldSpaceID, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldName, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
 func ExpiresAt(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldExpiresAt, v))
 }
 
 // SpaceIDEQ applies the EQ predicate on the "space_id" field.
 func SpaceIDEQ(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldSpaceID, v))
 }
 
 // SpaceIDNEQ applies the NEQ predicate on the "space_id" field.
 func SpaceIDNEQ(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldNEQ(FieldSpaceID, v))
 }
 
 // SpaceIDIn applies the In predicate on the "space_id" field.
 func SpaceIDIn(vs ...string) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSpaceID), v...))
-	})
+	return predicate.Folder(sql.FieldIn(FieldSpaceID, vs...))
 }
 
 // SpaceIDNotIn applies the NotIn predicate on the "space_id" field.
 func SpaceIDNotIn(vs ...string) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSpaceID), v...))
-	})
+	return predicate.Folder(sql.FieldNotIn(FieldSpaceID, vs...))
 }
 
 // SpaceIDGT applies the GT predicate on the "space_id" field.
 func SpaceIDGT(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldGT(FieldSpaceID, v))
 }
 
 // SpaceIDGTE applies the GTE predicate on the "space_id" field.
 func SpaceIDGTE(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldGTE(FieldSpaceID, v))
 }
 
 // SpaceIDLT applies the LT predicate on the "space_id" field.
 func SpaceIDLT(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldLT(FieldSpaceID, v))
 }
 
 // SpaceIDLTE applies the LTE predicate on the "space_id" field.
 func SpaceIDLTE(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldLTE(FieldSpaceID, v))
 }
 
 // SpaceIDContains applies the Contains predicate on the "space_id" field.
 func SpaceIDContains(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldContains(FieldSpaceID, v))
 }
 
 // SpaceIDHasPrefix applies the HasPrefix predicate on the "space_id" field.
 func SpaceIDHasPrefix(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldHasPrefix(FieldSpaceID, v))
 }
 
 // SpaceIDHasSuffix applies the HasSuffix predicate on the "space_id" field.
 func SpaceIDHasSuffix(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldHasSuffix(FieldSpaceID, v))
 }
 
 // SpaceIDEqualFold applies the EqualFold predicate on the "space_id" field.
 func SpaceIDEqualFold(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldEqualFold(FieldSpaceID, v))
 }
 
 // SpaceIDContainsFold applies the ContainsFold predicate on the "space_id" field.
 func SpaceIDContainsFold(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldSpaceID), v))
-	})
+	return predicate.Folder(sql.FieldContainsFold(FieldSpaceID, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldName, v))
 }
 
 // NameNEQ applies the NEQ predicate on the "name" field.
 func NameNEQ(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldNEQ(FieldName, v))
 }
 
 // NameIn applies the In predicate on the "name" field.
 func NameIn(vs ...string) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldName), v...))
-	})
+	return predicate.Folder(sql.FieldIn(FieldName, vs...))
 }
 
 // NameNotIn applies the NotIn predicate on the "name" field.
 func NameNotIn(vs ...string) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldName), v...))
-	})
+	return predicate.Folder(sql.FieldNotIn(FieldName, vs...))
 }
 
 // NameGT applies the GT predicate on the "name" field.
 func NameGT(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldGT(FieldName, v))
 }
 
 // NameGTE applies the GTE predicate on the "name" field.
 func NameGTE(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldGTE(FieldName, v))
 }
 
 // NameLT applies the LT predicate on the "name" field.
 func NameLT(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldLT(FieldName, v))
 }
 
 // NameLTE applies the LTE predicate on the "name" field.
 func NameLTE(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldLTE(FieldName, v))
 }
 
 // NameContains applies the Contains predicate on the "name" field.
 func NameContains(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldContains(FieldName, v))
 }
 
 // NameHasPrefix applies the HasPrefix predicate on the "name" field.
 func NameHasPrefix(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldHasPrefix(FieldName, v))
 }
 
 // NameHasSuffix applies the HasSuffix predicate on the "name" field.
 func NameHasSuffix(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldHasSuffix(FieldName, v))
 }
 
 // NameEqualFold applies the EqualFold predicate on the "name" field.
 func NameEqualFold(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldEqualFold(FieldName, v))
 }
 
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldName), v))
-	})
+	return predicate.Folder(sql.FieldContainsFold(FieldName, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Folder(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Folder(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Folder(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
 func UpdatedAtNEQ(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUpdatedAt), v...))
-	})
+	return predicate.Folder(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUpdatedAt), v...))
-	})
+	return predicate.Folder(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtGT applies the GT predicate on the "updated_at" field.
 func UpdatedAtGT(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldGT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
 func UpdatedAtGTE(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLT applies the LT predicate on the "updated_at" field.
 func UpdatedAtLT(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldLT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Folder(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
 func ExpiresAtEQ(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldEQ(FieldExpiresAt, v))
 }
 
 // ExpiresAtNEQ applies the NEQ predicate on the "expires_at" field.
 func ExpiresAtNEQ(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldNEQ(FieldExpiresAt, v))
 }
 
 // ExpiresAtIn applies the In predicate on the "expires_at" field.
 func ExpiresAtIn(vs ...time.Time) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldExpiresAt), v...))
-	})
+	return predicate.Folder(sql.FieldIn(FieldExpiresAt, vs...))
 }
 
 // ExpiresAtNotIn applies the NotIn predicate on the "expires_at" field.
 func ExpiresAtNotIn(vs ...time.Time) predicate.Folder {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldExpiresAt), v...))
-	})
+	return predicate.Folder(sql.FieldNotIn(FieldExpiresAt, vs...))
 }
 
 // ExpiresAtGT applies the GT predicate on the "expires_at" field.
 func ExpiresAtGT(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldGT(FieldExpiresAt, v))
 }
 
 // ExpiresAtGTE applies the GTE predicate on the "expires_at" field.
 func ExpiresAtGTE(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldGTE(FieldExpiresAt, v))
 }
 
 // ExpiresAtLT applies the LT predicate on the "expires_at" field.
 func ExpiresAtLT(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldLT(FieldExpiresAt, v))
 }
 
 // ExpiresAtLTE applies the LTE predicate on the "expires_at" field.
 func ExpiresAtLTE(v time.Time) predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldExpiresAt), v))
-	})
+	return predicate.Folder(sql.FieldLTE(FieldExpiresAt, v))
 }
 
 // ExpiresAtIsNil applies the IsNil predicate on the "expires_at" field.
 func ExpiresAtIsNil() predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldExpiresAt)))
-	})
+	return predicate.Folder(sql.FieldIsNull(FieldExpiresAt))
 }
 
 // ExpiresAtNotNil applies the NotNil predicate on the "expires_at" field.
 func ExpiresAtNotNil() predicate.Folder {
-	return predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldExpiresAt)))
-	})
+	return predicate.Folder(sql.FieldNotNull(FieldExpiresAt))
 }
 
 // HasSpace applies the HasEdge predicate on the "space" edge.
@@ -525,7 +345,6 @@ func HasSpace() predicate.Folder {
 	return predicate.Folder(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(SpaceTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, SpaceTable, SpaceColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -553,7 +372,6 @@ func HasFiles() predicate.Folder {
 	return predicate.Folder(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(FilesTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, FilesTable, FilesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

@@ -9,11 +9,11 @@ import (
 
 	entdialect "entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	"github.com/ugent-library/dilliver/ent"
-	"github.com/ugent-library/dilliver/ent/file"
-	"github.com/ugent-library/dilliver/ent/folder"
-	entmigrate "github.com/ugent-library/dilliver/ent/migrate"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent"
+	"github.com/ugent-library/deliver/ent/file"
+	"github.com/ugent-library/deliver/ent/folder"
+	entmigrate "github.com/ugent-library/deliver/ent/migrate"
+	"github.com/ugent-library/deliver/ent/space"
 )
 
 var ErrNotFound = errors.New("not found")

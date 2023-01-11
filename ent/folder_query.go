@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/dilliver/ent/file"
-	"github.com/ugent-library/dilliver/ent/folder"
-	"github.com/ugent-library/dilliver/ent/predicate"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/file"
+	"github.com/ugent-library/deliver/ent/folder"
+	"github.com/ugent-library/deliver/ent/predicate"
+	"github.com/ugent-library/deliver/ent/space"
 )
 
 // FolderQuery is the builder for querying Folder entities.
@@ -25,6 +25,7 @@ type FolderQuery struct {
 	unique     *bool
 	order      []OrderFunc
 	fields     []string
+	inters     []Interceptor
 	predicates []predicate.Folder
 	withSpace  *SpaceQuery
 	withFiles  *FileQuery
@@ -39,13 +40,13 @@ func (fq *FolderQuery) Where(ps ...predicate.Folder) *FolderQuery {
 	return fq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (fq *FolderQuery) Limit(limit int) *FolderQuery {
 	fq.limit = &limit
 	return fq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (fq *FolderQuery) Offset(offset int) *FolderQuery {
 	fq.offset = &offset
 	return fq
@@ -58,7 +59,7 @@ func (fq *FolderQuery) Unique(unique bool) *FolderQuery {
 	return fq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (fq *FolderQuery) Order(o ...OrderFunc) *FolderQuery {
 	fq.order = append(fq.order, o...)
 	return fq
@@ -66,7 +67,7 @@ func (fq *FolderQuery) Order(o ...OrderFunc) *FolderQuery {
 
 // QuerySpace chains the current query on the "space" edge.
 func (fq *FolderQuery) QuerySpace() *SpaceQuery {
-	query := &SpaceQuery{config: fq.config}
+	query := (&SpaceClient{config: fq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := fq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -88,7 +89,7 @@ func (fq *FolderQuery) QuerySpace() *SpaceQuery {
 
 // QueryFiles chains the current query on the "files" edge.
 func (fq *FolderQuery) QueryFiles() *FileQuery {
-	query := &FileQuery{config: fq.config}
+	query := (&FileClient{config: fq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := fq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -111,7 +112,7 @@ func (fq *FolderQuery) QueryFiles() *FileQuery {
 // First returns the first Folder entity from the query.
 // Returns a *NotFoundError when no Folder was found.
 func (fq *FolderQuery) First(ctx context.Context) (*Folder, error) {
-	nodes, err := fq.Limit(1).All(ctx)
+	nodes, err := fq.Limit(1).All(newQueryContext(ctx, TypeFolder, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +135,7 @@ func (fq *FolderQuery) FirstX(ctx context.Context) *Folder {
 // Returns a *NotFoundError when no Folder ID was found.
 func (fq *FolderQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = fq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = fq.Limit(1).IDs(newQueryContext(ctx, TypeFolder, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -157,7 +158,7 @@ func (fq *FolderQuery) FirstIDX(ctx context.Context) string {
 // Returns a *NotSingularError when more than one Folder entity is found.
 // Returns a *NotFoundError when no Folder entities are found.
 func (fq *FolderQuery) Only(ctx context.Context) (*Folder, error) {
-	nodes, err := fq.Limit(2).All(ctx)
+	nodes, err := fq.Limit(2).All(newQueryContext(ctx, TypeFolder, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +186,7 @@ func (fq *FolderQuery) OnlyX(ctx context.Context) *Folder {
 // Returns a *NotFoundError when no entities are found.
 func (fq *FolderQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = fq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = fq.Limit(2).IDs(newQueryContext(ctx, TypeFolder, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -210,10 +211,12 @@ func (fq *FolderQuery) OnlyIDX(ctx context.Context) string {
 
 // All executes the query and returns a list of Folders.
 func (fq *FolderQuery) All(ctx context.Context) ([]*Folder, error) {
+	ctx = newQueryContext(ctx, TypeFolder, "All")
 	if err := fq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return fq.sqlAll(ctx)
+	qr := querierAll[[]*Folder, *FolderQuery]()
+	return withInterceptors[[]*Folder](ctx, fq, qr, fq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -228,6 +231,7 @@ func (fq *FolderQuery) AllX(ctx context.Context) []*Folder {
 // IDs executes the query and returns a list of Folder IDs.
 func (fq *FolderQuery) IDs(ctx context.Context) ([]string, error) {
 	var ids []string
+	ctx = newQueryContext(ctx, TypeFolder, "IDs")
 	if err := fq.Select(folder.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -245,10 +249,11 @@ func (fq *FolderQuery) IDsX(ctx context.Context) []string {
 
 // Count returns the count of the given query.
 func (fq *FolderQuery) Count(ctx context.Context) (int, error) {
+	ctx = newQueryContext(ctx, TypeFolder, "Count")
 	if err := fq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return fq.sqlCount(ctx)
+	return withInterceptors[int](ctx, fq, querierCount[*FolderQuery](), fq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -262,10 +267,15 @@ func (fq *FolderQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (fq *FolderQuery) Exist(ctx context.Context) (bool, error) {
-	if err := fq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = newQueryContext(ctx, TypeFolder, "Exist")
+	switch _, err := fq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return fq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -288,6 +298,7 @@ func (fq *FolderQuery) Clone() *FolderQuery {
 		limit:      fq.limit,
 		offset:     fq.offset,
 		order:      append([]OrderFunc{}, fq.order...),
+		inters:     append([]Interceptor{}, fq.inters...),
 		predicates: append([]predicate.Folder{}, fq.predicates...),
 		withSpace:  fq.withSpace.Clone(),
 		withFiles:  fq.withFiles.Clone(),
@@ -301,7 +312,7 @@ func (fq *FolderQuery) Clone() *FolderQuery {
 // WithSpace tells the query-builder to eager-load the nodes that are connected to
 // the "space" edge. The optional arguments are used to configure the query builder of the edge.
 func (fq *FolderQuery) WithSpace(opts ...func(*SpaceQuery)) *FolderQuery {
-	query := &SpaceQuery{config: fq.config}
+	query := (&SpaceClient{config: fq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -312,7 +323,7 @@ func (fq *FolderQuery) WithSpace(opts ...func(*SpaceQuery)) *FolderQuery {
 // WithFiles tells the query-builder to eager-load the nodes that are connected to
 // the "files" edge. The optional arguments are used to configure the query builder of the edge.
 func (fq *FolderQuery) WithFiles(opts ...func(*FileQuery)) *FolderQuery {
-	query := &FileQuery{config: fq.config}
+	query := (&FileClient{config: fq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -335,16 +346,11 @@ func (fq *FolderQuery) WithFiles(opts ...func(*FileQuery)) *FolderQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (fq *FolderQuery) GroupBy(field string, fields ...string) *FolderGroupBy {
-	grbuild := &FolderGroupBy{config: fq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := fq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return fq.sqlQuery(ctx), nil
-	}
+	fq.fields = append([]string{field}, fields...)
+	grbuild := &FolderGroupBy{build: fq}
+	grbuild.flds = &fq.fields
 	grbuild.label = folder.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -362,10 +368,10 @@ func (fq *FolderQuery) GroupBy(field string, fields ...string) *FolderGroupBy {
 //		Scan(ctx, &v)
 func (fq *FolderQuery) Select(fields ...string) *FolderSelect {
 	fq.fields = append(fq.fields, fields...)
-	selbuild := &FolderSelect{FolderQuery: fq}
-	selbuild.label = folder.Label
-	selbuild.flds, selbuild.scan = &fq.fields, selbuild.Scan
-	return selbuild
+	sbuild := &FolderSelect{FolderQuery: fq}
+	sbuild.label = folder.Label
+	sbuild.flds, sbuild.scan = &fq.fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a FolderSelect configured with the given aggregations.
@@ -374,6 +380,16 @@ func (fq *FolderQuery) Aggregate(fns ...AggregateFunc) *FolderSelect {
 }
 
 func (fq *FolderQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range fq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, fq); err != nil {
+				return err
+			}
+		}
+	}
 	for _, f := range fq.fields {
 		if !folder.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
@@ -495,17 +511,6 @@ func (fq *FolderQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, fq.driver, _spec)
 }
 
-func (fq *FolderQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := fq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (fq *FolderQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := &sqlgraph.QuerySpec{
 		Node: &sqlgraph.NodeSpec{
@@ -588,13 +593,8 @@ func (fq *FolderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // FolderGroupBy is the group-by builder for Folder entities.
 type FolderGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *FolderQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -603,58 +603,46 @@ func (fgb *FolderGroupBy) Aggregate(fns ...AggregateFunc) *FolderGroupBy {
 	return fgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (fgb *FolderGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := fgb.path(ctx)
-	if err != nil {
+	ctx = newQueryContext(ctx, TypeFolder, "GroupBy")
+	if err := fgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	fgb.sql = query
-	return fgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*FolderQuery, *FolderGroupBy](ctx, fgb.build, fgb, fgb.build.inters, v)
 }
 
-func (fgb *FolderGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range fgb.fields {
-		if !folder.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (fgb *FolderGroupBy) sqlScan(ctx context.Context, root *FolderQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(fgb.fns))
+	for _, fn := range fgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := fgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*fgb.flds)+len(fgb.fns))
+		for _, f := range *fgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*fgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := fgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := fgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (fgb *FolderGroupBy) sqlQuery() *sql.Selector {
-	selector := fgb.sql.Select()
-	aggregation := make([]string, 0, len(fgb.fns))
-	for _, fn := range fgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(fgb.fields)+len(fgb.fns))
-		for _, f := range fgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(fgb.fields...)...)
-}
-
 // FolderSelect is the builder for selecting fields of Folder entities.
 type FolderSelect struct {
 	*FolderQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -665,26 +653,27 @@ func (fs *FolderSelect) Aggregate(fns ...AggregateFunc) *FolderSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (fs *FolderSelect) Scan(ctx context.Context, v any) error {
+	ctx = newQueryContext(ctx, TypeFolder, "Select")
 	if err := fs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	fs.sql = fs.FolderQuery.sqlQuery(ctx)
-	return fs.sqlScan(ctx, v)
+	return scanWithInterceptors[*FolderQuery, *FolderSelect](ctx, fs.FolderQuery, fs, fs.inters, v)
 }
 
-func (fs *FolderSelect) sqlScan(ctx context.Context, v any) error {
+func (fs *FolderSelect) sqlScan(ctx context.Context, root *FolderQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(fs.fns))
 	for _, fn := range fs.fns {
-		aggregation = append(aggregation, fn(fs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*fs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		fs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		fs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := fs.sql.Query()
+	query, args := selector.Query()
 	if err := fs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

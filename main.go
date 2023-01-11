@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ugent-library/dilliver/cmd"
+import "github.com/ugent-library/deliver/cmd"
 
 func main() {
 	cmd.Execute()

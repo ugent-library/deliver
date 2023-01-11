@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ugent-library/dilliver/ent/migrate"
+	"github.com/ugent-library/deliver/ent/migrate"
 
-	"github.com/ugent-library/dilliver/ent/file"
-	"github.com/ugent-library/dilliver/ent/folder"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/file"
+	"github.com/ugent-library/deliver/ent/folder"
+	"github.com/ugent-library/deliver/ent/space"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -34,7 +34,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -137,6 +137,28 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Space.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.File.Intercept(interceptors...)
+	c.Folder.Intercept(interceptors...)
+	c.Space.Intercept(interceptors...)
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *FileMutation:
+		return c.File.mutate(ctx, m)
+	case *FolderMutation:
+		return c.Folder.mutate(ctx, m)
+	case *SpaceMutation:
+		return c.Space.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // FileClient is a client for the File schema.
 type FileClient struct {
 	config
@@ -151,6 +173,12 @@ func NewFileClient(c config) *FileClient {
 // A call to `Use(f, g, h)` equals to `file.Hooks(f(g(h())))`.
 func (c *FileClient) Use(hooks ...Hook) {
 	c.hooks.File = append(c.hooks.File, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `file.Intercept(f(g(h())))`.
+func (c *FileClient) Intercept(interceptors ...Interceptor) {
+	c.inters.File = append(c.inters.File, interceptors...)
 }
 
 // Create returns a builder for creating a File entity.
@@ -205,6 +233,7 @@ func (c *FileClient) DeleteOneID(id string) *FileDeleteOne {
 func (c *FileClient) Query() *FileQuery {
 	return &FileQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -224,7 +253,7 @@ func (c *FileClient) GetX(ctx context.Context, id string) *File {
 
 // QueryFolder queries the folder edge of a File.
 func (c *FileClient) QueryFolder(f *File) *FolderQuery {
-	query := &FolderQuery{config: c.config}
+	query := (&FolderClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := f.ID
 		step := sqlgraph.NewStep(
@@ -243,6 +272,26 @@ func (c *FileClient) Hooks() []Hook {
 	return c.hooks.File
 }
 
+// Interceptors returns the client interceptors.
+func (c *FileClient) Interceptors() []Interceptor {
+	return c.inters.File
+}
+
+func (c *FileClient) mutate(ctx context.Context, m *FileMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FileCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FileUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown File mutation op: %q", m.Op())
+	}
+}
+
 // FolderClient is a client for the Folder schema.
 type FolderClient struct {
 	config
@@ -257,6 +306,12 @@ func NewFolderClient(c config) *FolderClient {
 // A call to `Use(f, g, h)` equals to `folder.Hooks(f(g(h())))`.
 func (c *FolderClient) Use(hooks ...Hook) {
 	c.hooks.Folder = append(c.hooks.Folder, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `folder.Intercept(f(g(h())))`.
+func (c *FolderClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Folder = append(c.inters.Folder, interceptors...)
 }
 
 // Create returns a builder for creating a Folder entity.
@@ -311,6 +366,7 @@ func (c *FolderClient) DeleteOneID(id string) *FolderDeleteOne {
 func (c *FolderClient) Query() *FolderQuery {
 	return &FolderQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -330,7 +386,7 @@ func (c *FolderClient) GetX(ctx context.Context, id string) *Folder {
 
 // QuerySpace queries the space edge of a Folder.
 func (c *FolderClient) QuerySpace(f *Folder) *SpaceQuery {
-	query := &SpaceQuery{config: c.config}
+	query := (&SpaceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := f.ID
 		step := sqlgraph.NewStep(
@@ -346,7 +402,7 @@ func (c *FolderClient) QuerySpace(f *Folder) *SpaceQuery {
 
 // QueryFiles queries the files edge of a Folder.
 func (c *FolderClient) QueryFiles(f *Folder) *FileQuery {
-	query := &FileQuery{config: c.config}
+	query := (&FileClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := f.ID
 		step := sqlgraph.NewStep(
@@ -365,6 +421,26 @@ func (c *FolderClient) Hooks() []Hook {
 	return c.hooks.Folder
 }
 
+// Interceptors returns the client interceptors.
+func (c *FolderClient) Interceptors() []Interceptor {
+	return c.inters.Folder
+}
+
+func (c *FolderClient) mutate(ctx context.Context, m *FolderMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FolderCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FolderUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FolderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FolderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Folder mutation op: %q", m.Op())
+	}
+}
+
 // SpaceClient is a client for the Space schema.
 type SpaceClient struct {
 	config
@@ -379,6 +455,12 @@ func NewSpaceClient(c config) *SpaceClient {
 // A call to `Use(f, g, h)` equals to `space.Hooks(f(g(h())))`.
 func (c *SpaceClient) Use(hooks ...Hook) {
 	c.hooks.Space = append(c.hooks.Space, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `space.Intercept(f(g(h())))`.
+func (c *SpaceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Space = append(c.inters.Space, interceptors...)
 }
 
 // Create returns a builder for creating a Space entity.
@@ -433,6 +515,7 @@ func (c *SpaceClient) DeleteOneID(id string) *SpaceDeleteOne {
 func (c *SpaceClient) Query() *SpaceQuery {
 	return &SpaceQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -452,7 +535,7 @@ func (c *SpaceClient) GetX(ctx context.Context, id string) *Space {
 
 // QueryFolders queries the folders edge of a Space.
 func (c *SpaceClient) QueryFolders(s *Space) *FolderQuery {
-	query := &FolderQuery{config: c.config}
+	query := (&FolderClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
@@ -469,4 +552,24 @@ func (c *SpaceClient) QueryFolders(s *Space) *FolderQuery {
 // Hooks returns the client hooks.
 func (c *SpaceClient) Hooks() []Hook {
 	return c.hooks.Space
+}
+
+// Interceptors returns the client interceptors.
+func (c *SpaceClient) Interceptors() []Interceptor {
+	return c.inters.Space
+}
+
+func (c *SpaceClient) mutate(ctx context.Context, m *SpaceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SpaceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SpaceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SpaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SpaceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Space mutation op: %q", m.Op())
+	}
 }

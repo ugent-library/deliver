@@ -7,7 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/dilliver/ulid"
+	"github.com/ugent-library/deliver/ulid"
 )
 
 // Folder holds the schema definition for the Folder entity.

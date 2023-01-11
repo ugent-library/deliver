@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/ugent-library/dilliver/models"
-	"github.com/ugent-library/dilliver/oidc"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/oidc"
 )
 
 type Auth struct {

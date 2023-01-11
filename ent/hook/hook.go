@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ugent-library/dilliver/ent"
+	"github.com/ugent-library/deliver/ent"
 )
 
 // The FileFunc type is an adapter to allow the use of ordinary
@@ -15,11 +15,10 @@ type FileFunc func(context.Context, *ent.FileMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f FileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.FileMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileMutation", m)
+	if mv, ok := m.(*ent.FileMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileMutation", m)
 }
 
 // The FolderFunc type is an adapter to allow the use of ordinary
@@ -28,11 +27,10 @@ type FolderFunc func(context.Context, *ent.FolderMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f FolderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.FolderMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FolderMutation", m)
+	if mv, ok := m.(*ent.FolderMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FolderMutation", m)
 }
 
 // The SpaceFunc type is an adapter to allow the use of ordinary
@@ -41,11 +39,10 @@ type SpaceFunc func(context.Context, *ent.SpaceMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f SpaceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.SpaceMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SpaceMutation", m)
+	if mv, ok := m.(*ent.SpaceMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SpaceMutation", m)
 }
 
 // Condition is a hook condition function.

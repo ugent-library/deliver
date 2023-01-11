@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/dilliver/ulid"
+	"github.com/ugent-library/deliver/ulid"
 )
 
 // File holds the schema definition for the File entity.

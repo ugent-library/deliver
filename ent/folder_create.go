@@ -10,9 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/dilliver/ent/file"
-	"github.com/ugent-library/dilliver/ent/folder"
-	"github.com/ugent-library/dilliver/ent/space"
+	"github.com/ugent-library/deliver/ent/file"
+	"github.com/ugent-library/deliver/ent/folder"
+	"github.com/ugent-library/deliver/ent/space"
 )
 
 // FolderCreate is the builder for creating a Folder entity.
@@ -117,50 +117,8 @@ func (fc *FolderCreate) Mutation() *FolderMutation {
 
 // Save creates the Folder in the database.
 func (fc *FolderCreate) Save(ctx context.Context) (*Folder, error) {
-	var (
-		err  error
-		node *Folder
-	)
 	fc.defaults()
-	if len(fc.hooks) == 0 {
-		if err = fc.check(); err != nil {
-			return nil, err
-		}
-		node, err = fc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*FolderMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = fc.check(); err != nil {
-				return nil, err
-			}
-			fc.mutation = mutation
-			if node, err = fc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(fc.hooks) - 1; i >= 0; i-- {
-			if fc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = fc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, fc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Folder)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from FolderMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Folder, FolderMutation](ctx, fc.sqlSave, fc.mutation, fc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -222,6 +180,9 @@ func (fc *FolderCreate) check() error {
 }
 
 func (fc *FolderCreate) sqlSave(ctx context.Context) (*Folder, error) {
+	if err := fc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := fc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, fc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -236,6 +197,8 @@ func (fc *FolderCreate) sqlSave(ctx context.Context) (*Folder, error) {
 			return nil, fmt.Errorf("unexpected Folder.ID type: %T", _spec.ID.Value)
 		}
 	}
+	fc.mutation.id = &_node.ID
+	fc.mutation.done = true
 	return _node, nil
 }
 

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/ugent-library/dilliver/view"
+	"github.com/ugent-library/deliver/view"
 )
 
 type Pages struct {
