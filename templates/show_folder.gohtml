@@ -8,12 +8,43 @@
                 <div class="bc-toolbar">
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item">
-                            <h4 class="bc-toolbar-title">{{.Data.folder.Name}}</h4>
+                            {{if $isAdmin}}
+                            <a class="btn btn-link btn-sm" href="{{.PathTo "space" "spaceID" .Data.folder.SpaceID}}">
+                                <i class="if if-arrow-left"></i>
+                                <span>Back to {{.Data.folder.Space.Name}} folders overview</span>
+                            </a>
+                            <h4 class="bc-toolbar-title">{{.Data.folder.Space.Name}} space — {{.Data.folder.Name}} folder</h4>
+                            {{else}}
+                            <h4 class="bc-toolbar-title">{{.Data.folder.Name}} folder</h4>
+                            {{end}}
                         </div>
                     </div>
+                    {{if $isAdmin}}
+                    <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <button class="btn btn-link btn-link-muted" type="button">
+                                <i class="if if-add"></i>
+                                <span class="btn-text">Make a new folder</span>
+                            </button>
+                        </div>
+                        <div class="bc-toolbar-item">
+                            <button class="btn btn-link btn-link-muted" type="button">
+                                <i class="if if-delete"></i>
+                                <span class="btn-text">Delete folder</span>
+                            </a>
+                        </div>
+                        <div class="bc-toolbar-item">
+                            <button class="btn btn-primary" type="button">
+                                <i class="if if-edit"></i>
+                                <span class="btn-text">Edit folder</span>
+                            </button>
+                        </div>
+                    </div>
+                    {{end}}
                 </div>
             </div>
         </div>
+
         <div class="u-scroll-wrapper__body p-6">
             <div class="bc-toolbar bc-toolbar--sm">
                 <div class="bc-toolbar-left">
