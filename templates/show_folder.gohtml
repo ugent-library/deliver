@@ -15,23 +15,25 @@
             </div>
         </div>
         <div class="u-scroll-wrapper__body p-6">
-            <div class="bc-toolbar-left">
-                <div class="bc-toolbar-item">
-                    <label class="c-label m-0">Public shareable link</label>
-                </div>
-                <div class="bc-toolbar-item">
-                    <a class="btn btn-link px-0" href="{{.PathTo "folder" "folderID" .Data.folder.ID}}" target="_blank">
-                        {{.URLTo "folder" "folderID" .Data.folder.ID}}
-                    </a>
-                    <button class="btn btn-link btn-icon-only btn-sm pb-1 px-0">
-                        <i class="if if-copy text-muted"></i>
-                    </button>
-                </div>
-                <div class="bc-toolbar-item border-left pl-6">
-                    <label class="c-label m-0">Expires on</label>
-                </div>
-                <div class="bc-toolbar-item">
-                    <span>{{.Data.folder.ExpiresAt.Format "2006-01-02 15:04"}}</span>
+            <div class="bc-toolbar bc-toolbar--sm">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item">
+                        <label class="c-label m-0">Public shareable link</label>
+                    </div>
+                    <div class="bc-toolbar-item">
+                        <a class="btn btn-link px-0" href="{{.PathTo "folder" "folderID" .Data.folder.ID}}" target="_blank">
+                            {{.URLTo "folder" "folderID" .Data.folder.ID}}
+                        </a>
+                        <button class="btn btn-link btn-icon-only btn-sm pb-1 px-0">
+                            <i class="if if-copy text-muted"></i>
+                        </button>
+                    </div>
+                    <div class="bc-toolbar-item border-left pl-6">
+                        <label class="c-label m-0">Expires on</label>
+                    </div>
+                    <div class="bc-toolbar-item">
+                        <span>{{.Data.folder.ExpiresAt.Format "2006-01-02 15:04"}}</span>
+                    </div>
                 </div>
             </div>
 
