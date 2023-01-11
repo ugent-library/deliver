@@ -97,14 +97,6 @@ var appCmd = &cobra.Command{
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
-		r.Use(csrf.Protect(
-			[]byte(config.Session.Secret),
-			csrf.CookieName(config.Session.Name+".csrf"),
-			csrf.Path("/"),
-			csrf.Secure(config.Production),
-			csrf.SameSite(csrf.SameSiteStrictMode),
-			csrf.FieldName("csrf_token"),
-		))
 
 		// controllers
 		errs := c.NewErrors()
@@ -148,6 +140,15 @@ var appCmd = &cobra.Command{
 					logger.Error(err)
 				}
 			}),
+			// apply before ProxyHeaders to avoid invalid referer errors
+			csrf.Protect(
+				[]byte(config.Session.Secret),
+				csrf.CookieName(config.Session.Name+".csrf"),
+				csrf.Path("/"),
+				csrf.Secure(config.Production),
+				csrf.SameSite(csrf.SameSiteStrictMode),
+				csrf.FieldName("csrf_token"),
+			),
 			handlers.HTTPMethodOverrideHandler,
 			middleware.If(config.Production, handlers.ProxyHeaders),
 			middleware.SetRequestID(ulid.MustGenerate),
