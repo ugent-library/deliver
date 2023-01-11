@@ -20,6 +20,11 @@ var (
 	MessageMax      = "must be %d or less"
 )
 
+func Validate(errs ...*Error) error {
+	return NewErrors(errs...).ErrorOrNil()
+}
+
+// TODO return *Errors object from rules
 func NotEmpty[T ~string | ~[]any | ~map[any]any](key string, val T) *Error {
 	if len(val) == 0 {
 		return &Error{

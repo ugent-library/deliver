@@ -6,7 +6,7 @@ import (
 )
 
 type Errors struct {
-	Errors []*Error
+	errors []*Error
 }
 
 func NewErrors(errs ...*Error) *Errors {
@@ -16,9 +16,9 @@ func NewErrors(errs ...*Error) *Errors {
 
 func (e *Errors) Error() string {
 	msg := ""
-	for i, err := range e.Errors {
+	for i, err := range e.errors {
 		msg += err.Error()
-		if i < len(e.Errors)-1 {
+		if i < len(e.errors)-1 {
 			msg += ", "
 		}
 	}
@@ -28,7 +28,7 @@ func (e *Errors) Error() string {
 func (e *Errors) Add(errs ...*Error) *Errors {
 	for _, err := range errs {
 		if err != nil {
-			e.Errors = append(e.Errors, err)
+			e.errors = append(e.errors, err)
 		}
 	}
 	return e
@@ -38,14 +38,14 @@ func (e *Errors) AddWithPrefix(prefix string, errs ...*Error) *Errors {
 	for _, err := range errs {
 		if err != nil {
 			err.key = prefix + err.key
-			e.Errors = append(e.Errors, err)
+			e.errors = append(e.errors, err)
 		}
 	}
 	return e
 }
 
 func (e *Errors) Get(key string) *Error {
-	for _, e := range e.Errors {
+	for _, e := range e.errors {
 		if e.key == key {
 			return e
 		}
@@ -56,9 +56,9 @@ func (e *Errors) Get(key string) *Error {
 func (e *Errors) WithPrefix(prefix string) *Errors {
 	ee := &Errors{}
 
-	for _, err := range e.Errors {
+	for _, err := range e.errors {
 		if strings.HasPrefix(err.key, prefix) {
-			ee.Errors = append(ee.Errors, err)
+			ee.errors = append(ee.errors, err)
 		}
 	}
 
@@ -66,7 +66,7 @@ func (e *Errors) WithPrefix(prefix string) *Errors {
 }
 
 func (e *Errors) ErrorOrNil() error {
-	if len(e.Errors) > 0 {
+	if len(e.errors) > 0 {
 		return e
 	}
 	return nil

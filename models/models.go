@@ -41,22 +41,22 @@ type File struct {
 }
 
 func (s *Space) Validate() error {
-	return validate.NewErrors(
+	return validate.Validate(
 		validate.NotEmpty("name", s.Name),
 		validate.LengthIn("name", s.Name, 1, 256),
-	).ErrorOrNil()
+	)
 }
 
 func (f *Folder) Validate() error {
-	return validate.NewErrors(
+	return validate.Validate(
 		validate.NotEmpty("name", f.Name),
 		validate.LengthIn("name", f.Name, 1, 256),
-	).ErrorOrNil()
+	)
 }
 
 func (f *File) Validate() error {
-	return validate.NewErrors(
+	return validate.Validate(
 		validate.NotEmpty("name", f.Name),
 		validate.Min("size", f.Size, 1),
-	).ErrorOrNil()
+	)
 }
