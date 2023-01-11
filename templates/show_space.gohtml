@@ -5,7 +5,7 @@
         <div class="bc-toolbar">
             <div class="bc-toolbar-left">
                 <div class="bc-toolbar-item">
-                    <h4 class="bc-toolbar-title">Your docs spaces</h4>
+                    <h4 class="bc-toolbar-title">Your deliver spaces</h4>
                 </div>
             </div>
         </div>
@@ -13,16 +13,13 @@
     <div class="c-sub-sidebar__menu my-6">
         <nav>
             <ul class="c-sub-sidebar-menu">
-                <li class="c-sub-sidebar__item c-sub-sidebar__item--active">
-                    <a href="{{.PathTo "space" "spaceID" .Data.space.ID}}">
-                        <span class="c-sidebar__label">{{.Data.space.Name}}</span>
+                {{range .Data.userSpaces}}
+                <li class="c-sub-sidebar__item{{if eq .ID $.Data.space.ID}} c-sub-sidebar__item--active{{end}}">
+                    <a href="{{$.PathTo "space" "spaceID" .ID}}">
+                        <span class="c-sidebar__label">{{.Name}}</span>
                     </a>
                 </li>
-                <li class="c-sub-sidebar__item">
-                    <a href="#">
-                        <span class="c-sidebar__label">New space</span>
-                    </a>
-                </li>
+                {{end}}
             </ul>
         </nav>
     </div>
