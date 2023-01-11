@@ -28,7 +28,7 @@ func init() {
 	viper.SetEnvPrefix("deliver")
 	viper.SetDefault("s3.region", "us-east-1")
 	viper.SetDefault("s3.bucket", "deliver")
-	viper.SetDefault("addr", "localhost:3002")
+	viper.SetDefault("addr", ":3000")
 	viper.SetDefault("session.name", "deliver")
 	viper.SetDefault("session.max_age", 86400*30) // 30 days
 }
