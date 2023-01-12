@@ -71,7 +71,13 @@ func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
 func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, error) {
 	row, err := r.db.Space.Query().
 		Where(space.IDEQ(spaceID)).
-		WithFolders().
+		WithFolders(func(q *ent.FolderQuery) {
+			q.WithFiles(func(q *ent.FileQuery) {
+				// TODO why does this give the error
+				// unexpected foreign-key "folder_id" returned  for node
+				// q.Select(file.FieldSize)
+			})
+		}).
 		First(ctx)
 	if err != nil {
 		var e *ent.NotFoundError
@@ -193,7 +199,22 @@ func rowToSpace(row *ent.Space) *Space {
 	if row.Edges.Folders != nil {
 		s.Folders = make([]*Folder, len(row.Edges.Folders))
 		for i, r := range row.Edges.Folders {
-			s.Folders[i] = rowToFolder(r)
+			f := &Folder{
+				ID:        r.ID,
+				SpaceID:   r.SpaceID,
+				Name:      r.Name,
+				CreatedAt: r.CreatedAt,
+				UpdatedAt: r.UpdatedAt,
+				ExpiresAt: r.ExpiresAt,
+			}
+			if r.Edges.Files != nil {
+				f.FileCount = len(r.Edges.Files)
+				for _, r := range r.Edges.Files {
+					f.Size += r.Size
+				}
+			}
+
+			s.Folders[i] = f
 		}
 	}
 	return s
@@ -212,9 +233,12 @@ func rowToFolder(row *ent.Folder) *Folder {
 		f.Space = rowToSpace(row.Edges.Space)
 	}
 	if row.Edges.Files != nil {
+		f.FileCount = len(row.Edges.Files)
 		f.Files = make([]*File, len(row.Edges.Files))
 		for i, r := range row.Edges.Files {
-			f.Files[i] = rowToFile(r)
+			ff := rowToFile(r)
+			f.Size += ff.Size
+			f.Files[i] = ff
 		}
 	}
 	return f

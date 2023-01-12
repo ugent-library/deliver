@@ -125,34 +125,27 @@ func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 	}
 
 	// TODO clean this up
-	// TODO don't eager load folders for all user spaces
-	// TODO get all spaces in 1 query (admin sees all spaces anyway)
-	var space *models.Space
+	space, err := h.repo.Space(c.Context(), spaceID)
+	if err != nil {
+		return err
+	}
 	var userSpaces []*models.Space
+	allSpaces, err := h.repo.Spaces(c.Context())
+	if err != nil {
+		return err
+	}
 	if c.IsAdmin(c.User) {
-		allSpaces, err := h.repo.Spaces(c.Context())
-		if err != nil {
-			return err
-		}
 		userSpaces = allSpaces
 	} else {
 		userSpaceIDs := c.UserSpaces(c.User)
 		userSpaces = make([]*models.Space, len(userSpaceIDs))
 		for i, id := range userSpaceIDs {
-			s, err := h.repo.Space(c.Context(), id)
-			if err != nil {
-				return err
+			for _, s := range allSpaces {
+				if s.ID == id {
+					userSpaces[i] = s
+					break
+				}
 			}
-			userSpaces[i] = s
-			if id == spaceID {
-				space = s
-			}
-		}
-	}
-	for _, s := range userSpaces {
-		if s.ID == spaceID {
-			space = s
-			break
 		}
 	}
 

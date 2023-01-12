@@ -23,8 +23,10 @@ type Folder struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// relations (can be empty)
-	Space *Space  `json:"space,omitempty"`
-	Files []*File `json:"files,omitempty"`
+	Size      int64   `json:"size"`
+	FileCount int     `json:"file_count"`
+	Space     *Space  `json:"space,omitempty"`
+	Files     []*File `json:"files,omitempty"`
 }
 
 type File struct {

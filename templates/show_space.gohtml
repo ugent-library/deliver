@@ -98,7 +98,8 @@
                                 </code>
                             </td>
                             <td class="text-nowrap">
-                                <p></p>
+                                <p>{{.FileCount}} files</p>
+                                <p class="small">{{friendlyBytes .Size}}</p>
                             </td>
                             <td class="text-nowrap">
                                 <p>{{.ExpiresAt.Format "2006-01-02 15:04"}}</p>
