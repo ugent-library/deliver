@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
@@ -162,8 +163,10 @@ var appCmd = &cobra.Command{
 		// start server
 		// TODO make timeouts configurable
 		server := graceful.WithDefaults(&http.Server{
-			Addr:    config.Addr,
-			Handler: handler,
+			Addr:         config.Addr,
+			Handler:      handler,
+			ReadTimeout:  3 * time.Minute,
+			WriteTimeout: 3 * time.Minute,
 		})
 		logger.Infof("starting server at %s", config.Addr)
 		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
