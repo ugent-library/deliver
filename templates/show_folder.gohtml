@@ -28,10 +28,14 @@
                             </button>
                         </div>
                         <div class="bc-toolbar-item">
-                            <button class="btn btn-link btn-link-muted" type="button">
-                                <i class="if if-delete"></i>
-                                <span class="btn-text">Delete folder</span>
-                            </a>
+                            <form action="{{.PathTo "delete_folder" "folderID" .Data.folder.ID}}" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                {{.CSRFTag}}
+                                <button class="btn btn-link btn-link-muted" type="submit">
+                                    <i class="if if-delete"></i>
+                                    <span class="btn-text">Delete folder</span>
+                                </button>
+                            </form>
                         </div>
                         <div class="bc-toolbar-item">
                             <button class="btn btn-primary" type="button">

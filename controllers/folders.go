@@ -33,7 +33,6 @@ func (h *Folders) Show(c *Ctx) error {
 	return h.show(c, nil)
 }
 
-// TODO remove files
 func (h *Folders) Delete(c *Ctx) error {
 	folderID := c.Path("folderID")
 
@@ -46,10 +45,15 @@ func (h *Folders) Delete(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
+	for _, f := range folder.Files {
+		if err := h.file.Delete(c.Context(), f.ID); err != nil {
+			return err
+		}
+	}
 	if err := h.repo.DeleteFolder(c.Context(), folderID); err != nil {
 		return err
 	}
-
+	
 	c.Session.Append(flashKey, Flash{
 		Type: infoFlash,
 		Body: "Folder deleted succesfully",
