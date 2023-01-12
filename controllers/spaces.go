@@ -34,7 +34,7 @@ func (h *Spaces) List(c *Ctx) error {
 }
 
 func (h *Spaces) Show(c *Ctx) error {
-	return h.show(c, nil)
+	return h.show(c, &models.Folder{}, nil)
 }
 
 func (h *Spaces) Create(c *Ctx) error {
@@ -81,7 +81,7 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	}
 
 	if err := h.repo.CreateFolder(c.Context(), folder); err != nil {
-		return h.show(c, err)
+		return h.show(c, folder, err)
 	}
 
 	c.Session.Append(flashKey, Flash{
@@ -110,7 +110,7 @@ func (h *Spaces) list(c *Ctx, err error) error {
 	})
 }
 
-func (h *Spaces) show(c *Ctx, err error) error {
+func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 	spaceID := c.Path("spaceID")
 
 	if !c.IsSpaceAdmin(spaceID, c.User) {
@@ -127,7 +127,6 @@ func (h *Spaces) show(c *Ctx, err error) error {
 	// TODO get all spaces in 1 query (admin sees all spaces anyway)
 	var space *models.Space
 	var userSpaces []*models.Space
-
 	if c.IsAdmin(c.User) {
 		allSpaces, err := h.repo.Spaces(c.Context())
 		if err != nil {
@@ -148,7 +147,6 @@ func (h *Spaces) show(c *Ctx, err error) error {
 			}
 		}
 	}
-
 	for _, s := range userSpaces {
 		if s.ID == spaceID {
 			space = s
@@ -159,6 +157,7 @@ func (h *Spaces) show(c *Ctx, err error) error {
 	return c.Render(h.showView, Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
+		"folder":           folder,
 		"validationErrors": validationErrors,
 	})
 }
