@@ -21,12 +21,12 @@
                     </div>
                     {{if $isAdmin}}
                     <div class="bc-toolbar-right">
-                        <div class="bc-toolbar-item">
+                        <!-- <div class="bc-toolbar-item">
                             <button class="btn btn-link btn-link-muted" type="button">
                                 <i class="if if-add"></i>
                                 <span class="btn-text">Make a new folder</span>
                             </button>
-                        </div>
+                        </div> -->
                         <div class="bc-toolbar-item">
                             <form action="{{.PathTo "delete_folder" "folderID" .Data.folder.ID}}" method="POST">
                                 <input type="hidden" name="_method" value="DELETE">
@@ -37,12 +37,12 @@
                                 </button>
                             </form>
                         </div>
-                        <div class="bc-toolbar-item">
+                        <!-- <div class="bc-toolbar-item">
                             <button class="btn btn-primary" type="button">
                                 <i class="if if-edit"></i>
                                 <span class="btn-text">Edit folder</span>
                             </button>
-                        </div>
+                        </div> -->
                     </div>
                     {{end}}
                 </div>
