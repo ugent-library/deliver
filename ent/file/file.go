@@ -21,6 +21,8 @@ const (
 	FieldSize = "size"
 	// FieldContentType holds the string denoting the content_type field in the database.
 	FieldContentType = "content_type"
+	// FieldDownloads holds the string denoting the downloads field in the database.
+	FieldDownloads = "downloads"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -46,6 +48,7 @@ var Columns = []string{
 	FieldName,
 	FieldSize,
 	FieldContentType,
+	FieldDownloads,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -61,6 +64,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultDownloads holds the default value on creation for the "downloads" field.
+	DefaultDownloads int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

@@ -51,6 +51,20 @@ func (fc *FileCreate) SetContentType(s string) *FileCreate {
 	return fc
 }
 
+// SetDownloads sets the "downloads" field.
+func (fc *FileCreate) SetDownloads(i int64) *FileCreate {
+	fc.mutation.SetDownloads(i)
+	return fc
+}
+
+// SetNillableDownloads sets the "downloads" field if the given value is not nil.
+func (fc *FileCreate) SetNillableDownloads(i *int64) *FileCreate {
+	if i != nil {
+		fc.SetDownloads(*i)
+	}
+	return fc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (fc *FileCreate) SetCreatedAt(t time.Time) *FileCreate {
 	fc.mutation.SetCreatedAt(t)
@@ -133,6 +147,10 @@ func (fc *FileCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (fc *FileCreate) defaults() {
+	if _, ok := fc.mutation.Downloads(); !ok {
+		v := file.DefaultDownloads
+		fc.mutation.SetDownloads(v)
+	}
 	if _, ok := fc.mutation.CreatedAt(); !ok {
 		v := file.DefaultCreatedAt()
 		fc.mutation.SetCreatedAt(v)
@@ -163,6 +181,9 @@ func (fc *FileCreate) check() error {
 	}
 	if _, ok := fc.mutation.ContentType(); !ok {
 		return &ValidationError{Name: "content_type", err: errors.New(`ent: missing required field "File.content_type"`)}
+	}
+	if _, ok := fc.mutation.Downloads(); !ok {
+		return &ValidationError{Name: "downloads", err: errors.New(`ent: missing required field "File.downloads"`)}
 	}
 	if _, ok := fc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "File.created_at"`)}
@@ -229,6 +250,10 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 	if value, ok := fc.mutation.ContentType(); ok {
 		_spec.SetField(file.FieldContentType, field.TypeString, value)
 		_node.ContentType = value
+	}
+	if value, ok := fc.mutation.Downloads(); ok {
+		_spec.SetField(file.FieldDownloads, field.TypeInt64, value)
+		_node.Downloads = value
 	}
 	if value, ok := fc.mutation.CreatedAt(); ok {
 		_spec.SetField(file.FieldCreatedAt, field.TypeTime, value)

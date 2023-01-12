@@ -19,7 +19,7 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 
 func (h *Files) Download(c *Ctx) error {
 	fileID := c.Path("fileID")
-	if _, err := h.repo.File(c.Context(), fileID); err != nil {
+	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
 	}
 	return h.file.Get(c.Context(), fileID, c.Res)

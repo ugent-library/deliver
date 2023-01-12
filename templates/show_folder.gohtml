@@ -120,6 +120,7 @@
                                 <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
                                 <th class="text-nowrap">Size</th>
                                 <th class="text-nowrap">Type</th>
+                                <th class="text-nowrap">Downloads</th>
                                 <th class="text-nowrap">Created at</th>
                                 {{if $isAdmin}}
                                 <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
@@ -142,6 +143,9 @@
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{{.ContentType}}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.Downloads}}</p>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>

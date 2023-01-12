@@ -15,6 +15,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "size", Type: field.TypeInt64},
 		{Name: "content_type", Type: field.TypeString},
+		{Name: "downloads", Type: field.TypeInt64, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "folder_id", Type: field.TypeString},
@@ -27,7 +28,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "files_folders_files",
-				Columns:    []*schema.Column{FilesColumns[7]},
+				Columns:    []*schema.Column{FilesColumns[8]},
 				RefColumns: []*schema.Column{FoldersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

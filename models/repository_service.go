@@ -28,6 +28,7 @@ type RepositoryService interface {
 	File(context.Context, string) (*File, error)
 	CreateFile(context.Context, *File) error
 	DeleteFile(context.Context, string) error
+	AddFileDownload(context.Context, string) error
 }
 
 func NewRepositoryService(c Config) (RepositoryService, error) {
@@ -174,6 +175,14 @@ func (r *repositoryService) DeleteFile(ctx context.Context, fileID string) error
 	return err
 }
 
+func (r *repositoryService) AddFileDownload(ctx context.Context, fileID string) error {
+	err := r.db.File.
+		UpdateOneID(fileID).
+		AddDownloads(1).
+		Exec(ctx)
+	return err
+}
+
 func rowToSpace(row *ent.Space) *Space {
 	s := &Space{
 		ID:        row.ID,
@@ -219,6 +228,7 @@ func rowToFile(row *ent.File) *File {
 		Name:        row.Name,
 		Size:        row.Size,
 		ContentType: row.ContentType,
+		Downloads:   row.Downloads,
 		CreatedAt:   row.CreatedAt,
 		UpdatedAt:   row.UpdatedAt,
 	}

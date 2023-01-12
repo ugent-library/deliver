@@ -34,6 +34,7 @@ type File struct {
 	Name        string    `json:"name,omitempty"`
 	Size        int64     `json:"size,omitempty"`
 	ContentType string    `json:"content_type,omitempty"`
+	Downloads   int64     `json:"downloads,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`
 	// relations (can be empty)

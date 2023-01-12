@@ -27,6 +27,8 @@ type File struct {
 	Size int64 `json:"size,omitempty"`
 	// ContentType holds the value of the "content_type" field.
 	ContentType string `json:"content_type,omitempty"`
+	// Downloads holds the value of the "downloads" field.
+	Downloads int64 `json:"downloads,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -63,7 +65,7 @@ func (*File) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case file.FieldSize:
+		case file.FieldSize, file.FieldDownloads:
 			values[i] = new(sql.NullInt64)
 		case file.FieldID, file.FieldFolderID, file.FieldMd5, file.FieldName, file.FieldContentType:
 			values[i] = new(sql.NullString)
@@ -119,6 +121,12 @@ func (f *File) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field content_type", values[i])
 			} else if value.Valid {
 				f.ContentType = value.String
+			}
+		case file.FieldDownloads:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field downloads", values[i])
+			} else if value.Valid {
+				f.Downloads = value.Int64
 			}
 		case file.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -179,6 +187,9 @@ func (f *File) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("content_type=")
 	builder.WriteString(f.ContentType)
+	builder.WriteString(", ")
+	builder.WriteString("downloads=")
+	builder.WriteString(fmt.Sprintf("%v", f.Downloads))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(f.CreatedAt.Format(time.ANSIC))

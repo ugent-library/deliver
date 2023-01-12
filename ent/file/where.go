@@ -80,6 +80,11 @@ func ContentType(v string) predicate.File {
 	return predicate.File(sql.FieldEQ(FieldContentType, v))
 }
 
+// Downloads applies equality check predicate on the "downloads" field. It's identical to DownloadsEQ.
+func Downloads(v int64) predicate.File {
+	return predicate.File(sql.FieldEQ(FieldDownloads, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.File {
 	return predicate.File(sql.FieldEQ(FieldCreatedAt, v))
@@ -388,6 +393,46 @@ func ContentTypeEqualFold(v string) predicate.File {
 // ContentTypeContainsFold applies the ContainsFold predicate on the "content_type" field.
 func ContentTypeContainsFold(v string) predicate.File {
 	return predicate.File(sql.FieldContainsFold(FieldContentType, v))
+}
+
+// DownloadsEQ applies the EQ predicate on the "downloads" field.
+func DownloadsEQ(v int64) predicate.File {
+	return predicate.File(sql.FieldEQ(FieldDownloads, v))
+}
+
+// DownloadsNEQ applies the NEQ predicate on the "downloads" field.
+func DownloadsNEQ(v int64) predicate.File {
+	return predicate.File(sql.FieldNEQ(FieldDownloads, v))
+}
+
+// DownloadsIn applies the In predicate on the "downloads" field.
+func DownloadsIn(vs ...int64) predicate.File {
+	return predicate.File(sql.FieldIn(FieldDownloads, vs...))
+}
+
+// DownloadsNotIn applies the NotIn predicate on the "downloads" field.
+func DownloadsNotIn(vs ...int64) predicate.File {
+	return predicate.File(sql.FieldNotIn(FieldDownloads, vs...))
+}
+
+// DownloadsGT applies the GT predicate on the "downloads" field.
+func DownloadsGT(v int64) predicate.File {
+	return predicate.File(sql.FieldGT(FieldDownloads, v))
+}
+
+// DownloadsGTE applies the GTE predicate on the "downloads" field.
+func DownloadsGTE(v int64) predicate.File {
+	return predicate.File(sql.FieldGTE(FieldDownloads, v))
+}
+
+// DownloadsLT applies the LT predicate on the "downloads" field.
+func DownloadsLT(v int64) predicate.File {
+	return predicate.File(sql.FieldLT(FieldDownloads, v))
+}
+
+// DownloadsLTE applies the LTE predicate on the "downloads" field.
+func DownloadsLTE(v int64) predicate.File {
+	return predicate.File(sql.FieldLTE(FieldDownloads, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
