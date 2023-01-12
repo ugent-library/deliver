@@ -4,6 +4,7 @@ import (
 	"context"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -37,9 +38,10 @@ type Ctx struct {
 }
 
 type Flash struct {
-	Type  string
-	Title string
-	Body  template.HTML
+	Type         string
+	Title        string
+	Body         template.HTML
+	DismissAfter time.Duration
 }
 
 type Renderer interface {

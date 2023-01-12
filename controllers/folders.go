@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
@@ -53,10 +54,11 @@ func (h *Folders) Delete(c *Ctx) error {
 	if err := h.repo.DeleteFolder(c.Context(), folderID); err != nil {
 		return err
 	}
-	
+
 	c.Session.Append(flashKey, Flash{
-		Type: infoFlash,
-		Body: "Folder deleted succesfully",
+		Type:         infoFlash,
+		Body:         "Folder deleted succesfully",
+		DismissAfter: 3 * time.Second,
 	})
 	c.RedirectTo("space", "spaceID", folder.SpaceID)
 
@@ -116,8 +118,9 @@ func (h *Folders) UploadFile(c *Ctx) error {
 	}
 
 	c.Session.Append(flashKey, Flash{
-		Type: infoFlash,
-		Body: "File added succesfully",
+		Type:         infoFlash,
+		Body:         "File added succesfully",
+		DismissAfter: 3 * time.Second,
 	})
 
 	c.RedirectTo("folder", "folderID", folderID)

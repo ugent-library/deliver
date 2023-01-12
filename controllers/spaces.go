@@ -53,8 +53,9 @@ func (h *Spaces) Create(c *Ctx) error {
 	}
 
 	c.Session.Append(flashKey, Flash{
-		Type: infoFlash,
-		Body: "Space created succesfully",
+		Type:         infoFlash,
+		Body:         "Space created succesfully",
+		DismissAfter: 3 * time.Second,
 	})
 	c.RedirectTo("space", "spaceID", space.ID)
 
@@ -85,8 +86,9 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	}
 
 	c.Session.Append(flashKey, Flash{
-		Type: infoFlash,
-		Body: "Folder created succesfully",
+		Type:         infoFlash,
+		Body:         "Folder created succesfully",
+		DismissAfter: 3 * time.Second,
 	})
 	c.RedirectTo("folder", "folderID", folder.ID)
 

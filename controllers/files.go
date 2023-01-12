@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
 )
@@ -45,8 +47,9 @@ func (h *Files) Delete(c *Ctx) error {
 	}
 
 	c.Session.Append(flashKey, Flash{
-		Type: infoFlash,
-		Body: "File deleted succesfully",
+		Type:         infoFlash,
+		Body:         "File deleted succesfully",
+		DismissAfter: 3 * time.Second,
 	})
 	c.RedirectTo("folder", "folderID", file.FolderID)
 
