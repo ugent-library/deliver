@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
+	"github.com/ugent-library/deliver/friendly"
 	"github.com/ugent-library/deliver/middleware"
 	"github.com/ugent-library/deliver/mix"
 	"github.com/ugent-library/deliver/models"
@@ -56,7 +57,8 @@ var appCmd = &cobra.Command{
 
 		// setup views
 		view.DefaultConfig.Funcs = template.FuncMap{
-			"assetPath": assets.AssetPath,
+			"assetPath":     assets.AssetPath,
+			"friendlyBytes": friendly.Bytes,
 		}
 
 		// setup sessions
