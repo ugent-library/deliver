@@ -165,8 +165,8 @@ var appCmd = &cobra.Command{
 		server := graceful.WithDefaults(&http.Server{
 			Addr:         config.Addr,
 			Handler:      handler,
-			ReadTimeout:  3 * time.Minute,
-			WriteTimeout: 3 * time.Minute,
+			ReadTimeout:  10 * time.Minute,
+			WriteTimeout: 10 * time.Minute,
 		})
 		logger.Infof("starting server at %s", config.Addr)
 		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
