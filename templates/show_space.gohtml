@@ -119,7 +119,9 @@
                                     <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{$.CSRFTag}}
-                                        <button class="btn btn-icon-only btn-link" type="submit">
+                                        <button class="btn btn-icon-only btn-link"
+                                            data-confirm="Are you sure you want to delete this folder?"
+                                        >
                                             <i class="if if-delete"></i>
                                             <div class="sr-only">Delete folder</div>
                                         </button>
