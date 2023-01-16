@@ -33,8 +33,10 @@ export default function() {
                 }, false);
 
                 ajax.upload.addEventListener('progress', e => {
+                    if (!evt.detail.lengthComputable) {
+                        return
+                    }
                     let percent = Math.ceil(e.loaded / e.total) * 100
-                    console.log(file.name + ": " + percent)
                     tmpl.querySelector('.upload-size').innerText = friendlyBytes(e.loaded)
                     tmpl.querySelector('.upload-percent').innerText = percent
                     let pb = tmpl.querySelector('.progress-bar')
