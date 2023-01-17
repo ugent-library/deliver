@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ugent-library/deliver/bind"
 	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/ulid"
@@ -16,6 +17,7 @@ type Folders struct {
 	repo     models.RepositoryService
 	file     models.FileService
 	showView view.View
+	editView view.View
 }
 
 type FolderForm struct {
@@ -27,11 +29,66 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 		repo:     r,
 		file:     f,
 		showView: view.MustNew("page", "show_folder"),
+		editView: view.MustNew("page", "edit_folder"),
 	}
 }
 
 func (h *Folders) Show(c *Ctx) error {
 	return h.show(c, nil)
+}
+
+func (h *Folders) Edit(c *Ctx) error {
+	folderID := c.Path("folderID")
+
+	folder, err := h.repo.Folder(c.Context(), folderID)
+	if err != nil {
+		return err
+	}
+
+	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+		return httperror.Forbidden
+	}
+
+	return c.Render(h.editView, Map{
+		"folder":           folder,
+		"validationErrors": validate.NewErrors(),
+	})
+}
+
+func (h *Folders) Update(c *Ctx) error {
+	folderID := c.Path("folderID")
+
+	folder, err := h.repo.Folder(c.Context(), folderID)
+	if err != nil {
+		return err
+	}
+
+	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+		return httperror.Forbidden
+	}
+
+	b := FolderForm{}
+	// TODO return ErrBadRequest
+	if err := bind.Form(c.Req, &b); err != nil {
+		return err
+	}
+
+	folder.Name = b.Name
+
+	if err := h.repo.UpdateFolder(c.Context(), folder); err != nil {
+		validationErrors := validate.NewErrors()
+		if err != nil && !errors.As(err, &validationErrors) {
+			return err
+		}
+		return c.Render(h.editView, Map{
+			"folder":           folder,
+			"validationErrors": validationErrors,
+		})
+	}
+
+	c.RedirectTo("folder", "folderID", folder.ID)
+
+	return nil
 }
 
 func (h *Folders) Delete(c *Ctx) error {

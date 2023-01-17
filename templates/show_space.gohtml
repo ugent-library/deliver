@@ -132,10 +132,10 @@
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                 <div class="c-button-toolbar flex-nowrap">
-                                    <!-- <button class="btn btn-icon-only btn-link">
+                                    <a class="btn btn-icon-only btn-link" href="{{$.PathTo "edit_folder" "folderID" .ID}}">
                                         <i class="if if-edit"></i>
                                         <div class="sr-only">Edit folder</div>
-                                    </button> -->
+                                    </a>
                                     <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST" id="delete-folder-{{.ID}}">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{$.CSRFTag}}

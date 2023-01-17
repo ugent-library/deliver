@@ -24,6 +24,7 @@ type RepositoryService interface {
 	CreateSpace(context.Context, *Space) error
 	Folder(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
+	UpdateFolder(context.Context, *Folder) error
 	DeleteFolder(context.Context, string) error
 	File(context.Context, string) (*File, error)
 	CreateFile(context.Context, *File) error
@@ -130,6 +131,20 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 		SetSpaceID(f.SpaceID).
 		SetName(f.Name).
 		SetExpiresAt(f.ExpiresAt).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	*f = *rowToFolder(row)
+	return nil
+}
+
+func (r *repositoryService) UpdateFolder(ctx context.Context, f *Folder) error {
+	if err := f.Validate(); err != nil {
+		return err
+	}
+	row, err := r.db.Folder.UpdateOneID(f.ID).
+		SetName(f.Name).
 		Save(ctx)
 	if err != nil {
 		return err
