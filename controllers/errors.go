@@ -15,7 +15,7 @@ type Errors struct {
 
 func NewErrors() *Errors {
 	return &Errors{
-		notFoundView: view.MustNew("page", "not_found").Status(404),
+		notFoundView: view.MustNew("page", "404").Status(404),
 	}
 }
 
