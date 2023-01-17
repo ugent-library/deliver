@@ -125,6 +125,7 @@
                         </div>
                     </div>
                 </div>
+                {{if .Data.folder.Files}}
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered">
                         <thead>
@@ -184,6 +185,11 @@
                         </tbody>
                     </table>
                 </div>
+                {{else}}
+                <div class="m-6">
+                    <span class="text-muted">No files</span>
+                </div>
+                {{end}}
             </div>
         </div>
     </div>
@@ -199,7 +205,7 @@
                         <h4>
                             Are you sure you want to delete the folder
                             <br>
-                            <strong>{{.Name}}</strong>
+                            <strong>{{.Data.folder.Name}}</strong>
                             ant its files?
                         </h4>
                         <p>You cannot undo this action or recover the files.</p>
