@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/gob"
+	"fmt"
 	"html/template"
 	"net/http"
 	"time"
@@ -162,13 +163,14 @@ var appCmd = &cobra.Command{
 
 		// start server
 		// TODO make timeouts configurable
+		addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 		server := graceful.WithDefaults(&http.Server{
-			Addr:         config.Addr,
+			Addr:         addr,
 			Handler:      handler,
 			ReadTimeout:  10 * time.Minute,
 			WriteTimeout: 10 * time.Minute,
 		})
-		logger.Infof("starting server at %s", config.Addr)
+		logger.Infof("starting server at %s", addr)
 		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
 			logger.Fatal(err)
 		}

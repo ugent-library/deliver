@@ -6,7 +6,8 @@ type Config struct {
 	Spaces     []SpacesConfig
 	DB         string
 	S3         S3Config
-	Addr       string
+	Host       string
+	Port       int
 	OIDC       OIDCConfig
 	Session    SessionConfig
 	CSRF       CSRFConfig
