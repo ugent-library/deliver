@@ -57,7 +57,9 @@ type repositoryService struct {
 }
 
 func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
-	rows, err := r.db.Space.Query().All(ctx)
+	rows, err := r.db.Space.Query().
+		Order(ent.Asc(space.FieldName)).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +74,7 @@ func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, 
 	row, err := r.db.Space.Query().
 		Where(space.IDEQ(spaceID)).
 		WithFolders(func(q *ent.FolderQuery) {
+			q.Order(ent.Asc(folder.FieldExpiresAt))
 			q.WithFiles(func(q *ent.FileQuery) {
 				// TODO why does this give the error
 				// unexpected foreign-key "folder_id" returned  for node
@@ -105,7 +108,9 @@ func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folde
 	row, err := r.db.Folder.Query().
 		Where(folder.IDEQ(folderID)).
 		WithSpace().
-		WithFiles().
+		WithFiles(func(q *ent.FileQuery) {
+			q.Order(ent.Asc(file.FieldName))
+		}).
 		First(ctx)
 	if err != nil {
 		var e *ent.NotFoundError
