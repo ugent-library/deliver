@@ -13,15 +13,15 @@ import (
 
 type Spaces struct {
 	repo     models.RepositoryService
-	listView view.View
 	showView view.View
+	newView  view.View
 }
 
 func NewSpaces(r models.RepositoryService) *Spaces {
 	return &Spaces{
 		repo:     r,
-		listView: view.MustNew("page", "list_spaces"),
 		showView: view.MustNew("page", "show_space"),
+		newView:  view.MustNew("page", "new_space"),
 	}
 }
 
@@ -29,12 +29,54 @@ type SpaceForm struct {
 	Name string `form:"name"`
 }
 
+// TODO clean this up
 func (h *Spaces) List(c *Ctx) error {
-	return h.list(c, nil)
+	var userSpaces []*models.Space
+	allSpaces, err := h.repo.Spaces(c.Context())
+	if err != nil {
+		return err
+	}
+	if c.IsAdmin(c.User) {
+		userSpaces = allSpaces
+	} else {
+		userSpaceIDs := c.UserSpaces(c.User)
+		userSpaces = make([]*models.Space, len(userSpaceIDs))
+		for i, id := range userSpaceIDs {
+			for _, s := range allSpaces {
+				if s.ID == id {
+					userSpaces[i] = s
+					break
+				}
+			}
+		}
+	}
+
+	if len(userSpaces) == 0 {
+		return httperror.Forbidden
+	}
+
+	space, err := h.repo.Space(c.Context(), userSpaces[0].ID)
+	if err != nil {
+		return err
+	}
+
+	return c.Render(h.showView, Map{
+		"space":            space,
+		"userSpaces":       userSpaces,
+		"folder":           &models.Folder{},
+		"validationErrors": validate.NewErrors(),
+	})
 }
 
 func (h *Spaces) Show(c *Ctx) error {
 	return h.show(c, &models.Folder{}, nil)
+}
+
+func (h *Spaces) New(c *Ctx) error {
+	return c.Render(h.newView, Map{
+		"space":            &models.Space{},
+		"validationErrors": validate.NewErrors(),
+	})
 }
 
 func (h *Spaces) Create(c *Ctx) error {
@@ -49,7 +91,14 @@ func (h *Spaces) Create(c *Ctx) error {
 	}
 
 	if err := h.repo.CreateSpace(c.Context(), space); err != nil {
-		return h.list(c, err)
+		validationErrors := validate.NewErrors()
+		if err != nil && !errors.As(err, &validationErrors) {
+			return err
+		}
+		return c.Render(h.newView, Map{
+			"space":            space,
+			"validationErrors": validationErrors,
+		})
 	}
 
 	c.Session.Append(flashKey, Flash{
@@ -95,23 +144,7 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	return nil
 }
 
-func (h *Spaces) list(c *Ctx, err error) error {
-	validationErrors := validate.NewErrors()
-	if err != nil && !errors.As(err, &validationErrors) {
-		return err
-	}
-
-	spaces, err := h.repo.Spaces(c.Context())
-	if err != nil {
-		return err
-	}
-
-	return c.Render(h.listView, Map{
-		"spaces":           spaces,
-		"validationErrors": validationErrors,
-	})
-}
-
+// TODO clean this up
 func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 	spaceID := c.Path("spaceID")
 
@@ -124,7 +157,6 @@ func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	// TODO clean this up
 	space, err := h.repo.Space(c.Context(), spaceID)
 	if err != nil {
 		return err

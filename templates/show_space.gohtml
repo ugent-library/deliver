@@ -20,6 +20,16 @@
                     </a>
                 </li>
                 {{end}}
+                {{if .IsAdmin .User}}
+                <li class="c-sub-sidebar__item">
+                    <a href="{{.PathTo "new_space"}}">
+                        <span class="c-sidebar__label">
+                            <i class="if if-add"></i>
+                            Make a new space
+                        </span>
+                    </a>
+                </li>
+                {{end}}
             </ul>
         </nav>
     </div>

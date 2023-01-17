@@ -71,6 +71,7 @@
 @import "bootstrap-additions/nav";
 @import "bootstrap-additions/pagination";
 @import "bootstrap-additions/popover";
+@import "bootstrap-additions/progress";
 @import "bootstrap-additions/reboot";
 @import "bootstrap-additions/table";
 @import "bootstrap-additions/toasts";
@@ -113,6 +114,9 @@
 
 /* Third-party additions
    ========================================================================== */
+// @import "./node_modules/select2/src/scss/core";
+// @import "vendor/select2-bootstrap4-theme/select2-bootstrap4.scss";
+
 
 // Custom utilities written from scratch
 

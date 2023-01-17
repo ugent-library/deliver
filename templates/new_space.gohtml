@@ -1,0 +1,50 @@
+{{define "body"}}
+<div class="w-100 u-scroll-wrapper">
+    <div class="bg-white">
+        <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+            <div class="bc-toolbar">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item">
+                        <h4 class="bc-toolbar-title">Make a new space</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="u-scroll-wrapper__body p-6">
+        <div class="card w-100 mb-6">
+            <div class="card-header">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">Make a new space</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form action="{{.PathTo "create_space"}}" method="POST">
+                    {{.CSRFTag}}
+                    <div class="form-group{{if .Data.validationErrors.Get "name"}} is-invalid{{end}}">
+                        <label class="c-label" for="folder-name">Space name</label>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                {{with .Data.validationErrors.Get "name"}}
+                                <input class="form-control is-invalid" type="text" value="{{$.Data.space.Name}}" id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid">
+                                <small class="invalid-feedback" id="space-name-invalid">{{.}}</small>
+                                {{else}}
+                                <input class="form-control" type="text" value="{{.Data.space.Name}}" id="space-name" name="name">
+                                {{end}}
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary ml-4" type="submit">
+                                    <i class="if if-check"></i>
+                                    <span class="btn-text">Make space</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
