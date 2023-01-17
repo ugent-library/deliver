@@ -30,7 +30,7 @@ func (h *Files) Download(c *Ctx) error {
 func (h *Files) Delete(c *Ctx) error {
 	fileID := c.Path("fileID")
 
-	file, err := h.repo.File(c.Context(), fileID)
+	file, err := h.repo.FileByID(c.Context(), fileID)
 	if err != nil {
 		return err
 	}

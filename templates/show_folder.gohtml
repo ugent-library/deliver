@@ -9,7 +9,7 @@
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item">
                             {{if $isAdmin}}
-                            <a class="btn btn-link btn-sm" href="{{.PathTo "space" "spaceID" .Data.folder.SpaceID}}">
+                            <a class="btn btn-link btn-sm" href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
                                 <i class="if if-arrow-left"></i>
                                 <span>Back to {{.Data.folder.Space.Name}} folders overview</span>
                             </a>
@@ -22,7 +22,7 @@
                     {{if $isAdmin}}
                     <div class="bc-toolbar-right">
                         <div class="bc-toolbar-item">
-                            <a class="btn btn-link btn-link-muted" href="{{.PathTo "space" "spaceID" .Data.folder.SpaceID}}">
+                            <a class="btn btn-link btn-link-muted" href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
                                 <i class="if if-add"></i>
                                 <span class="btn-text">Make a new folder</span>
                             </a>

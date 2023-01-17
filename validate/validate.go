@@ -2,22 +2,29 @@ package validate
 
 import (
 	"fmt"
+	"regexp"
 )
 
 const (
-	RuleNotEmpty = "not_empty"
-	RuleLength   = "length"
-	RuleLengthIn = "length_in"
-	RuleMin      = "min"
-	RuleMax      = "max"
+	RuleNotEmpty     = "not_empty"
+	RuleLength       = "length"
+	RuleLengthIn     = "length_in"
+	RuleMin          = "min"
+	RuleMax          = "max"
+	RuleMatch        = "match"
+	RuleAlphanumeric = "alphanumeric"
 )
 
 var (
-	MessageNotEmpty = "cannot be empty"
-	MessageLength   = "length must be %d"
-	MessageLengthIn = "length must be between %d and %d"
-	MessageMin      = "must be %d or more"
-	MessageMax      = "must be %d or less"
+	MessageNotEmpty     = "cannot be empty"
+	MessageLength       = "length must be %d"
+	MessageLengthIn     = "length must be between %d and %d"
+	MessageMin          = "must be %d or more"
+	MessageMax          = "must be %d or less"
+	MessageMatch        = "must match %s"
+	MessageAlphanumeric = "must only contain letters a to z and digits"
+
+	ReAlphanumeric = regexp.MustCompile("^[a-zA-Z0-9]+$")
 )
 
 func Validate(errs ...*Error) error {
@@ -79,6 +86,29 @@ func Max[T int | int64 | float64](key string, val T, max T) *Error {
 			rule:   RuleMax,
 			msg:    fmt.Sprintf(MessageMax, max),
 			params: []any{max},
+		}
+	}
+	return nil
+}
+
+func Match(key, val string, r *regexp.Regexp) *Error {
+	if !r.MatchString(val) {
+		return &Error{
+			key:    key,
+			rule:   RuleNotEmpty,
+			msg:    fmt.Sprintf(MessageMatch, r),
+			params: []any{r},
+		}
+	}
+	return nil
+}
+
+func Alphanumeric(key, val string) *Error {
+	if !ReAlphanumeric.MatchString(val) {
+		return &Error{
+			key:  key,
+			rule: RuleAlphanumeric,
+			msg:  MessageAlphanumeric,
 		}
 	}
 	return nil

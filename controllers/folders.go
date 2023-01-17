@@ -40,7 +40,7 @@ func (h *Folders) Show(c *Ctx) error {
 func (h *Folders) Edit(c *Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.Folder(c.Context(), folderID)
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (h *Folders) Edit(c *Ctx) error {
 func (h *Folders) Update(c *Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.Folder(c.Context(), folderID)
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (h *Folders) Update(c *Ctx) error {
 func (h *Folders) Delete(c *Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.Folder(c.Context(), folderID)
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (h *Folders) Delete(c *Ctx) error {
 		Body:         "Folder deleted succesfully",
 		DismissAfter: 3 * time.Second,
 	})
-	c.RedirectTo("space", "spaceID", folder.SpaceID)
+	c.RedirectTo("space", "spaceName", folder.Space.Name)
 
 	return nil
 }
@@ -125,7 +125,7 @@ func (h *Folders) Delete(c *Ctx) error {
 func (h *Folders) UploadFile(c *Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.Folder(c.Context(), folderID)
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func (h *Folders) show(c *Ctx, err error) error {
 	}
 
 	folderID := c.Path("folderID")
-	folder, err := h.repo.Folder(c.Context(), folderID)
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
 		return err
 	}

@@ -15,7 +15,7 @@
             <ul class="c-sub-sidebar-menu">
                 {{range .Data.userSpaces}}
                 <li class="c-sub-sidebar__item{{if eq .ID $.Data.space.ID}} c-sub-sidebar__item--active{{end}}">
-                    <a href="{{$.PathTo "space" "spaceID" .ID}}">
+                    <a href="{{$.PathTo "space" "spaceName" .Name}}">
                         <span class="c-sidebar__label">{{.Name}}</span>
                     </a>
                 </li>

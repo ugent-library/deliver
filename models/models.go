@@ -46,14 +46,15 @@ type File struct {
 func (s *Space) Validate() error {
 	return validate.Validate(
 		validate.NotEmpty("name", s.Name),
-		validate.LengthIn("name", s.Name, 1, 256),
+		validate.LengthIn("name", s.Name, 1, 50),
+		validate.Alphanumeric("name", s.Name),
 	)
 }
 
 func (f *Folder) Validate() error {
 	return validate.Validate(
 		validate.NotEmpty("name", f.Name),
-		validate.LengthIn("name", f.Name, 1, 256),
+		validate.LengthIn("name", f.Name, 1, 100),
 	)
 }
 

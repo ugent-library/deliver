@@ -55,7 +55,7 @@ func (h *Spaces) List(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
-	space, err := h.repo.Space(c.Context(), userSpaces[0].ID)
+	space, err := h.repo.SpaceByID(c.Context(), userSpaces[0].ID)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func (h *Spaces) Create(c *Ctx) error {
 		Body:         "Space created succesfully",
 		DismissAfter: 3 * time.Second,
 	})
-	c.RedirectTo("space", "spaceID", space.ID)
+	c.RedirectTo("space", "spaceName", space.Name)
 
 	return nil
 }
@@ -146,21 +146,22 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 
 // TODO clean this up
 func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
-	spaceID := c.Path("spaceID")
-
-	if !c.IsSpaceAdmin(spaceID, c.User) {
-		return httperror.Forbidden
-	}
+	spaceName := c.Path("spaceName")
 
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
 		return err
 	}
 
-	space, err := h.repo.Space(c.Context(), spaceID)
+	space, err := h.repo.SpaceByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
+
+	if !c.IsSpaceAdmin(spaceName, c.User) {
+		return httperror.Forbidden
+	}
+
 	var userSpaces []*models.Space
 	allSpaces, err := h.repo.Spaces(c.Context())
 	if err != nil {

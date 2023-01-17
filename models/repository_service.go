@@ -20,13 +20,14 @@ var ErrNotFound = errors.New("not found")
 
 type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
-	Space(context.Context, string) (*Space, error)
+	SpaceByID(context.Context, string) (*Space, error)
+	SpaceByName(context.Context, string) (*Space, error)
 	CreateSpace(context.Context, *Space) error
-	Folder(context.Context, string) (*Folder, error)
+	FolderByID(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
 	UpdateFolder(context.Context, *Folder) error
 	DeleteFolder(context.Context, string) error
-	File(context.Context, string) (*File, error)
+	FileByID(context.Context, string) (*File, error)
 	CreateFile(context.Context, *File) error
 	DeleteFile(context.Context, string) error
 	AddFileDownload(context.Context, string) error
@@ -71,9 +72,31 @@ func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
 	return spaces, nil
 }
 
-func (r *repositoryService) Space(ctx context.Context, spaceID string) (*Space, error) {
+func (r *repositoryService) SpaceByID(ctx context.Context, id string) (*Space, error) {
 	row, err := r.db.Space.Query().
-		Where(space.IDEQ(spaceID)).
+		Where(space.IDEQ(id)).
+		WithFolders(func(q *ent.FolderQuery) {
+			q.Order(ent.Asc(folder.FieldExpiresAt))
+			q.WithFiles(func(q *ent.FileQuery) {
+				// TODO why does this give the error
+				// unexpected foreign-key "folder_id" returned  for node
+				// q.Select(file.FieldSize)
+			})
+		}).
+		First(ctx)
+	if err != nil {
+		var e *ent.NotFoundError
+		if errors.As(err, &e) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return rowToSpace(row), nil
+}
+
+func (r *repositoryService) SpaceByName(ctx context.Context, name string) (*Space, error) {
+	row, err := r.db.Space.Query().
+		Where(space.NameEQ(name)).
 		WithFolders(func(q *ent.FolderQuery) {
 			q.Order(ent.Asc(folder.FieldExpiresAt))
 			q.WithFiles(func(q *ent.FileQuery) {
@@ -105,9 +128,9 @@ func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	return nil
 }
 
-func (r *repositoryService) Folder(ctx context.Context, folderID string) (*Folder, error) {
+func (r *repositoryService) FolderByID(ctx context.Context, id string) (*Folder, error) {
 	row, err := r.db.Folder.Query().
-		Where(folder.IDEQ(folderID)).
+		Where(folder.IDEQ(id)).
 		WithSpace().
 		WithFiles(func(q *ent.FileQuery) {
 			q.Order(ent.Asc(file.FieldName))
@@ -179,9 +202,9 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 	return nil
 }
 
-func (r *repositoryService) File(ctx context.Context, fileID string) (*File, error) {
+func (r *repositoryService) FileByID(ctx context.Context, id string) (*File, error) {
 	row, err := r.db.File.Query().
-		Where(file.IDEQ(fileID)).
+		Where(file.IDEQ(id)).
 		WithFolder().
 		First(ctx)
 	if err != nil {
@@ -194,16 +217,16 @@ func (r *repositoryService) File(ctx context.Context, fileID string) (*File, err
 	return rowToFile(row), nil
 }
 
-func (r *repositoryService) DeleteFile(ctx context.Context, fileID string) error {
+func (r *repositoryService) DeleteFile(ctx context.Context, id string) error {
 	err := r.db.File.
-		DeleteOneID(fileID).
+		DeleteOneID(id).
 		Exec(ctx)
 	return err
 }
 
-func (r *repositoryService) AddFileDownload(ctx context.Context, fileID string) error {
+func (r *repositoryService) AddFileDownload(ctx context.Context, id string) error {
 	err := r.db.File.
-		UpdateOneID(fileID).
+		UpdateOneID(id).
 		AddDownloads(1).
 		Exec(ctx)
 	return err
