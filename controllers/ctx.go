@@ -64,6 +64,7 @@ type Config struct {
 	Permissions  *models.Permissions
 }
 
+// TODO add Ctx as request Context value in middleware?
 func Wrapper(config Config) func(...func(*Ctx) error) http.Handler {
 	return func(handlers ...func(*Ctx) error) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
