@@ -23,6 +23,8 @@ func (Space) Fields() []ent.Field {
 			DefaultFunc(ulid.MustGenerate),
 		field.String("name").
 			Unique(),
+		field.Strings("admins").
+			Optional(),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

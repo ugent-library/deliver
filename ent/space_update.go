@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ugent-library/deliver/ent/folder"
 	"github.com/ugent-library/deliver/ent/predicate"
@@ -32,6 +33,24 @@ func (su *SpaceUpdate) Where(ps ...predicate.Space) *SpaceUpdate {
 // SetName sets the "name" field.
 func (su *SpaceUpdate) SetName(s string) *SpaceUpdate {
 	su.mutation.SetName(s)
+	return su
+}
+
+// SetAdmins sets the "admins" field.
+func (su *SpaceUpdate) SetAdmins(s []string) *SpaceUpdate {
+	su.mutation.SetAdmins(s)
+	return su
+}
+
+// AppendAdmins appends s to the "admins" field.
+func (su *SpaceUpdate) AppendAdmins(s []string) *SpaceUpdate {
+	su.mutation.AppendAdmins(s)
+	return su
+}
+
+// ClearAdmins clears the value of the "admins" field.
+func (su *SpaceUpdate) ClearAdmins() *SpaceUpdate {
+	su.mutation.ClearAdmins()
 	return su
 }
 
@@ -139,6 +158,17 @@ func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Name(); ok {
 		_spec.SetField(space.FieldName, field.TypeString, value)
 	}
+	if value, ok := su.mutation.Admins(); ok {
+		_spec.SetField(space.FieldAdmins, field.TypeJSON, value)
+	}
+	if value, ok := su.mutation.AppendedAdmins(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, space.FieldAdmins, value)
+		})
+	}
+	if su.mutation.AdminsCleared() {
+		_spec.ClearField(space.FieldAdmins, field.TypeJSON)
+	}
 	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.SetField(space.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -219,6 +249,24 @@ type SpaceUpdateOne struct {
 // SetName sets the "name" field.
 func (suo *SpaceUpdateOne) SetName(s string) *SpaceUpdateOne {
 	suo.mutation.SetName(s)
+	return suo
+}
+
+// SetAdmins sets the "admins" field.
+func (suo *SpaceUpdateOne) SetAdmins(s []string) *SpaceUpdateOne {
+	suo.mutation.SetAdmins(s)
+	return suo
+}
+
+// AppendAdmins appends s to the "admins" field.
+func (suo *SpaceUpdateOne) AppendAdmins(s []string) *SpaceUpdateOne {
+	suo.mutation.AppendAdmins(s)
+	return suo
+}
+
+// ClearAdmins clears the value of the "admins" field.
+func (suo *SpaceUpdateOne) ClearAdmins() *SpaceUpdateOne {
+	suo.mutation.ClearAdmins()
 	return suo
 }
 
@@ -349,6 +397,17 @@ func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error
 	}
 	if value, ok := suo.mutation.Name(); ok {
 		_spec.SetField(space.FieldName, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.Admins(); ok {
+		_spec.SetField(space.FieldAdmins, field.TypeJSON, value)
+	}
+	if value, ok := suo.mutation.AppendedAdmins(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, space.FieldAdmins, value)
+		})
+	}
+	if suo.mutation.AdminsCleared() {
+		_spec.ClearField(space.FieldAdmins, field.TypeJSON)
 	}
 	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.SetField(space.FieldUpdatedAt, field.TypeTime, value)

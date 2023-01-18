@@ -27,6 +27,12 @@ func (sc *SpaceCreate) SetName(s string) *SpaceCreate {
 	return sc
 }
 
+// SetAdmins sets the "admins" field.
+func (sc *SpaceCreate) SetAdmins(s []string) *SpaceCreate {
+	sc.mutation.SetAdmins(s)
+	return sc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (sc *SpaceCreate) SetCreatedAt(t time.Time) *SpaceCreate {
 	sc.mutation.SetCreatedAt(t)
@@ -188,6 +194,10 @@ func (sc *SpaceCreate) createSpec() (*Space, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Name(); ok {
 		_spec.SetField(space.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := sc.mutation.Admins(); ok {
+		_spec.SetField(space.FieldAdmins, field.TypeJSON, value)
+		_node.Admins = value
 	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(space.FieldCreatedAt, field.TypeTime, value)

@@ -1579,6 +1579,8 @@ type SpaceMutation struct {
 	typ            string
 	id             *string
 	name           *string
+	admins         *[]string
+	appendadmins   []string
 	created_at     *time.Time
 	updated_at     *time.Time
 	clearedFields  map[string]struct{}
@@ -1728,6 +1730,71 @@ func (m *SpaceMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *SpaceMutation) ResetName() {
 	m.name = nil
+}
+
+// SetAdmins sets the "admins" field.
+func (m *SpaceMutation) SetAdmins(s []string) {
+	m.admins = &s
+	m.appendadmins = nil
+}
+
+// Admins returns the value of the "admins" field in the mutation.
+func (m *SpaceMutation) Admins() (r []string, exists bool) {
+	v := m.admins
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAdmins returns the old "admins" field's value of the Space entity.
+// If the Space object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SpaceMutation) OldAdmins(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAdmins is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAdmins requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAdmins: %w", err)
+	}
+	return oldValue.Admins, nil
+}
+
+// AppendAdmins adds s to the "admins" field.
+func (m *SpaceMutation) AppendAdmins(s []string) {
+	m.appendadmins = append(m.appendadmins, s...)
+}
+
+// AppendedAdmins returns the list of values that were appended to the "admins" field in this mutation.
+func (m *SpaceMutation) AppendedAdmins() ([]string, bool) {
+	if len(m.appendadmins) == 0 {
+		return nil, false
+	}
+	return m.appendadmins, true
+}
+
+// ClearAdmins clears the value of the "admins" field.
+func (m *SpaceMutation) ClearAdmins() {
+	m.admins = nil
+	m.appendadmins = nil
+	m.clearedFields[space.FieldAdmins] = struct{}{}
+}
+
+// AdminsCleared returns if the "admins" field was cleared in this mutation.
+func (m *SpaceMutation) AdminsCleared() bool {
+	_, ok := m.clearedFields[space.FieldAdmins]
+	return ok
+}
+
+// ResetAdmins resets all changes to the "admins" field.
+func (m *SpaceMutation) ResetAdmins() {
+	m.admins = nil
+	m.appendadmins = nil
+	delete(m.clearedFields, space.FieldAdmins)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -1890,9 +1957,12 @@ func (m *SpaceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SpaceMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.name != nil {
 		fields = append(fields, space.FieldName)
+	}
+	if m.admins != nil {
+		fields = append(fields, space.FieldAdmins)
 	}
 	if m.created_at != nil {
 		fields = append(fields, space.FieldCreatedAt)
@@ -1910,6 +1980,8 @@ func (m *SpaceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case space.FieldName:
 		return m.Name()
+	case space.FieldAdmins:
+		return m.Admins()
 	case space.FieldCreatedAt:
 		return m.CreatedAt()
 	case space.FieldUpdatedAt:
@@ -1925,6 +1997,8 @@ func (m *SpaceMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case space.FieldName:
 		return m.OldName(ctx)
+	case space.FieldAdmins:
+		return m.OldAdmins(ctx)
 	case space.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case space.FieldUpdatedAt:
@@ -1944,6 +2018,13 @@ func (m *SpaceMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case space.FieldAdmins:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAdmins(v)
 		return nil
 	case space.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1988,7 +2069,11 @@ func (m *SpaceMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SpaceMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(space.FieldAdmins) {
+		fields = append(fields, space.FieldAdmins)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2001,6 +2086,11 @@ func (m *SpaceMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SpaceMutation) ClearField(name string) error {
+	switch name {
+	case space.FieldAdmins:
+		m.ClearAdmins()
+		return nil
+	}
 	return fmt.Errorf("unknown Space nullable field %s", name)
 }
 
@@ -2010,6 +2100,9 @@ func (m *SpaceMutation) ResetField(name string) error {
 	switch name {
 	case space.FieldName:
 		m.ResetName()
+		return nil
+	case space.FieldAdmins:
+		m.ResetAdmins()
 		return nil
 	case space.FieldCreatedAt:
 		m.ResetCreatedAt()

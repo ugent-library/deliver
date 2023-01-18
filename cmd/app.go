@@ -88,13 +88,8 @@ var appCmd = &cobra.Command{
 		}
 
 		// setup permissions
-		// TODO cleanup, service interface
 		permissions := &models.Permissions{
-			Admins:      config.Admins,
-			SpaceAdmins: make(map[string][]string),
-		}
-		for _, s := range config.Spaces {
-			permissions.SpaceAdmins[s.ID] = s.Admins
+			Admins: config.Admins,
 		}
 
 		// setup router
@@ -125,14 +120,14 @@ var appCmd = &cobra.Command{
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
-		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.List)).Methods("GET").Name("spaces")
+		r.Handle("/spaces", wrap(c.RequireUser, spaces.List)).Methods("GET").Name("spaces")
 		r.Handle("/spaces/{spaceName}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
 		r.Handle("/new-space", wrap(c.RequireAdmin, spaces.New)).Methods("GET").Name("new_space")
 		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.Create)).Methods("POST").Name("create_space")
 		r.Handle("/spaces/{spaceID}/folders", wrap(c.RequireUser, spaces.CreateFolder)).Methods("POST").Name("create_folder")
 		r.Handle("/folders/{folderID}", wrap(folders.Show)).Methods("GET").Name("folder")
 		r.Handle("/folders/{folderID}/edit", wrap(c.RequireUser, folders.Edit)).Methods("GET").Name("edit_folder")
-		r.Handle("/folders/{folderID}", wrap(folders.Update)).Methods("PUT").Name("update_folder")
+		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Update)).Methods("PUT").Name("update_folder")
 		r.Handle("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")

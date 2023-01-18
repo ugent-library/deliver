@@ -54,11 +54,11 @@ func init() {
 	spaceFields := schema.Space{}.Fields()
 	_ = spaceFields
 	// spaceDescCreatedAt is the schema descriptor for created_at field.
-	spaceDescCreatedAt := spaceFields[2].Descriptor()
+	spaceDescCreatedAt := spaceFields[3].Descriptor()
 	// space.DefaultCreatedAt holds the default value on creation for the created_at field.
 	space.DefaultCreatedAt = spaceDescCreatedAt.Default.(func() time.Time)
 	// spaceDescUpdatedAt is the schema descriptor for updated_at field.
-	spaceDescUpdatedAt := spaceFields[3].Descriptor()
+	spaceDescUpdatedAt := spaceFields[4].Descriptor()
 	// space.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	space.DefaultUpdatedAt = spaceDescUpdatedAt.Default.(func() time.Time)
 	// space.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"regexp"
 	"time"
 
 	"github.com/ugent-library/deliver/bind"
@@ -25,30 +26,23 @@ func NewSpaces(r models.RepositoryService) *Spaces {
 	}
 }
 
+var reSplitAdmins = regexp.MustCompile(`\s*[,;]\s*`)
+
 type SpaceForm struct {
-	Name string `form:"name"`
+	Name   string `form:"name"`
+	Admins string `form:"admins"`
 }
 
-// TODO clean this up
 func (h *Spaces) List(c *Ctx) error {
 	var userSpaces []*models.Space
-	allSpaces, err := h.repo.Spaces(c.Context())
+	var err error
+	if c.IsAdmin(c.User) {
+		userSpaces, err = h.repo.Spaces(c.Context())
+	} else {
+		userSpaces, err = h.repo.SpacesByUsername(c.Context(), c.User.Username)
+	}
 	if err != nil {
 		return err
-	}
-	if c.IsAdmin(c.User) {
-		userSpaces = allSpaces
-	} else {
-		userSpaceIDs := c.UserSpaces(c.User)
-		userSpaces = make([]*models.Space, len(userSpaceIDs))
-		for i, id := range userSpaceIDs {
-			for _, s := range allSpaces {
-				if s.ID == id {
-					userSpaces[i] = s
-					break
-				}
-			}
-		}
 	}
 
 	if len(userSpaces) == 0 {
@@ -86,8 +80,11 @@ func (h *Spaces) Create(c *Ctx) error {
 		return err
 	}
 
+	// TODO add ToSpace() method to SpaceForm
+	// or add a ultity BindSpace function?
 	space := &models.Space{
-		Name: b.Name,
+		Name:   b.Name,
+		Admins: reSplitAdmins.Split(b.Admins, -1),
 	}
 
 	if err := h.repo.CreateSpace(c.Context(), space); err != nil {
@@ -114,7 +111,12 @@ func (h *Spaces) Create(c *Ctx) error {
 func (h *Spaces) CreateFolder(c *Ctx) error {
 	spaceID := c.Path("spaceID")
 
-	if !c.IsSpaceAdmin(spaceID, c.User) {
+	space, err := h.repo.SpaceByID(c.Context(), spaceID)
+	if err != nil {
+		return err
+	}
+
+	if !c.IsSpaceAdmin(c.User, space) {
 		return httperror.Forbidden
 	}
 
@@ -144,7 +146,6 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	return nil
 }
 
-// TODO clean this up
 func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 	spaceName := c.Path("spaceName")
 
@@ -158,28 +159,18 @@ func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	if !c.IsSpaceAdmin(spaceName, c.User) {
+	if !c.IsSpaceAdmin(c.User, space) {
 		return httperror.Forbidden
 	}
 
 	var userSpaces []*models.Space
-	allSpaces, err := h.repo.Spaces(c.Context())
+	if c.IsAdmin(c.User) {
+		userSpaces, err = h.repo.Spaces(c.Context())
+	} else {
+		userSpaces, err = h.repo.SpacesByUsername(c.Context(), c.User.Username)
+	}
 	if err != nil {
 		return err
-	}
-	if c.IsAdmin(c.User) {
-		userSpaces = allSpaces
-	} else {
-		userSpaceIDs := c.UserSpaces(c.User)
-		userSpaces = make([]*models.Space, len(userSpaceIDs))
-		for i, id := range userSpaceIDs {
-			for _, s := range allSpaces {
-				if s.ID == id {
-					userSpaces[i] = s
-					break
-				}
-			}
-		}
 	}
 
 	return c.Render(h.showView, Map{

@@ -135,6 +135,16 @@ func NameContainsFold(v string) predicate.Space {
 	return predicate.Space(sql.FieldContainsFold(FieldName, v))
 }
 
+// AdminsIsNil applies the IsNil predicate on the "admins" field.
+func AdminsIsNil() predicate.Space {
+	return predicate.Space(sql.FieldIsNull(FieldAdmins))
+}
+
+// AdminsNotNil applies the NotNil predicate on the "admins" field.
+func AdminsNotNil() predicate.Space {
+	return predicate.Space(sql.FieldNotNull(FieldAdmins))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Space {
 	return predicate.Space(sql.FieldEQ(FieldCreatedAt, v))

@@ -3,7 +3,6 @@ package cmd
 type Config struct {
 	Production bool
 	Admins     []string
-	Spaces     []SpacesConfig
 	DB         string
 	S3         S3Config
 	Host       string

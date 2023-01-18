@@ -9,6 +9,7 @@ import (
 
 	entdialect "entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"github.com/ugent-library/deliver/ent"
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
@@ -20,6 +21,7 @@ var ErrNotFound = errors.New("not found")
 
 type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
+	SpacesByUsername(context.Context, string) ([]*Space, error)
 	SpaceByID(context.Context, string) (*Space, error)
 	SpaceByName(context.Context, string) (*Space, error)
 	CreateSpace(context.Context, *Space) error
@@ -60,6 +62,23 @@ type repositoryService struct {
 
 func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
 	rows, err := r.db.Space.Query().
+		Order(ent.Asc(space.FieldName)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	spaces := make([]*Space, len(rows))
+	for i, row := range rows {
+		spaces[i] = rowToSpace(row)
+	}
+	return spaces, nil
+}
+
+func (r *repositoryService) SpacesByUsername(ctx context.Context, username string) ([]*Space, error) {
+	rows, err := r.db.Space.Query().
+		Where(func(s *entsql.Selector) {
+			s.Where(sqljson.ValueContains(space.FieldAdmins, username))
+		}).
 		Order(ent.Asc(space.FieldName)).
 		All(ctx)
 	if err != nil {
@@ -120,7 +139,10 @@ func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	if err := s.Validate(); err != nil {
 		return err
 	}
-	row, err := r.db.Space.Create().SetName(s.Name).Save(ctx)
+	row, err := r.db.Space.Create().
+		SetName(s.Name).
+		SetAdmins(s.Admins).
+		Save(ctx)
 	if err != nil {
 		return err
 	}
@@ -205,7 +227,9 @@ func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
 func (r *repositoryService) FileByID(ctx context.Context, id string) (*File, error) {
 	row, err := r.db.File.Query().
 		Where(file.IDEQ(id)).
-		WithFolder().
+		WithFolder(func(q *ent.FolderQuery) {
+			q.WithSpace()
+		}).
 		First(ctx)
 	if err != nil {
 		var e *ent.NotFoundError
@@ -236,6 +260,7 @@ func rowToSpace(row *ent.Space) *Space {
 	s := &Space{
 		ID:        row.ID,
 		Name:      row.Name,
+		Admins:    row.Admins,
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 	}

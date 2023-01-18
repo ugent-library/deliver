@@ -45,7 +45,7 @@ func (h *Folders) Edit(c *Ctx) error {
 		return err
 	}
 
-	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+	if !c.IsSpaceAdmin(c.User, folder.Space) {
 		return httperror.Forbidden
 	}
 
@@ -63,7 +63,7 @@ func (h *Folders) Update(c *Ctx) error {
 		return err
 	}
 
-	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+	if !c.IsSpaceAdmin(c.User, folder.Space) {
 		return httperror.Forbidden
 	}
 
@@ -99,7 +99,7 @@ func (h *Folders) Delete(c *Ctx) error {
 		return err
 	}
 
-	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+	if !c.IsSpaceAdmin(c.User, folder.Space) {
 		return httperror.Forbidden
 	}
 
@@ -130,7 +130,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		return err
 	}
 
-	if !c.IsSpaceAdmin(folder.SpaceID, c.User) {
+	if !c.IsSpaceAdmin(c.User, folder.Space) {
 		return httperror.Forbidden
 	}
 

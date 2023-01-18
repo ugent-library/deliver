@@ -35,7 +35,7 @@ func (h *Files) Delete(c *Ctx) error {
 		return err
 	}
 
-	if !c.IsSpaceAdmin(file.Folder.SpaceID, c.User) {
+	if !c.IsSpaceAdmin(c.User, file.Folder.Space) {
 		return httperror.Forbidden
 	}
 
