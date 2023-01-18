@@ -10,13 +10,19 @@ import (
 )
 
 type Errors struct {
-	notFoundView view.View
+	forbiddenView view.View
+	notFoundView  view.View
 }
 
 func NewErrors() *Errors {
 	return &Errors{
-		notFoundView: view.MustNew("page", "404").Status(404),
+		forbiddenView: view.MustNew("share/page", "errors/forbidden").Status(403),
+		notFoundView:  view.MustNew("share/page", "errors/not_found").Status(404),
 	}
+}
+
+func (h *Errors) Forbidden(c *Ctx) error {
+	return h.forbiddenView.Render(c.Res, c)
 }
 
 func (h *Errors) NotFound(c *Ctx) error {
@@ -36,6 +42,10 @@ func (h *Errors) HandleError(c *Ctx, err error) {
 	switch httpErr.Code {
 	case http.StatusUnauthorized:
 		c.RedirectTo("login")
+	case http.StatusForbidden:
+		if err := h.Forbidden(c); err != nil {
+			h.HandleError(c, err)
+		}
 	case http.StatusNotFound:
 		if err := h.NotFound(c); err != nil {
 			h.HandleError(c, err)
