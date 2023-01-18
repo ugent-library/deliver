@@ -126,17 +126,18 @@ var appCmd = &cobra.Command{
 		r.Handle("/spaces/{spaceName}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
 		r.Handle("/new-space", wrap(c.RequireAdmin, spaces.New)).Methods("GET").Name("new_space")
 		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.Create)).Methods("POST").Name("create_space")
-		// TODO use name everywhere instead of id
+		// TODO use space name everywhere instead of id
 		r.Handle("/spaces/{spaceID}/edit", wrap(c.RequireAdmin, spaces.Edit)).Methods("GET").Name("edit_space")
 		r.Handle("/spaces/{spaceID}", wrap(c.RequireAdmin, spaces.Update)).Methods("PUT").Name("update_space")
 		r.Handle("/spaces/{spaceID}/folders", wrap(c.RequireUser, spaces.CreateFolder)).Methods("POST").Name("create_folder")
-		r.Handle("/folders/{folderID}", wrap(folders.Show)).Methods("GET").Name("folder")
+		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
 		r.Handle("/folders/{folderID}/edit", wrap(c.RequireUser, folders.Edit)).Methods("GET").Name("edit_folder")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Update)).Methods("PUT").Name("update_folder")
 		r.Handle("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
+		r.Handle("/share/{folderID}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,

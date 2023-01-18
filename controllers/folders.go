@@ -14,10 +14,11 @@ import (
 )
 
 type Folders struct {
-	repo     models.RepositoryService
-	file     models.FileService
-	showView view.View
-	editView view.View
+	repo      models.RepositoryService
+	file      models.FileService
+	showView  view.View
+	editView  view.View
+	shareView view.View
 }
 
 type FolderForm struct {
@@ -26,10 +27,11 @@ type FolderForm struct {
 
 func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	return &Folders{
-		repo:     r,
-		file:     f,
-		showView: view.MustNew("page", "show_folder"),
-		editView: view.MustNew("page", "edit_folder"),
+		repo:      r,
+		file:      f,
+		showView:  view.MustNew("page", "show_folder"),
+		editView:  view.MustNew("page", "edit_folder"),
+		shareView: view.MustNew("share/page", "share/folder"),
 	}
 }
 
@@ -183,6 +185,17 @@ func (h *Folders) UploadFile(c *Ctx) error {
 	c.RedirectTo("folder", "folderID", folderID)
 
 	return nil
+}
+
+func (h *Folders) Share(c *Ctx) error {
+	folderID := c.Path("folderID")
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	if err != nil {
+		return err
+	}
+	return c.Render(h.shareView, Map{
+		"folder": folder,
+	})
 }
 
 func (h *Folders) show(c *Ctx, err error) error {

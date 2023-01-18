@@ -1,25 +1,18 @@
 {{define "page_title"}}{{.Data.folder.Name}}{{end}}
 {{define "body"}}
-    {{$isAdmin := .IsSpaceAdmin .User .Data.folder.Space}}
-
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
             <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
                 <div class="bc-toolbar">
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item">
-                            {{if $isAdmin}}
                             <a class="btn btn-link btn-sm" href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
                                 <i class="if if-arrow-left"></i>
                                 <span>Back to {{.Data.folder.Space.Name}} folders overview</span>
                             </a>
                             <h4 class="bc-toolbar-title">{{.Data.folder.Space.Name}} space — {{.Data.folder.Name}} folder</h4>
-                            {{else}}
-                            <h4 class="bc-toolbar-title">{{.Data.folder.Name}} folder</h4>
-                            {{end}}
                         </div>
                     </div>
-                    {{if $isAdmin}}
                     <div class="bc-toolbar-right">
                         <div class="bc-toolbar-item">
                             <a class="btn btn-link btn-link-muted" href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
@@ -48,7 +41,6 @@
                             </a>
                         </div>
                     </div>
-                    {{end}}
                 </div>
             </div>
         </div>
@@ -60,8 +52,8 @@
                         <label class="c-label m-0">Public shareable link</label>
                     </div>
                     <div class="bc-toolbar-item">
-                        <a class="btn btn-link px-0" href="{{.PathTo "folder" "folderID" .Data.folder.ID}}" target="_blank">
-                            {{.URLTo "folder" "folderID" .Data.folder.ID}}
+                        <a class="btn btn-link px-0" href="{{.PathTo "share_folder" "folderID" .Data.folder.ID}}" target="_blank">
+                            {{.URLTo "share_folder" "folderID" .Data.folder.ID}}
                         </a>
                         <button class="btn btn-link btn-icon-only btn-sm pb-1 px-0">
                             <i class="if if-copy text-muted"></i>
@@ -76,7 +68,6 @@
                 </div>
             </div>
 
-            {{if $isAdmin}}
             <div class="card w-100 mb-6">
                 <div class="card-header">
                     <div class="bc-toolbar">
@@ -108,7 +99,6 @@
                     <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
                 </div>
             </div>
-            {{end}}
 
             <div class="card w-100 mb-6">
                 <div class="card-header">
@@ -135,9 +125,7 @@
                                 <th class="text-nowrap">Type</th>
                                 <th class="text-nowrap">Downloads</th>
                                 <th class="text-nowrap">Created at</th>
-                                {{if $isAdmin}}
                                 <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
-                                {{end}}
                             </tr>
                         </thead>
                         <tbody>
@@ -163,7 +151,6 @@
                                 <td class="text-nowrap">
                                     <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>
                                 </td>
-                                {{if $isAdmin}}
                                 <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                     <div class="c-button-toolbar flex-nowrap">
                                         <form action="{{$.PathTo "delete_file" "fileID" .ID}}" method="POST" id="delete-file-{{.ID}}">
@@ -179,7 +166,6 @@
                                         </form>
                                     </div>
                                 </td>
-                                {{end}}
                             </tr>
                             {{end}}
                         </tbody>

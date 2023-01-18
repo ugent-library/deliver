@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 	"text/template"
 )
@@ -32,13 +33,14 @@ type Config struct {
 }
 
 func (c Config) NewView(tmpl string, files ...string) (View, error) {
-	tmpl = tmpl + c.TemplateExtension
+	name := filepath.Base(tmpl)
 
+	tmpl = tmpl + c.TemplateExtension
 	for i, f := range files {
 		files[i] = f + c.TemplateExtension
 	}
 
-	t, err := template.New(tmpl).
+	t, err := template.New("").
 		Option(c.Option).
 		Funcs(c.Funcs).
 		ParseFS(c.FS, append(files, tmpl)...)
@@ -46,11 +48,12 @@ func (c Config) NewView(tmpl string, files ...string) (View, error) {
 		return View{}, err
 	}
 
-	return View{Template: t}, nil
+	return View{Template: t, name: name}, nil
 }
 
 type View struct {
 	Template    *template.Template
+	name        string
 	contentType string
 	status      int
 }
@@ -89,7 +92,7 @@ func (v View) Render(w http.ResponseWriter, data any) error {
 		bufPool.Put(buf)
 	}()
 
-	if err := v.Template.Execute(buf, data); err != nil {
+	if err := v.Template.ExecuteTemplate(buf, v.name, data); err != nil {
 		return err
 	}
 
