@@ -31,7 +31,7 @@ func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 		file:      f,
 		showView:  view.MustNew("page", "show_folder"),
 		editView:  view.MustNew("page", "edit_folder"),
-		shareView: view.MustNew("share/page", "share/folder"),
+		shareView: view.MustNew("simple_page", "share_folder"),
 	}
 }
 

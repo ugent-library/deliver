@@ -16,8 +16,8 @@ type Errors struct {
 
 func NewErrors() *Errors {
 	return &Errors{
-		forbiddenView: view.MustNew("share/page", "errors/forbidden").Status(403),
-		notFoundView:  view.MustNew("share/page", "errors/not_found").Status(404),
+		forbiddenView: view.MustNew("simple_page", "errors/forbidden").Status(403),
+		notFoundView:  view.MustNew("simple_page", "errors/not_found").Status(404),
 	}
 }
 
