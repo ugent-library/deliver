@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 	"text/template"
 )
@@ -46,7 +47,7 @@ func (c Config) NewView(layout string, files ...string) (View, error) {
 	}
 
 	return View{
-		layout: layout,
+		layout: filepath.Base(layout),
 		tmpl:   tmpl,
 	}, nil
 }
