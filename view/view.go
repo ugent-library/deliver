@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
-	"path/filepath"
 	"sync"
 	"text/template"
 )
@@ -32,42 +31,43 @@ type Config struct {
 	DefaultContentType string
 }
 
-func (c Config) NewView(tmpl string, files ...string) (View, error) {
-	name := filepath.Base(tmpl)
-
-	tmpl = tmpl + c.TemplateExtension
+func (c Config) NewView(layout string, files ...string) (View, error) {
+	files = append(files, layout)
 	for i, f := range files {
 		files[i] = f + c.TemplateExtension
 	}
 
-	t, err := template.New("").
+	tmpl, err := template.New("").
 		Option(c.Option).
 		Funcs(c.Funcs).
-		ParseFS(c.FS, append(files, tmpl)...)
+		ParseFS(c.FS, files...)
 	if err != nil {
 		return View{}, err
 	}
 
-	return View{Template: t, name: name}, nil
+	return View{
+		layout: layout,
+		tmpl:   tmpl,
+	}, nil
 }
 
 type View struct {
-	Template    *template.Template
-	name        string
+	tmpl        *template.Template
+	layout      string
 	contentType string
 	status      int
 }
 
-func MustNew(tmpl string, files ...string) View {
-	v, err := DefaultConfig.NewView(tmpl, files...)
+func MustNew(layout string, files ...string) View {
+	v, err := DefaultConfig.NewView(layout, files...)
 	if err != nil {
 		panic(err)
 	}
 	return v
 }
 
-func New(tmpl string, files ...string) (View, error) {
-	return DefaultConfig.NewView(tmpl, files...)
+func New(layout string, files ...string) (View, error) {
+	return DefaultConfig.NewView(layout, files...)
 }
 
 func (v View) Status(s int) View {
@@ -92,7 +92,7 @@ func (v View) Render(w http.ResponseWriter, data any) error {
 		bufPool.Put(buf)
 	}()
 
-	if err := v.Template.ExecuteTemplate(buf, v.name, data); err != nil {
+	if err := v.tmpl.ExecuteTemplate(buf, v.layout, data); err != nil {
 		return err
 	}
 
