@@ -16,6 +16,7 @@ type Spaces struct {
 	repo     models.RepositoryService
 	showView view.View
 	newView  view.View
+	editView view.View
 }
 
 func NewSpaces(r models.RepositoryService) *Spaces {
@@ -23,6 +24,7 @@ func NewSpaces(r models.RepositoryService) *Spaces {
 		repo:     r,
 		showView: view.MustNew("page", "show_space"),
 		newView:  view.MustNew("page", "new_space"),
+		editView: view.MustNew("page", "edit_space"),
 	}
 }
 
@@ -142,6 +144,52 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 		DismissAfter: 3 * time.Second,
 	})
 	c.RedirectTo("folder", "folderID", folder.ID)
+
+	return nil
+}
+
+func (h *Spaces) Edit(c *Ctx) error {
+	spaceID := c.Path("spaceID")
+
+	space, err := h.repo.SpaceByID(c.Context(), spaceID)
+	if err != nil {
+		return err
+	}
+
+	return c.Render(h.editView, Map{
+		"space":            space,
+		"validationErrors": validate.NewErrors(),
+	})
+}
+
+func (h *Spaces) Update(c *Ctx) error {
+	spaceID := c.Path("spaceID")
+
+	space, err := h.repo.SpaceByID(c.Context(), spaceID)
+	if err != nil {
+		return err
+	}
+
+	b := SpaceForm{}
+	// TODO return ErrBadRequest
+	if err := bind.Form(c.Req, &b); err != nil {
+		return err
+	}
+
+	space.Admins = reSplitAdmins.Split(b.Admins, -1)
+
+	if err := h.repo.UpdateSpace(c.Context(), space); err != nil {
+		validationErrors := validate.NewErrors()
+		if err != nil && !errors.As(err, &validationErrors) {
+			return err
+		}
+		return c.Render(h.editView, Map{
+			"space":            space,
+			"validationErrors": validationErrors,
+		})
+	}
+
+	c.RedirectTo("space", "spaceName", space.Name)
 
 	return nil
 }

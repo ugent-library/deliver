@@ -25,6 +25,7 @@ type RepositoryService interface {
 	SpaceByID(context.Context, string) (*Space, error)
 	SpaceByName(context.Context, string) (*Space, error)
 	CreateSpace(context.Context, *Space) error
+	UpdateSpace(context.Context, *Space) error
 	FolderByID(context.Context, string) (*Folder, error)
 	CreateFolder(context.Context, *Folder) error
 	UpdateFolder(context.Context, *Folder) error
@@ -141,6 +142,20 @@ func (r *repositoryService) CreateSpace(ctx context.Context, s *Space) error {
 	}
 	row, err := r.db.Space.Create().
 		SetName(s.Name).
+		SetAdmins(s.Admins).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	*s = *rowToSpace(row)
+	return nil
+}
+
+func (r *repositoryService) UpdateSpace(ctx context.Context, s *Space) error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	row, err := r.db.Space.UpdateOneID(s.ID).
 		SetAdmins(s.Admins).
 		Save(ctx)
 	if err != nil {

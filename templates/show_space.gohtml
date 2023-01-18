@@ -44,6 +44,16 @@
                         <h4 class="bc-toolbar-title">{{.Data.space.Name}} folders</h4>
                     </div>
                 </div>
+                {{if .IsAdmin .User}}
+                <div class="bc-toolbar-right">
+                    <div class="bc-toolbar-item">
+                        <a class="btn btn-link btn-link-muted" href="{{.PathTo "edit_space" "spaceID" .Data.space.ID}}">
+                            <i class="if if-edit"></i>
+                            <span class="btn-text">Edit space</span>
+                        </a>
+                    </div>
+                </div>
+                {{end}}
             </div>
         </div>
     </div>

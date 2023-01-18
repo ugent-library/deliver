@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/csrf"
@@ -61,6 +62,7 @@ var appCmd = &cobra.Command{
 		view.DefaultConfig.Funcs = template.FuncMap{
 			"assetPath":     assets.AssetPath,
 			"friendlyBytes": friendly.Bytes,
+			"join":          strings.Join,
 		}
 
 		// setup sessions
@@ -124,6 +126,9 @@ var appCmd = &cobra.Command{
 		r.Handle("/spaces/{spaceName}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
 		r.Handle("/new-space", wrap(c.RequireAdmin, spaces.New)).Methods("GET").Name("new_space")
 		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.Create)).Methods("POST").Name("create_space")
+		// TODO use name everywhere instead of id
+		r.Handle("/spaces/{spaceID}/edit", wrap(c.RequireAdmin, spaces.Edit)).Methods("GET").Name("edit_space")
+		r.Handle("/spaces/{spaceID}", wrap(c.RequireAdmin, spaces.Update)).Methods("PUT").Name("update_space")
 		r.Handle("/spaces/{spaceID}/folders", wrap(c.RequireUser, spaces.CreateFolder)).Methods("POST").Name("create_folder")
 		r.Handle("/folders/{folderID}", wrap(folders.Show)).Methods("GET").Name("folder")
 		r.Handle("/folders/{folderID}/edit", wrap(c.RequireUser, folders.Edit)).Methods("GET").Name("edit_folder")
