@@ -24,6 +24,7 @@ var bufPool = sync.Pool{
 	},
 }
 
+// TODO add Include option to include shared templates by default
 type Config struct {
 	FS                 fs.FS
 	TemplateExtension  string
