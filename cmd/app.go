@@ -37,7 +37,7 @@ var appCmd = &cobra.Command{
 	Short: "Start the web app server",
 	Run: func(cmd *cobra.Command, args []string) {
 		// setup services
-		repositoryService, err := models.NewRepositoryService(models.RepositoryConfig{
+		repoService, err := models.NewRepositoryService(models.RepositoryConfig{
 			DB: config.DB,
 		})
 		if err != nil {
@@ -108,9 +108,9 @@ var appCmd = &cobra.Command{
 		errs := c.NewErrors()
 		auth := c.NewAuth(oidcAuth)
 		pages := c.NewPages()
-		spaces := c.NewSpaces(repositoryService)
-		folders := c.NewFolders(repositoryService, fileService)
-		files := c.NewFiles(repositoryService, fileService)
+		spaces := c.NewSpaces(repoService)
+		folders := c.NewFolders(repoService, fileService)
+		files := c.NewFiles(repoService, fileService)
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{

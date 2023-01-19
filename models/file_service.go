@@ -23,6 +23,7 @@ type FileService interface {
 	Add(context.Context, string, io.ReadSeekCloser) (string, error)
 	Get(context.Context, string, io.Writer) error
 	Delete(context.Context, string) error
+	EachID(context.Context, func(string) bool) error
 }
 
 // see https://stackoverflow.com/questions/67575681/is-aws-go-sdk-v2-integrated-with-local-minio-server
@@ -88,6 +89,24 @@ func (f *fileService) Delete(ctx context.Context, id string) error {
 		Key:    aws.String(id),
 	})
 	return err
+}
+
+func (f *fileService) EachID(ctx context.Context, fn func(string) bool) error {
+	pager := s3.NewListObjectsV2Paginator(f.client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(f.bucket),
+	})
+	for pager.HasMorePages() {
+		page, err := pager.NextPage(ctx)
+		if err != nil {
+			return err
+		}
+		for _, obj := range page.Contents {
+			if ok := fn(*obj.Key); !ok {
+				return nil
+			}
+		}
+	}
+	return nil
 }
 
 // implement io.WriterAt for a plain io.Writer

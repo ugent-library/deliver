@@ -9,6 +9,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/securecookie v1.1.1
+	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/oklog/ulid v1.3.1
 	golang.org/x/oauth2 v0.4.0
 )
@@ -34,7 +35,6 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/mozillazg/go-unidecode v0.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
