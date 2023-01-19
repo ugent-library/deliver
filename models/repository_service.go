@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -222,7 +223,11 @@ func (r *repositoryService) DeleteFolder(ctx context.Context, folderID string) e
 }
 
 func (r *repositoryService) DeleteExpiredFolders(ctx context.Context) error {
-	return nil
+	_, err := r.db.Folder.
+		Delete().
+		Where(folder.ExpiresAtLT(time.Now())).
+		Exec(ctx)
+	return err
 }
 
 func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
