@@ -42,9 +42,6 @@ func (h *Files) Delete(c *Ctx) error {
 	if err := h.repo.DeleteFile(c.Context(), fileID); err != nil {
 		return err
 	}
-	if err := h.file.Delete(c.Context(), fileID); err != nil {
-		return err
-	}
 
 	c.Session.Append(flashKey, Flash{
 		Type:         infoFlash,
