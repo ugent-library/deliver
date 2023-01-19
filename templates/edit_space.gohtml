@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{.PathTo "update_space" "spaceID" .Data.space.ID}}" method="POST" id="update-space">
+                <form action="{{.PathTo "update_space" "spaceName" .Data.space.Name}}" method="POST" id="update-space">
                     <input type="hidden" name="_method" value="PUT">
                     {{.CSRFTag}}
                     <div class="form-group">

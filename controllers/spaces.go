@@ -57,7 +57,7 @@ func (h *Spaces) List(c *Ctx) error {
 		return nil
 	}
 
-	// return forbidden is not an admin of anything
+	// return forbidden if user is not an admin of anything
 	if len(userSpaces) == 0 {
 		return httperror.Forbidden
 	}
@@ -122,9 +122,9 @@ func (h *Spaces) Create(c *Ctx) error {
 }
 
 func (h *Spaces) CreateFolder(c *Ctx) error {
-	spaceID := c.Path("spaceID")
+	spaceName := c.Path("spaceName")
 
-	space, err := h.repo.SpaceByID(c.Context(), spaceID)
+	space, err := h.repo.SpaceByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
@@ -139,8 +139,9 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 		return err
 	}
 
+	// TODO constructor for new objects
 	folder := &models.Folder{
-		SpaceID:   spaceID,
+		SpaceID:   space.ID,
 		Name:      b.Name,
 		ExpiresAt: time.Now().AddDate(0, 1, 0),
 	}
@@ -160,9 +161,9 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 }
 
 func (h *Spaces) Edit(c *Ctx) error {
-	spaceID := c.Path("spaceID")
+	spaceName := c.Path("spaceName")
 
-	space, err := h.repo.SpaceByID(c.Context(), spaceID)
+	space, err := h.repo.SpaceByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
@@ -174,9 +175,9 @@ func (h *Spaces) Edit(c *Ctx) error {
 }
 
 func (h *Spaces) Update(c *Ctx) error {
-	spaceID := c.Path("spaceID")
+	spaceName := c.Path("spaceName")
 
-	space, err := h.repo.SpaceByID(c.Context(), spaceID)
+	space, err := h.repo.SpaceByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}

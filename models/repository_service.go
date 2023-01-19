@@ -30,6 +30,7 @@ type RepositoryService interface {
 	CreateFolder(context.Context, *Folder) error
 	UpdateFolder(context.Context, *Folder) error
 	DeleteFolder(context.Context, string) error
+	DeleteExpiredFolders(context.Context) error
 	FileByID(context.Context, string) (*File, error)
 	CreateFile(context.Context, *File) error
 	DeleteFile(context.Context, string) error
@@ -218,6 +219,10 @@ func (r *repositoryService) DeleteFolder(ctx context.Context, folderID string) e
 		DeleteOneID(folderID).
 		Exec(ctx)
 	return err
+}
+
+func (r *repositoryService) DeleteExpiredFolders(ctx context.Context) error {
+	return nil
 }
 
 func (r *repositoryService) CreateFile(ctx context.Context, f *File) error {
