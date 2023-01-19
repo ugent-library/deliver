@@ -47,6 +47,17 @@ func (h *Spaces) List(c *Ctx) error {
 		return err
 	}
 
+	// handle new empty installation
+	if c.IsAdmin(c.User) && len(userSpaces) == 0 {
+		c.Session.Append(flashKey, Flash{
+			Type: infoFlash,
+			Body: "Create an initial space to get started",
+		})
+		c.RedirectTo("new_space")
+		return nil
+	}
+
+	// return forbidden is not an admin of anything
 	if len(userSpaces) == 0 {
 		return httperror.Forbidden
 	}
