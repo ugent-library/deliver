@@ -20,6 +20,10 @@ import (
 
 var ErrNotFound = errors.New("not found")
 
+type RepositoryConfig struct {
+	DB string
+}
+
 type RepositoryService interface {
 	Spaces(context.Context) ([]*Space, error)
 	SpacesByUsername(context.Context, string) ([]*Space, error)
@@ -38,7 +42,7 @@ type RepositoryService interface {
 	AddFileDownload(context.Context, string) error
 }
 
-func NewRepositoryService(c Config) (RepositoryService, error) {
+func NewRepositoryService(c RepositoryConfig) (RepositoryService, error) {
 	db, err := sql.Open("pgx", c.DB)
 	if err != nil {
 		return nil, err

@@ -37,13 +37,36 @@ var appCmd = &cobra.Command{
 	Short: "Start the web app server",
 	Run: func(cmd *cobra.Command, args []string) {
 		// setup services
-		services, err := models.NewServices(models.Config{
-			DB:       config.DB,
-			S3URL:    config.S3.URL,
+		repositoryService, err := models.NewRepositoryService(models.RepositoryConfig{
+			DB: config.DB,
+		})
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		fileService, err := models.NewFileService(models.FileConfig{
 			S3ID:     config.S3.ID,
 			S3Secret: config.S3.Secret,
 			S3Bucket: config.S3.Bucket,
 			S3Region: config.S3.Region,
+		})
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		// setup permissions
+		permissions := &models.Permissions{
+			Admins: config.Admins,
+		}
+
+		// setup auth
+		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
+			URL:          config.OIDC.URL,
+			ClientID:     config.OIDC.ID,
+			ClientSecret: config.OIDC.Secret,
+			RedirectURL:  config.OIDC.RedirectURL,
+			CookieName:   config.Session.Name + ".state",
+			CookieSecret: []byte(config.Session.Secret),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -76,24 +99,6 @@ var appCmd = &cobra.Command{
 		gob.Register(&models.User{})
 		gob.Register(c.Flash{})
 
-		// setup auth
-		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
-			URL:          config.OIDC.URL,
-			ClientID:     config.OIDC.ID,
-			ClientSecret: config.OIDC.Secret,
-			RedirectURL:  config.OIDC.RedirectURL,
-			CookieName:   config.Session.Name + ".state",
-			CookieSecret: []byte(config.Session.Secret),
-		})
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		// setup permissions
-		permissions := &models.Permissions{
-			Admins: config.Admins,
-		}
-
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
@@ -103,9 +108,9 @@ var appCmd = &cobra.Command{
 		errs := c.NewErrors()
 		auth := c.NewAuth(oidcAuth)
 		pages := c.NewPages()
-		spaces := c.NewSpaces(services.Repository)
-		folders := c.NewFolders(services.Repository, services.File)
-		files := c.NewFiles(services.Repository, services.File)
+		spaces := c.NewSpaces(repositoryService)
+		folders := c.NewFolders(repositoryService, fileService)
+		files := c.NewFiles(repositoryService, fileService)
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{

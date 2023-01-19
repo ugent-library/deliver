@@ -105,11 +105,6 @@ func (h *Folders) Delete(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
-	for _, f := range folder.Files {
-		if err := h.file.Delete(c.Context(), f.ID); err != nil {
-			return err
-		}
-	}
 	if err := h.repo.DeleteFolder(c.Context(), folderID); err != nil {
 		return err
 	}

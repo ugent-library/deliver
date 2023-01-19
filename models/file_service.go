@@ -11,6 +11,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
+type FileConfig struct {
+	S3URL    string
+	S3Region string
+	S3ID     string
+	S3Secret string
+	S3Bucket string
+}
+
 type FileService interface {
 	Add(context.Context, string, io.ReadSeekCloser) (string, error)
 	Get(context.Context, string, io.Writer) error
@@ -18,7 +26,7 @@ type FileService interface {
 }
 
 // see https://stackoverflow.com/questions/67575681/is-aws-go-sdk-v2-integrated-with-local-minio-server
-func NewFileService(c Config) (FileService, error) {
+func NewFileService(c FileConfig) (FileService, error) {
 	config := aws.Config{
 		Region:      c.S3Region,
 		Credentials: credentials.NewStaticCredentialsProvider(c.S3ID, c.S3Secret, ""),
