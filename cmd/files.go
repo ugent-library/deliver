@@ -10,7 +10,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(filesCmd)
-	foldersCmd.AddCommand(gcFilesCmd)
+	filesCmd.AddCommand(gcFilesCmd)
 }
 
 var filesCmd = &cobra.Command{
