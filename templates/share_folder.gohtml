@@ -1,0 +1,101 @@
+{{define "page_title"}}{{.Data.folder.Name}}{{end}}
+{{define "body"}}
+<div class="d-flex u-maximize-height">
+    <div class="w-100 u-scroll-wrapper">
+        <div class="bg-white">
+            <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+                <div class="w-100">
+                    <div class="bc-toolbar bc-toolbar--auto">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">
+                                <h4 class="bc-toolbar-title">Library delivery from {{.Data.folder.Space.Name}}: {{.Data.folder.Name}}</h4>
+                                <code class="c-code">
+                                    <a href="{{.URLTo "share_folder" "folderID" .Data.folder.ID}}" target="_blank">
+                                        {{.URLTo "share_folder" "folderID" .Data.folder.ID}}
+                                    </a>
+                                </code>
+                            </div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item">
+                                <label class="c-label m-0">Expires on</label>
+                                <span>{{.Data.folder.ExpiresAt.Format "2006-01-02 15:04"}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="u-scroll-wrapper__body p-6">
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">
+                                <h5>Download your files before {{.Data.folder.ExpiresAt.Format "2006-01-02 15:04"}}</h5>
+                            </div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item">
+                                <p>{{len .Data.folder.Files}} items</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap align-middle">File name</th>
+                                <th class="text-nowrap align-middle">Size</th>
+                                <th class="text-nowrap align-middle">Type</th>
+                                <th class="text-nowrap align-middle">Downloads</th>
+                                <th class="text-nowrap align-middle">Created at</th>
+                                <th class="table-col-sm-fixed table-col-sm-fixed-right text-right align-middle">
+                                    <!-- <div class="c-button-group">
+                                        <button class="btn btn-primary">
+                                            <i class="if if-download"></i>
+                                            <span class="btn-text">Download all files</span>
+                                        </button>
+                                    </div> -->
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range .Data.folder.Files}}
+                            <tr class="clickable-table-row">
+                                <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                                    <a href="{{$.PathTo "download_file" "fileID" .ID}}">
+                                        <span>{{.Name}}</span>
+                                    </a>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{friendlyBytes .Size}}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.ContentType}}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.Downloads}}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>
+                                </td>
+                                <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                                    <div class="c-button-toolbar">
+                                        <a class="btn btn-link" href="{{$.PathTo "download_file" "fileID" .ID}}">
+                                            <i class="if if-download"></i>
+                                            <span class="btn-txt">Download</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
