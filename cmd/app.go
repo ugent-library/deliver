@@ -141,7 +141,7 @@ var appCmd = &cobra.Command{
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
-		r.Handle("/share/{folderID}", wrap(folders.Share)).Methods("GET").Name("share_folder")
+		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,

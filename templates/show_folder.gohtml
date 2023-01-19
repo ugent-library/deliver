@@ -52,8 +52,8 @@
                         <label class="c-label m-0">Public shareable link</label>
                     </div>
                     <div class="bc-toolbar-item">
-                        <a class="btn btn-link px-0" href="{{.PathTo "share_folder" "folderID" .Data.folder.ID}}" target="_blank">
-                            {{.URLTo "share_folder" "folderID" .Data.folder.ID}}
+                        <a class="btn btn-link px-0" href="{{.PathTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}" target="_blank">
+                            {{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}
                         </a>
                         <button class="btn btn-link btn-icon-only btn-sm pb-1 px-0">
                             <i class="if if-copy text-muted"></i>

@@ -1,10 +1,15 @@
 package models
 
 import (
+	"regexp"
+	"strings"
 	"time"
 
+	"github.com/mozillazg/go-unidecode"
 	"github.com/ugent-library/deliver/validate"
 )
+
+var reSlug = regexp.MustCompile("[^a-zA-Z0-9-]+")
 
 type Folder struct {
 	ID        string    `json:"id,omitempty"`
@@ -18,6 +23,10 @@ type Folder struct {
 	FileCount int     `json:"file_count"`
 	Space     *Space  `json:"space,omitempty"`
 	Files     []*File `json:"files,omitempty"`
+}
+
+func (f *Folder) Slug() string {
+	return strings.Trim(reSlug.ReplaceAllString(unidecode.Unidecode(f.Name), "-"), "-")
 }
 
 func (f *Folder) Validate() error {

@@ -10,8 +10,8 @@
                             <div class="bc-toolbar-item">
                                 <h4 class="bc-toolbar-title">Library delivery from {{.Data.folder.Space.Name}}: {{.Data.folder.Name}}</h4>
                                 <code class="c-code">
-                                    <a href="{{.URLTo "share_folder" "folderID" .Data.folder.ID}}" target="_blank">
-                                        {{.URLTo "share_folder" "folderID" .Data.folder.ID}}
+                                    <a href="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}" target="_blank">
+                                        {{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}
                                     </a>
                                 </code>
                             </div>
