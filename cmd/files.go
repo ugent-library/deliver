@@ -31,6 +31,7 @@ var gcFilesCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 		fileService, err := models.NewFileService(models.FileConfig{
+			S3URL:    config.S3.URL,
 			S3ID:     config.S3.ID,
 			S3Secret: config.S3.Secret,
 			S3Bucket: config.S3.Bucket,
