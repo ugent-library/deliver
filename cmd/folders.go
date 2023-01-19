@@ -9,7 +9,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(foldersCmd)
-	foldersCmd.AddCommand(deleteExpiredFoldersCmd)
+	foldersCmd.AddCommand(expireFoldersCmd)
 }
 
 var foldersCmd = &cobra.Command{
@@ -17,8 +17,8 @@ var foldersCmd = &cobra.Command{
 	Short: "Folder commands",
 }
 
-var deleteExpiredFoldersCmd = &cobra.Command{
-	Use:   "delete-expired",
+var expireFoldersCmd = &cobra.Command{
+	Use:   "expire",
 	Short: "Delete all expired folders",
 	Run: func(cmd *cobra.Command, args []string) {
 		repoService, err := models.NewRepositoryService(models.RepositoryConfig{
