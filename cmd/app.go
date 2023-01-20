@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/oklog/ulid/v2"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/autosession"
@@ -22,7 +23,6 @@ import (
 	"github.com/ugent-library/deliver/mix"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/oidc"
-	"github.com/ugent-library/deliver/ulid"
 	"github.com/ugent-library/deliver/view"
 	"github.com/ugent-library/deliver/zaphttp"
 	"go.uber.org/zap"
@@ -164,7 +164,9 @@ var appCmd = &cobra.Command{
 			),
 			handlers.HTTPMethodOverrideHandler,
 			middleware.If(config.Production, handlers.ProxyHeaders),
-			middleware.SetRequestID(ulid.MustGenerate),
+			middleware.SetRequestID(func() string {
+				return ulid.Make().String()
+			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests,
 			autosession.Enable(autosession.GorillaSession(sessionStore, sessionName)),

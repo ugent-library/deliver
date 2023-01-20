@@ -3,8 +3,6 @@ package httperror
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/hashicorp/go-multierror"
 )
 
 var (
@@ -58,10 +56,6 @@ type Error struct {
 
 func New(code int) *Error {
 	return &Error{code}
-}
-
-func (e *Error) Wrap(err error) error {
-	return multierror.Append(e, err)
 }
 
 func (e *Error) Error() string {

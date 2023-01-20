@@ -7,7 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/deliver/ulid"
+	"github.com/oklog/ulid/v2"
 )
 
 // Folder holds the schema definition for the Folder entity.
@@ -20,7 +20,9 @@ func (Folder) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").
 			Unique().
-			DefaultFunc(ulid.MustGenerate),
+			DefaultFunc(func() string {
+				return ulid.Make().String()
+			}),
 		field.String("space_id"),
 		field.String("name"),
 		field.Time("created_at").

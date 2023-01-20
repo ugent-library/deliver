@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/deliver/bind"
 	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/ulid"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/view"
 )
@@ -152,7 +152,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 
 		file := &models.File{
 			FolderID:    folderID,
-			ID:          ulid.MustGenerate(),
+			ID:          ulid.Make().String(),
 			Name:        fileHeader.Filename,
 			ContentType: contentType,
 			Size:        fileHeader.Size,

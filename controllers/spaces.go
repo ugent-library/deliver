@@ -89,6 +89,7 @@ func (h *Spaces) New(c *Ctx) error {
 func (h *Spaces) Create(c *Ctx) error {
 	b := SpaceForm{}
 	// TODO return ErrBadRequest
+	// TODO use errors.Join when go 1.20 is released
 	if err := bind.Form(c.Req, &b); err != nil {
 		return err
 	}

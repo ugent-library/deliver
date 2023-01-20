@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/ugent-library/deliver/ulid"
+	"github.com/oklog/ulid/v2"
 )
 
 // File holds the schema definition for the File entity.
@@ -19,7 +19,9 @@ func (File) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").
 			Unique().
-			DefaultFunc(ulid.MustGenerate),
+			DefaultFunc(func() string {
+				return ulid.Make().String()
+			}),
 		field.String("folder_id"),
 		field.String("md5"),
 		field.String("name"),
