@@ -79,7 +79,11 @@
                                 {{else}}
                                 <input class="form-control" type="text" value="{{.Data.folder.Name}}" id="folder-name" name="name">
                                 {{end}}
-                                <small class="form-text text-muted">Each folder will expire one month after creation date.</small>
+                                <small class="form-text text-muted">
+                                    We will generate a shareable public link for you.
+                                    <br>
+                                    Each folder will expire one month after creation date.
+                                </small>
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-primary ml-4" type="submit">
@@ -126,7 +130,7 @@
                                 <code class="c-code">
                                     {{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}
                                     <a class="btn btn-link btn-icon-only btn-sm pl-3 ml-3 border-left" href="{{$.PathTo "share_folder" "folderID" .ID "folderSlug" .Slug}}" target="_blank">
-                                        <i class="if if-external-link">
+                                        <i class="if if-eye">
                                             <p class="sr-only">Open public shareable link in a new tab</p>
                                         </i>
                                     </a>
@@ -147,19 +151,19 @@
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                 <div class="c-button-toolbar flex-nowrap">
-                                    <a class="btn btn-icon-only btn-link" href="{{$.PathTo "edit_folder" "folderID" .ID}}">
-                                        <i class="if if-edit"></i>
-                                        <div class="sr-only">Edit folder</div>
+                                    <a class="btn btn-link" href="{{$.PathTo "folder" "folderID" .ID}}">
+                                        <i class="if if-draft"></i>
+                                        <span class="btn-text">Open</span>
                                     </a>
                                     <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST" id="delete-folder-{{.ID}}">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{$.CSRFTag}}
-                                        <button class="btn btn-icon-only btn-link"
+                                        <button class="btn btn-link"
                                             data-toggle="modal"
                                             data-target="#confirm-delete-folder-{{.ID}}"
                                         >
                                             <i class="if if-delete"></i>
-                                            <div class="sr-only">Delete folder</div>
+                                            <span class="btn-text">Delete</span>
                                         </button>
                                     </form>
                                 </div>

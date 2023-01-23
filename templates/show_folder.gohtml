@@ -55,7 +55,7 @@
                         <code class="c-code">
                             {{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}
                             <a class="btn btn-link btn-icon-only btn-sm pl-3 ml-3 border-left" href="{{.PathTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}" target="_blank">
-                                <i class="if if-external-link">
+                                <i class="if if-eye">
                                     <p class="sr-only">Open public shareable link in a new tab</p>
                                 </i>
                             </a>
@@ -139,7 +139,7 @@
                                         <span>{{.Name}}</span>
                                     </a>
                                     <br>
-                                    <small>md5 checksum: {{.MD5}}</small>
+                                    <small class="text-muted">md5 checksum: {{.MD5}}</small>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{{friendlyBytes .Size}}</p>
