@@ -158,14 +158,18 @@
                                         <form action="{{$.PathTo "delete_file" "fileID" .ID}}" method="POST" id="delete-file-{{.ID}}">
                                             <input type="hidden" name="_method" value="DELETE">
                                             {{$.CSRFTag}}
-                                            <button class="btn btn-icon-only btn-link"
+                                            <button class="btn btn-link"
                                                 data-toggle="modal"
                                                 data-target="#confirm-delete-file-{{.ID}}"
                                             >
                                                 <i class="if if-delete"></i>
-                                                <div class="sr-only">Delete file</div>
+                                                <span class="btn-text">Delete</span>
                                             </button>
                                         </form>
+                                        <a class="btn btn-link" href="{{$.PathTo "download_file" "fileID" .ID}}">
+                                            <i class="if if-download"></i>
+                                            <span class="btn-text">Download</span>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>

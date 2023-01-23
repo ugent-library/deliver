@@ -151,10 +151,6 @@
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                 <div class="c-button-toolbar flex-nowrap">
-                                    <a class="btn btn-link" href="{{$.PathTo "folder" "folderID" .ID}}">
-                                        <i class="if if-draft"></i>
-                                        <span class="btn-text">Open</span>
-                                    </a>
                                     <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST" id="delete-folder-{{.ID}}">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{$.CSRFTag}}
@@ -166,6 +162,10 @@
                                             <span class="btn-text">Delete</span>
                                         </button>
                                     </form>
+                                    <a class="btn btn-link" href="{{$.PathTo "folder" "folderID" .ID}}">
+                                        <i class="if if-draft"></i>
+                                        <span class="btn-text">Open</span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
