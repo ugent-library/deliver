@@ -62,7 +62,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.0
 	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/go-openapi/inflect v0.19.0 // indirect
-	github.com/go-playground/form/v4 v4.2.0
+	github.com/go-playground/form/v4 v4.2.0 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/csrf v1.7.1
@@ -74,6 +74,7 @@ require (
 	github.com/ory/graceful v0.1.3
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
+	github.com/ugent-library/bind v0.0.0-20230123163112-7e1a2071a3d0
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
 	github.com/ugent-library/mix v0.0.0-20230123085323-ee6f14c9d431
 	github.com/zclconf/go-cty v1.12.1 // indirect

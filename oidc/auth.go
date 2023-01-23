@@ -30,7 +30,7 @@ type Auth struct {
 	cookieName    string
 }
 
-func NewAuth(ctx context.Context, c Config) (*Auth, error) {
+func New(ctx context.Context, c Config) (*Auth, error) {
 	oidcProvider, err := oidc.NewProvider(ctx, c.URL)
 	if err != nil {
 		return nil, fmt.Errorf("oidc: %w", err)

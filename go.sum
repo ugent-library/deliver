@@ -284,6 +284,8 @@ github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKs
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/subosito/gotenv v1.4.1 h1:jyEFiXpy21Wm81FBN71l9VoMMV8H8jG+qIK3GCpY6Qs=
 github.com/subosito/gotenv v1.4.1/go.mod h1:ayKnFf/c6rvx/2iiLrJUk1e6plDbT3edrFNGqEflhK0=
+github.com/ugent-library/bind v0.0.0-20230123163112-7e1a2071a3d0 h1:x/rkl54tNWkdVAG1vQiHsb4ZuQni0P2YaV+r39b/6BE=
+github.com/ugent-library/bind v0.0.0-20230123163112-7e1a2071a3d0/go.mod h1:QN9gGk5/ux2xoIia5EQbkw7XdO7yYQ5dG7/p6WSvp0o=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20 h1:djFbAZZWAHkbqTmDjOkd1LwnirpiVe4nyp0sp3lQ9Ds=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20/go.mod h1:QuEpmxsRkH6YuLjj1xAS2g1xywDUxxdfuN0bBfkB1oc=
 github.com/ugent-library/mix v0.0.0-20230123085323-ee6f14c9d431 h1:SiRrv/eBUIn6j8Tkg2CLVHTSFhbNP/Ue/Bpyb/mYC+0=

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/ugent-library/deliver/bind"
+	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/view"
