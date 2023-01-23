@@ -9,10 +9,10 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/ugent-library/deliver/autosession"
-	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/routes"
 	"github.com/ugent-library/deliver/zaphttp"
+	"github.com/ugent-library/httperror"
 	"go.uber.org/zap"
 )
 

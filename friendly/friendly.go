@@ -7,7 +7,8 @@ import (
 
 var byteUnits = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
-// taken from https://github.com/dustin/go-humanize/blob/v1.0.0/bytes.go#L68
+// based on https://github.com/dustin/go-humanize/blob/v1.0.0/bytes.go
+// but with KB instead of kB
 func Bytes(n int64) string {
 	if n < 10 {
 		return fmt.Sprintf("%d B", n)

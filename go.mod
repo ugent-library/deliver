@@ -74,6 +74,8 @@ require (
 	github.com/ory/graceful v0.1.3
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
+	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
+	github.com/ugent-library/mix v0.0.0-20230123085323-ee6f14c9d431
 	github.com/zclconf/go-cty v1.12.1 // indirect
 	go.uber.org/zap v1.24.0
 	golang.org/x/mod v0.7.0 // indirect

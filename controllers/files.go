@@ -3,8 +3,8 @@ package controllers
 import (
 	"time"
 
-	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/httperror"
 )
 
 type Files struct {

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/view"
+	"github.com/ugent-library/httperror"
 )
 
 type Errors struct {
@@ -39,7 +39,7 @@ func (h *Errors) HandleError(c *Ctx, err error) {
 		httpErr = httperror.InternalServerError
 	}
 
-	switch httpErr.Code {
+	switch httpErr.StatusCode {
 	case http.StatusUnauthorized:
 		c.RedirectTo("login")
 	case http.StatusForbidden:
@@ -52,6 +52,6 @@ func (h *Errors) HandleError(c *Ctx, err error) {
 		}
 	default:
 		c.Log.Error(err)
-		http.Error(c.Res, http.StatusText(httpErr.Code), httpErr.Code)
+		http.Error(c.Res, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
 	}
 }

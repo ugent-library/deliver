@@ -7,10 +7,10 @@ import (
 
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/deliver/bind"
-	"github.com/ugent-library/deliver/httperror"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/view"
+	"github.com/ugent-library/httperror"
 )
 
 type Folders struct {
