@@ -124,8 +124,11 @@
                             </td>
                             <td class="text-nowrap">
                                 <code class="c-code">
-                                    <a href="{{$.PathTo "share_folder" "folderID" .ID "folderSlug" .Slug}}" target="_blank">
-                                        {{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}
+                                    {{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}
+                                    <a class="btn btn-link btn-icon-only btn-sm pl-3 ml-3 border-left" href="{{$.PathTo "share_folder" "folderID" .ID "folderSlug" .Slug}}" target="_blank">
+                                        <i class="if if-external-link">
+                                            <p class="sr-only">Open public shareable link in a new tab</p>
+                                        </i>
                                     </a>
                                 </code>
                             </td>
