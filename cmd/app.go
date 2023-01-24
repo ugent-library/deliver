@@ -22,9 +22,9 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/oidc"
 	"github.com/ugent-library/deliver/view"
-	"github.com/ugent-library/deliver/zaphttp"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
+	"github.com/ugent-library/zaphttp"
 	"go.uber.org/zap"
 )
 

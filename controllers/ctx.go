@@ -11,8 +11,8 @@ import (
 	"github.com/ugent-library/deliver/autosession"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/routes"
-	"github.com/ugent-library/deliver/zaphttp"
 	"github.com/ugent-library/httperror"
+	"github.com/ugent-library/zaphttp"
 	"go.uber.org/zap"
 )
 
