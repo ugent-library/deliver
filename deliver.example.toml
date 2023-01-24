@@ -1,0 +1,31 @@
+host = "localhost"
+port = 3000
+
+# array of admin usernames
+admins = [
+  "",
+]
+
+db = "postgres://user:pass@localhost:5432/deliver_dev?sslmode=disable"
+
+[s3]
+
+url = ""
+id = ""
+secret = ""
+bucket = ""
+
+[oidc]
+
+url = ""
+id = ""
+redirect_url = "http://localhost:3000/auth/callback"
+secret = ""
+
+[session]
+
+secret = ""
+
+[csrf]
+
+secret = ""
