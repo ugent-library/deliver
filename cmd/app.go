@@ -168,7 +168,7 @@ var appCmd = &cobra.Command{
 				return ulid.Make().String()
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
-			zaphttp.LogRequests,
+			zaphttp.LogRequests(logger.Desugar()),
 			autosession.Enable(autosession.GorillaSession(sessionStore, sessionName)),
 		)
 
