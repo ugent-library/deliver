@@ -48,12 +48,6 @@
                                 <th class="text-nowrap align-middle">Downloads</th>
                                 <th class="text-nowrap align-middle">Created at</th>
                                 <th class="table-col-sm-fixed table-col-sm-fixed-right text-right align-middle">
-                                    <!-- <div class="c-button-group">
-                                        <button class="btn btn-primary">
-                                            <i class="if if-download"></i>
-                                            <span class="btn-text">Download all files</span>
-                                        </button>
-                                    </div> -->
                                 </th>
                             </tr>
                         </thead>
@@ -64,6 +58,7 @@
                                     <a href="{{$.PathTo "download_file" "fileID" .ID}}">
                                         <span>{{.Name}}</span>
                                     </a>
+                                    <br><small class="text-muted">md5 checksum: {{.MD5}}</small>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{{friendlyBytes .Size}}</p>
