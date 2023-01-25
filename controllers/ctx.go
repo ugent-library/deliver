@@ -31,7 +31,7 @@ type Ctx struct {
 	Log     *zap.SugaredLogger // TODO use plain logger
 	Req     *http.Request
 	Res     http.ResponseWriter
-	Session autosession.Session
+	Session *autosession.Session
 	User    *models.User
 	*models.Permissions
 	Flash []Flash

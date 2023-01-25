@@ -15,17 +15,18 @@ func (c contextKey) String() string {
 
 var sessionKey = contextKey("session")
 
-func Get(r *http.Request) Session {
+func Get(r *http.Request) *Session {
 	if l := r.Context().Value(sessionKey); l != nil {
-		return l.(Session)
+		return l.(*Session)
 	}
 	return nil
 }
 
-func Enable(fn SessionFunc) func(http.Handler) http.Handler {
+func Enable(provider SessionProvider) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			s := fn(w, r)
+			// TODO handle error
+			s, _ := provider(w, r)
 			w = httpsnoop.Wrap(w, httpsnoop.Hooks{
 				WriteHeader: func(nextFunc httpsnoop.WriteHeaderFunc) httpsnoop.WriteHeaderFunc {
 					return func(code int) {
