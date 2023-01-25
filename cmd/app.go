@@ -61,7 +61,7 @@ var appCmd = &cobra.Command{
 		}
 
 		// setup auth
-		oidcAuth, err := oidc.New(context.TODO(), oidc.Config{
+		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
 			URL:          config.OIDC.URL,
 			ClientID:     config.OIDC.ID,
 			ClientSecret: config.OIDC.Secret,

@@ -30,7 +30,7 @@ type Auth struct {
 	cookieName    string
 }
 
-func New(ctx context.Context, c Config) (*Auth, error) {
+func NewAuth(ctx context.Context, c Config) (*Auth, error) {
 	oidcProvider, err := oidc.NewProvider(ctx, c.URL)
 	if err != nil {
 		return nil, fmt.Errorf("oidc: %w", err)
@@ -101,6 +101,15 @@ func (a *Auth) CompleteAuth(w http.ResponseWriter, r *http.Request, claims any) 
 	if err = a.secureCookie.Decode(a.cookieName, cookie.Value, &state); err != nil {
 		return fmt.Errorf("oidc: %w", err)
 	}
+
+	// delete cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     a.cookieName,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		MaxAge:   -1,
+	})
 
 	if r.URL.Query().Get("state") != state {
 		return errors.New("oidc: invalid state parameter")
