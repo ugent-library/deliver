@@ -293,6 +293,8 @@ github.com/ugent-library/zaphttp v0.0.0-20230124130623-2390950381a6 h1:eqn2GElPq
 github.com/ugent-library/zaphttp v0.0.0-20230124130623-2390950381a6/go.mod h1:NNb8N0IFmnHlnGV3C7GwQ1GUwNgw7DVLTlqovnNaC7M=
 github.com/ugent-library/zaphttp v0.0.0-20230125075318-03d861a93f66 h1:/btTAABYr3TgCD1tYWTfxSVUA/kL1R//HKiY/LQOeWE=
 github.com/ugent-library/zaphttp v0.0.0-20230125075318-03d861a93f66/go.mod h1:NNb8N0IFmnHlnGV3C7GwQ1GUwNgw7DVLTlqovnNaC7M=
+github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2 h1:FZFcxps2peVWfyiFDRLH2ZvVs/4X5n7Xe1M5s78ZF/4=
+github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2/go.mod h1:NNb8N0IFmnHlnGV3C7GwQ1GUwNgw7DVLTlqovnNaC7M=
 github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+NXzzngzBKDPIqw4=
 github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgqMEUPoW2WPyhdI=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
