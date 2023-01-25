@@ -8,12 +8,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.9
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.48
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.1
-	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
-	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.1
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/mozillazg/go-unidecode v0.2.0
@@ -26,7 +24,12 @@ require (
 	github.com/ugent-library/middleware v0.0.0-20230124121524-d72a5ab6674f
 	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
 	go.uber.org/zap v1.24.0
-	golang.org/x/oauth2 v0.4.0
+)
+
+require (
+	github.com/coreos/go-oidc/v3 v3.5.0 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
+	golang.org/x/oauth2 v0.4.0 // indirect
 )
 
 require (
@@ -65,6 +68,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
+	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
 	github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect

@@ -20,10 +20,10 @@ import (
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/friendly"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/oidc"
 	"github.com/ugent-library/deliver/view"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
+	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"go.uber.org/zap"
 )
