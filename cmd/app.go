@@ -169,7 +169,12 @@ var appCmd = &cobra.Command{
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests(logger.Desugar()),
-			autosession.Enable(autosession.GorillaSessions(sessionStore, sessionName)),
+			autosession.Enable(
+				autosession.GorillaSessions(sessionStore, sessionName),
+				autosession.WithErrorHandler(func(err error) {
+					logger.Error(err)
+				}),
+			),
 		)
 
 		// start server

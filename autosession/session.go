@@ -1,6 +1,7 @@
 package autosession
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -48,8 +49,18 @@ func (s *Session) Get(k string) any {
 	return s.session.Values[k]
 }
 
+func (s *Session) GetString(k string) string {
+	return s.session.Values[k].(string)
+}
+
 func (s *Session) Pop(k string) any {
 	v := s.Get(k)
+	s.Delete(k)
+	return v
+}
+
+func (s *Session) PopString(k string) string {
+	v := s.GetString(k)
 	s.Delete(k)
 	return v
 }
@@ -85,7 +96,7 @@ func (s *Session) Clear() {
 	}
 }
 
-func (s *Session) Save() error {
+func (s *Session) Save(ctx context.Context) error {
 	if s.changed {
 		if err := s.session.Save(s.r, s.w); err != nil {
 			return err
