@@ -31,7 +31,6 @@ func Validate(errs ...*Error) error {
 	return NewErrors(errs...).ErrorOrNil()
 }
 
-// TODO return *Errors object from rules
 func NotEmpty[T ~string | ~[]any | ~map[any]any](key string, val T) *Error {
 	if len(val) == 0 {
 		return &Error{
@@ -48,8 +47,8 @@ func Length[T ~string | ~[]any | ~map[any]any](key string, val T, n int) *Error 
 		return &Error{
 			key:    key,
 			rule:   RuleLength,
-			msg:    fmt.Sprintf(MessageLength, n),
 			params: []any{n},
+			msg:    fmt.Sprintf(MessageLength, n),
 		}
 	}
 	return nil
@@ -60,8 +59,8 @@ func LengthIn[T ~string | ~[]any | ~map[any]any](key string, val T, min, max int
 		return &Error{
 			key:    key,
 			rule:   RuleLengthIn,
-			msg:    fmt.Sprintf(MessageLengthIn, min, max),
 			params: []any{min, max},
+			msg:    fmt.Sprintf(MessageLengthIn, min, max),
 		}
 	}
 	return nil
@@ -72,8 +71,8 @@ func Min[T int | int64 | float64](key string, val T, min T) *Error {
 		return &Error{
 			key:    key,
 			rule:   RuleMin,
-			msg:    fmt.Sprintf(MessageMin, min),
 			params: []any{min},
+			msg:    fmt.Sprintf(MessageMin, min),
 		}
 	}
 	return nil
@@ -84,8 +83,8 @@ func Max[T int | int64 | float64](key string, val T, max T) *Error {
 		return &Error{
 			key:    key,
 			rule:   RuleMax,
-			msg:    fmt.Sprintf(MessageMax, max),
 			params: []any{max},
+			msg:    fmt.Sprintf(MessageMax, max),
 		}
 	}
 	return nil
@@ -96,8 +95,8 @@ func Match(key, val string, r *regexp.Regexp) *Error {
 		return &Error{
 			key:    key,
 			rule:   RuleNotEmpty,
-			msg:    fmt.Sprintf(MessageMatch, r),
 			params: []any{r},
+			msg:    fmt.Sprintf(MessageMatch, r),
 		}
 	}
 	return nil

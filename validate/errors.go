@@ -99,9 +99,11 @@ func (e *Error) Message() string {
 	return e.msg
 }
 
-func (e Error) WithMessage(msg string) *Error {
-	e.msg = msg
-	return &e
+func (e *Error) WithMessage(msg string) *Error {
+	if e != nil {
+		e.msg = msg
+	}
+	return e
 }
 
 func (e *Error) Error() string {
