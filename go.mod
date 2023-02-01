@@ -68,6 +68,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
+	github.com/ugent-library/httphelpers v0.0.0-20230201143255-2cc0471c702e
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
 	github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2
 	github.com/zclconf/go-cty v1.8.0 // indirect

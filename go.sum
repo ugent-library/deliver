@@ -285,6 +285,8 @@ github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f h1:KqaSxb7cYVFk
 github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f/go.mod h1:QN9gGk5/ux2xoIia5EQbkw7XdO7yYQ5dG7/p6WSvp0o=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20 h1:djFbAZZWAHkbqTmDjOkd1LwnirpiVe4nyp0sp3lQ9Ds=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20/go.mod h1:QuEpmxsRkH6YuLjj1xAS2g1xywDUxxdfuN0bBfkB1oc=
+github.com/ugent-library/httphelpers v0.0.0-20230201143255-2cc0471c702e h1:qdWZqNyHuLT4eQEG4/Nfup15bK92sEP9nYuUxovk1G8=
+github.com/ugent-library/httphelpers v0.0.0-20230201143255-2cc0471c702e/go.mod h1:sYsWfdjKmHUp4RuQFywR2tqlOOmtqPHzrsLO8QeVgfA=
 github.com/ugent-library/middleware v0.0.0-20230124121524-d72a5ab6674f h1:UqrjHYN9yNMu8pTVBv+ooC0s0NLKqWRLs7xWEH9PhyQ=
 github.com/ugent-library/middleware v0.0.0-20230124121524-d72a5ab6674f/go.mod h1:xWVMe++RYKIhFZwRdiRe522qdlwpN1DBFV7RHmc637w=
 github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b h1:4Ine7pmtSh4f8xSFb5hAIelgy5O/HjOVne49+C04fto=

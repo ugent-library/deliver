@@ -11,6 +11,7 @@ import (
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/view"
 	"github.com/ugent-library/httperror"
+	"github.com/ugent-library/httphelpers"
 )
 
 type Folders struct {
@@ -145,7 +146,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		}
 		defer f.Close()
 
-		contentType, err := detectContentType(f)
+		mediatype, err := httphelpers.DetectContentType(f)
 		if err != nil {
 			return err
 		}
@@ -154,7 +155,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 			FolderID:    folderID,
 			ID:          ulid.Make().String(),
 			Name:        fileHeader.Filename,
-			ContentType: contentType,
+			ContentType: mediatype,
 			Size:        fileHeader.Size,
 		}
 

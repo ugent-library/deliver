@@ -18,19 +18,19 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initLogger)
-	cobra.OnFinalize(func() {
-		logger.Sync()
-	})
-
-	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file")
-
 	viper.SetEnvPrefix("deliver")
 	viper.SetDefault("port", 3000)
 	viper.SetDefault("s3.region", "us-east-1")
 	viper.SetDefault("s3.bucket", "deliver")
 	viper.SetDefault("session.name", "deliver")
 	viper.SetDefault("session.max_age", 86400*30) // 30 days
+
+	cobra.OnInitialize(initConfig, initLogger)
+	cobra.OnFinalize(func() {
+		logger.Sync()
+	})
+
+	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file")
 }
 
 func initConfig() {
