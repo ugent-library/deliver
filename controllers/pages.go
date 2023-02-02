@@ -15,5 +15,9 @@ func NewPages() *Pages {
 }
 
 func (h *Pages) Home(c *Ctx) error {
+	if c.User != nil {
+		c.RedirectTo("spaces")
+		return nil
+	}
 	return h.homeView.Render(c.Res, c)
 }
