@@ -71,7 +71,7 @@ function friendlyBytes(n) {
     let e = Math.floor(Math.log(n) / Math.log(1000))
     let unit = byteUnits[e]
     let val =  Math.floor(n / Math.pow(1000, e)*10+0.5) / 10
-    if (val < 10) {
+    if (val < 10 && !Number.isInteger(val)) {
         return val.toFixed(1) + ' ' + unit
     }
     return val.toFixed(0) + ' ' + unit 
