@@ -113,8 +113,8 @@
                         <tr>
                             <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
                             <th class="text-nowrap">Shareable link</th>
-                            <th class="text-nowrap">Documents</th>
                             <th class="text-nowrap">Expires on</th>
+                            <th class="text-nowrap">Documents</th>
                             <th class="text-nowrap">Created at</th>
                             <th class="text-nowrap">Updated at</th>
                             <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
@@ -137,11 +137,11 @@
                                 </code>
                             </td>
                             <td class="text-nowrap">
-                                <p>{{.FileCount}} files</p>
-                                <p class="small">{{friendlyBytes .Size}}</p>
+                                <p>{{.ExpiresAt.Format "2006-01-02 15:04"}}</p>
                             </td>
                             <td class="text-nowrap">
-                                <p>{{.ExpiresAt.Format "2006-01-02 15:04"}}</p>
+                                <p>{{.FileCount}} files</p>
+                                <p class="small">{{friendlyBytes .Size}}</p>
                             </td>
                             <td class="text-nowrap">
                                 <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>
