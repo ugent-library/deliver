@@ -206,9 +206,7 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 		// https://github.com/ent/ent/issues/2328
 		// see also UpdateFolder
 		if strings.Contains(err.Error(), "SQLSTATE 23505") {
-			return validate.NewErrors(
-				validate.NewError("name", "unique").WithMessage("must be unique"),
-			)
+			return validate.NewErrors(validate.ErrNotUnique("name"))
 		}
 		return err
 	}
@@ -225,9 +223,7 @@ func (r *repositoryService) UpdateFolder(ctx context.Context, f *Folder) error {
 		Save(ctx)
 	if err != nil {
 		if strings.Contains(err.Error(), "SQLSTATE 23505") {
-			return validate.NewErrors(
-				validate.NewError("name", "unique").WithMessage("must be unique"),
-			)
+			return validate.NewErrors(validate.ErrNotUnique("name"))
 		}
 		return err
 	}

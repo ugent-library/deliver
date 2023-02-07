@@ -13,6 +13,7 @@ const (
 	RuleMax          = "max"
 	RuleMatch        = "match"
 	RuleAlphanumeric = "alphanumeric"
+	RuleUnique       = "unique"
 )
 
 var (
@@ -23,6 +24,7 @@ var (
 	MessageMax          = "must be %d or less"
 	MessageMatch        = "must match %s"
 	MessageAlphanumeric = "must only contain letters a to z and digits"
+	MessageUnique       = "must be unique"
 
 	ReAlphanumeric = regexp.MustCompile("^[a-zA-Z0-9]+$")
 )
@@ -111,4 +113,12 @@ func Alphanumeric(key, val string) *Error {
 		}
 	}
 	return nil
+}
+
+func ErrNotUnique(key string) *Error {
+	return &Error{
+		key:  key,
+		rule: RuleUnique,
+		msg:  MessageUnique,
+	}
 }
