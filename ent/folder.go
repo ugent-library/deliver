@@ -132,19 +132,19 @@ func (f *Folder) assignValues(columns []string, values []any) error {
 
 // QuerySpace queries the "space" edge of the Folder entity.
 func (f *Folder) QuerySpace() *SpaceQuery {
-	return (&FolderClient{config: f.config}).QuerySpace(f)
+	return NewFolderClient(f.config).QuerySpace(f)
 }
 
 // QueryFiles queries the "files" edge of the Folder entity.
 func (f *Folder) QueryFiles() *FileQuery {
-	return (&FolderClient{config: f.config}).QueryFiles(f)
+	return NewFolderClient(f.config).QueryFiles(f)
 }
 
 // Update returns a builder for updating this Folder.
 // Note that you need to call Folder.Unwrap() before calling this method if this Folder
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (f *Folder) Update() *FolderUpdateOne {
-	return (&FolderClient{config: f.config}).UpdateOne(f)
+	return NewFolderClient(f.config).UpdateOne(f)
 }
 
 // Unwrap unwraps the Folder entity that was returned from a transaction after it was closed,

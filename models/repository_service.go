@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -16,6 +17,7 @@ import (
 	"github.com/ugent-library/deliver/ent/folder"
 	entmigrate "github.com/ugent-library/deliver/ent/migrate"
 	"github.com/ugent-library/deliver/ent/space"
+	"github.com/ugent-library/deliver/validate"
 )
 
 var ErrNotFound = errors.New("not found")
@@ -199,6 +201,15 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 		SetExpiresAt(f.ExpiresAt).
 		Save(ctx)
 	if err != nil {
+		// TODO does ent support unwrapping sql errors?
+		// https://stackoverflow.com/questions/70859712/how-do-you-handle-database-errors-in-go-without-getting-coupled-to-the-sql-drive
+		// https://github.com/ent/ent/issues/2328
+		// see also UpdateFolder
+		if strings.Contains(err.Error(), "SQLSTATE 23505") {
+			return validate.NewErrors(
+				validate.NewError("name", "unique").WithMessage("must be unique"),
+			)
+		}
 		return err
 	}
 	*f = *rowToFolder(row)
@@ -213,6 +224,11 @@ func (r *repositoryService) UpdateFolder(ctx context.Context, f *Folder) error {
 		SetName(f.Name).
 		Save(ctx)
 	if err != nil {
+		if strings.Contains(err.Error(), "SQLSTATE 23505") {
+			return validate.NewErrors(
+				validate.NewError("name", "unique").WithMessage("must be unique"),
+			)
+		}
 		return err
 	}
 	*f = *rowToFolder(row)

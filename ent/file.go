@@ -147,14 +147,14 @@ func (f *File) assignValues(columns []string, values []any) error {
 
 // QueryFolder queries the "folder" edge of the File entity.
 func (f *File) QueryFolder() *FolderQuery {
-	return (&FileClient{config: f.config}).QueryFolder(f)
+	return NewFileClient(f.config).QueryFolder(f)
 }
 
 // Update returns a builder for updating this File.
 // Note that you need to call File.Unwrap() before calling this method if this File
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (f *File) Update() *FileUpdateOne {
-	return (&FileClient{config: f.config}).UpdateOne(f)
+	return NewFileClient(f.config).UpdateOne(f)
 }
 
 // Unwrap unwraps the File entity that was returned from a transaction after it was closed,

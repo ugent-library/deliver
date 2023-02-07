@@ -22,7 +22,7 @@ var gcFilesCmd = &cobra.Command{
 	Use:   "gc",
 	Short: "Garbage collect orphaned files",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.TODO()
+		ctx := context.Background()
 
 		repoService, err := models.NewRepositoryService(models.RepositoryConfig{
 			DB: config.DB,

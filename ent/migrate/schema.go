@@ -56,6 +56,13 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "folder_space_id_name",
+				Unique:  true,
+				Columns: []*schema.Column{FoldersColumns[5], FoldersColumns[1]},
+			},
+		},
 	}
 	// SpacesColumns holds the columns for the "spaces" table.
 	SpacesColumns = []*schema.Column{

@@ -20,11 +20,8 @@ import (
 // FolderQuery is the builder for querying Folder entities.
 type FolderQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
+	ctx        *QueryContext
 	order      []OrderFunc
-	fields     []string
 	inters     []Interceptor
 	predicates []predicate.Folder
 	withSpace  *SpaceQuery
@@ -42,20 +39,20 @@ func (fq *FolderQuery) Where(ps ...predicate.Folder) *FolderQuery {
 
 // Limit the number of records to be returned by this query.
 func (fq *FolderQuery) Limit(limit int) *FolderQuery {
-	fq.limit = &limit
+	fq.ctx.Limit = &limit
 	return fq
 }
 
 // Offset to start from.
 func (fq *FolderQuery) Offset(offset int) *FolderQuery {
-	fq.offset = &offset
+	fq.ctx.Offset = &offset
 	return fq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (fq *FolderQuery) Unique(unique bool) *FolderQuery {
-	fq.unique = &unique
+	fq.ctx.Unique = &unique
 	return fq
 }
 
@@ -112,7 +109,7 @@ func (fq *FolderQuery) QueryFiles() *FileQuery {
 // First returns the first Folder entity from the query.
 // Returns a *NotFoundError when no Folder was found.
 func (fq *FolderQuery) First(ctx context.Context) (*Folder, error) {
-	nodes, err := fq.Limit(1).All(newQueryContext(ctx, TypeFolder, "First"))
+	nodes, err := fq.Limit(1).All(setContextOp(ctx, fq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +132,7 @@ func (fq *FolderQuery) FirstX(ctx context.Context) *Folder {
 // Returns a *NotFoundError when no Folder ID was found.
 func (fq *FolderQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = fq.Limit(1).IDs(newQueryContext(ctx, TypeFolder, "FirstID")); err != nil {
+	if ids, err = fq.Limit(1).IDs(setContextOp(ctx, fq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -158,7 +155,7 @@ func (fq *FolderQuery) FirstIDX(ctx context.Context) string {
 // Returns a *NotSingularError when more than one Folder entity is found.
 // Returns a *NotFoundError when no Folder entities are found.
 func (fq *FolderQuery) Only(ctx context.Context) (*Folder, error) {
-	nodes, err := fq.Limit(2).All(newQueryContext(ctx, TypeFolder, "Only"))
+	nodes, err := fq.Limit(2).All(setContextOp(ctx, fq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +183,7 @@ func (fq *FolderQuery) OnlyX(ctx context.Context) *Folder {
 // Returns a *NotFoundError when no entities are found.
 func (fq *FolderQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = fq.Limit(2).IDs(newQueryContext(ctx, TypeFolder, "OnlyID")); err != nil {
+	if ids, err = fq.Limit(2).IDs(setContextOp(ctx, fq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -211,7 +208,7 @@ func (fq *FolderQuery) OnlyIDX(ctx context.Context) string {
 
 // All executes the query and returns a list of Folders.
 func (fq *FolderQuery) All(ctx context.Context) ([]*Folder, error) {
-	ctx = newQueryContext(ctx, TypeFolder, "All")
+	ctx = setContextOp(ctx, fq.ctx, "All")
 	if err := fq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -231,7 +228,7 @@ func (fq *FolderQuery) AllX(ctx context.Context) []*Folder {
 // IDs executes the query and returns a list of Folder IDs.
 func (fq *FolderQuery) IDs(ctx context.Context) ([]string, error) {
 	var ids []string
-	ctx = newQueryContext(ctx, TypeFolder, "IDs")
+	ctx = setContextOp(ctx, fq.ctx, "IDs")
 	if err := fq.Select(folder.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -249,7 +246,7 @@ func (fq *FolderQuery) IDsX(ctx context.Context) []string {
 
 // Count returns the count of the given query.
 func (fq *FolderQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeFolder, "Count")
+	ctx = setContextOp(ctx, fq.ctx, "Count")
 	if err := fq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -267,7 +264,7 @@ func (fq *FolderQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (fq *FolderQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeFolder, "Exist")
+	ctx = setContextOp(ctx, fq.ctx, "Exist")
 	switch _, err := fq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -295,17 +292,15 @@ func (fq *FolderQuery) Clone() *FolderQuery {
 	}
 	return &FolderQuery{
 		config:     fq.config,
-		limit:      fq.limit,
-		offset:     fq.offset,
+		ctx:        fq.ctx.Clone(),
 		order:      append([]OrderFunc{}, fq.order...),
 		inters:     append([]Interceptor{}, fq.inters...),
 		predicates: append([]predicate.Folder{}, fq.predicates...),
 		withSpace:  fq.withSpace.Clone(),
 		withFiles:  fq.withFiles.Clone(),
 		// clone intermediate query.
-		sql:    fq.sql.Clone(),
-		path:   fq.path,
-		unique: fq.unique,
+		sql:  fq.sql.Clone(),
+		path: fq.path,
 	}
 }
 
@@ -346,9 +341,9 @@ func (fq *FolderQuery) WithFiles(opts ...func(*FileQuery)) *FolderQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (fq *FolderQuery) GroupBy(field string, fields ...string) *FolderGroupBy {
-	fq.fields = append([]string{field}, fields...)
+	fq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &FolderGroupBy{build: fq}
-	grbuild.flds = &fq.fields
+	grbuild.flds = &fq.ctx.Fields
 	grbuild.label = folder.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -367,10 +362,10 @@ func (fq *FolderQuery) GroupBy(field string, fields ...string) *FolderGroupBy {
 //		Select(folder.FieldSpaceID).
 //		Scan(ctx, &v)
 func (fq *FolderQuery) Select(fields ...string) *FolderSelect {
-	fq.fields = append(fq.fields, fields...)
+	fq.ctx.Fields = append(fq.ctx.Fields, fields...)
 	sbuild := &FolderSelect{FolderQuery: fq}
 	sbuild.label = folder.Label
-	sbuild.flds, sbuild.scan = &fq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &fq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -390,7 +385,7 @@ func (fq *FolderQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range fq.fields {
+	for _, f := range fq.ctx.Fields {
 		if !folder.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -458,6 +453,9 @@ func (fq *FolderQuery) loadSpace(ctx context.Context, query *SpaceQuery, nodes [
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(space.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -504,9 +502,9 @@ func (fq *FolderQuery) loadFiles(ctx context.Context, query *FileQuery, nodes []
 
 func (fq *FolderQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := fq.querySpec()
-	_spec.Node.Columns = fq.fields
-	if len(fq.fields) > 0 {
-		_spec.Unique = fq.unique != nil && *fq.unique
+	_spec.Node.Columns = fq.ctx.Fields
+	if len(fq.ctx.Fields) > 0 {
+		_spec.Unique = fq.ctx.Unique != nil && *fq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, fq.driver, _spec)
 }
@@ -524,10 +522,10 @@ func (fq *FolderQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   fq.sql,
 		Unique: true,
 	}
-	if unique := fq.unique; unique != nil {
+	if unique := fq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := fq.fields; len(fields) > 0 {
+	if fields := fq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, folder.FieldID)
 		for i := range fields {
@@ -543,10 +541,10 @@ func (fq *FolderQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := fq.limit; limit != nil {
+	if limit := fq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := fq.offset; offset != nil {
+	if offset := fq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := fq.order; len(ps) > 0 {
@@ -562,7 +560,7 @@ func (fq *FolderQuery) querySpec() *sqlgraph.QuerySpec {
 func (fq *FolderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(fq.driver.Dialect())
 	t1 := builder.Table(folder.Table)
-	columns := fq.fields
+	columns := fq.ctx.Fields
 	if len(columns) == 0 {
 		columns = folder.Columns
 	}
@@ -571,7 +569,7 @@ func (fq *FolderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = fq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if fq.unique != nil && *fq.unique {
+	if fq.ctx.Unique != nil && *fq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range fq.predicates {
@@ -580,12 +578,12 @@ func (fq *FolderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range fq.order {
 		p(selector)
 	}
-	if offset := fq.offset; offset != nil {
+	if offset := fq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := fq.limit; limit != nil {
+	if limit := fq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -605,7 +603,7 @@ func (fgb *FolderGroupBy) Aggregate(fns ...AggregateFunc) *FolderGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (fgb *FolderGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeFolder, "GroupBy")
+	ctx = setContextOp(ctx, fgb.build.ctx, "GroupBy")
 	if err := fgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -653,7 +651,7 @@ func (fs *FolderSelect) Aggregate(fns ...AggregateFunc) *FolderSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (fs *FolderSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeFolder, "Select")
+	ctx = setContextOp(ctx, fs.ctx, "Select")
 	if err := fs.prepareQuery(ctx); err != nil {
 		return err
 	}

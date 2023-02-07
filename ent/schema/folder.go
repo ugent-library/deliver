@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/oklog/ulid/v2"
 )
 
@@ -33,6 +34,14 @@ func (Folder) Fields() []ent.Field {
 			UpdateDefault(time.Now),
 		field.Time("expires_at").
 			Optional(),
+	}
+}
+
+// Indexes of the folder.
+func (Folder) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("space_id", "name").
+			Unique(),
 	}
 }
 

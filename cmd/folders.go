@@ -27,7 +27,7 @@ var expireFoldersCmd = &cobra.Command{
 		if err != nil {
 			logger.Fatal(err)
 		}
-		if err := repoService.DeleteExpiredFolders(context.TODO()); err != nil {
+		if err := repoService.DeleteExpiredFolders(context.Background()); err != nil {
 			logger.Fatal(err)
 		}
 	},

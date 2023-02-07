@@ -233,6 +233,7 @@ func (c *FileClient) DeleteOneID(id string) *FileDeleteOne {
 func (c *FileClient) Query() *FileQuery {
 	return &FileQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeFile},
 		inters: c.Interceptors(),
 	}
 }
@@ -366,6 +367,7 @@ func (c *FolderClient) DeleteOneID(id string) *FolderDeleteOne {
 func (c *FolderClient) Query() *FolderQuery {
 	return &FolderQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeFolder},
 		inters: c.Interceptors(),
 	}
 }
@@ -515,6 +517,7 @@ func (c *SpaceClient) DeleteOneID(id string) *SpaceDeleteOne {
 func (c *SpaceClient) Query() *SpaceQuery {
 	return &SpaceQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeSpace},
 		inters: c.Interceptors(),
 	}
 }

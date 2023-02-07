@@ -19,11 +19,8 @@ import (
 // SpaceQuery is the builder for querying Space entities.
 type SpaceQuery struct {
 	config
-	limit       *int
-	offset      *int
-	unique      *bool
+	ctx         *QueryContext
 	order       []OrderFunc
-	fields      []string
 	inters      []Interceptor
 	predicates  []predicate.Space
 	withFolders *FolderQuery
@@ -40,20 +37,20 @@ func (sq *SpaceQuery) Where(ps ...predicate.Space) *SpaceQuery {
 
 // Limit the number of records to be returned by this query.
 func (sq *SpaceQuery) Limit(limit int) *SpaceQuery {
-	sq.limit = &limit
+	sq.ctx.Limit = &limit
 	return sq
 }
 
 // Offset to start from.
 func (sq *SpaceQuery) Offset(offset int) *SpaceQuery {
-	sq.offset = &offset
+	sq.ctx.Offset = &offset
 	return sq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (sq *SpaceQuery) Unique(unique bool) *SpaceQuery {
-	sq.unique = &unique
+	sq.ctx.Unique = &unique
 	return sq
 }
 
@@ -88,7 +85,7 @@ func (sq *SpaceQuery) QueryFolders() *FolderQuery {
 // First returns the first Space entity from the query.
 // Returns a *NotFoundError when no Space was found.
 func (sq *SpaceQuery) First(ctx context.Context) (*Space, error) {
-	nodes, err := sq.Limit(1).All(newQueryContext(ctx, TypeSpace, "First"))
+	nodes, err := sq.Limit(1).All(setContextOp(ctx, sq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +108,7 @@ func (sq *SpaceQuery) FirstX(ctx context.Context) *Space {
 // Returns a *NotFoundError when no Space ID was found.
 func (sq *SpaceQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = sq.Limit(1).IDs(newQueryContext(ctx, TypeSpace, "FirstID")); err != nil {
+	if ids, err = sq.Limit(1).IDs(setContextOp(ctx, sq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +131,7 @@ func (sq *SpaceQuery) FirstIDX(ctx context.Context) string {
 // Returns a *NotSingularError when more than one Space entity is found.
 // Returns a *NotFoundError when no Space entities are found.
 func (sq *SpaceQuery) Only(ctx context.Context) (*Space, error) {
-	nodes, err := sq.Limit(2).All(newQueryContext(ctx, TypeSpace, "Only"))
+	nodes, err := sq.Limit(2).All(setContextOp(ctx, sq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +159,7 @@ func (sq *SpaceQuery) OnlyX(ctx context.Context) *Space {
 // Returns a *NotFoundError when no entities are found.
 func (sq *SpaceQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = sq.Limit(2).IDs(newQueryContext(ctx, TypeSpace, "OnlyID")); err != nil {
+	if ids, err = sq.Limit(2).IDs(setContextOp(ctx, sq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +184,7 @@ func (sq *SpaceQuery) OnlyIDX(ctx context.Context) string {
 
 // All executes the query and returns a list of Spaces.
 func (sq *SpaceQuery) All(ctx context.Context) ([]*Space, error) {
-	ctx = newQueryContext(ctx, TypeSpace, "All")
+	ctx = setContextOp(ctx, sq.ctx, "All")
 	if err := sq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +204,7 @@ func (sq *SpaceQuery) AllX(ctx context.Context) []*Space {
 // IDs executes the query and returns a list of Space IDs.
 func (sq *SpaceQuery) IDs(ctx context.Context) ([]string, error) {
 	var ids []string
-	ctx = newQueryContext(ctx, TypeSpace, "IDs")
+	ctx = setContextOp(ctx, sq.ctx, "IDs")
 	if err := sq.Select(space.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +222,7 @@ func (sq *SpaceQuery) IDsX(ctx context.Context) []string {
 
 // Count returns the count of the given query.
 func (sq *SpaceQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeSpace, "Count")
+	ctx = setContextOp(ctx, sq.ctx, "Count")
 	if err := sq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +240,7 @@ func (sq *SpaceQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (sq *SpaceQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeSpace, "Exist")
+	ctx = setContextOp(ctx, sq.ctx, "Exist")
 	switch _, err := sq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,16 +268,14 @@ func (sq *SpaceQuery) Clone() *SpaceQuery {
 	}
 	return &SpaceQuery{
 		config:      sq.config,
-		limit:       sq.limit,
-		offset:      sq.offset,
+		ctx:         sq.ctx.Clone(),
 		order:       append([]OrderFunc{}, sq.order...),
 		inters:      append([]Interceptor{}, sq.inters...),
 		predicates:  append([]predicate.Space{}, sq.predicates...),
 		withFolders: sq.withFolders.Clone(),
 		// clone intermediate query.
-		sql:    sq.sql.Clone(),
-		path:   sq.path,
-		unique: sq.unique,
+		sql:  sq.sql.Clone(),
+		path: sq.path,
 	}
 }
 
@@ -310,9 +305,9 @@ func (sq *SpaceQuery) WithFolders(opts ...func(*FolderQuery)) *SpaceQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *SpaceQuery) GroupBy(field string, fields ...string) *SpaceGroupBy {
-	sq.fields = append([]string{field}, fields...)
+	sq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &SpaceGroupBy{build: sq}
-	grbuild.flds = &sq.fields
+	grbuild.flds = &sq.ctx.Fields
 	grbuild.label = space.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -331,10 +326,10 @@ func (sq *SpaceQuery) GroupBy(field string, fields ...string) *SpaceGroupBy {
 //		Select(space.FieldName).
 //		Scan(ctx, &v)
 func (sq *SpaceQuery) Select(fields ...string) *SpaceSelect {
-	sq.fields = append(sq.fields, fields...)
+	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
 	sbuild := &SpaceSelect{SpaceQuery: sq}
 	sbuild.label = space.Label
-	sbuild.flds, sbuild.scan = &sq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &sq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -354,7 +349,7 @@ func (sq *SpaceQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range sq.fields {
+	for _, f := range sq.ctx.Fields {
 		if !space.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -435,9 +430,9 @@ func (sq *SpaceQuery) loadFolders(ctx context.Context, query *FolderQuery, nodes
 
 func (sq *SpaceQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
-	_spec.Node.Columns = sq.fields
-	if len(sq.fields) > 0 {
-		_spec.Unique = sq.unique != nil && *sq.unique
+	_spec.Node.Columns = sq.ctx.Fields
+	if len(sq.ctx.Fields) > 0 {
+		_spec.Unique = sq.ctx.Unique != nil && *sq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, sq.driver, _spec)
 }
@@ -455,10 +450,10 @@ func (sq *SpaceQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   sq.sql,
 		Unique: true,
 	}
-	if unique := sq.unique; unique != nil {
+	if unique := sq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := sq.fields; len(fields) > 0 {
+	if fields := sq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, space.FieldID)
 		for i := range fields {
@@ -474,10 +469,10 @@ func (sq *SpaceQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := sq.limit; limit != nil {
+	if limit := sq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := sq.offset; offset != nil {
+	if offset := sq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := sq.order; len(ps) > 0 {
@@ -493,7 +488,7 @@ func (sq *SpaceQuery) querySpec() *sqlgraph.QuerySpec {
 func (sq *SpaceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(sq.driver.Dialect())
 	t1 := builder.Table(space.Table)
-	columns := sq.fields
+	columns := sq.ctx.Fields
 	if len(columns) == 0 {
 		columns = space.Columns
 	}
@@ -502,7 +497,7 @@ func (sq *SpaceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = sq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if sq.unique != nil && *sq.unique {
+	if sq.ctx.Unique != nil && *sq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range sq.predicates {
@@ -511,12 +506,12 @@ func (sq *SpaceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range sq.order {
 		p(selector)
 	}
-	if offset := sq.offset; offset != nil {
+	if offset := sq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := sq.limit; limit != nil {
+	if limit := sq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -536,7 +531,7 @@ func (sgb *SpaceGroupBy) Aggregate(fns ...AggregateFunc) *SpaceGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (sgb *SpaceGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeSpace, "GroupBy")
+	ctx = setContextOp(ctx, sgb.build.ctx, "GroupBy")
 	if err := sgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -584,7 +579,7 @@ func (ss *SpaceSelect) Aggregate(fns ...AggregateFunc) *SpaceSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ss *SpaceSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeSpace, "Select")
+	ctx = setContextOp(ctx, ss.ctx, "Select")
 	if err := ss.prepareQuery(ctx); err != nil {
 		return err
 	}

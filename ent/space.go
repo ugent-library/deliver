@@ -113,14 +113,14 @@ func (s *Space) assignValues(columns []string, values []any) error {
 
 // QueryFolders queries the "folders" edge of the Space entity.
 func (s *Space) QueryFolders() *FolderQuery {
-	return (&SpaceClient{config: s.config}).QueryFolders(s)
+	return NewSpaceClient(s.config).QueryFolders(s)
 }
 
 // Update returns a builder for updating this Space.
 // Note that you need to call Space.Unwrap() before calling this method if this Space
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (s *Space) Update() *SpaceUpdateOne {
-	return (&SpaceClient{config: s.config}).UpdateOne(s)
+	return NewSpaceClient(s.config).UpdateOne(s)
 }
 
 // Unwrap unwraps the Space entity that was returned from a transaction after it was closed,
