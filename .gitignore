@@ -13,10 +13,12 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-
 .DS_Store
 node_modules
 !.gitkeep
 
 # Live reloading
 .reflex.conf
+
+# Config
+deliver.toml
