@@ -297,6 +297,8 @@ github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62 h1:TWb788Kaux7Y
 github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62/go.mod h1:2LCM3IglxvIwUSO610PQUJ9aA3kROToNfUGCip6/Ozs=
 github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2 h1:FZFcxps2peVWfyiFDRLH2ZvVs/4X5n7Xe1M5s78ZF/4=
 github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2/go.mod h1:NNb8N0IFmnHlnGV3C7GwQ1GUwNgw7DVLTlqovnNaC7M=
+github.com/unrolled/render v1.5.0 h1:uNTHMvVoI9pyyXfgoDHHycIqFONNY2p4eQR9ty+NsxM=
+github.com/unrolled/render v1.5.0/go.mod h1:eLTosBkQqEPEk7pRfkCRApXd++lm++nCsVlFOHpeedw=
 github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+NXzzngzBKDPIqw4=
 github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgqMEUPoW2WPyhdI=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

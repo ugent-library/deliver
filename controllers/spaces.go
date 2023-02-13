@@ -2,29 +2,23 @@ package controllers
 
 import (
 	"errors"
+	"net/http"
 	"regexp"
 	"time"
 
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
-	"github.com/ugent-library/deliver/view"
 	"github.com/ugent-library/httperror"
 )
 
 type Spaces struct {
-	repo     models.RepositoryService
-	showView view.View
-	newView  view.View
-	editView view.View
+	repo models.RepositoryService
 }
 
 func NewSpaces(r models.RepositoryService) *Spaces {
 	return &Spaces{
-		repo:     r,
-		showView: view.MustNew("page", "show_space"),
-		newView:  view.MustNew("page", "new_space"),
-		editView: view.MustNew("page", "edit_space"),
+		repo: r,
 	}
 }
 
@@ -67,7 +61,7 @@ func (h *Spaces) List(c *Ctx) error {
 		return err
 	}
 
-	return c.Render(h.showView, Map{
+	return c.HTML(http.StatusOK, "page", "show_space", Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
 		"folder":           &models.Folder{},
@@ -80,7 +74,7 @@ func (h *Spaces) Show(c *Ctx) error {
 }
 
 func (h *Spaces) New(c *Ctx) error {
-	return c.Render(h.newView, Map{
+	return c.HTML(http.StatusOK, "page", "new_space", Map{
 		"space":            &models.Space{},
 		"validationErrors": validate.NewErrors(),
 	})
@@ -106,7 +100,7 @@ func (h *Spaces) Create(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.Render(h.newView, Map{
+		return c.HTML(http.StatusOK, "page", "new_space", Map{
 			"space":            space,
 			"validationErrors": validationErrors,
 		})
@@ -169,7 +163,7 @@ func (h *Spaces) Edit(c *Ctx) error {
 		return err
 	}
 
-	return c.Render(h.editView, Map{
+	return c.HTML(http.StatusOK, "page", "edit_space", Map{
 		"space":            space,
 		"validationErrors": validate.NewErrors(),
 	})
@@ -196,7 +190,7 @@ func (h *Spaces) Update(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.Render(h.editView, Map{
+		return c.HTML(http.StatusOK, "page", "edit_space", Map{
 			"space":            space,
 			"validationErrors": validationErrors,
 		})
@@ -234,7 +228,7 @@ func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	return c.Render(h.showView, Map{
+	return c.HTML(http.StatusOK, "page", "show_space", Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
 		"folder":           folder,

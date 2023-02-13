@@ -9,17 +9,13 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
-	"github.com/ugent-library/deliver/view"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/httphelpers"
 )
 
 type Folders struct {
-	repo      models.RepositoryService
-	file      models.FileService
-	showView  view.View
-	editView  view.View
-	shareView view.View
+	repo models.RepositoryService
+	file models.FileService
 }
 
 type FolderForm struct {
@@ -28,11 +24,8 @@ type FolderForm struct {
 
 func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
 	return &Folders{
-		repo:      r,
-		file:      f,
-		showView:  view.MustNew("page", "show_folder"),
-		editView:  view.MustNew("page", "edit_folder"),
-		shareView: view.MustNew("simple_page", "share_folder"),
+		repo: r,
+		file: f,
 	}
 }
 
@@ -52,7 +45,7 @@ func (h *Folders) Edit(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
-	return c.Render(h.editView, Map{
+	return c.HTML(http.StatusOK, "page", "edit_folder", Map{
 		"folder":           folder,
 		"validationErrors": validate.NewErrors(),
 	})
@@ -83,7 +76,7 @@ func (h *Folders) Update(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.Render(h.editView, Map{
+		return c.HTML(http.StatusOK, "page", "edit_folder", Map{
 			"folder":           folder,
 			"validationErrors": validationErrors,
 		})
@@ -189,7 +182,7 @@ func (h *Folders) Share(c *Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(h.shareView, Map{
+	return c.HTML(http.StatusOK, "simple_page", "share_folder", Map{
 		"folder": folder,
 	})
 }
@@ -205,7 +198,7 @@ func (h *Folders) show(c *Ctx, err error) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(h.showView, Map{
+	return c.HTML(http.StatusOK, "page", "show_folder", Map{
 		"folder":           folder,
 		"validationErrors": validationErrors,
 	})

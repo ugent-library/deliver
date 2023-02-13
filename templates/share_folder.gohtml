@@ -1,5 +1,7 @@
-{{define "page_title"}}{{.Data.folder.Name}}{{end}}
-{{define "body"}}
+{{define "head-share_folder"}}
+    <title>{{.Data.folder.Name}}</title>
+{{end}}
+
 <div class="d-flex u-maximize-height">
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
@@ -89,4 +91,3 @@
         </div>
     </div>
 </div>
-{{end}}

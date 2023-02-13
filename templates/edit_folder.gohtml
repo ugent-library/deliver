@@ -1,5 +1,7 @@
-{{define "page_title"}}{{.Data.folder.Space.Name}} - Edit {{.Data.folder.Name}}{{end}}
-{{define "body"}}
+{{define "head-edit_folder"}}
+    <title>{{.Data.folder.Space.Name}} - Edit {{.Data.folder.Name}}</title>
+{{end}}
+
 <div class="w-100 u-scroll-wrapper">
     <div class="bg-white">
         <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
@@ -68,4 +70,3 @@
         </div>
     </div>
 </div>
-{{end}}

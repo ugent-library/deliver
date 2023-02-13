@@ -19,12 +19,12 @@ import (
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/view"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
+	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
@@ -82,12 +82,17 @@ var appCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
-		// setup views
-		view.DefaultConfig.Funcs = template.FuncMap{
-			"assetPath":     assets.AssetPath,
-			"friendlyBytes": friendly.Bytes,
-			"join":          strings.Join,
-		}
+		// setup renderer
+		renderer := render.New(render.Options{
+			Directory:       "templates",
+			Extensions:      []string{".gohtml"},
+			RequirePartials: true,
+			Funcs: []template.FuncMap{{
+				"assetPath":     assets.AssetPath,
+				"friendlyBytes": friendly.Bytes,
+				"join":          strings.Join,
+			}},
+		})
 
 		// setup sessions
 		sessionName := config.Session.Name
@@ -118,6 +123,7 @@ var appCmd = &cobra.Command{
 			Router:       r,
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
+			Render:       renderer,
 		})
 
 		// routes

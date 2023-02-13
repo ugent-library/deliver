@@ -1,4 +1,3 @@
-{{define "simple_page"}}
 <!DOCTYPE html>
 <html class="u-maximize-height" dir="ltr" lang="en">
 
@@ -8,7 +7,7 @@
     <meta name="robots" content="noindex">
     <link rel="stylesheet" href="{{assetPath "/css/app.css"}}">
     <link rel="icon" href="{{assetPath "/favicon.ico"}}">
-    <title>{{block "page_title" .}}Deliver{{end}}</title>
+    {{partial "head"}}
 </head>
 
 <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
@@ -45,7 +44,7 @@
                 </div>
             </header>
             <main>
-                {{block "body" .}}{{end}}
+                {{yield}}
             </main>
         </div>
     </div>  
@@ -54,4 +53,3 @@
 </body>
 
 </html>
-{{end}}

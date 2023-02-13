@@ -1,17 +1,14 @@
 package controllers
 
 import (
-	"github.com/ugent-library/deliver/view"
+	"net/http"
 )
 
 type Pages struct {
-	homeView view.View
 }
 
 func NewPages() *Pages {
-	return &Pages{
-		homeView: view.MustNew("page", "home"),
-	}
+	return &Pages{}
 }
 
 func (h *Pages) Home(c *Ctx) error {
@@ -19,5 +16,5 @@ func (h *Pages) Home(c *Ctx) error {
 		c.RedirectTo("spaces")
 		return nil
 	}
-	return h.homeView.Render(c.Res, c)
+	return c.HTML(http.StatusOK, "page", "home", nil)
 }

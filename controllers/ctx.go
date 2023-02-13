@@ -13,6 +13,7 @@ import (
 	"github.com/ugent-library/deliver/routes"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/zaphttp"
+	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +35,8 @@ type Ctx struct {
 	Session *autosession.Session
 	User    *models.User
 	*models.Permissions
-	Flash []Flash
+	Flash  []Flash
+	render *render.Render
 }
 
 type Flash struct {
@@ -48,7 +50,7 @@ type Renderer interface {
 	Render(http.ResponseWriter, any) error
 }
 
-type ViewData struct {
+type TemplateData struct {
 	routes.URLHelpers
 	CSRFToken string
 	CSRFTag   template.HTML
@@ -62,6 +64,7 @@ type Config struct {
 	Router       *mux.Router
 	ErrorHandler func(*Ctx, error)
 	Permissions  *models.Permissions
+	Render       *render.Render
 }
 
 // TODO add Ctx as request Context value in middleware?
@@ -76,6 +79,7 @@ func Wrapper(config Config) func(...func(*Ctx) error) http.Handler {
 				Req:            r,
 				Session:        autosession.Get(r),
 				Permissions:    config.Permissions,
+				render:         config.Render,
 			}
 			if err := LoadSession(c); err != nil {
 				config.ErrorHandler(c, err)
@@ -95,8 +99,8 @@ func (c *Ctx) Context() context.Context {
 	return c.Req.Context()
 }
 
-func (c *Ctx) Render(r Renderer, data any) error {
-	return r.Render(c.Res, ViewData{
+func (c *Ctx) HTML(status int, layout, tmpl string, data any) error {
+	return c.render.HTML(c.Res, status, tmpl, TemplateData{
 		URLHelpers:  c.URLHelpers,
 		CSRFToken:   csrf.Token(c.Req),
 		CSRFTag:     csrf.TemplateField(c.Req),
@@ -104,6 +108,8 @@ func (c *Ctx) Render(r Renderer, data any) error {
 		Permissions: c.Permissions,
 		Flash:       c.Flash,
 		Data:        data,
+	}, render.HTMLOptions{
+		Layout: layout,
 	})
 }
 
