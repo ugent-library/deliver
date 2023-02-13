@@ -72,37 +72,38 @@
             </div>
         </div>
 
-        <div class="card w-100 mb-6">
-            <div class="card-header">
-                <div class="bc-toolbar">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">Upload files</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <form
-                    action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
-                    enctype="multipart/form-data"
-                    method="POST"
-                >
-                    {{.CSRFTag}}
-                    <div class="c-file-upload">
-                        <input type="file" name="file" multiple
-                            data-upload-progress-target="file-upload-progress"
-                            data-upload-progress-include="csrf_token"
-                        >
-                        <div class="c-file-upload__content">
-                            <p>Drag and drop or</p>
-                            <button class="btn btn-outline-primary" data-loading="Uploading...">
-                                Upload files
-                            </button>
+        <div class="u-scroll-wrapper__body px-6 pt-5">
+            <div class="card w-100 mb-6">
+                <div class="card-header sr-only">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <h2 class="bc-toolbar-item">Upload files</h2>
                         </div>
                     </div>
-                </form>
-                <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
+                </div>
+                <div class="card-body">
+                    <form
+                        action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
+                        enctype="multipart/form-data"
+                        method="POST"
+                    >
+                        {{.CSRFTag}}
+                        <div class="c-file-upload c-file-upload--small">
+                            <input type="file" name="file" multiple
+                                data-upload-progress-target="file-upload-progress"
+                                data-upload-progress-include="csrf_token"
+                            >
+                            <div class="c-file-upload__content">
+                                <p>Drag and drop or</p>
+                                <button class="btn btn-outline-primary" data-loading="Uploading...">
+                                    Upload files
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
+                </div>
             </div>
-        </div>
 
         <div class="card w-100 mb-6">
             <div class="card-header">

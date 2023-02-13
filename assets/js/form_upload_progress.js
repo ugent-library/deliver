@@ -39,7 +39,7 @@ export default function() {
                 req.upload.addEventListener('progress', e => {
                     if (!e.lengthComputable) return;
 
-                    let percent = Math.floor(e.loaded / e.total) * 100
+                    let percent = Math.floor(e.loaded / e.total * 100)
                     tmpl.querySelector('.upload-size').innerText = friendlyBytes(e.loaded)
                     tmpl.querySelector('.upload-percent').innerText = percent
                     let pb = tmpl.querySelector('.progress-bar')

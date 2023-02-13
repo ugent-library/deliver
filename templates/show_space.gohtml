@@ -7,7 +7,7 @@
         <div class="bc-toolbar">
             <div class="bc-toolbar-left">
                 <div class="bc-toolbar-item">
-                    <h4 class="bc-toolbar-title">Your deliver spaces</h4>
+                    <h1 class="bc-toolbar-title">Your deliver spaces</h1>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
                     <div class="bc-toolbar-item">
-                        <h4 class="bc-toolbar-title">{{.Data.space.Name}} folders</h4>
+                        <h1 class="bc-toolbar-title">{{.Data.space.Name}} folders</h1>
                     </div>
                 </div>
                 {{if .IsAdmin .User}}
@@ -64,7 +64,9 @@
             <div class="card-header">
                 <div class="bc-toolbar">
                     <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">Make a folder</div>
+                        <div class="bc-toolbar-item">
+                            <h2>Make a folder</h2>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,7 +105,12 @@
                 <div class="bc-toolbar">
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item">
-                            Showing {{len .Data.space.Folders}} of {{len .Data.space.Folders}} items
+                            <h2>Folders</h2>
+                        </div>
+                    </div>
+                    <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <p>Showing {{len .Data.space.Folders}} of {{len .Data.space.Folders}} folders</p>
                         </div>
                     </div>
                 </div>
@@ -115,8 +122,8 @@
                         <tr>
                             <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
                             <th class="text-nowrap">Shareable link</th>
-                            <th class="text-nowrap">Documents</th>
                             <th class="text-nowrap">Expires on</th>
+                            <th class="text-nowrap">Documents</th>
                             <th class="text-nowrap">Created at</th>
                             <th class="text-nowrap">Updated at</th>
                             <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
@@ -139,11 +146,11 @@
                                 </code>
                             </td>
                             <td class="text-nowrap">
-                                <p>{{.FileCount}} files</p>
-                                <p class="small">{{friendlyBytes .Size}}</p>
+                                <p>{{.ExpiresAt.Format "2006-01-02 15:04"}}</p>
                             </td>
                             <td class="text-nowrap">
-                                <p>{{.ExpiresAt.Format "2006-01-02 15:04"}}</p>
+                                <p>{{.FileCount}} files</p>
+                                <p class="small">{{friendlyBytes .Size}}</p>
                             </td>
                             <td class="text-nowrap">
                                 <p>{{.CreatedAt.Format "2006-01-02 15:04"}}</p>
