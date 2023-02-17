@@ -5,7 +5,6 @@ import (
 	"strings"
 )
 
-// TODO take advantage of errors.Join in Go 1.20
 type Errors struct {
 	errors []*Error
 }
