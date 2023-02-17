@@ -118,62 +118,66 @@ func (h *Folders) UploadFile(c *Ctx) error {
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
-		return err
+		return httperror.NotFound
 	}
 
 	if !c.IsSpaceAdmin(c.User, folder.Space) {
 		return httperror.Forbidden
 	}
 
-	// 2GB limit on request body
-	c.Req.Body = http.MaxBytesReader(c.Res, c.Req.Body, 2_000_000_000)
-	// buffer limit of 32MB
+	// buffer limit of 32MB. Rest is stored in $TMPDIR/multipart-*
 	if err := c.Req.ParseMultipartForm(32_000_000); err != nil {
+		// error is always caused by max bytes reader?
+		return httperror.RequestEntityTooLarge
+	}
+
+	// important: upload size limit moved to middleware
+	fileBody, fileHeader, err := c.Req.FormFile("file")
+
+	if err != nil {
 		return err
 	}
 
-	for _, fileHeader := range c.Req.MultipartForm.File["file"] {
-		f, err := fileHeader.Open()
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		mediatype, err := httphelpers.DetectContentType(f)
-		if err != nil {
-			return err
-		}
-
-		file := &models.File{
-			FolderID:    folderID,
-			ID:          ulid.Make().String(),
-			Name:        fileHeader.Filename,
-			ContentType: mediatype,
-			Size:        fileHeader.Size,
-		}
-
-		// TODO get size
-		md5, err := h.file.Add(c.Context(), file.ID, f)
-		if err != nil {
-			return err
-		}
-
-		file.MD5 = md5
-
-		if err = h.repo.CreateFile(c.Context(), file); err != nil {
-			return h.show(c, err)
-		}
+	mediatype, err := httphelpers.DetectContentType(fileBody)
+	if err != nil {
+		return err
 	}
 
-	c.Session.Append(flashKey, Flash{
-		Type:         infoFlash,
-		Body:         "File added succesfully",
-		DismissAfter: 3 * time.Second,
-	})
+	file := &models.File{
+		FolderID:    folderID,
+		ID:          ulid.Make().String(),
+		Name:        fileHeader.Filename,
+		ContentType: mediatype,
+		Size:        fileHeader.Size,
+	}
 
-	c.RedirectTo("folder", "folderID", folderID)
+	// TODO get size
+	md5, err := h.file.Add(c.Context(), file.ID, fileBody)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	file.MD5 = md5
+
+	if err = h.repo.CreateFile(c.Context(), file); err != nil {
+		return h.show(c, err)
+	}
+
+	//reload folder
+	folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
+
+	if err != nil {
+		return err
+	}
+
+	return c.HTML(
+		http.StatusOK,
+		"",
+		"show_folder/files_body",
+		Map{
+			"folder": folder,
+		},
+	)
 }
 
 func (h *Folders) Share(c *Ctx) error {

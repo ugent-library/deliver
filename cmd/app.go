@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
+	internalHandlers "github.com/ugent-library/deliver/handlers"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
@@ -148,6 +149,7 @@ var appCmd = &cobra.Command{
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
+		r.Handle("/files/{fileID}/confirm-delete", wrap(c.RequireUser, files.ConfirmDelete)).Methods("GET").Name("confirm_delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
 		// apply these before request reaches the router
@@ -159,6 +161,8 @@ var appCmd = &cobra.Command{
 					logger.Error(err)
 				}
 			}),
+			// TODO: make size configurable
+			internalHandlers.MaxBytesHandler(2_000_000_000),
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
 				[]byte(config.Session.Secret),
@@ -168,7 +172,7 @@ var appCmd = &cobra.Command{
 				csrf.SameSite(csrf.SameSiteStrictMode),
 				csrf.FieldName("csrf_token"),
 			),
-			handlers.HTTPMethodOverrideHandler,
+			internalHandlers.HTTPMethodOverrideHandler,
 			middleware.If(config.Production, handlers.ProxyHeaders),
 			middleware.SetRequestID(func() string {
 				return ulid.Make().String()

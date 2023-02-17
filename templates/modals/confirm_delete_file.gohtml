@@ -1,0 +1,23 @@
+{{define "modal_dialog"}}
+<div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="c-blank-slate c-blank-slate-muted">
+                <div class="bc-avatar">
+                    <i class="if if-alert"></i>
+                </div>
+                <h4>
+                    Are you sure you want to delete the file
+                    <br>
+                    <strong>{{.Data.file.Name}}</strong>?
+                </h4>
+                <p>You cannot undo this action.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-link modal-close" data-dismiss="modal">No, cancel</button>
+            <button class="btn btn-danger" hx-delete="{{$.PathTo "delete_file" "fileID" .Data.file.ID}}" hx-swap="none">Yes, delete this file</button>
+        </div>
+    </div>
+</div>
+{{end}}
