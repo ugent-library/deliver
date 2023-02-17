@@ -93,7 +93,7 @@
                                 data-upload-progress-target="file-upload-progress"
                                 data-upload-progress-include="csrf_token"
                                 data-upload-max-size="5000000000"
-                                data-upload-msg-file-aborted="File uploaded by you"
+                                data-upload-msg-file-aborted="File upload aborted by you"
                                 data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
                                 data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
                                 data-upload-msg-file-too-large="File upload failed: too large"
@@ -159,11 +159,15 @@
                                 <i class="if if-close"></i>
                                 <span class="btn-text">Cancel upload</span>
                             </button>
+                            <button class="btn btn-sm btn-remove-upload d-none" type="button">
+                                <i class="if if-close"></i>
+                                <span class="btn-text">Remove</span>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="progress w-100 mt-4">
-                    <div class="progress-bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="bc-toolbar bc-toolbar--auto mt-2">
                     <div class="bc-toolbar-left">

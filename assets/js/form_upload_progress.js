@@ -1,28 +1,6 @@
+import BSN from 'bootstrap.native/dist/bootstrap-native-v4';
 export default function() {
     document.querySelectorAll('form input[data-upload-progress-target]').forEach(input => {
-        /*
-         *  TODO: after full upload provide state to show that server is still processing content,
-         *  otherwise you will end up with with a progress bar showing 100% for a long time
-         *
-         *  TODO: check traefik request timeout when proxying content
-         *
-         *  TODO: inspect at server if the request body is really streamed into the S3 storage,
-         *  because there is some lag after upload, which suggests that the upload to the S3 storage
-         *  still needs to start at that point. Maybe because golang middlewares CSRF and ProxyMethodOverride
-         *  have started reading the request body, and therefore the request is blocked in those
-         *  middlewares before arriving at the destination request handler? That would mean that
-         *  the upload ends while we are still in the middleware, and that the request handler
-         *  gets a "temporary file" that needs to be uploaded to S3
-         *
-         *  TODO: even if at server side the middlewars CSRF and ProxyMethodOverride use only the headers,
-         *  the request handler cannot return a response before the full request body is sent.
-         *  http.MaxBytesReader solves this by closing the connection, but can we do this here too?
-         *
-         *  TODO: prematurely stop upload on client side
-         *
-         *  TODO: on server ParseForm is executed, which reads file bigger than 32MB into tmp files.
-         *        so .. why not upload file in body only, and pass content-type and file-name via the headers?
-         * */
         input.addEventListener('change', () => {
             let files = Array.from(input.files)
 
@@ -42,6 +20,15 @@ export default function() {
                   if (b == null) return
                   b.parentElement.removeChild(b)
                 }
+                let showBtnRemoveUpload = function(){
+                  let b = tmpl.querySelector('.btn-remove-upload')
+                  if (b == null) return
+                  b.classList.remove('d-none')
+                }
+                tmpl.querySelector('.btn-remove-upload').addEventListener('click', function(){
+                  let i = this.closest('.list-group-item')
+                  i.parentElement.removeChild(i)
+                })
                 let showMessage = function(msg, level) {
                   let m = tmpl.querySelector('.upload-msg')
                   let cl = 'text-muted'
@@ -65,17 +52,19 @@ export default function() {
                   pgBar.classList.add(cl)
                 }
 
+                // prevent file upload when above max size
                 let maxSize = input.dataset.uploadMaxSize
-
                 if (!isNaN(maxSize) && file.size > maxSize) {
 
                   hideBtnCancelUpload()
+                  showBtnRemoveUpload()
                   showMessage(input.dataset.uploadMsgFileTooLarge, 'error')
                   hlPgBar(tmpl.querySelector('.progress-bar'), 'error')
                   return
 
                 }
 
+                // send headers along with request
                 let headers = [
                   ['X-CSRF-Token', csrfToken],
                   // weird, but makes sure that middleware does not try to read _method from form
@@ -89,9 +78,12 @@ export default function() {
                 let req = new XMLHttpRequest();
 
                 req.addEventListener('abort', e => {
+
                   showMessage(input.dataset.uploadMsgFileAborted, 'error')
                   hlPgBar(tmpl.querySelector('.progress-bar'), 'error')
                   hideBtnCancelUpload()
+                  showBtnRemoveUpload()
+
                 }, false);
 
                 req.upload.addEventListener('progress', e => {
@@ -108,7 +100,6 @@ export default function() {
 
                       hideBtnCancelUpload()
                       showMessage(input.dataset.uploadMsgFileProcessing, 'info')
-                      pb.classList.add('progress-bar-striped')
 
                     } else {
 
@@ -130,19 +121,26 @@ export default function() {
                     tmpl.parentElement.removeChild(tmpl)
                     let filesBody = document.getElementById('files-body')
                     filesBody.innerHTML = req.response
-                    //trigger htmx on newly added elements
+                    //trigger htmx and bootstrap on newly added elements
                     htmx.process(filesBody)
+                    //htmx.process does not trigger htmx.onload, so repeat here
+                    BSN.initCallback()
 
                   }
-                  // file too large
+                  /*
+                   * file too large.
+                   */
                   else if(req.status == 413) {
 
+                    showBtnRemoveUpload()
                     showMessage(input.dataset.uploadMsgFileTooLarge, 'error')
                     hlPgBar(tmpl.querySelector('.progress-bar'), 'error')
 
                   }
+                  // directory has been removed in the meantime
                   else if(req.status == 404) {
 
+                    showBtnRemoveUpload()
                     showMessage(input.dataset.uploadMsgDirNotFound, 'error')
                     hlPgBar(tmpl.querySelector('.progress-bar'), 'error')
 
@@ -150,6 +148,7 @@ export default function() {
                   // undetermined errors
                   else {
 
+                    showBtnRemoveUpload()
                     showMessage(input.dataset.uploadMsgUnexpected, 'error')
                     hlPgBar(tmpl.querySelector('.progress-bar'), 'error')
 

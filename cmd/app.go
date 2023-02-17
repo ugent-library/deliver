@@ -106,6 +106,9 @@ var appCmd = &cobra.Command{
 		gob.Register(&models.User{})
 		gob.Register(c.Flash{})
 
+		// upload max size (TODO: make this configurable)
+		const uploadMaxSize = 2_000_000_000
+
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
@@ -149,7 +152,6 @@ var appCmd = &cobra.Command{
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
-		r.Handle("/files/{fileID}/confirm-delete", wrap(c.RequireUser, files.ConfirmDelete)).Methods("GET").Name("confirm_delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
 		// apply these before request reaches the router
@@ -161,8 +163,9 @@ var appCmd = &cobra.Command{
 					logger.Error(err)
 				}
 			}),
-			// TODO: make size configurable
-			internalHandlers.MaxBytesHandler(5_000_000_000),
+			func(next http.Handler) http.Handler {
+				return http.MaxBytesHandler(next, uploadMaxSize)
+			},
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
 				[]byte(config.Session.Secret),

@@ -50,7 +50,7 @@
                 </td>
                 <td class="table-col-sm-fixed table-col-sm-fixed-right">
                     <div class="c-button-toolbar flex-nowrap">
-                        <button class="btn btn-link" hx-get="{{$.PathTo "confirm_delete_file" "fileID" .ID}}" hx-target="#modals">
+                        <button class="btn btn-link" data-toggle="modal" data-target="#confirm-delete-file-{{.ID}}">
                             <i class="if if-delete"></i>
                             <span class="btn-text">Delete</span>
                         </button>
@@ -73,3 +73,31 @@
     <p>Upload files to get started</p>
 </div>
 {{end}}
+
+<div id="confirm-delete-file-modals">
+{{range .Data.folder.Files}}
+    <div id="confirm-delete-file-{{.ID}}" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="c-blank-slate c-blank-slate-muted">
+                        <div class="bc-avatar">
+                            <i class="if if-alert"></i>
+                        </div>
+                        <h4>
+                            Are you sure you want to delete the file
+                            <br>
+                            <strong>{{.Name}}</strong>?
+                        </h4>
+                        <p>You cannot undo this action.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                    <button class="btn btn-danger" hx-delete="{{$.PathTo "download_file" "fileID" .ID}}" hx-swap="none">Yes, delete this file</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
+</div>

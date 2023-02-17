@@ -125,6 +125,10 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
+	/*
+		TODO: retrieve content type by content sniffing
+		without interfering with streaming body
+	*/
 	contentLength, _ := strconv.ParseInt(c.Req.Header.Get("Content-Length"), 10, 64)
 
 	file := &models.File{
@@ -147,7 +151,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		return h.show(c, err)
 	}
 
-	//reload folder
+	// reload folder
 	folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
 
 	if err != nil {
