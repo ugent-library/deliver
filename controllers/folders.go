@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -10,7 +11,6 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/httphelpers"
 )
 
 type Folders struct {
@@ -125,34 +125,18 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
-	// buffer limit of 32MB. Rest is stored in $TMPDIR/multipart-*
-	if err := c.Req.ParseMultipartForm(32_000_000); err != nil {
-		// error is always caused by max bytes reader?
-		return httperror.RequestEntityTooLarge
-	}
-
-	// important: upload size limit moved to middleware
-	fileBody, fileHeader, err := c.Req.FormFile("file")
-
-	if err != nil {
-		return err
-	}
-
-	mediatype, err := httphelpers.DetectContentType(fileBody)
-	if err != nil {
-		return err
-	}
+	contentLength, _ := strconv.ParseInt(c.Req.Header.Get("Content-Length"), 10, 64)
 
 	file := &models.File{
 		FolderID:    folderID,
 		ID:          ulid.Make().String(),
-		Name:        fileHeader.Filename,
-		ContentType: mediatype,
-		Size:        fileHeader.Size,
+		Name:        c.Req.Header.Get("X-Upload-Filename"),
+		ContentType: c.Req.Header.Get("Content-Type"),
+		Size:        contentLength,
 	}
 
 	// TODO get size
-	md5, err := h.file.Add(c.Context(), file.ID, fileBody)
+	md5, err := h.file.Add(c.Context(), file.ID, c.Req.Body)
 	if err != nil {
 		return err
 	}

@@ -76,13 +76,14 @@ export default function() {
 
                 }
 
-                let formData = new FormData()
-                formData.append('file', file)
-
                 let headers = [
                   ['X-CSRF-Token', csrfToken],
                   // weird, but makes sure that middleware does not try to read _method from form
-                  ['X-HTTP-Method-Override', 'POST']
+                  ['X-HTTP-Method-Override', 'POST'],
+                  ['X-Upload-Filename', file.name],
+                  //refused by browser
+                  //['Content-Length', file.size],
+                  ['ContentT-Type', file.type]
                 ]
 
                 let req = new XMLHttpRequest();
@@ -164,7 +165,7 @@ export default function() {
                   evt.preventDefault()
                   req.abort()
                 })
-                req.send(formData);
+                req.send(file);
 
             })
         })

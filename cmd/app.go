@@ -162,7 +162,7 @@ var appCmd = &cobra.Command{
 				}
 			}),
 			// TODO: make size configurable
-			internalHandlers.MaxBytesHandler(2_000_000_000),
+			internalHandlers.MaxBytesHandler(5_000_000_000),
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
 				[]byte(config.Session.Secret),
