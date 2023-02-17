@@ -52,9 +52,9 @@ export default function() {
                   pgBar.classList.add(cl)
                 }
 
-                // prevent file upload when above max size
-                let maxSize = input.dataset.uploadMaxSize
-                if (!isNaN(maxSize) && file.size > maxSize) {
+                // prevent file upload when above max file size
+                let maxFileSize = input.dataset.uploadMaxFileSize
+                if (!isNaN(maxFileSize) && file.size > maxFileSize) {
 
                   hideBtnCancelUpload()
                   showBtnRemoveUpload()

@@ -1,15 +1,16 @@
 package cmd
 
 type Config struct {
-	Production bool
-	Admins     []string
-	DB         string
-	S3         S3Config
-	Host       string
-	Port       int
-	OIDC       OIDCConfig
-	Session    SessionConfig
-	CSRF       CSRFConfig
+	Production  bool
+	Admins      []string
+	DB          string
+	S3          S3Config
+	Host        string
+	Port        int
+	OIDC        OIDCConfig
+	Session     SessionConfig
+	CSRF        CSRFConfig
+	MaxFileSize int64 `mapstructure:"max_file_size"`
 }
 
 type SpacesConfig struct {

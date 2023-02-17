@@ -16,6 +16,7 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
 	internalHandlers "github.com/ugent-library/deliver/handlers"
@@ -106,9 +107,6 @@ var appCmd = &cobra.Command{
 		gob.Register(&models.User{})
 		gob.Register(c.Flash{})
 
-		// upload max size (TODO: make this configurable)
-		const uploadMaxSize = 2_000_000_000
-
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
@@ -119,7 +117,7 @@ var appCmd = &cobra.Command{
 		auth := c.NewAuth(oidcAuth)
 		pages := c.NewPages()
 		spaces := c.NewSpaces(repoService)
-		folders := c.NewFolders(repoService, fileService)
+		folders := c.NewFolders(repoService, fileService, viper.GetInt64("max_file_size"))
 		files := c.NewFiles(repoService, fileService)
 
 		// request context wrapper
@@ -164,7 +162,7 @@ var appCmd = &cobra.Command{
 				}
 			}),
 			func(next http.Handler) http.Handler {
-				return http.MaxBytesHandler(next, uploadMaxSize)
+				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
 			},
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(

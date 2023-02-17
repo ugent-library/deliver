@@ -14,18 +14,20 @@ import (
 )
 
 type Folders struct {
-	repo models.RepositoryService
-	file models.FileService
+	repo        models.RepositoryService
+	file        models.FileService
+	maxFileSize int64
 }
 
 type FolderForm struct {
 	Name string `form:"name"`
 }
 
-func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
+func NewFolders(r models.RepositoryService, f models.FileService, maxFileSize int64) *Folders {
 	return &Folders{
-		repo: r,
-		file: f,
+		repo:        r,
+		file:        f,
+		maxFileSize: maxFileSize,
 	}
 }
 
@@ -163,7 +165,8 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		"",
 		"show_folder/files_body",
 		Map{
-			"folder": folder,
+			"folder":      folder,
+			"maxFileSize": h.maxFileSize,
 		},
 	)
 }
@@ -193,5 +196,6 @@ func (h *Folders) show(c *Ctx, err error) error {
 	return c.HTML(http.StatusOK, "page", "show_folder", Map{
 		"folder":           folder,
 		"validationErrors": validationErrors,
+		"maxFileSize":      h.maxFileSize,
 	})
 }

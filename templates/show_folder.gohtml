@@ -92,11 +92,11 @@
                             <input type="file" name="file" multiple
                                 data-upload-progress-target="file-upload-progress"
                                 data-upload-progress-include="csrf_token"
-                                data-upload-max-size="5000000000"
+                                data-upload-max-file-size="{{.Data.maxFileSize}}"
                                 data-upload-msg-file-aborted="File upload aborted by you"
                                 data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
                                 data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
-                                data-upload-msg-file-too-large="File upload failed: too large"
+                                data-upload-msg-file-too-large="File is too large. Maximum file size is {{friendlyBytes .Data.maxFileSize}}"
                                 data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
                                 data-upload-msg-unexpected="File upload failed: unexpected server error"
                             >
@@ -105,6 +105,7 @@
                                 <button class="btn btn-outline-primary" data-loading="Uploading...">
                                     Upload files
                                 </button>
+                                <p class="small pt-3 mb-0">Maximum file size: {{friendlyBytes .Data.maxFileSize}}</p>
                             </div>
                         </div>
                     </form>
