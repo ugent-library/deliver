@@ -167,6 +167,9 @@ export default function() {
                 req.send(file);
 
             })
+
+            // important to retrigger "change" when someone enters the same file name again
+            input.value = "";
         })
     });
 }
