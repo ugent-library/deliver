@@ -128,7 +128,8 @@ export default function() {
 
                   }
                   /*
-                   * file too large.
+                   * file too large. Unfortunately this cannot be detected
+                   * anymore at server as the error is wrapped inside others.
                    */
                   else if(req.status == 413) {
 
