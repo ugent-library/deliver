@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -198,7 +197,6 @@ func (h *Folders) Share(c *Ctx) error {
 
 func (h *Folders) Download(c *Ctx) error {
 
-	fmt.Fprintf(os.Stderr, "download folder\n")
 	folderID := c.Path("folderID")
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
