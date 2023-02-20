@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"archive/zip"
+	"bufio"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -182,9 +186,60 @@ func (h *Folders) Share(c *Ctx) error {
 	if err != nil {
 		return err
 	}
+	var folderSize int64 = 0
+	for _, file := range folder.Files {
+		folderSize += file.Size
+	}
 	return c.HTML(http.StatusOK, "simple_page", "share_folder", Map{
-		"folder": folder,
+		"folder":     folder,
+		"folderSize": folderSize,
 	})
+}
+
+func (h *Folders) Download(c *Ctx) error {
+
+	fmt.Fprintf(os.Stderr, "download folder\n")
+	folderID := c.Path("folderID")
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	if err != nil {
+		return httperror.NotFound
+	}
+
+	zipFileName := fmt.Sprintf(
+		"%s-%s.zip",
+		folder.ID,
+		folder.Slug(),
+	)
+	c.Res.Header().Add("Content-Type", "application/zip")
+	c.Res.Header().Add(
+		"Content-Disposition",
+		fmt.Sprintf("attachment; filename*=UTF-8''%s", zipFileName),
+	)
+
+	zipFh := zip.NewWriter(bufio.NewWriter(c.Res))
+	defer zipFh.Close()
+
+	for _, file := range folder.Files {
+
+		fileWriter, err := zipFh.CreateHeader(&zip.FileHeader{
+			Name:     file.Name,
+			Method:   zip.Store, //no compression for streaming
+			Modified: time.Now(),
+		})
+		if err != nil {
+			return err
+		}
+
+		// increment file download count
+		if err := h.repo.AddFileDownload(c.Context(), file.ID); err != nil {
+			return err
+		}
+
+		// add file contents to zip
+		h.file.Get(c.Context(), file.ID, fileWriter)
+	}
+
+	return nil
 }
 
 func (h *Folders) show(c *Ctx, err error) error {

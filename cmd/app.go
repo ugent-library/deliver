@@ -143,6 +143,7 @@ var appCmd = &cobra.Command{
 		r.Handle("/spaces/{spaceName}/folders", wrap(c.RequireUser, spaces.CreateFolder)).Methods("POST").Name("create_folder")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
 		r.Handle("/folders/{folderID}/edit", wrap(c.RequireUser, folders.Edit)).Methods("GET").Name("edit_folder")
+		r.Handle("/download/{folderID}", wrap(folders.Download)).Methods("GET").Name("download_folder")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Update)).Methods("PUT").Name("update_folder")
 		r.Handle("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
 		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")

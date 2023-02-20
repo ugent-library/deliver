@@ -56,6 +56,10 @@
                                 <th class="text-nowrap align-middle">Downloads</th>
                                 <th class="text-nowrap align-middle">Created at</th>
                                 <th class="table-col-sm-fixed table-col-sm-fixed-right text-right align-middle">
+                                    <a class="btn btn-primary" href="{{$.PathTo "download_folder" "folderID" .Data.folder.ID}}">
+                                        <i class="if if-download"></i>
+                                        <span class="btn-text">Download all files</span>
+                                    </a>
                                 </th>
                             </tr>
                         </thead>
