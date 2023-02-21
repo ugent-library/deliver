@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -133,10 +134,13 @@ func (h *Folders) UploadFile(c *Ctx) error {
 	*/
 	contentLength, _ := strconv.ParseInt(c.Req.Header.Get("Content-Length"), 10, 64)
 
+	// request header only accepts ISO-8859-1 so we had to escape it
+	uploadFilename, _ := url.QueryUnescape(c.Req.Header.Get("X-Upload-Filename"))
+
 	file := &models.File{
 		FolderID:    folderID,
 		ID:          ulid.Make().String(),
-		Name:        c.Req.Header.Get("X-Upload-Filename"),
+		Name:        uploadFilename,
 		ContentType: c.Req.Header.Get("Content-Type"),
 		Size:        contentLength,
 	}

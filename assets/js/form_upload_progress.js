@@ -69,7 +69,8 @@ export default function() {
                   ['X-CSRF-Token', csrfToken],
                   // weird, but makes sure that middleware does not try to read _method from form
                   ['X-HTTP-Method-Override', 'POST'],
-                  ['X-Upload-Filename', file.name],
+                  //"Failed to execute 'setRequestHeader' on 'XMLHttpRequest': String contains non ISO-8859-1 code point"
+                  ['X-Upload-Filename', encodeURIComponent(file.name)],
                   //refused by browser
                   //['Content-Length', file.size],
                   ['ContentT-Type', file.type]
