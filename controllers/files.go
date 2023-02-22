@@ -24,6 +24,7 @@ func (h *Files) Download(c *Ctx) error {
 	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
 	}
+	c.Res.Header().Add("Content-Disposition", "attachment")
 	return h.file.Get(c.Context(), fileID, c.Res)
 }
 
