@@ -51,17 +51,11 @@
         <div class="bc-toolbar bc-toolbar--sm">
             <div class="bc-toolbar-left">
                 <div class="bc-toolbar-item">
-                    <label class="c-label m-0">Public shareable link</label>
-                </div>
-                <div class="bc-toolbar-item">
-                    <code class="c-code">
-                        {{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}
-                        <a class="btn btn-link btn-icon-only btn-sm pl-3 ml-3 border-left" href="{{.PathTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}" target="_blank">
-                            <i class="if if-eye">
-                                <p class="sr-only">Open public shareable link in a new tab</p>
-                            </i>
-                        </a>
-                    </code>
+                    <button class="btn btn-outline-secondary btn-clipboard-small">
+                        <i class="if if-copy text-primary"></i>
+                        <span class="btn-text text-primary">Copy public shareable link</span>
+                        <span class="btn-text border-left pl-4 ml-4 btn-clipboard-value">{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}</span>
+                    </button>
                 </div>
                 <div class="bc-toolbar-item border-left pl-6">
                     <label class="c-label m-0">Expires on</label>
