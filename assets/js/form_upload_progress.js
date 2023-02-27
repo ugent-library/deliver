@@ -1,5 +1,3 @@
-import BSN from 'bootstrap.native/dist/bootstrap-native-v4';
-
 export default function(rootEl) {
     rootEl.querySelectorAll('form input[data-upload-progress-target]').forEach(input => {
         input.addEventListener('change', () => {
@@ -123,12 +121,11 @@ export default function(rootEl) {
                     tmpl.parentElement.removeChild(tmpl)
                     let filesBody = document.getElementById('files-body')
                     filesBody.innerHTML = req.response
-                    //trigger htmx and bootstrap on newly added elements
+                    // trigger htmx on newly added elements
                     htmx.process(filesBody)
-                    //htmx.process does not trigger htmx.onload, so repeat here
-                    BSN.initCallback()
-
+                    htmx.trigger(filesBody, 'htmx:load')
                   }
+
                   /*
                    * file too large. Unfortunately this cannot be detected
                    * anymore at server as the error is wrapped inside others.
