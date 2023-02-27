@@ -74,7 +74,7 @@ export default function() {
                   ['X-Upload-Filename', encodeURIComponent(file.name)],
                   //refused by browser
                   //['Content-Length', file.size],
-                  ['ContentT-Type', file.type]
+                  ['Content-Type', file.type]
                 ]
 
                 let req = new XMLHttpRequest();
