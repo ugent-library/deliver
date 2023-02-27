@@ -1,7 +1,7 @@
 import BSN from 'bootstrap.native/dist/bootstrap-native-v4';
 
-export default function() {
-    document.querySelectorAll('form input[data-upload-progress-target]').forEach(input => {
+export default function(rootEl) {
+    rootEl.querySelectorAll('form input[data-upload-progress-target]').forEach(input => {
         input.addEventListener('change', () => {
             let files = Array.from(input.files)
 

@@ -1,5 +1,5 @@
-export default function () {
-    document.querySelectorAll('[data-dismiss="toast"]').forEach((el) => {
+export default function (rootEl) {
+    rootEl.querySelectorAll('[data-dismiss="toast"]').forEach((el) => {
         el.Toast.show()
     })
 }

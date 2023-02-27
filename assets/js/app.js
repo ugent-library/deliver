@@ -8,13 +8,13 @@ import modalClose from './modal_close.js'
 
 // configure htmx
 htmx.config.defaultFocusScroll = true
-htmx.onLoad(function(el) {
-    BSN.initCallback()
-    bootstrapPopper()
-    toast()
-    formSubmit()
-    formUploadProgress()
-    modalClose()
+htmx.onLoad(function(rootEl) {
+    BSN.initCallback(rootEl)
+    bootstrapPopper(rootEl)
+    toast(rootEl)
+    formSubmit(rootEl)
+    formUploadProgress(rootEl)
+    modalClose(rootEl)
 });
 
 window.htmx = htmx
