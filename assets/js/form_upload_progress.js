@@ -1,4 +1,5 @@
 import BSN from 'bootstrap.native/dist/bootstrap-native-v4';
+
 export default function() {
     document.querySelectorAll('form input[data-upload-progress-target]').forEach(input => {
         input.addEventListener('change', () => {
@@ -170,7 +171,7 @@ export default function() {
 
             })
 
-            // important to retrigger "change" when someone enters the same file name again
+            // important to retrigger "change" when someone enters the same file again
             input.value = "";
         })
     });
