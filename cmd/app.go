@@ -86,9 +86,10 @@ var appCmd = &cobra.Command{
 
 		// setup renderer
 		renderer := render.New(render.Options{
-			Directory:       "templates",
-			Extensions:      []string{".gohtml"},
-			RequirePartials: true,
+			Directory:          "templates",
+			Extensions:         []string{".gohtml"},
+			RequirePartials:    true,
+			HTMLTemplateOption: "missingkey=error",
 			Funcs: []template.FuncMap{{
 				"assetPath":     assets.AssetPath,
 				"friendlyBytes": friendly.Bytes,
