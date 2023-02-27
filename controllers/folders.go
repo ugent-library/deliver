@@ -3,6 +3,8 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/oklog/ulid/v2"
@@ -10,22 +12,23 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/httphelpers"
 )
 
 type Folders struct {
-	repo models.RepositoryService
-	file models.FileService
+	repo        models.RepositoryService
+	file        models.FileService
+	maxFileSize int64
 }
 
 type FolderForm struct {
 	Name string `form:"name"`
 }
 
-func NewFolders(r models.RepositoryService, f models.FileService) *Folders {
+func NewFolders(r models.RepositoryService, f models.FileService, maxFileSize int64) *Folders {
 	return &Folders{
-		repo: r,
-		file: f,
+		repo:        r,
+		file:        f,
+		maxFileSize: maxFileSize,
 	}
 }
 
@@ -118,62 +121,58 @@ func (h *Folders) UploadFile(c *Ctx) error {
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
-		return err
+		return httperror.NotFound
 	}
 
 	if !c.IsSpaceAdmin(c.User, folder.Space) {
 		return httperror.Forbidden
 	}
 
-	// 2GB limit on request body
-	c.Req.Body = http.MaxBytesReader(c.Res, c.Req.Body, 2_000_000_000)
-	// buffer limit of 32MB
-	if err := c.Req.ParseMultipartForm(32_000_000); err != nil {
+	/*
+		TODO: retrieve content type by content sniffing
+		without interfering with streaming body
+	*/
+	contentLength, _ := strconv.ParseInt(c.Req.Header.Get("Content-Length"), 10, 64)
+
+	// request header only accepts ISO-8859-1 so we had to escape it
+	uploadFilename, _ := url.QueryUnescape(c.Req.Header.Get("X-Upload-Filename"))
+
+	file := &models.File{
+		FolderID:    folderID,
+		ID:          ulid.Make().String(),
+		Name:        uploadFilename,
+		ContentType: c.Req.Header.Get("Content-Type"),
+		Size:        contentLength,
+	}
+
+	// TODO get size
+	md5, err := h.file.Add(c.Context(), file.ID, c.Req.Body)
+	if err != nil {
 		return err
 	}
 
-	for _, fileHeader := range c.Req.MultipartForm.File["file"] {
-		f, err := fileHeader.Open()
-		if err != nil {
-			return err
-		}
-		defer f.Close()
+	file.MD5 = md5
 
-		mediatype, err := httphelpers.DetectContentType(f)
-		if err != nil {
-			return err
-		}
-
-		file := &models.File{
-			FolderID:    folderID,
-			ID:          ulid.Make().String(),
-			Name:        fileHeader.Filename,
-			ContentType: mediatype,
-			Size:        fileHeader.Size,
-		}
-
-		// TODO get size
-		md5, err := h.file.Add(c.Context(), file.ID, f)
-		if err != nil {
-			return err
-		}
-
-		file.MD5 = md5
-
-		if err = h.repo.CreateFile(c.Context(), file); err != nil {
-			return h.show(c, err)
-		}
+	if err = h.repo.CreateFile(c.Context(), file); err != nil {
+		return h.show(c, err)
 	}
 
-	c.Session.Append(flashKey, Flash{
-		Type:         infoFlash,
-		Body:         "File added succesfully",
-		DismissAfter: 3 * time.Second,
-	})
+	// reload folder
+	folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
 
-	c.RedirectTo("folder", "folderID", folderID)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return c.HTML(
+		http.StatusOK,
+		"",
+		"show_folder/files_body",
+		Map{
+			"folder":      folder,
+			"maxFileSize": h.maxFileSize,
+		},
+	)
 }
 
 func (h *Folders) Share(c *Ctx) error {
@@ -201,5 +200,6 @@ func (h *Folders) show(c *Ctx, err error) error {
 	return c.HTML(http.StatusOK, "page", "show_folder", Map{
 		"folder":           folder,
 		"validationErrors": validationErrors,
+		"maxFileSize":      h.maxFileSize,
 	})
 }

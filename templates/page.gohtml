@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
+    <meta name="csrf_token" content="{{.CSRFToken}}">
     <link rel="stylesheet" href="{{assetPath "/css/app.css"}}">
     <link rel="icon" href="{{assetPath "/favicon.ico"}}">
     {{partial "head"}}
@@ -137,7 +138,6 @@
         </div>
         {{end}}
     </div>
-
     <script type="application/javascript" src="{{assetPath "/js/app.js"}}"></script>
 </body>
 

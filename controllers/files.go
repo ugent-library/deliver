@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"time"
+	"net/http"
 
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/httperror"
@@ -33,7 +33,7 @@ func (h *Files) Delete(c *Ctx) error {
 
 	file, err := h.repo.FileByID(c.Context(), fileID)
 	if err != nil {
-		return err
+		return httperror.NotFound
 	}
 
 	if !c.IsSpaceAdmin(c.User, file.Folder.Space) {
@@ -44,12 +44,19 @@ func (h *Files) Delete(c *Ctx) error {
 		return err
 	}
 
-	c.Session.Append(flashKey, Flash{
-		Type:         infoFlash,
-		Body:         "File deleted succesfully",
-		DismissAfter: 3 * time.Second,
-	})
-	c.RedirectTo("folder", "folderID", file.FolderID)
+	// reload folder
+	folder, err := h.repo.FolderByID(c.Context(), file.FolderID)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	// returns html response for htmx
+	return c.HTML(
+		http.StatusOK,
+		"",
+		"show_folder/refresh_show_files",
+		Map{
+			"folder": folder,
+		},
+	)
 }

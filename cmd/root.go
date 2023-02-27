@@ -24,6 +24,7 @@ func init() {
 	viper.SetDefault("s3.bucket", "deliver")
 	viper.SetDefault("session.name", "deliver")
 	viper.SetDefault("session.max_age", 86400*30) // 30 days
+	viper.SetDefault("max_file_size", 2_000_000_000)
 
 	cobra.OnInitialize(initConfig, initLogger)
 	cobra.OnFinalize(func() {
