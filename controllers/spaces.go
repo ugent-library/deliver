@@ -82,10 +82,8 @@ func (h *Spaces) New(c *Ctx) error {
 
 func (h *Spaces) Create(c *Ctx) error {
 	b := SpaceForm{}
-	// TODO return ErrBadRequest
-	// TODO use errors.Join when go 1.20 is released
 	if err := bind.Form(c.Req, &b); err != nil {
-		return err
+		return errors.Join(httperror.BadRequest, err)
 	}
 
 	// TODO add ToSpace() method to SpaceForm
@@ -129,9 +127,8 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	}
 
 	b := FolderForm{}
-	// TODO return ErrBadRequest
 	if err := bind.Form(c.Req, &b); err != nil {
-		return err
+		return errors.Join(httperror.BadRequest, err)
 	}
 
 	// TODO constructor for new objects
@@ -178,9 +175,8 @@ func (h *Spaces) Update(c *Ctx) error {
 	}
 
 	b := SpaceForm{}
-	// TODO return ErrBadRequest
 	if err := bind.Form(c.Req, &b); err != nil {
-		return err
+		return errors.Join(httperror.BadRequest, err)
 	}
 
 	space.Admins = reSplitAdmins.Split(b.Admins, -1)

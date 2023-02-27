@@ -67,9 +67,8 @@ func (h *Folders) Update(c *Ctx) error {
 	}
 
 	b := FolderForm{}
-	// TODO return ErrBadRequest
 	if err := bind.Form(c.Req, &b); err != nil {
-		return err
+		return errors.Join(httperror.BadRequest, err)
 	}
 
 	folder.Name = b.Name
