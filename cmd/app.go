@@ -19,7 +19,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
-	internalHandlers "github.com/ugent-library/deliver/handlers"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
@@ -172,9 +171,12 @@ var appCmd = &cobra.Command{
 				csrf.Path("/"),
 				csrf.Secure(config.Production),
 				csrf.SameSite(csrf.SameSiteStrictMode),
-				csrf.FieldName("csrf_token"),
+				csrf.FieldName("_csrf_token"),
 			),
-			internalHandlers.HTTPMethodOverrideHandler,
+			middleware.MethodOverride(
+				middleware.MethodFromHeader(middleware.MethodHeader),
+				middleware.MethodFromForm(middleware.MethodParam),
+			),
 			middleware.If(config.Production, handlers.ProxyHeaders),
 			middleware.SetRequestID(func() string {
 				return ulid.Make().String()

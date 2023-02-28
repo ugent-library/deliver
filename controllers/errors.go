@@ -16,11 +16,11 @@ func NewErrors() *Errors {
 }
 
 func (h *Errors) Forbidden(c *Ctx) error {
-	return c.HTML(http.StatusForbidden, "simple_page", "errors/forbidden", nil)
+	return c.HTML(http.StatusForbidden, "layouts/public_page", "errors/forbidden", nil)
 }
 
 func (h *Errors) NotFound(c *Ctx) error {
-	return c.HTML(http.StatusNotFound, "simple_page", "errors/not_found", nil)
+	return c.HTML(http.StatusNotFound, "layouts/public_page", "errors/not_found", nil)
 }
 
 func (h *Errors) HandleError(c *Ctx, err error) {

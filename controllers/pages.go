@@ -16,5 +16,5 @@ func (h *Pages) Home(c *Ctx) error {
 		c.RedirectTo("spaces")
 		return nil
 	}
-	return c.HTML(http.StatusOK, "page", "home", nil)
+	return c.HTML(http.StatusOK, "layouts/page", "home", nil)
 }

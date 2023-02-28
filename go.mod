@@ -13,7 +13,7 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/sessions v1.2.1
-	github.com/jackc/pgx/v5 v5.3.0
+	github.com/jackc/pgx/v5 v5.3.1
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ory/graceful v0.1.3
@@ -21,7 +21,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
-	github.com/ugent-library/middleware v0.0.0-20230124121524-d72a5ab6674f
+	github.com/ugent-library/middleware v0.0.0-20230227155910-03965f71a3db
 	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
 	go.uber.org/zap v1.24.0
 )
