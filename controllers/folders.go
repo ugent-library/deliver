@@ -48,7 +48,7 @@ func (h *Folders) Edit(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
-	return c.HTML(http.StatusOK, "page", "edit_folder", Map{
+	return c.HTML(http.StatusOK, "layouts/page", "edit_folder", Map{
 		"folder":           folder,
 		"validationErrors": validate.NewErrors(),
 	})
@@ -78,7 +78,7 @@ func (h *Folders) Update(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "page", "edit_folder", Map{
+		return c.HTML(http.StatusOK, "layouts/page", "edit_folder", Map{
 			"folder":           folder,
 			"validationErrors": validationErrors,
 		})
@@ -175,7 +175,7 @@ func (h *Folders) Share(c *Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.HTML(http.StatusOK, "simple_page", "share_folder", Map{
+	return c.HTML(http.StatusOK, "layouts/public_page", "share_folder", Map{
 		"folder": folder,
 	})
 }
@@ -191,7 +191,7 @@ func (h *Folders) show(c *Ctx, err error) error {
 	if err != nil {
 		return err
 	}
-	return c.HTML(http.StatusOK, "page", "show_folder", Map{
+	return c.HTML(http.StatusOK, "layouts/page", "show_folder", Map{
 		"folder":           folder,
 		"validationErrors": validationErrors,
 		"maxFileSize":      h.maxFileSize,

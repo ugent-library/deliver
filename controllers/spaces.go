@@ -61,7 +61,7 @@ func (h *Spaces) List(c *Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "page", "show_space", Map{
+	return c.HTML(http.StatusOK, "layouts/page", "show_space", Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
 		"folder":           &models.Folder{},
@@ -74,7 +74,7 @@ func (h *Spaces) Show(c *Ctx) error {
 }
 
 func (h *Spaces) New(c *Ctx) error {
-	return c.HTML(http.StatusOK, "page", "new_space", Map{
+	return c.HTML(http.StatusOK, "layouts/page", "new_space", Map{
 		"space":            &models.Space{},
 		"validationErrors": validate.NewErrors(),
 	})
@@ -98,7 +98,7 @@ func (h *Spaces) Create(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "page", "new_space", Map{
+		return c.HTML(http.StatusOK, "layouts/page", "new_space", Map{
 			"space":            space,
 			"validationErrors": validationErrors,
 		})
@@ -160,7 +160,7 @@ func (h *Spaces) Edit(c *Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "page", "edit_space", Map{
+	return c.HTML(http.StatusOK, "layouts/page", "edit_space", Map{
 		"space":            space,
 		"validationErrors": validate.NewErrors(),
 	})
@@ -186,7 +186,7 @@ func (h *Spaces) Update(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "page", "edit_space", Map{
+		return c.HTML(http.StatusOK, "layouts/page", "edit_space", Map{
 			"space":            space,
 			"validationErrors": validationErrors,
 		})
@@ -224,7 +224,7 @@ func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "page", "show_space", Map{
+	return c.HTML(http.StatusOK, "layouts/page", "show_space", Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
 		"folder":           folder,
