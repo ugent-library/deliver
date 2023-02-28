@@ -163,15 +163,10 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		return err
 	}
 
-	return c.HTML(
-		http.StatusOK,
-		"",
-		"show_folder/files_body",
-		Map{
-			"folder":      folder,
-			"maxFileSize": h.maxFileSize,
-		},
-	)
+	return c.HTML(http.StatusOK, "", "show_folder/files", Map{
+		"folder":      folder,
+		"maxFileSize": h.maxFileSize,
+	})
 }
 
 func (h *Folders) Share(c *Ctx) error {

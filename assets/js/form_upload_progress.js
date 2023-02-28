@@ -119,7 +119,7 @@ export default function(rootEl) {
                   if (req.status == 200 || req.status == 201) {
 
                     tmpl.parentElement.removeChild(tmpl)
-                    let filesBody = document.getElementById('files-body')
+                    let filesBody = document.getElementById('files')
                     filesBody.innerHTML = req.response
                     // trigger htmx on newly added elements
                     htmx.process(filesBody)
