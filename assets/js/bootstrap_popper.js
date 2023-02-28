@@ -2,8 +2,8 @@ import Popper from 'popper.js'
 
 // Wire in popper.js support. This ensure popups stays within the viewport.
 // See: https://github.com/thednp/bootstrap.native/issues/211
-export default function() {
-    document.querySelectorAll("div.dropdown > button").forEach(function(button) {
+export default function(rootEl) {
+    rootEl.querySelectorAll("div.dropdown > button").forEach(function(button) {
         button.addEventListener("click", function(evt) {
             let menu = button.parentElement.children.item(1);
 

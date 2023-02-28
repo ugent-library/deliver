@@ -16,8 +16,10 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
+	internalHandlers "github.com/ugent-library/deliver/handlers"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
@@ -84,9 +86,10 @@ var appCmd = &cobra.Command{
 
 		// setup renderer
 		renderer := render.New(render.Options{
-			Directory:       "templates",
-			Extensions:      []string{".gohtml"},
-			RequirePartials: true,
+			Directory:          "templates",
+			Extensions:         []string{".gohtml"},
+			RequirePartials:    true,
+			HTMLTemplateOption: "missingkey=error",
 			Funcs: []template.FuncMap{{
 				"assetPath":     assets.AssetPath,
 				"friendlyBytes": friendly.Bytes,
@@ -115,7 +118,7 @@ var appCmd = &cobra.Command{
 		auth := c.NewAuth(oidcAuth)
 		pages := c.NewPages()
 		spaces := c.NewSpaces(repoService)
-		folders := c.NewFolders(repoService, fileService)
+		folders := c.NewFolders(repoService, fileService, viper.GetInt64("max_file_size"))
 		files := c.NewFiles(repoService, fileService)
 
 		// request context wrapper
@@ -159,6 +162,9 @@ var appCmd = &cobra.Command{
 					logger.Error(err)
 				}
 			}),
+			func(next http.Handler) http.Handler {
+				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
+			},
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
 				[]byte(config.Session.Secret),
@@ -168,7 +174,7 @@ var appCmd = &cobra.Command{
 				csrf.SameSite(csrf.SameSiteStrictMode),
 				csrf.FieldName("csrf_token"),
 			),
-			handlers.HTTPMethodOverrideHandler,
+			internalHandlers.HTTPMethodOverrideHandler,
 			middleware.If(config.Production, handlers.ProxyHeaders),
 			middleware.SetRequestID(func() string {
 				return ulid.Make().String()

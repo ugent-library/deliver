@@ -20,7 +20,7 @@ type FileConfig struct {
 }
 
 type FileService interface {
-	Add(context.Context, string, io.ReadSeekCloser) (string, error)
+	Add(context.Context, string, io.Reader) (string, error)
 	Get(context.Context, string, io.Writer) error
 	Delete(context.Context, string) error
 	EachID(context.Context, func(string) bool) error
@@ -56,7 +56,7 @@ type fileService struct {
 	bucket string
 }
 
-func (f *fileService) Add(ctx context.Context, id string, b io.ReadSeekCloser) (string, error) {
+func (f *fileService) Add(ctx context.Context, id string, b io.Reader) (string, error) {
 	uploader := manager.NewUploader(f.client)
 	res, err := uploader.Upload(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(f.bucket),
