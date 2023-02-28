@@ -7,7 +7,6 @@ export default function () {
     let btn = this
 
     navigator.clipboard.writeText(value).then(function() {
-
       btn.classList.remove("btn-outline-secondary")
       btn.classList.add("btn-outline-success")
 
@@ -16,18 +15,21 @@ export default function () {
       icon.classList.add("if-check", "text-success")
 
       let span = btn.querySelector("span")
-      span.classList.remove("text-primary")
-      span.classList.add("text-success")
-      span.setAttribute("aria-live", "polite")
+      if (span) {
+        span.classList.remove("text-primary")
+        span.classList.add("text-success")
+        span.setAttribute("aria-live", "polite")  
+      }
 
       setTimeout(function(){
-
         icon.classList.remove("if-check", "text-success")
         icon.classList.add("if-copy", "text-primary")
 
-        span.classList.remove("text-success")
-        span.classList.add("text-primary")
-
+        if (span) {
+          span.classList.remove("text-success")
+          span.classList.add("text-primary")  
+        }
+        
         btn.classList.remove("btn-outline-success")
         btn.classList.add("btn-outline-secondary")
       }, restoreTimeout)
