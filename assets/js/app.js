@@ -5,6 +5,7 @@ import toast from './toast.js'
 import formSubmit from './form_submit.js'
 import formUploadProgress from './form_upload_progress.js'
 import modalClose from './modal_close.js'
+import clipboard from './clipboard.js'
 
 // configure htmx
 htmx.config.defaultFocusScroll = true
@@ -15,6 +16,7 @@ htmx.onLoad(function(rootEl) {
     formSubmit(rootEl)
     formUploadProgress(rootEl)
     modalClose(rootEl)
+    clipboard(rootEl)
 });
 
 window.htmx = htmx
