@@ -171,7 +171,7 @@ var appCmd = &cobra.Command{
 				csrf.Path("/"),
 				csrf.Secure(config.Production),
 				csrf.SameSite(csrf.SameSiteStrictMode),
-				csrf.FieldName("csrf_token"),
+				csrf.FieldName("_csrf_token"),
 			),
 			middleware.MethodOverride(
 				middleware.MethodFromHeader(middleware.MethodHeader),
