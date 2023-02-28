@@ -163,7 +163,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "", "files", Map{
+	return c.HTML(http.StatusOK, "", "show_folder/files", Map{
 		"folder":      folder,
 		"maxFileSize": h.maxFileSize,
 	})
