@@ -50,7 +50,7 @@ func (h *Files) Delete(c *Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "", "show_folder/refresh_files", Map{
+	return c.HTML(http.StatusOK, "", "refresh_files", Map{
 		"folder": folder,
 	})
 }
