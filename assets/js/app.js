@@ -16,6 +16,7 @@ htmx.onLoad(function(rootEl) {
     formSubmit(rootEl)
     formUploadProgress(rootEl)
     modalClose(rootEl)
+    clipboard(rootEl)
 });
 
 window.htmx = htmx

@@ -136,11 +136,15 @@
                                 <a href="{{$.PathTo "folder" "folderID" .ID}}">{{.Name}}</a>
                             </td>
                             <td class="text-nowrap">
-                                <button class="btn btn-outline-secondary btn-clipboard-large">
-                                    <i class="if if-copy text-primary"></i>
-                                    <span class="sr-only">Copy public shareable link</span>
-                                    <span class="btn-text border-left pl-3 ml-3 btn-clipboard-value">{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}</span>
-                                </button>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}">
+                                            <i class="if if-copy text-primary"></i>
+                                            <span class="btn-text text-primary">Copy</span>
+                                        </button>
+                                    </div>
+                                    <input type="text" class="form-control input-select-text" readonly value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}">
+                                </div>
                             </td>
                             <td class="text-nowrap">
                                 <p>{{.ExpiresAt.Format "2006-01-02 15:04"}}</p>

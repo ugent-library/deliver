@@ -50,12 +50,16 @@
     <div class="u-scroll-wrapper__body p-6">
         <div class="bc-toolbar bc-toolbar--sm">
             <div class="bc-toolbar-left">
-                <div class="bc-toolbar-item">
-                    <button class="btn btn-outline-secondary btn-clipboard-small">
-                        <i class="if if-copy text-primary"></i>
-                        <span class="btn-text text-primary">Copy public shareable link</span>
-                        <span class="btn-text border-left pl-4 ml-4 btn-clipboard-value">{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}</span>
-                    </button>
+                <div class="bc-toolbar-item flex-fill">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                        <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}">
+                            <i class="if if-copy text-primary"></i>
+                            <span class="btn-text text-primary">Copy</span>
+                        </button>
+                        </div>
+                        <input type="text" class="form-control input-select-text" readonly value="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}">
+                    </div>
                 </div>
                 <div class="bc-toolbar-item border-left pl-6">
                     <label class="c-label m-0">Expires on</label>
