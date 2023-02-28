@@ -70,45 +70,44 @@
             </div>
         </div>
 
-        <div class="u-scroll-wrapper__body px-6 pt-5">
-            <div class="card w-100 mb-6">
-                <div class="card-header sr-only">
-                    <div class="bc-toolbar">
-                        <div class="bc-toolbar-left">
-                            <h2 class="bc-toolbar-item">Upload files</h2>
-                        </div>
+        <div class="card w-100 mb-6">
+            <div class="card-header sr-only">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <h2 class="bc-toolbar-item">Upload files</h2>
                     </div>
                 </div>
-                <div class="card-body">
-                    <form
-                        action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
-                        enctype="multipart/form-data"
-                        method="POST"
-                    >
-                        {{.CSRFTag}}
-                        <div class="c-file-upload c-file-upload--small">
-                            <input type="file" name="file" multiple
-                                data-upload-progress-target="file-upload-progress"
-                                data-upload-max-file-size="{{.Data.maxFileSize}}"
-                                data-upload-msg-file-aborted="File upload aborted by you"
-                                data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
-                                data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
-                                data-upload-msg-file-too-large="File is too large. Maximum file size is {{friendlyBytes .Data.maxFileSize}}"
-                                data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
-                                data-upload-msg-unexpected="File upload failed: unexpected server error"
-                            >
-                            <div class="c-file-upload__content">
-                                <p>Drag and drop or</p>
-                                <button class="btn btn-outline-primary" data-loading="Uploading...">
-                                    Upload files
-                                </button>
-                                <p class="small pt-3 mb-0">Maximum file size: {{friendlyBytes .Data.maxFileSize}}</p>
-                            </div>
-                        </div>
-                    </form>
-                    <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
-                </div>
             </div>
+            <div class="card-body">
+                <form
+                    action="{{.PathTo "upload_file" "folderID" .Data.folder.ID}}"
+                    enctype="multipart/form-data"
+                    method="POST"
+                >
+                    {{.CSRFTag}}
+                    <div class="c-file-upload c-file-upload--small">
+                        <input type="file" name="file" multiple
+                            data-upload-progress-target="file-upload-progress"
+                            data-upload-max-file-size="{{.Data.maxFileSize}}"
+                            data-upload-msg-file-aborted="File upload aborted by you"
+                            data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
+                            data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
+                            data-upload-msg-file-too-large="File is too large. Maximum file size is {{friendlyBytes .Data.maxFileSize}}"
+                            data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
+                            data-upload-msg-unexpected="File upload failed: unexpected server error"
+                        >
+                        <div class="c-file-upload__content">
+                            <p>Drag and drop or</p>
+                            <button class="btn btn-outline-primary" data-loading="Uploading...">
+                                Upload files
+                            </button>
+                            <p class="small pt-3 mb-0">Maximum file size: {{friendlyBytes .Data.maxFileSize}}</p>
+                        </div>
+                    </div>
+                </form>
+                <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
+            </div>
+        </div>
 
         <div class="card w-100 mb-6" id="files">
             {{ template "show_folder/files" . }}
