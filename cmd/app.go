@@ -20,6 +20,7 @@ import (
 	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
@@ -151,6 +152,7 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
+		r.Handle("/ws", turbo.NewHub(turbo.Config{}))
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,

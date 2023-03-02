@@ -1,6 +1,7 @@
-import BSN from 'bootstrap.native/dist/bootstrap-native-v4';
+import BSN from 'bootstrap.native/dist/bootstrap-native-v4'
 import bootstrapPopper from './bootstrap_popper.js'
 import htmx from 'htmx.org'
+import * as Turbo from '@hotwired/turbo'
 import toast from './toast.js'
 import formSubmit from './form_submit.js'
 import formUploadProgress from './form_upload_progress.js'
