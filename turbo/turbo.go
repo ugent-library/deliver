@@ -37,11 +37,11 @@ type Client struct {
 	msgs chan []byte
 }
 
-type Stream interface {
-	Action() Action
-	Target() string
-	TargetSelector() string
-	Template() []byte
+type Stream struct {
+	Action         Action
+	Target         string
+	TargetSelector string
+	Template       []byte
 }
 
 func (c *Client) Send(streams ...Stream) {
@@ -52,7 +52,7 @@ func (c *Client) Send(streams ...Stream) {
 }
 
 type Responder interface {
-	Respond(Client, []byte)
+	Respond(*Client, []byte)
 }
 
 type Hub struct {
@@ -175,6 +175,7 @@ func readPump(h *Hub, c *Client) {
 			break
 		}
 		log.Printf("message: %s", msg)
+		h.responder.Respond(c, msg)
 	}
 }
 
@@ -182,18 +183,22 @@ func serializeStreams(streams []Stream) []byte {
 	b := bytes.Buffer{}
 	for _, s := range streams {
 		b.WriteString(`<turbo-stream action="`)
-		b.Write([]byte(s.Action()))
+		b.Write([]byte(s.Action))
 		b.WriteString(`" `)
-		if s.Target() != "" {
+		if s.Target != "" {
 			b.WriteString(`target="`)
-			b.WriteString(s.Target())
+			b.WriteString(s.Target)
 		} else {
 			b.WriteString(`targets="`)
-			b.WriteString(s.TargetSelector())
+			b.WriteString(s.TargetSelector)
 		}
 		b.WriteString(`"><template>`)
-		b.Write(s.Template())
+		b.Write(s.Template)
 		b.WriteString(`</template></turbo-stream>`)
 	}
 	return b.Bytes()
+}
+
+func Write(w http.ResponseWriter, streams ...Stream) {
+	w.Write(serializeStreams(streams))
 }

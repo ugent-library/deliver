@@ -3,10 +3,12 @@ package cmd
 import (
 	"context"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/csrf"
@@ -21,6 +23,7 @@ import (
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
+	"github.com/ugent-library/deliver/turborouter"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
@@ -152,7 +155,63 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
-		r.Handle("/ws", turbo.NewHub(turbo.Config{}))
+
+		type WebSocketRequest struct {
+			Route  string
+			Params map[string]string
+		}
+
+		wsRouter := &turborouter.Router[map[string]string]{
+			Deserializer: func(msg []byte) (string, map[string]string, error) {
+				r := &WebSocketRequest{}
+				if err := json.Unmarshal(msg, r); err != nil {
+					return "", nil, err
+				}
+				return r.Route, r.Params, nil
+			},
+		}
+
+		mu := sync.RWMutex{}
+		var greetName string
+		nameSwapper := func(str string) {
+			mu.Lock()
+			greetName = str
+			mu.Unlock()
+		}
+
+		wsRouter.Add("home", func(c *turbo.Client, params map[string]string) {
+			nameSwapper(params["name"])
+			c.Send(turbo.Stream{
+				Action:         turbo.Replace,
+				TargetSelector: ".bc-avatar-text",
+				Template:       []byte(`<span class="bc-avatar-text">Hi ` + params["name"] + `<span id="current-time"></span></span>`),
+			})
+		})
+
+		hub := turbo.NewHub(turbo.Config{
+			Responder: wsRouter,
+		})
+
+		r.Handle("/ws", hub)
+
+		tick := time.NewTicker(5 * time.Second)
+		go func() {
+			for {
+				select {
+				case <-tick.C:
+					mu.RLock()
+					name := greetName
+					mu.RUnlock()
+
+					hub.Broadcast(turbo.Stream{
+						Action:         turbo.Replace,
+						TargetSelector: "h1.bc-toolbar-title",
+						Template:       []byte(`<h1 class="bc-toolbar-title">Hi ` + name + `</h1>`),
+					})
+
+				}
+			}
+		}()
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,

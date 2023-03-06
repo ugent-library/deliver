@@ -18,10 +18,38 @@ htmx.onLoad(function(rootEl) {
     formUploadProgress(rootEl)
     modalClose(rootEl)
     clipboard(rootEl)
+
+    window.htmx = htmx
+
+    document.body.addEventListener('htmx:configRequest', evt => {
+        evt.detail.headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf_token"]').content
+    })
+
+    let ws = new WebSocket("ws://" + document.location.host + "/ws")
+
+    Turbo.connectStreamSource(ws);
+
+    document.querySelectorAll('.breadcrumb').forEach(el => {
+        let n = 0
+        el.addEventListener('click', evt => {
+            evt.preventDefault()
+            n++
+            ws.send(JSON.stringify({
+                route: 'home',
+                params: {
+                    name: "Matthias " + n
+                }
+            }))
+        })
+    })
 });
 
-window.htmx = htmx
-
-document.body.addEventListener('htmx:configRequest', (evt) => {
-    evt.detail.headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf_token"]').content
-})
+// document.body.addEventListener('turbo:load', evt => {
+//     BSN.initCallback(rootEl)
+//     bootstrapPopper(rootEl)
+//     toast(rootEl)
+//     formSubmit(rootEl)
+//     formUploadProgress(rootEl)
+//     modalClose(rootEl)
+//     clipboard(rootEl)    
+// })

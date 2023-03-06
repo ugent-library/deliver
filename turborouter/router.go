@@ -1,4 +1,4 @@
-package router
+package turborouter
 
 import "github.com/ugent-library/deliver/turbo"
 
@@ -23,5 +23,8 @@ func (r *Router[T]) Respond(c *turbo.Client, msg []byte) {
 }
 
 func (r *Router[T]) Add(route string, handler HandlerFunc[T]) {
+	if r.routes == nil {
+		r.routes = make(map[string]HandlerFunc[T])
+	}
 	r.routes[route] = handler
 }
