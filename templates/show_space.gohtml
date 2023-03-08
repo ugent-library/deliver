@@ -121,7 +121,7 @@
                     <thead>
                         <tr>
                             <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
-                            <th class="text-nowrap">Shareable link</th>
+                            <th class="text-nowrap">Public shareable link</th>
                             <th class="text-nowrap">Expires on</th>
                             <th class="text-nowrap">Documents</th>
                             <th class="text-nowrap">Created at</th>
@@ -136,13 +136,14 @@
                                 <a href="{{$.PathTo "folder" "folderID" .ID}}">{{.Name}}</a>
                             </td>
                             <td class="text-nowrap">
-                                <div class="input-group">
+                                <div class="input-group" style="min-width: 375px;">
                                     <div class="input-group-prepend">
                                         <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}">
                                             <i class="if if-copy text-primary"></i>
+                                            <span class="btn-text">Copy link</span>
                                         </button>
                                     </div>
-                                    <input type="text" class="form-control input-select-text" readonly value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}">
+                                    <input type="text" class="form-control input-select-text" readonly value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}" style="min-width: 250px;">
                                 </div>
                             </td>
                             <td class="text-nowrap">
