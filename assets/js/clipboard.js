@@ -18,7 +18,8 @@ export default function () {
       if (span) {
         span.classList.remove("text-primary")
         span.classList.add("text-success")
-        span.setAttribute("aria-live", "polite")  
+        span.setAttribute("aria-live", "polite")
+        span.innerText="Link copied"
       }
 
       setTimeout(function(){
@@ -27,7 +28,8 @@ export default function () {
 
         if (span) {
           span.classList.remove("text-success")
-          span.classList.add("text-primary")  
+          span.classList.add("text-primary")
+          span.innerText="Copy link"
         }
         
         btn.classList.remove("btn-outline-success")

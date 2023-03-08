@@ -4,43 +4,49 @@
 
 <div class="w-100 u-scroll-wrapper">
     <div class="bg-white">
-        <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
-            <div class="bc-toolbar">
+        <div class="border-bottom py-5 px-6">
+            <div class="bc-toolbar bc-toolbar--auto">
                 <div class="bc-toolbar-left">
                     <div class="bc-toolbar-item">
-                        <a class="btn btn-link btn-sm" href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
-                            <i class="if if-arrow-left"></i>
-                            <span>Back to {{.Data.folder.Space.Name}} folders overview</span>
-                        </a>
-                        <h4 class="bc-toolbar-title">{{.Data.folder.Space.Name}} space — {{.Data.folder.Name}} folder</h4>
+                        <h4 class="bc-toolbar-title">
+                            <a href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
+                                <i class="if if-arrow-left"></i>
+                                <span>{{.Data.folder.Space.Name}}</span>
+                            </a>
+                            &nbsp;&mdash; {{.Data.folder.Name}}
+                        </h4>
+                    </div>
+                    <div class="bc-toolbar-item">
+                        <p>expires on {{.Data.folder.ExpiresAt.Format "2006-01-02 15:04"}}</p>
                     </div>
                 </div>
                 <div class="bc-toolbar-right">
                     <div class="bc-toolbar-item">
                         <a class="btn btn-link btn-link-muted" href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
                             <i class="if if-add"></i>
-                            <span class="btn-text">Make a new folder</span>
+                            <span class="btn-text">Make new folder</span>
                         </a>
                     </div>
                     <div class="bc-toolbar-item">
-                        <form action="{{.PathTo "delete_folder" "folderID" .Data.folder.ID}}" method="POST" id="delete-folder">
-                            <input type="hidden" name="_method" value="DELETE">
-                            {{.CSRFTag}}
-                            <button
-                                class="btn btn-link btn-link-muted"
-                                data-toggle="modal"
-                                data-target="#confirm-delete-folder"
-                            >
-                                <i class="if if-delete"></i>
-                                <span class="btn-text">Delete folder</span>
-                            </button>
-                        </form>
-                    </div>
-                    <div class="bc-toolbar-item">
-                        <a class="btn btn-primary" href="{{.PathTo "edit_folder" "folderID" .Data.folder.ID}}">
+                        <a class="btn btn-link btn-link-muted" href="{{.PathTo "edit_folder" "folderID" .Data.folder.ID}}">
                             <i class="if if-edit"></i>
-                            <span class="btn-text">Edit folder</span>
+                            <span class="btn-text">Edit</span>
                         </a>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item col-lg-8 col-sm-12 pl-0">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                            <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}">
+                                <i class="if if-copy text-primary"></i>
+                                <span class="btn-text text-primary">Copy public shareable link</span>
+                            </button>
+                            </div>
+                            <input type="text" class="form-control input-select-text" readonly value="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,28 +54,6 @@
     </div>
 
     <div class="u-scroll-wrapper__body p-6">
-        <div class="bc-toolbar bc-toolbar--sm">
-            <div class="bc-toolbar-left">
-                <div class="bc-toolbar-item flex-fill">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                        <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}">
-                            <i class="if if-copy text-primary"></i>
-                            <span class="btn-text text-primary">Copy</span>
-                        </button>
-                        </div>
-                        <input type="text" class="form-control input-select-text" readonly value="{{.URLTo "share_folder" "folderID" .Data.folder.ID "folderSlug" .Data.folder.Slug}}">
-                    </div>
-                </div>
-                <div class="bc-toolbar-item border-left pl-6">
-                    <label class="c-label m-0">Expires on</label>
-                </div>
-                <div class="bc-toolbar-item">
-                    <span>{{.Data.folder.ExpiresAt.Format "2006-01-02 15:04"}}</span>
-                </div>
-            </div>
-        </div>
-
         <div class="card w-100 mb-6">
             <div class="card-header sr-only">
                 <div class="bc-toolbar">
@@ -111,31 +95,6 @@
 
         <div class="card w-100 mb-6" id="files">
             {{template "show_folder/files" .}}
-        </div>
-    </div>
-</div>
-
-<div id="confirm-delete-folder" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="c-blank-slate c-blank-slate-muted">
-                    <div class="bc-avatar">
-                        <i class="if if-alert"></i>
-                    </div>
-                    <h4>
-                        Are you sure you want to delete the folder
-                        <br>
-                        <strong>{{.Data.folder.Name}}</strong>
-                        and its files?
-                    </h4>
-                    <p>You cannot undo this action or recover the files.</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                <button class="btn btn-danger" data-submit-target="#delete-folder">Yes, delete this folder</button>
-            </div>
         </div>
     </div>
 </div>
