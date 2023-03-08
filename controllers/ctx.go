@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/ugent-library/deliver/cookies"
+	"github.com/ugent-library/deliver/cookiematic"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/zaphttp"
@@ -30,7 +30,7 @@ type Ctx struct {
 	Log     *zap.SugaredLogger // TODO use plain logger
 	Req     *http.Request
 	Res     http.ResponseWriter
-	Cookies *cookies.Manager
+	Cookies *cookiematic.Jar
 	User    *models.User
 	*models.Permissions
 	Flash  []Flash
@@ -97,7 +97,7 @@ func Wrapper(config Config) func(...func(*Ctx) error) http.Handler {
 				Log:         zaphttp.Logger(r.Context()).Sugar(),
 				Res:         w,
 				Req:         r,
-				Cookies:     cookies.Jar(r),
+				Cookies:     cookiematic.Cookies(r),
 				Permissions: config.Permissions,
 				router:      config.Router,
 				path:        mux.Vars(r),
@@ -186,15 +186,15 @@ func (c *Ctx) AddFlash(f Flash) {
 }
 
 func LoadSession(userFunc func(context.Context, string) (*models.User, error), c *Ctx) error {
-	if cookie, _ := c.Req.Cookie(rememberCookie); cookie != nil {
-		user, err := userFunc(c.Context(), cookie.Value)
+	if token := c.Cookies.Get(rememberCookie); token != "" {
+		user, err := userFunc(c.Context(), token)
 		if err != nil && err != models.ErrNotFound {
 			return err
 		}
 		c.User = user
 	}
 
-	cookies.Unmarshal(c.Req, flashCookie, &c.Flash)
+	c.Cookies.Unmarshal(flashCookie, &c.Flash)
 	c.Cookies.Delete(flashCookie)
 
 	return nil

@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/deliver/controllers"
-	"github.com/ugent-library/deliver/cookies"
+	"github.com/ugent-library/deliver/cookiematic"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
@@ -171,7 +171,7 @@ var appCmd = &cobra.Command{
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests(logger.Desugar()),
-			cookies.Manage(),
+			cookiematic.Enable(),
 		)
 
 		// start server
