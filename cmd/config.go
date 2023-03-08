@@ -1,16 +1,15 @@
 package cmd
 
 type Config struct {
-	Production  bool
-	Admins      []string
-	DB          string
-	S3          S3Config
-	Host        string
-	Port        int
-	OIDC        OIDCConfig
-	Session     SessionConfig
-	CSRF        CSRFConfig
-	MaxFileSize int64 `mapstructure:"max_file_size"`
+	Production   bool
+	Admins       []string
+	DB           string
+	S3           S3Config
+	Host         string
+	Port         int
+	OIDC         OIDCConfig
+	MaxFileSize  int64  `mapstructure:"max_file_size"`
+	CookieSecret string `mapstructure:"cookie_secret"`
 }
 
 type SpacesConfig struct {
@@ -31,12 +30,6 @@ type OIDCConfig struct {
 	ID          string
 	Secret      string
 	RedirectURL string `mapstructure:"redirect_url"`
-}
-
-type SessionConfig struct {
-	Name   string
-	MaxAge int `mapstructure:"max_age"`
-	Secret string
 }
 
 type CSRFConfig struct {

@@ -226,10 +226,12 @@ func (fq *FolderQuery) AllX(ctx context.Context) []*Folder {
 }
 
 // IDs executes the query and returns a list of Folder IDs.
-func (fq *FolderQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (fq *FolderQuery) IDs(ctx context.Context) (ids []string, err error) {
+	if fq.ctx.Unique == nil && fq.path != nil {
+		fq.Unique(true)
+	}
 	ctx = setContextOp(ctx, fq.ctx, "IDs")
-	if err := fq.Select(folder.FieldID).Scan(ctx, &ids); err != nil {
+	if err = fq.Select(folder.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -510,20 +512,12 @@ func (fq *FolderQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (fq *FolderQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   folder.Table,
-			Columns: folder.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: folder.FieldID,
-			},
-		},
-		From:   fq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(folder.Table, folder.Columns, sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString))
+	_spec.From = fq.sql
 	if unique := fq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if fq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := fq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

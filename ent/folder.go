@@ -183,9 +183,3 @@ func (f *Folder) String() string {
 
 // Folders is a parsable slice of Folder.
 type Folders []*Folder
-
-func (f Folders) config(cfg config) {
-	for _i := range f {
-		f[_i].config = cfg
-	}
-}

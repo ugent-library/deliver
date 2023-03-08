@@ -17,6 +17,7 @@ import (
 	"github.com/ugent-library/deliver/ent/folder"
 	entmigrate "github.com/ugent-library/deliver/ent/migrate"
 	"github.com/ugent-library/deliver/ent/space"
+	"github.com/ugent-library/deliver/ent/user"
 	"github.com/ugent-library/deliver/validate"
 )
 
@@ -27,6 +28,9 @@ type RepositoryConfig struct {
 }
 
 type RepositoryService interface {
+	UserByRememberToken(context.Context, string) (*User, error)
+	CreateOrUpdateUser(context.Context, *User) error
+	RenewUserRememberToken(context.Context, string) error
 	Spaces(context.Context) ([]*Space, error)
 	SpacesByUsername(context.Context, string) ([]*Space, error)
 	SpaceByID(context.Context, string) (*Space, error)
@@ -67,6 +71,70 @@ func NewRepositoryService(c RepositoryConfig) (RepositoryService, error) {
 
 type repositoryService struct {
 	db *ent.Client
+}
+
+func (r *repositoryService) UserByRememberToken(ctx context.Context, token string) (*User, error) {
+	row, err := r.db.User.Query().
+		Where(user.RememberTokenEQ(token)).
+		First(ctx)
+	if err != nil {
+		var e *ent.NotFoundError
+		if errors.As(err, &e) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return rowToUser(row), nil
+
+}
+
+// TODO rewrite this when ent supports the Save method on Update; until then
+// we have to do an extra select
+// https://github.com/ent/ent/issues/2600
+func (r *repositoryService) CreateOrUpdateUser(ctx context.Context, u *User) error {
+	if err := u.Validate(); err != nil {
+		return err
+	}
+	token, err := NewRememberToken()
+	if err != nil {
+		return err
+	}
+	id, err := r.db.User.Create().
+		SetUsername(u.Username).
+		SetName(u.Name).
+		SetEmail(u.Email).
+		SetRememberToken(token).
+		OnConflict(
+			entsql.ConflictColumns(user.FieldUsername),
+		).
+		Update(func(u *ent.UserUpsert) {
+			u.UpdateName()
+			u.UpdateEmail()
+		}).ID(ctx)
+	if err != nil {
+		if strings.Contains(err.Error(), "SQLSTATE 23505") {
+			return validate.NewErrors(validate.ErrNotUnique("username"))
+		}
+		return err
+	}
+	row, err := r.db.User.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+	*u = *rowToUser(row)
+	return nil
+}
+
+func (r *repositoryService) RenewUserRememberToken(ctx context.Context, id string) error {
+	newToken, err := NewRememberToken()
+	if err != nil {
+		return err
+	}
+	err = r.db.User.
+		UpdateOneID(id).
+		SetRememberToken(newToken).
+		Exec(ctx)
+	return err
 }
 
 func (r *repositoryService) Spaces(ctx context.Context) ([]*Space, error) {
@@ -204,7 +272,7 @@ func (r *repositoryService) CreateFolder(ctx context.Context, f *Folder) error {
 		// TODO does ent support unwrapping sql errors?
 		// https://stackoverflow.com/questions/70859712/how-do-you-handle-database-errors-in-go-without-getting-coupled-to-the-sql-drive
 		// https://github.com/ent/ent/issues/2328
-		// see also UpdateFolder
+		// see also UpdateFolder and CreateUser
 		if strings.Contains(err.Error(), "SQLSTATE 23505") {
 			return validate.NewErrors(validate.ErrNotUnique("name"))
 		}
@@ -295,6 +363,19 @@ func (r *repositoryService) AddFileDownload(ctx context.Context, id string) erro
 		AddDownloads(1).
 		Exec(ctx)
 	return err
+}
+
+func rowToUser(row *ent.User) *User {
+	u := &User{
+		ID:            row.ID,
+		Username:      row.Username,
+		Name:          row.Name,
+		Email:         row.Email,
+		RememberToken: row.RememberToken,
+		CreatedAt:     row.CreatedAt,
+		UpdatedAt:     row.UpdatedAt,
+	}
+	return u
 }
 
 func rowToSpace(row *ent.Space) *Space {

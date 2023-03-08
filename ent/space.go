@@ -156,9 +156,3 @@ func (s *Space) String() string {
 
 // Spaces is a parsable slice of Space.
 type Spaces []*Space
-
-func (s Spaces) config(cfg config) {
-	for _i := range s {
-		s[_i].config = cfg
-	}
-}

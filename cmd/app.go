@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"encoding/gob"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -12,13 +11,12 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"github.com/oklog/ulid/v2"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ugent-library/deliver/autosession"
 	c "github.com/ugent-library/deliver/controllers"
+	"github.com/ugent-library/deliver/cookies"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
@@ -67,8 +65,8 @@ var appCmd = &cobra.Command{
 			ClientID:     config.OIDC.ID,
 			ClientSecret: config.OIDC.Secret,
 			RedirectURL:  config.OIDC.RedirectURL,
-			CookieName:   config.Session.Name + ".state",
-			CookieSecret: []byte(config.Session.Secret),
+			CookieName:   "deliver.state",
+			CookieSecret: []byte(config.CookieSecret),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -96,17 +94,6 @@ var appCmd = &cobra.Command{
 			}},
 		})
 
-		// setup sessions
-		sessionName := config.Session.Name
-		sessionStore := sessions.NewCookieStore([]byte(config.Session.Secret))
-		sessionStore.MaxAge(config.Session.MaxAge)
-		sessionStore.Options.Path = "/"
-		sessionStore.Options.HttpOnly = true
-		sessionStore.Options.Secure = config.Production
-		// register types so CookieStore can serialize them
-		gob.Register(&models.User{})
-		gob.Register(c.Flash{})
-
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
@@ -114,7 +101,7 @@ var appCmd = &cobra.Command{
 
 		// controllers
 		errs := c.NewErrors()
-		auth := c.NewAuth(oidcAuth)
+		auth := c.NewAuth(repoService, oidcAuth)
 		pages := c.NewPages()
 		spaces := c.NewSpaces(repoService)
 		folders := c.NewFolders(repoService, fileService, viper.GetInt64("max_file_size"))
@@ -122,6 +109,7 @@ var appCmd = &cobra.Command{
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{
+			UserFunc:     repoService.UserByRememberToken,
 			Router:       r,
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
@@ -166,8 +154,8 @@ var appCmd = &cobra.Command{
 			},
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
-				[]byte(config.Session.Secret),
-				csrf.CookieName(config.Session.Name+".csrf"),
+				[]byte(config.CookieSecret),
+				csrf.CookieName("deliver.csrf"),
 				csrf.Path("/"),
 				csrf.Secure(config.Production),
 				csrf.SameSite(csrf.SameSiteStrictMode),
@@ -183,12 +171,7 @@ var appCmd = &cobra.Command{
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests(logger.Desugar()),
-			autosession.Enable(
-				autosession.GorillaSessions(sessionStore, sessionName),
-				autosession.WithErrorHandler(func(err error) {
-					logger.Error(err)
-				}),
-			),
+			cookies.Manage(),
 		)
 
 		// start server

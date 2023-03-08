@@ -168,16 +168,7 @@ func (fu *FolderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := fu.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   folder.Table,
-			Columns: folder.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: folder.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(folder.Table, folder.Columns, sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString))
 	if ps := fu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -396,6 +387,12 @@ func (fuo *FolderUpdateOne) RemoveFiles(f ...*File) *FolderUpdateOne {
 	return fuo.RemoveFileIDs(ids...)
 }
 
+// Where appends a list predicates to the FolderUpdate builder.
+func (fuo *FolderUpdateOne) Where(ps ...predicate.Folder) *FolderUpdateOne {
+	fuo.mutation.Where(ps...)
+	return fuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (fuo *FolderUpdateOne) Select(field string, fields ...string) *FolderUpdateOne {
@@ -451,16 +448,7 @@ func (fuo *FolderUpdateOne) sqlSave(ctx context.Context) (_node *Folder, err err
 	if err := fuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   folder.Table,
-			Columns: folder.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: folder.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(folder.Table, folder.Columns, sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString))
 	id, ok := fuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Folder.id" for update`)}

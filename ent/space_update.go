@@ -138,16 +138,7 @@ func (su *SpaceUpdate) defaults() {
 }
 
 func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   space.Table,
-			Columns: space.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: space.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(space.Table, space.Columns, sqlgraph.NewFieldSpec(space.FieldID, field.TypeString))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -317,6 +308,12 @@ func (suo *SpaceUpdateOne) RemoveFolders(f ...*Folder) *SpaceUpdateOne {
 	return suo.RemoveFolderIDs(ids...)
 }
 
+// Where appends a list predicates to the SpaceUpdate builder.
+func (suo *SpaceUpdateOne) Where(ps ...predicate.Space) *SpaceUpdateOne {
+	suo.mutation.Where(ps...)
+	return suo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (suo *SpaceUpdateOne) Select(field string, fields ...string) *SpaceUpdateOne {
@@ -361,16 +358,7 @@ func (suo *SpaceUpdateOne) defaults() {
 }
 
 func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   space.Table,
-			Columns: space.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: space.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(space.Table, space.Columns, sqlgraph.NewFieldSpec(space.FieldID, field.TypeString))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Space.id" for update`)}

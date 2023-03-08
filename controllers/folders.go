@@ -105,8 +105,8 @@ func (h *Folders) Delete(c *Ctx) error {
 		return err
 	}
 
-	c.Session.Append(flashKey, Flash{
-		Type:         infoFlash,
+	c.AddFlash(Flash{
+		Type:         "info",
 		Body:         "Folder deleted succesfully",
 		DismissAfter: 3 * time.Second,
 	})

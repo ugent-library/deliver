@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ugent-library/deliver/ent/file"
@@ -20,6 +22,7 @@ type FolderCreate struct {
 	config
 	mutation *FolderMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetSpaceID sets the "space_id" field.
@@ -205,14 +208,9 @@ func (fc *FolderCreate) sqlSave(ctx context.Context) (*Folder, error) {
 func (fc *FolderCreate) createSpec() (*Folder, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Folder{config: fc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: folder.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: folder.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(folder.Table, sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = fc.conflict
 	if id, ok := fc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -275,10 +273,266 @@ func (fc *FolderCreate) createSpec() (*Folder, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Folder.Create().
+//		SetSpaceID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FolderUpsert) {
+//			SetSpaceID(v+v).
+//		}).
+//		Exec(ctx)
+func (fc *FolderCreate) OnConflict(opts ...sql.ConflictOption) *FolderUpsertOne {
+	fc.conflict = opts
+	return &FolderUpsertOne{
+		create: fc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Folder.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (fc *FolderCreate) OnConflictColumns(columns ...string) *FolderUpsertOne {
+	fc.conflict = append(fc.conflict, sql.ConflictColumns(columns...))
+	return &FolderUpsertOne{
+		create: fc,
+	}
+}
+
+type (
+	// FolderUpsertOne is the builder for "upsert"-ing
+	//  one Folder node.
+	FolderUpsertOne struct {
+		create *FolderCreate
+	}
+
+	// FolderUpsert is the "OnConflict" setter.
+	FolderUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetSpaceID sets the "space_id" field.
+func (u *FolderUpsert) SetSpaceID(v string) *FolderUpsert {
+	u.Set(folder.FieldSpaceID, v)
+	return u
+}
+
+// UpdateSpaceID sets the "space_id" field to the value that was provided on create.
+func (u *FolderUpsert) UpdateSpaceID() *FolderUpsert {
+	u.SetExcluded(folder.FieldSpaceID)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *FolderUpsert) SetName(v string) *FolderUpsert {
+	u.Set(folder.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FolderUpsert) UpdateName() *FolderUpsert {
+	u.SetExcluded(folder.FieldName)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *FolderUpsert) SetUpdatedAt(v time.Time) *FolderUpsert {
+	u.Set(folder.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *FolderUpsert) UpdateUpdatedAt() *FolderUpsert {
+	u.SetExcluded(folder.FieldUpdatedAt)
+	return u
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *FolderUpsert) SetExpiresAt(v time.Time) *FolderUpsert {
+	u.Set(folder.FieldExpiresAt, v)
+	return u
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *FolderUpsert) UpdateExpiresAt() *FolderUpsert {
+	u.SetExcluded(folder.FieldExpiresAt)
+	return u
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (u *FolderUpsert) ClearExpiresAt() *FolderUpsert {
+	u.SetNull(folder.FieldExpiresAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Folder.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(folder.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FolderUpsertOne) UpdateNewValues() *FolderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(folder.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(folder.FieldCreatedAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Folder.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *FolderUpsertOne) Ignore() *FolderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FolderUpsertOne) DoNothing() *FolderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FolderCreate.OnConflict
+// documentation for more info.
+func (u *FolderUpsertOne) Update(set func(*FolderUpsert)) *FolderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FolderUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetSpaceID sets the "space_id" field.
+func (u *FolderUpsertOne) SetSpaceID(v string) *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetSpaceID(v)
+	})
+}
+
+// UpdateSpaceID sets the "space_id" field to the value that was provided on create.
+func (u *FolderUpsertOne) UpdateSpaceID() *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateSpaceID()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *FolderUpsertOne) SetName(v string) *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FolderUpsertOne) UpdateName() *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *FolderUpsertOne) SetUpdatedAt(v time.Time) *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *FolderUpsertOne) UpdateUpdatedAt() *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *FolderUpsertOne) SetExpiresAt(v time.Time) *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetExpiresAt(v)
+	})
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *FolderUpsertOne) UpdateExpiresAt() *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateExpiresAt()
+	})
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (u *FolderUpsertOne) ClearExpiresAt() *FolderUpsertOne {
+	return u.Update(func(s *FolderUpsert) {
+		s.ClearExpiresAt()
+	})
+}
+
+// Exec executes the query.
+func (u *FolderUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FolderCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FolderUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *FolderUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: FolderUpsertOne.ID is not supported by MySQL driver. Use FolderUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *FolderUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // FolderCreateBulk is the builder for creating many Folder entities in bulk.
 type FolderCreateBulk struct {
 	config
 	builders []*FolderCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Folder entities in the database.
@@ -305,6 +559,7 @@ func (fcb *FolderCreateBulk) Save(ctx context.Context) ([]*Folder, error) {
 					_, err = mutators[i+1].Mutate(root, fcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = fcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, fcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -351,6 +606,183 @@ func (fcb *FolderCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (fcb *FolderCreateBulk) ExecX(ctx context.Context) {
 	if err := fcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Folder.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FolderUpsert) {
+//			SetSpaceID(v+v).
+//		}).
+//		Exec(ctx)
+func (fcb *FolderCreateBulk) OnConflict(opts ...sql.ConflictOption) *FolderUpsertBulk {
+	fcb.conflict = opts
+	return &FolderUpsertBulk{
+		create: fcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Folder.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (fcb *FolderCreateBulk) OnConflictColumns(columns ...string) *FolderUpsertBulk {
+	fcb.conflict = append(fcb.conflict, sql.ConflictColumns(columns...))
+	return &FolderUpsertBulk{
+		create: fcb,
+	}
+}
+
+// FolderUpsertBulk is the builder for "upsert"-ing
+// a bulk of Folder nodes.
+type FolderUpsertBulk struct {
+	create *FolderCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Folder.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(folder.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FolderUpsertBulk) UpdateNewValues() *FolderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(folder.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(folder.FieldCreatedAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Folder.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *FolderUpsertBulk) Ignore() *FolderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FolderUpsertBulk) DoNothing() *FolderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FolderCreateBulk.OnConflict
+// documentation for more info.
+func (u *FolderUpsertBulk) Update(set func(*FolderUpsert)) *FolderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FolderUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetSpaceID sets the "space_id" field.
+func (u *FolderUpsertBulk) SetSpaceID(v string) *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetSpaceID(v)
+	})
+}
+
+// UpdateSpaceID sets the "space_id" field to the value that was provided on create.
+func (u *FolderUpsertBulk) UpdateSpaceID() *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateSpaceID()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *FolderUpsertBulk) SetName(v string) *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FolderUpsertBulk) UpdateName() *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *FolderUpsertBulk) SetUpdatedAt(v time.Time) *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *FolderUpsertBulk) UpdateUpdatedAt() *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *FolderUpsertBulk) SetExpiresAt(v time.Time) *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.SetExpiresAt(v)
+	})
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *FolderUpsertBulk) UpdateExpiresAt() *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.UpdateExpiresAt()
+	})
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (u *FolderUpsertBulk) ClearExpiresAt() *FolderUpsertBulk {
+	return u.Update(func(s *FolderUpsert) {
+		s.ClearExpiresAt()
+	})
+}
+
+// Exec executes the query.
+func (u *FolderUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the FolderCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FolderCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FolderUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

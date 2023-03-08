@@ -202,10 +202,12 @@ func (sq *SpaceQuery) AllX(ctx context.Context) []*Space {
 }
 
 // IDs executes the query and returns a list of Space IDs.
-func (sq *SpaceQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (sq *SpaceQuery) IDs(ctx context.Context) (ids []string, err error) {
+	if sq.ctx.Unique == nil && sq.path != nil {
+		sq.Unique(true)
+	}
 	ctx = setContextOp(ctx, sq.ctx, "IDs")
-	if err := sq.Select(space.FieldID).Scan(ctx, &ids); err != nil {
+	if err = sq.Select(space.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -438,20 +440,12 @@ func (sq *SpaceQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (sq *SpaceQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   space.Table,
-			Columns: space.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: space.FieldID,
-			},
-		},
-		From:   sq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(space.Table, space.Columns, sqlgraph.NewFieldSpec(space.FieldID, field.TypeString))
+	_spec.From = sq.sql
 	if unique := sq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if sq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := sq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

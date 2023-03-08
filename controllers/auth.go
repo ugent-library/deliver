@@ -1,16 +1,20 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/oidc"
 )
 
 type Auth struct {
+	repo     models.RepositoryService
 	oidcAuth *oidc.Auth
 }
 
-func NewAuth(oidcAuth *oidc.Auth) *Auth {
+func NewAuth(repo models.RepositoryService, oidcAuth *oidc.Auth) *Auth {
 	return &Auth{
+		repo:     repo,
 		oidcAuth: oidcAuth,
 	}
 }
@@ -20,12 +24,16 @@ func (h *Auth) Callback(c *Ctx) error {
 	if err := h.oidcAuth.CompleteAuth(c.Res, c.Req, &claims); err != nil {
 		return err
 	}
-	c.User = &models.User{
+	u := &models.User{
 		Username: claims.PreferredUsername,
 		Name:     claims.Name,
 		Email:    claims.Email,
 	}
-	c.Session.Set(userKey, c.User)
+	if err := h.repo.CreateOrUpdateUser(c.Context(), u); err != nil {
+		return err
+	}
+	c.User = u
+	c.Cookies.Set(rememberCookie, u.RememberToken, time.Now().Add(24*time.Hour*7))
 	c.RedirectTo("home")
 	return nil
 }
@@ -35,7 +43,10 @@ func (h *Auth) Login(c *Ctx) error {
 }
 
 func (h *Auth) Logout(c *Ctx) error {
-	c.Session.Delete(userKey)
+	c.Cookies.Delete(rememberCookie)
+	if err := h.repo.RenewUserRememberToken(c.Context(), c.User.ID); err != nil {
+		return err
+	}
 	c.RedirectTo("home")
 	return nil
 }
