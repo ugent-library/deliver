@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/ugent-library/deliver/cookiematic"
+	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/zaphttp"
@@ -30,7 +30,7 @@ type Ctx struct {
 	Log     *zap.SugaredLogger // TODO use plain logger
 	Req     *http.Request
 	Res     http.ResponseWriter
-	Cookies *cookiematic.Jar
+	Cookies *crumb.CookieJar
 	User    *models.User
 	*models.Permissions
 	Flash  []Flash
@@ -97,7 +97,7 @@ func Wrapper(config Config) func(...func(*Ctx) error) http.Handler {
 				Log:         zaphttp.Logger(r.Context()).Sugar(),
 				Res:         w,
 				Req:         r,
-				Cookies:     cookiematic.Cookies(r),
+				Cookies:     crumb.Cookies(r),
 				Permissions: config.Permissions,
 				router:      config.Router,
 				path:        mux.Vars(r),

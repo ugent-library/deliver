@@ -1,4 +1,4 @@
-package cookiematic
+package crumb
 
 import (
 	"context"
@@ -15,38 +15,64 @@ func (c contextKey) String() string {
 
 var cookiesKey = contextKey("cookies")
 
-func Cookies(r *http.Request) *Jar {
+func Cookies(r *http.Request) *CookieJar {
 	if v := r.Context().Value(cookiesKey); v != nil {
-		return v.(*Jar)
+		return v.(*CookieJar)
 	}
 	return nil
 }
 
-// futureproofing, not used yet
-type options struct{}
+type options struct {
+	errorHandler func(error)
+}
+
 type Option func(*options)
 
-// TODO error handler
+func WithErrorHandler(fn func(error)) Option {
+	return func(opts *options) {
+		opts.errorHandler = fn
+	}
+}
+
 func Enable(opts ...Option) func(http.Handler) http.Handler {
+	o := &options{
+		errorHandler: func(error) {},
+	}
+	for _, opt := range opts {
+		opt(o)
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			j := NewJar(w, r)
+			jar := NewCookieJar(r.Cookies())
+			written := false
 
 			w = httpsnoop.Wrap(w, httpsnoop.Hooks{
 				WriteHeader: func(nextFunc httpsnoop.WriteHeaderFunc) httpsnoop.WriteHeaderFunc {
 					return func(code int) {
-						j.Write()
+						if !written {
+							if err := jar.Write(w); err != nil {
+								o.errorHandler(err)
+							}
+							written = true
+						}
 						nextFunc(code)
 					}
 				},
 				Write: func(nextFunc httpsnoop.WriteFunc) httpsnoop.WriteFunc {
 					return func(b []byte) (int, error) {
-						j.Write()
+						if !written {
+							if err := jar.Write(w); err != nil {
+								o.errorHandler(err)
+							}
+							written = true
+						}
 						return nextFunc(b)
 					}
 				},
 			})
-			c := context.WithValue(r.Context(), cookiesKey, j)
+
+			c := context.WithValue(r.Context(), cookiesKey, jar)
 			next.ServeHTTP(w, r.WithContext(c))
 		})
 	}
