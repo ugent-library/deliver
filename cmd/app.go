@@ -232,7 +232,11 @@ var appCmd = &cobra.Command{
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests(logger.Desugar()),
-			crumb.Enable(),
+			crumb.Enable(
+				crumb.WithErrorHandler(func(err error) {
+					logger.Error(err)
+				}),
+			),
 		)
 
 		// start server
