@@ -19,8 +19,7 @@ type CookieJar struct {
 
 func NewCookieJar(cookies []*http.Cookie) *CookieJar {
 	return &CookieJar{
-		cookies:         cookies,
-		responseCookies: make(map[string]responseCookie),
+		cookies: cookies,
 	}
 }
 
@@ -49,6 +48,9 @@ func (m *CookieJar) Unmarshal(name string, data any) error {
 }
 
 func (j *CookieJar) Set(name string, data any, expires time.Time) {
+	if j.responseCookies == nil {
+		j.responseCookies = make(map[string]responseCookie)
+	}
 	j.responseCookies[name] = responseCookie{data: data, expires: expires}
 }
 
@@ -60,11 +62,11 @@ func (j *CookieJar) Append(name string, data any, expires time.Time) {
 		}
 	}
 	d = append(d, data)
-	j.responseCookies[name] = responseCookie{data: d, expires: expires}
+	j.Set(name, d, expires)
 }
 
 func (j *CookieJar) Delete(name string) {
-	j.responseCookies[name] = responseCookie{data: "", expires: time.Now()}
+	j.Set(name, "", time.Now())
 }
 
 func (j *CookieJar) Write(w http.ResponseWriter) error {
