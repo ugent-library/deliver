@@ -160,18 +160,7 @@
                                 <p>{{.UpdatedAt.Format "2006-01-02 15:04"}}</p>
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
-                                <div class="c-button-toolbar flex-nowrap">
-                                    <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST" id="delete-folder-{{.ID}}">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        {{$.CSRFTag}}
-                                        <button class="btn btn-link"
-                                            data-toggle="modal"
-                                            data-target="#confirm-delete-folder-{{.ID}}"
-                                        >
-                                            <i class="if if-delete"></i>
-                                            <span class="btn-text">Delete</span>
-                                        </button>
-                                    </form>
+                                <div class="c-button-toolbar">
                                     <a class="btn btn-link" href="{{$.PathTo "folder" "folderID" .ID}}">
                                         <i class="if if-draft"></i>
                                         <span class="btn-text">Open</span>
@@ -194,30 +183,3 @@
         </div>
     </div>
 </div>
-
-{{range .Data.space.Folders}}
-    <div id="confirm-delete-folder-{{.ID}}" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
-                        </div>
-                        <h4>
-                            Are you sure you want to delete the folder
-                            <br>
-                            <strong>{{.Name}}</strong>
-                            and its files?
-                        </h4>
-                        <p>You cannot undo this action or recover the files.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <button class="btn btn-danger" data-submit-target="#delete-folder-{{.ID}}">Yes, delete this folder</button>
-                </div>
-            </div>
-        </div>
-    </div>
-{{end}}
