@@ -30,11 +30,13 @@ type (
 		File   []ent.Hook
 		Folder []ent.Hook
 		Space  []ent.Hook
+		User   []ent.Hook
 	}
 	inters struct {
 		File   []ent.Interceptor
 		Folder []ent.Interceptor
 		Space  []ent.Interceptor
+		User   []ent.Interceptor
 	}
 )
 

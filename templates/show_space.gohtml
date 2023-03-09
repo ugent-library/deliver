@@ -121,7 +121,7 @@
                     <thead>
                         <tr>
                             <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
-                            <th class="text-nowrap">Shareable link</th>
+                            <th class="text-nowrap">Public shareable link</th>
                             <th class="text-nowrap">Expires on</th>
                             <th class="text-nowrap">Documents</th>
                             <th class="text-nowrap">Created at</th>
@@ -136,13 +136,14 @@
                                 <a href="{{$.PathTo "folder" "folderID" .ID}}">{{.Name}}</a>
                             </td>
                             <td class="text-nowrap">
-                                <div class="input-group">
+                                <div class="input-group" style="min-width: 375px;">
                                     <div class="input-group-prepend">
                                         <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}">
                                             <i class="if if-copy text-primary"></i>
+                                            <span class="btn-text">Copy link</span>
                                         </button>
                                     </div>
-                                    <input type="text" class="form-control input-select-text" readonly value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}">
+                                    <input type="text" class="form-control input-select-text" readonly value="{{$.URLTo "share_folder" "folderID" .ID "folderSlug" .Slug}}" style="min-width: 250px;">
                                 </div>
                             </td>
                             <td class="text-nowrap">
@@ -159,18 +160,7 @@
                                 <p>{{.UpdatedAt.Format "2006-01-02 15:04"}}</p>
                             </td>
                             <td class="table-col-sm-fixed table-col-sm-fixed-right">
-                                <div class="c-button-toolbar flex-nowrap">
-                                    <form action="{{$.PathTo "delete_folder" "folderID" .ID}}" method="POST" id="delete-folder-{{.ID}}">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        {{$.CSRFTag}}
-                                        <button class="btn btn-link"
-                                            data-toggle="modal"
-                                            data-target="#confirm-delete-folder-{{.ID}}"
-                                        >
-                                            <i class="if if-delete"></i>
-                                            <span class="btn-text">Delete</span>
-                                        </button>
-                                    </form>
+                                <div class="c-button-toolbar">
                                     <a class="btn btn-link" href="{{$.PathTo "folder" "folderID" .ID}}">
                                         <i class="if if-draft"></i>
                                         <span class="btn-text">Open</span>
@@ -193,30 +183,3 @@
         </div>
     </div>
 </div>
-
-{{range .Data.space.Folders}}
-    <div id="confirm-delete-folder-{{.ID}}" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
-                        </div>
-                        <h4>
-                            Are you sure you want to delete the folder
-                            <br>
-                            <strong>{{.Name}}</strong>
-                            and its files?
-                        </h4>
-                        <p>You cannot undo this action or recover the files.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <button class="btn btn-danger" data-submit-target="#delete-folder-{{.ID}}">Yes, delete this folder</button>
-                </div>
-            </div>
-        </div>
-    </div>
-{{end}}

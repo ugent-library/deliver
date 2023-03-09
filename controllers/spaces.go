@@ -43,8 +43,8 @@ func (h *Spaces) List(c *Ctx) error {
 
 	// handle new empty installation
 	if c.IsAdmin(c.User) && len(userSpaces) == 0 {
-		c.Session.Append(flashKey, Flash{
-			Type: infoFlash,
+		c.AddFlash(Flash{
+			Type: "info",
 			Body: "Create an initial space to get started",
 		})
 		c.RedirectTo("new_space")
@@ -104,8 +104,8 @@ func (h *Spaces) Create(c *Ctx) error {
 		})
 	}
 
-	c.Session.Append(flashKey, Flash{
-		Type:         infoFlash,
+	c.AddFlash(Flash{
+		Type:         "info",
 		Body:         "Space created succesfully",
 		DismissAfter: 3 * time.Second,
 	})
@@ -142,8 +142,8 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 		return h.show(c, folder, err)
 	}
 
-	c.Session.Append(flashKey, Flash{
-		Type:         infoFlash,
+	c.AddFlash(Flash{
+		Type:         "info",
 		Body:         "Folder created succesfully",
 		DismissAfter: 3 * time.Second,
 	})

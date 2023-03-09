@@ -1,6 +1,8 @@
 host = "localhost"
 port = 3000
 
+cookie_secret = ""
+
 # array of admin usernames
 admins = [
   "",
@@ -20,12 +22,4 @@ bucket = ""
 url = ""
 id = ""
 redirect_url = "http://localhost:3000/auth/callback"
-secret = ""
-
-[session]
-
-secret = ""
-
-[csrf]
-
 secret = ""

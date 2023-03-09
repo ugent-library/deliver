@@ -18,6 +18,8 @@ type Tx struct {
 	Folder *FolderClient
 	// Space is the client for interacting with the Space builders.
 	Space *SpaceClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -152,6 +154,7 @@ func (tx *Tx) init() {
 	tx.File = NewFileClient(tx.config)
 	tx.Folder = NewFolderClient(tx.config)
 	tx.Space = NewSpaceClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

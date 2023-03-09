@@ -14,6 +14,7 @@ import (
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
 	"github.com/ugent-library/deliver/ent/space"
+	"github.com/ugent-library/deliver/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -44,6 +45,7 @@ func columnChecker(table string) func(string) error {
 		file.Table:   file.ValidColumn,
 		folder.Table: folder.ValidColumn,
 		space.Table:  space.ValidColumn,
+		user.Table:   user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

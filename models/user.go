@@ -1,7 +1,37 @@
 package models
 
+import (
+	"crypto/rand"
+	"encoding/base64"
+	"time"
+
+	"github.com/ugent-library/deliver/validate"
+)
+
 type User struct {
-	Username string
-	Name     string
-	Email    string
+	ID            string    `json:"id,omitempty"`
+	Username      string    `json:"username,omitempty"`
+	Name          string    `json:"name,omitempty"`
+	Email         string    `json:"email,omitempty"`
+	RememberToken string    `json:"remember_token,omitempty"`
+	CreatedAt     time.Time `json:"created_at,omitempty"`
+	UpdatedAt     time.Time `json:"updated_at,omitempty"`
+}
+
+func (u *User) Validate() error {
+	return validate.Validate(
+		validate.NotEmpty("username", u.Username),
+		validate.LengthIn("username", u.Username, 1, 50),
+		validate.NotEmpty("name", u.Name),
+		validate.NotEmpty("email", u.Email),
+	)
+}
+
+func NewRememberToken() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }

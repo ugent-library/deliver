@@ -40,15 +40,7 @@ func (sd *SpaceDelete) ExecX(ctx context.Context) int {
 }
 
 func (sd *SpaceDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: space.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: space.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(space.Table, sqlgraph.NewFieldSpec(space.FieldID, field.TypeString))
 	if ps := sd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type SpaceDeleteOne struct {
 	sd *SpaceDelete
 }
 
+// Where appends a list predicates to the SpaceDelete builder.
+func (sdo *SpaceDeleteOne) Where(ps ...predicate.Space) *SpaceDeleteOne {
+	sdo.sd.mutation.Where(ps...)
+	return sdo
+}
+
 // Exec executes the deletion query.
 func (sdo *SpaceDeleteOne) Exec(ctx context.Context) error {
 	n, err := sdo.sd.Exec(ctx)
@@ -84,5 +82,7 @@ func (sdo *SpaceDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (sdo *SpaceDeleteOne) ExecX(ctx context.Context) {
-	sdo.sd.ExecX(ctx)
+	if err := sdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

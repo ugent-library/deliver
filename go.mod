@@ -12,7 +12,6 @@ require (
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
-	github.com/gorilla/sessions v1.2.1
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/oklog/ulid/v2 v2.1.0

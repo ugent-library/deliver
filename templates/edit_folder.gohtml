@@ -8,7 +8,16 @@
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
                     <div class="bc-toolbar-item">
-                        <h4 class="bc-toolbar-title">{{.Data.folder.Space.Name}} - Edit {{.Data.folder.Name}}</h4>
+                        <h4 class="bc-toolbar-title">
+                            <a href="{{.PathTo "space" "spaceName" .Data.folder.Space.Name}}">
+                                <i class="if if-arrow-left"></i>
+                                <span>{{.Data.folder.Space.Name}}</span>
+                            </a>
+                            <span>&mdash; Edit folder</span>
+                            <a href="{{.PathTo "folder" "folderID" .Data.folder.ID}}">
+                             {{.Data.folder.Name}}
+                            </a>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -22,6 +31,20 @@
                         <div class="bc-toolbar-item">Edit {{.Data.folder.Name}}</div>
                     </div>
                     <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <form action="{{.PathTo "delete_folder" "folderID" .Data.folder.ID}}" method="POST" id="delete-folder">
+                                <input type="hidden" name="_method" value="DELETE">
+                                {{.CSRFTag}}
+                                <button
+                                    class="btn btn-link btn-link-muted"
+                                    data-toggle="modal"
+                                    data-target="#confirm-delete-folder"
+                                >
+                                    <i class="if if-delete"></i>
+                                    <span class="btn-text">Delete folder</span>
+                                </button>
+                            </form>
+                        </div>
                         <div class="bc-toolbar-item">
                             <a class="btn btn-link btn-link-muted" href="{{.PathTo "folder" "folderID" .Data.folder.ID}}">
                                 <i class="if if-close"></i>
@@ -66,6 +89,31 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="confirm-delete-folder" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="c-blank-slate c-blank-slate-muted">
+                    <div class="bc-avatar">
+                        <i class="if if-alert"></i>
+                    </div>
+                    <h4>
+                        Are you sure you want to delete the folder
+                        <br>
+                        <strong>{{.Data.folder.Name}}</strong>
+                        and its files?
+                    </h4>
+                    <p>You cannot undo this action or recover the files.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                <button class="btn btn-danger" data-submit-target="#delete-folder">Yes, delete this folder</button>
             </div>
         </div>
     </div>

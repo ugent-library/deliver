@@ -40,15 +40,7 @@ func (fd *FolderDelete) ExecX(ctx context.Context) int {
 }
 
 func (fd *FolderDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: folder.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: folder.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(folder.Table, sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString))
 	if ps := fd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type FolderDeleteOne struct {
 	fd *FolderDelete
 }
 
+// Where appends a list predicates to the FolderDelete builder.
+func (fdo *FolderDeleteOne) Where(ps ...predicate.Folder) *FolderDeleteOne {
+	fdo.fd.mutation.Where(ps...)
+	return fdo
+}
+
 // Exec executes the deletion query.
 func (fdo *FolderDeleteOne) Exec(ctx context.Context) error {
 	n, err := fdo.fd.Exec(ctx)
@@ -84,5 +82,7 @@ func (fdo *FolderDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (fdo *FolderDeleteOne) ExecX(ctx context.Context) {
-	fdo.fd.ExecX(ctx)
+	if err := fdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }
