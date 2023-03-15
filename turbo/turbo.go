@@ -2,6 +2,7 @@ package turbo
 
 import (
 	"bytes"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -31,10 +32,27 @@ const (
 
 type Action string
 
-type Client struct {
-	hub  *Hub
-	conn *websocket.Conn
-	msgs chan []byte
+const ContentType = "text/vnd.turbo-stream.html"
+
+func FrameRequestID(r *http.Request) string {
+	return r.Header.Get("Turbo-Frame")
+	//		def turbo_frame_request_id
+	//		request.headers["Turbo-Frame"]
+	//	  end
+}
+
+func FrameRequest(r *http.Request) bool {
+	return FrameRequestID(r) != ""
+}
+
+// TODO give each client a unique id
+// add exclude to Send to avoid jitter etc
+type Client[T any] struct {
+	hub       *Hub[T]
+	conn      *websocket.Conn
+	indexKeys []string
+	msgs      chan []byte
+	Data      T
 }
 
 type Stream struct {
@@ -44,40 +62,81 @@ type Stream struct {
 	Template       []byte
 }
 
-func (c *Client) Send(streams ...Stream) {
+func (c *Client[T]) Send(streams ...Stream) {
 	if len(streams) == 0 {
 		return
 	}
 	c.msgs <- serializeStreams(streams)
 }
 
-type Responder interface {
-	Respond(*Client, []byte)
+func (c *Client[T]) Join(keys ...string) {
+	for _, k := range keys {
+		c.hub.addClientToIndex(k, c)
+		knownKey := false
+		for _, ik := range c.indexKeys {
+			if ik == k {
+				knownKey = true
+				break
+			}
+		}
+		if !knownKey {
+			// TODO mutex or channel
+			c.indexKeys = append(c.indexKeys, k)
+		}
+	}
 }
 
-type Hub struct {
-	responder Responder
+func (c *Client[T]) Leave(keys ...string) {
+	for _, k := range keys {
+		c.hub.removeClientFromIndex(k, c)
+		// TODO mutex or channel
+		for i, ik := range c.indexKeys {
+			if ik == k {
+				c.indexKeys = append(c.indexKeys[:i], c.indexKeys[i+1:]...)
+				break
+			}
+		}
+	}
+}
+
+func (c *Client[T]) LeaveAll() {
+	// TODO mutex or channel
+	for _, k := range c.indexKeys {
+		c.hub.removeClientFromIndex(k, c)
+	}
+	c.indexKeys = nil
+}
+
+type Responder[T any] interface {
+	Respond(*Client[T], []byte)
+}
+
+type Hub[T any] struct {
+	config    Config[T]
 	upgrader  websocket.Upgrader
-	clients   map[*Client]struct{}
-	mu        sync.RWMutex
+	clients   map[*Client[T]]struct{}
+	index     map[string]map[*Client[T]]struct{}
+	clientsMu sync.RWMutex
+	indexMu   sync.RWMutex
 }
 
-type Config struct {
-	Responder Responder
+type Config[T any] struct {
+	Responder Responder[T]
 }
 
-func NewHub(config Config) *Hub {
-	return &Hub{
-		responder: config.Responder,
-		clients:   make(map[*Client]struct{}),
+func NewHub[T any](config Config[T]) *Hub[T] {
+	return &Hub[T]{
+		config: config,
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
 		},
+		clients: make(map[*Client[T]]struct{}),
+		index:   make(map[string]map[*Client[T]]struct{}),
 	}
 }
 
-func (h *Hub) Broadcast(streams ...Stream) {
+func (h *Hub[T]) Broadcast(streams ...Stream) {
 	if len(streams) == 0 {
 		return
 	}
@@ -87,34 +146,76 @@ func (h *Hub) Broadcast(streams ...Stream) {
 	}
 }
 
-func (h *Hub) disconnect(c *Client) {
-	h.mu.Lock()
-	delete(h.clients, c)
-	h.mu.Unlock()
+func (h *Hub[T]) Send(k string, streams ...Stream) {
+	if len(streams) == 0 {
+		return
+	}
+
+	msg := serializeStreams(streams)
+
+	h.indexMu.RLock()
+	defer h.indexMu.RUnlock()
+
+	if clients, ok := h.index[k]; ok {
+		for c := range clients {
+			c.msgs <- msg
+		}
+	}
 }
 
-func (h *Hub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Hub[T]) disconnect(c *Client[T]) {
+	for _, k := range c.indexKeys {
+		h.removeClientFromIndex(k, c)
+	}
+	h.clientsMu.Lock()
+	delete(h.clients, c)
+	h.clientsMu.Unlock()
+}
+
+func (h *Hub[T]) Handle(w http.ResponseWriter, r *http.Request, visitors ...func(*Client[T])) {
 	conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	c := &Client{
+	c := &Client[T]{
 		hub:  h,
 		conn: conn,
 		msgs: make(chan []byte, 64),
 	}
 
-	h.mu.Lock()
+	for _, fn := range visitors {
+		fn(c)
+	}
+
+	h.clientsMu.Lock()
 	h.clients[c] = struct{}{}
-	h.mu.Unlock()
+	h.clientsMu.Unlock()
 
 	go writePump(h, c)
-	readPump(h, c)
+	go readPump(h, c)
 }
 
-func writePump(h *Hub, c *Client) {
+func (h *Hub[T]) addClientToIndex(k string, c *Client[T]) {
+	h.indexMu.Lock()
+	if clients, ok := h.index[k]; ok {
+		clients[c] = struct{}{}
+	} else {
+		h.index[k] = map[*Client[T]]struct{}{c: {}}
+	}
+	h.indexMu.Unlock()
+}
+
+func (h *Hub[T]) removeClientFromIndex(k string, c *Client[T]) {
+	h.indexMu.Lock()
+	if clients, ok := h.index[k]; ok {
+		delete(clients, c)
+	}
+	h.indexMu.Unlock()
+}
+
+func writePump[T any](h *Hub[T], c *Client[T]) {
 	ticker := time.NewTicker(pingPeriod)
 
 	defer func() {
@@ -153,7 +254,7 @@ func writePump(h *Hub, c *Client) {
 	}
 }
 
-func readPump(h *Hub, c *Client) {
+func readPump[T any](h *Hub[T], c *Client[T]) {
 	defer func() {
 		h.disconnect(c)
 		c.conn.Close()
@@ -175,7 +276,7 @@ func readPump(h *Hub, c *Client) {
 			break
 		}
 		log.Printf("message: %s", msg)
-		h.responder.Respond(c, msg)
+		h.config.Responder.Respond(c, msg)
 	}
 }
 
@@ -199,6 +300,6 @@ func serializeStreams(streams []Stream) []byte {
 	return b.Bytes()
 }
 
-func Write(w http.ResponseWriter, streams ...Stream) {
+func Write(w io.Writer, streams ...Stream) {
 	w.Write(serializeStreams(streams))
 }

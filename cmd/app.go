@@ -145,17 +145,24 @@ var appCmd = &cobra.Command{
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
 		type WebSocketRequest struct {
-			Route  string
-			Params map[string]string
+			Type string
+			Body struct {
+				Route  string
+				Params map[string]string
+			}
 		}
 
-		wsRouter := &turborouter.Router[map[string]string]{
+		type ClientData struct {
+			User *models.User
+		}
+
+		wsRouter := &turborouter.Router[ClientData, map[string]string]{
 			Deserializer: func(msg []byte) (string, map[string]string, error) {
 				r := &WebSocketRequest{}
 				if err := json.Unmarshal(msg, r); err != nil {
 					return "", nil, err
 				}
-				return r.Route, r.Params, nil
+				return r.Body.Route, r.Body.Params, nil
 			},
 		}
 
@@ -167,20 +174,27 @@ var appCmd = &cobra.Command{
 			mu.Unlock()
 		}
 
-		wsRouter.Add("home", func(c *turbo.Client, params map[string]string) {
+		wsRouter.Add("home", func(c *turbo.Client[ClientData], params map[string]string) {
 			nameSwapper(params["name"])
+			// c.Join("publication.1234")
 			c.Send(turbo.Stream{
 				Action:         turbo.Replace,
 				TargetSelector: ".bc-avatar-text",
-				Template:       []byte(`<span class="bc-avatar-text">Hi ` + params["name"] + `<span id="current-time"></span></span>`),
+				Template:       []byte(`<span class="bc-avatar-text">Hi ` + params["name"] + `(user: ` + c.Data.User.Name + `)<span id="current-time"></span></span>`),
 			})
 		})
 
-		hub := turbo.NewHub(turbo.Config{
+		hub := turbo.NewHub(turbo.Config[ClientData]{
 			Responder: wsRouter,
 		})
 
-		r.Handle("/ws", hub)
+		r.Handle("/ws", wrap(func(ctx *c.Ctx) error {
+			hub.Handle(ctx.Res, ctx.Req, func(c *turbo.Client[ClientData]) {
+				c.Data = ClientData{User: ctx.User}
+				c.Join(ctx.User.ID)
+			})
+			return nil
+		}))
 
 		tick := time.NewTicker(5 * time.Second)
 		go func() {

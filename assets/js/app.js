@@ -22,7 +22,7 @@ htmx.onLoad(function(rootEl) {
     window.htmx = htmx
 
     document.body.addEventListener('htmx:configRequest', evt => {
-        evt.detail.headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf_token"]').content
+        evt.detail.headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf-token"]').content
     })
 
     let ws = new WebSocket("ws://" + document.location.host + "/ws")
@@ -35,9 +35,12 @@ htmx.onLoad(function(rootEl) {
             evt.preventDefault()
             n++
             ws.send(JSON.stringify({
-                route: 'home',
-                params: {
-                    name: "Matthias " + n
+                type: "turbo",
+                body: {
+                    route: 'home',
+                    params: {
+                        name: "Matthias " + n
+                    }    
                 }
             }))
         })
