@@ -59,7 +59,7 @@ type Stream struct {
 	Action         Action
 	Target         string
 	TargetSelector string
-	Template       []byte
+	Template       bytes.Buffer
 }
 
 func (c *Client[T]) Send(streams ...Stream) {
@@ -294,7 +294,7 @@ func serializeStreams(streams []Stream) []byte {
 			b.WriteString(s.TargetSelector)
 		}
 		b.WriteString(`"><template>`)
-		b.Write(s.Template)
+		b.Write(s.Template.Bytes())
 		b.WriteString(`</template></turbo-stream>`)
 	}
 	return b.Bytes()
