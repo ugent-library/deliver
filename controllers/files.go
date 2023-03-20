@@ -1,8 +1,7 @@
 package controllers
 
 import (
-	"net/http"
-
+	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/httperror"
 )
@@ -19,7 +18,7 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-func (h *Files) Download(c *Ctx) error {
+func (h *Files) Download(c *ctx.Ctx) error {
 	fileID := c.Path("fileID")
 	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
@@ -28,7 +27,7 @@ func (h *Files) Download(c *Ctx) error {
 	return h.file.Get(c.Context(), fileID, c.Res)
 }
 
-func (h *Files) Delete(c *Ctx) error {
+func (h *Files) Delete(c *ctx.Ctx) error {
 	fileID := c.Path("fileID")
 
 	file, err := h.repo.FileByID(c.Context(), fileID)
@@ -44,13 +43,7 @@ func (h *Files) Delete(c *Ctx) error {
 		return err
 	}
 
-	// reload folder
-	folder, err := h.repo.FolderByID(c.Context(), file.FolderID)
-	if err != nil {
-		return err
-	}
+	c.RedirectTo("folder", "folderID", file.FolderID)
 
-	return c.HTML(http.StatusOK, "", "show_folder/refresh_files", Map{
-		"folder": folder,
-	})
+	return nil
 }

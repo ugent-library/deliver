@@ -1,3 +1,5 @@
+//go:generate go get -u github.com/valyala/quicktemplate/qtc
+//go:generate qtc -dir=views
 package cmd
 
 import (
@@ -18,6 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/deliver/controllers"
+	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
@@ -118,6 +121,7 @@ var appCmd = &cobra.Command{
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
 			Render:       renderer,
+			Assets:       assets,
 		})
 
 		// routes
@@ -178,7 +182,7 @@ var appCmd = &cobra.Command{
 			nameSwapper(params["name"])
 			// c.Join("publication.1234")
 			s := turbo.Stream{
-				Action:         turbo.Replace,
+				Action:         turbo.ReplaceAction,
 				TargetSelector: ".bc-avatar-text",
 			}
 			s.Template.WriteString(
@@ -195,7 +199,7 @@ var appCmd = &cobra.Command{
 			Responder: wsRouter,
 		})
 
-		r.Handle("/ws", wrap(func(ctx *c.Ctx) error {
+		r.Handle("/ws", wrap(func(ctx *ctx.Ctx) error {
 			hub.Handle(ctx.Res, ctx.Req, func(c *turbo.Client[ClientData]) {
 				c.Data = ClientData{User: ctx.User}
 				c.Join(ctx.User.ID)
@@ -212,7 +216,7 @@ var appCmd = &cobra.Command{
 					name := greetName
 					mu.RUnlock()
 					s := turbo.Stream{
-						Action:         turbo.Replace,
+						Action:         turbo.ReplaceAction,
 						TargetSelector: "h1.bc-toolbar-title",
 					}
 					s.Template.WriteString(`<h1 class="bc-toolbar-title">Hi ` + name + `</h1>`)

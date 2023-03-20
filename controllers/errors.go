@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/httperror"
 )
@@ -15,15 +16,15 @@ func NewErrors() *Errors {
 	return &Errors{}
 }
 
-func (h *Errors) Forbidden(c *Ctx) error {
+func (h *Errors) Forbidden(c *ctx.Ctx) error {
 	return c.HTML(http.StatusForbidden, "layouts/public_page", "errors/forbidden", nil)
 }
 
-func (h *Errors) NotFound(c *Ctx) error {
+func (h *Errors) NotFound(c *ctx.Ctx) error {
 	return c.HTML(http.StatusNotFound, "layouts/public_page", "errors/not_found", nil)
 }
 
-func (h *Errors) HandleError(c *Ctx, err error) {
+func (h *Errors) HandleError(c *ctx.Ctx, err error) {
 	if err == models.ErrNotFound {
 		err = httperror.NotFound
 	}

@@ -7,7 +7,7 @@ export default function(rootEl) {
 
             let target = document.getElementById(input.dataset.uploadProgressTarget)
             let form = input.closest('form')
-            let csrfToken = document.querySelector('meta[name=csrf_token]').content
+            let csrfToken = document.querySelector('meta[name=csrf-token]').content
 
             files.forEach((file, i) => {
                 let tmpl = document.getElementById('tmpl-upload-progress').content.firstElementChild.cloneNode(true)

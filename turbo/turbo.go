@@ -5,11 +5,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+type Action string
 
 const (
 	// Time allowed to write a message to the peer.
@@ -21,24 +24,23 @@ const (
 	// Maximum message size allowed from peer.
 	maxMessageSize = 512
 
-	Append  Action = "append"
-	Prepend Action = "prepend"
-	Replace Action = "replace"
-	Update  Action = "update"
-	Remove  Action = "remove"
-	Before  Action = "before"
-	After   Action = "after"
+	AppendAction  Action = "append"
+	PrependAction Action = "prepend"
+	ReplaceAction Action = "replace"
+	UpdateAction  Action = "update"
+	RemoveAction  Action = "remove"
+	BeforeAction  Action = "before"
+	AfterAction   Action = "after"
 )
-
-type Action string
 
 const ContentType = "text/vnd.turbo-stream.html"
 
+func Request(r *http.Request) bool {
+	return strings.HasPrefix(r.Header.Get("Accept"), ContentType)
+}
+
 func FrameRequestID(r *http.Request) string {
 	return r.Header.Get("Turbo-Frame")
-	//		def turbo_frame_request_id
-	//		request.headers["Turbo-Frame"]
-	//	  end
 }
 
 func FrameRequest(r *http.Request) bool {
@@ -62,11 +64,114 @@ type Stream struct {
 	Template       bytes.Buffer
 }
 
+func Append(target string) Stream {
+	return Stream{
+		Action: AppendAction,
+		Target: target,
+	}
+}
+
+func AppendMatch(target string) Stream {
+	return Stream{
+		Action:         AppendAction,
+		TargetSelector: target,
+	}
+}
+
+func Prepend(target string) Stream {
+	return Stream{
+		Action: PrependAction,
+		Target: target,
+	}
+}
+
+func PrependMatch(target string) Stream {
+	return Stream{
+		Action:         PrependAction,
+		TargetSelector: target,
+	}
+}
+
+func Replace(target string) Stream {
+	return Stream{
+		Action: ReplaceAction,
+		Target: target,
+	}
+}
+
+func ReplaceMatch(target string) Stream {
+	return Stream{
+		Action:         ReplaceAction,
+		TargetSelector: target,
+	}
+}
+
+func Update(target string) Stream {
+	return Stream{
+		Action: UpdateAction,
+		Target: target,
+	}
+}
+
+func UpdateMatch(target string) Stream {
+	return Stream{
+		Action:         UpdateAction,
+		TargetSelector: target,
+	}
+}
+
+func Remove(target string) Stream {
+	return Stream{
+		Action: RemoveAction,
+		Target: target,
+	}
+}
+
+func RemoveMatch(target string) Stream {
+	return Stream{
+		Action:         RemoveAction,
+		TargetSelector: target,
+	}
+}
+
+func Before(target string) Stream {
+	return Stream{
+		Action: BeforeAction,
+		Target: target,
+	}
+}
+
+func BeforeMatch(target string) Stream {
+	return Stream{
+		Action:         BeforeAction,
+		TargetSelector: target,
+	}
+}
+
+func After(target string) Stream {
+	return Stream{
+		Action: AfterAction,
+		Target: target,
+	}
+}
+
+func AfterMatch(target string) Stream {
+	return Stream{
+		Action:         AfterAction,
+		TargetSelector: target,
+	}
+}
+
 func (c *Client[T]) Send(streams ...Stream) {
 	if len(streams) == 0 {
 		return
 	}
 	c.msgs <- serializeStreams(streams)
+}
+
+func (c *Client[T]) Write(b []byte) (int, error) {
+	c.msgs <- b
+	return len(b), nil
 }
 
 func (c *Client[T]) Join(keys ...string) {
@@ -293,13 +398,24 @@ func serializeStreams(streams []Stream) []byte {
 			b.WriteString(`targets="`)
 			b.WriteString(s.TargetSelector)
 		}
-		b.WriteString(`"><template>`)
-		b.Write(s.Template.Bytes())
-		b.WriteString(`</template></turbo-stream>`)
+		b.WriteString(`">`)
+		if tmpl := s.Template.Bytes(); len(tmpl) > 0 {
+			b.WriteString(`<template>`)
+			b.Write(tmpl)
+			b.WriteString(`</template>`)
+		}
+		b.WriteString(`</turbo-stream>`)
 	}
 	return b.Bytes()
 }
 
-func Write(w io.Writer, streams ...Stream) {
-	w.Write(serializeStreams(streams))
+func Render(code int, w io.Writer, streams ...Stream) error {
+	if rw, ok := w.(http.ResponseWriter); ok {
+		if rw.Header().Get("Content-Type") == "" {
+			rw.Header().Set("Content-Type", ContentType)
+		}
+		rw.WriteHeader(code)
+	}
+	_, err := w.Write(serializeStreams(streams))
+	return err
 }

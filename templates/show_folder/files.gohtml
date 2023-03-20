@@ -94,7 +94,10 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <button class="btn btn-danger" hx-delete="{{$.PathTo "delete_file" "fileID" .ID}}" hx-swap="none">Yes, delete this file</button>
+                    <form action="{{$.PathTo "delete_file" "fileID" .ID}}" method="POST" data-turbo-stream>
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button class="btn btn-danger" type="submit">Yes, delete this file</button>
+                    </form>
                 </div>
             </div>
         </div>

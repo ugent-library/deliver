@@ -8,6 +8,39 @@ import formUploadProgress from './form_upload_progress.js'
 import modalClose from './modal_close.js'
 import clipboard from './clipboard.js'
 
+window.addEventListener("DOMContentLoaded", (evt) => {
+    let ws = new WebSocket("ws://" + document.location.host + "/ws")
+
+    Turbo.connectStreamSource(ws);
+
+    document.body.addEventListener('turbo:load', evt => {
+        BSN.initCallback(rootEl)
+        bootstrapPopper(rootEl)
+        toast(rootEl)
+        formSubmit(rootEl)
+        formUploadProgress(rootEl)
+        modalClose(rootEl)
+        clipboard(rootEl)    
+    })
+    
+    document.querySelectorAll('.breadcrumb').forEach(el => {
+        let n = 0
+        el.addEventListener('click', evt => {
+            evt.preventDefault()
+            n++
+            ws.send(JSON.stringify({
+                type: "turbo",
+                body: {
+                    route: 'home',
+                    params: {
+                        name: "Matthias " + n
+                    }    
+                }
+            }))
+        })
+    })
+})
+
 // configure htmx
 htmx.config.defaultFocusScroll = true
 htmx.onLoad(function(rootEl) {
@@ -25,34 +58,5 @@ htmx.onLoad(function(rootEl) {
         evt.detail.headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf-token"]').content
     })
 
-    let ws = new WebSocket("ws://" + document.location.host + "/ws")
-
-    Turbo.connectStreamSource(ws);
-
-    document.querySelectorAll('.breadcrumb').forEach(el => {
-        let n = 0
-        el.addEventListener('click', evt => {
-            evt.preventDefault()
-            n++
-            ws.send(JSON.stringify({
-                type: "turbo",
-                body: {
-                    route: 'home',
-                    params: {
-                        name: "Matthias " + n
-                    }    
-                }
-            }))
-        })
-    })
 });
 
-// document.body.addEventListener('turbo:load', evt => {
-//     BSN.initCallback(rootEl)
-//     bootstrapPopper(rootEl)
-//     toast(rootEl)
-//     formSubmit(rootEl)
-//     formUploadProgress(rootEl)
-//     modalClose(rootEl)
-//     clipboard(rootEl)    
-// })

@@ -9,7 +9,9 @@ import (
 
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/bind"
+	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/httperror"
 )
@@ -32,11 +34,11 @@ func NewFolders(r models.RepositoryService, f models.FileService, maxFileSize in
 	}
 }
 
-func (h *Folders) Show(c *Ctx) error {
+func (h *Folders) Show(c *ctx.Ctx) error {
 	return h.show(c, nil)
 }
 
-func (h *Folders) Edit(c *Ctx) error {
+func (h *Folders) Edit(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -54,7 +56,7 @@ func (h *Folders) Edit(c *Ctx) error {
 	})
 }
 
-func (h *Folders) Update(c *Ctx) error {
+func (h *Folders) Update(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -89,7 +91,7 @@ func (h *Folders) Update(c *Ctx) error {
 	return nil
 }
 
-func (h *Folders) Delete(c *Ctx) error {
+func (h *Folders) Delete(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -105,7 +107,7 @@ func (h *Folders) Delete(c *Ctx) error {
 		return err
 	}
 
-	c.AddFlash(Flash{
+	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
 		DismissAfter: 3 * time.Second,
@@ -115,7 +117,7 @@ func (h *Folders) Delete(c *Ctx) error {
 	return nil
 }
 
-func (h *Folders) UploadFile(c *Ctx) error {
+func (h *Folders) UploadFile(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -169,7 +171,7 @@ func (h *Folders) UploadFile(c *Ctx) error {
 	})
 }
 
-func (h *Folders) Share(c *Ctx) error {
+func (h *Folders) Share(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
@@ -180,7 +182,7 @@ func (h *Folders) Share(c *Ctx) error {
 	})
 }
 
-func (h *Folders) show(c *Ctx, err error) error {
+func (h *Folders) show(c *ctx.Ctx, err error) error {
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
 		return err
@@ -191,6 +193,21 @@ func (h *Folders) show(c *Ctx, err error) error {
 	if err != nil {
 		return err
 	}
+
+	if turbo.Request(c.Req) {
+		s := turbo.Update("files")
+		err = c.WriteHTML(&s.Template, "", "show_folder/files", Map{
+			"folder": folder,
+		})
+		if err != nil {
+			return err
+		}
+		return turbo.Render(http.StatusOK, c.Res,
+			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
+			s,
+		)
+	}
+
 	return c.HTML(http.StatusOK, "layouts/page", "show_folder", Map{
 		"folder":           folder,
 		"validationErrors": validationErrors,

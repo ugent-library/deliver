@@ -1,9 +1,10 @@
-package controllers
+package ctx
 
 import (
 	"context"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -12,8 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/zaphttp"
+	"github.com/ugent-library/mix"
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
@@ -24,32 +24,33 @@ const (
 	flashCookie    = "deliver.flash"
 )
 
-type Map = map[string]any
-
 type Ctx struct {
-	Log     *zap.SugaredLogger // TODO use plain logger
-	Req     *http.Request
-	Res     http.ResponseWriter
-	Cookies *crumb.CookieJar
-	User    *models.User
+	Log       *zap.SugaredLogger // TODO use plain logger
+	Req       *http.Request
+	Res       http.ResponseWriter
+	CSRFToken string
+	CSRFTag   template.HTML
+	Cookies   *crumb.CookieJar
+	User      *models.User
 	*models.Permissions
-	Flash  []Flash
-	router *mux.Router
-	path   map[string]string
-	render *render.Render
+	Flash    []Flash
+	Router   *mux.Router
+	PathVars map[string]string
+	Render   *render.Render
+	Assets   mix.Manifest
 }
 
 type Flash struct {
 	Type         string
 	Title        string
-	Body         template.HTML
+	Body         string
 	DismissAfter time.Duration
 }
 
 type TemplateData struct {
 	ctx       *Ctx
 	CSRFToken string
-	CSRFTag   template.HTML
+	CSRFTag   string
 	Data      any
 }
 
@@ -89,43 +90,27 @@ type Config struct {
 	Render       *render.Render
 }
 
-// TODO add Ctx as request Context value in middleware?
-func Wrapper(config Config) func(...func(*Ctx) error) http.Handler {
-	return func(handlers ...func(*Ctx) error) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c := &Ctx{
-				Log:         zaphttp.Logger(r.Context()).Sugar(),
-				Res:         w,
-				Req:         r,
-				Cookies:     crumb.Cookies(r),
-				Permissions: config.Permissions,
-				router:      config.Router,
-				path:        mux.Vars(r),
-				render:      config.Render,
-			}
-			if err := LoadSession(config.UserFunc, c); err != nil {
-				config.ErrorHandler(c, err)
-				return
-			}
-			for _, fn := range handlers {
-				if err := fn(c); err != nil {
-					config.ErrorHandler(c, err)
-					return
-				}
-			}
-		})
-	}
-}
-
 func (c *Ctx) Context() context.Context {
 	return c.Req.Context()
 }
 
 func (c *Ctx) HTML(status int, layout, tmpl string, data any) error {
-	return c.render.HTML(c.Res, status, tmpl, TemplateData{
+	return c.Render.HTML(c.Res, status, tmpl, TemplateData{
 		ctx:       c,
 		CSRFToken: csrf.Token(c.Req),
-		CSRFTag:   csrf.TemplateField(c.Req),
+		CSRFTag:   string(csrf.TemplateField(c.Req)),
+		Data:      data,
+	}, render.HTMLOptions{
+		Layout: layout,
+	})
+}
+
+// TODO use render.TemplateLookup?
+func (c *Ctx) WriteHTML(w io.Writer, layout, tmpl string, data any) error {
+	return c.Render.HTML(w, http.StatusOK, tmpl, TemplateData{
+		ctx:       c,
+		CSRFToken: csrf.Token(c.Req),
+		CSRFTag:   string(csrf.TemplateField(c.Req)),
 		Data:      data,
 	}, render.HTMLOptions{
 		Layout: layout,
@@ -133,11 +118,11 @@ func (c *Ctx) HTML(status int, layout, tmpl string, data any) error {
 }
 
 func (c *Ctx) Path(param string) string {
-	return c.path[param]
+	return c.PathVars[param]
 }
 
 func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
-	route := c.router.Get(name)
+	route := c.Router.Get(name)
 	if route == nil {
 		panic(fmt.Errorf("unknown route '%s'", name))
 	}
@@ -158,7 +143,7 @@ func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
 }
 
 func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
-	route := c.router.Get(name)
+	route := c.Router.Get(name)
 	if route == nil {
 		panic(fmt.Errorf("unknown route '%s'", name))
 	}
@@ -170,7 +155,7 @@ func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
 }
 
 func (c *Ctx) RedirectTo(name string, pairs ...string) {
-	route := c.router.Get(name)
+	route := c.Router.Get(name)
 	if route == nil {
 		panic(fmt.Errorf("unknown route '%s'", name))
 	}
@@ -181,38 +166,14 @@ func (c *Ctx) RedirectTo(name string, pairs ...string) {
 	http.Redirect(c.Res, c.Req, u.String(), http.StatusSeeOther)
 }
 
+func (c *Ctx) AssetPath(asset string) string {
+	ap, err := c.Assets.AssetPath(asset)
+	if err != nil {
+		panic(err)
+	}
+	return ap
+}
+
 func (c *Ctx) AddFlash(f Flash) {
 	c.Cookies.Append(flashCookie, f, time.Now().Add(3*time.Minute))
-}
-
-func LoadSession(userFunc func(context.Context, string) (*models.User, error), c *Ctx) error {
-	if token := c.Cookies.Get(rememberCookie); token != "" {
-		user, err := userFunc(c.Context(), token)
-		if err != nil && err != models.ErrNotFound {
-			return err
-		}
-		c.User = user
-	}
-
-	c.Cookies.Unmarshal(flashCookie, &c.Flash)
-	c.Cookies.Delete(flashCookie)
-
-	return nil
-}
-
-func RequireUser(c *Ctx) error {
-	if c.User == nil {
-		return httperror.Unauthorized
-	}
-	return nil
-}
-
-func RequireAdmin(c *Ctx) error {
-	if c.User == nil {
-		return httperror.Unauthorized
-	}
-	if !c.IsAdmin(c.User) {
-		return httperror.Forbidden
-	}
-	return nil
 }

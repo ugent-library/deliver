@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ugent-library/bind"
+	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/httperror"
@@ -29,7 +30,7 @@ type SpaceForm struct {
 	Admins string `form:"admins"`
 }
 
-func (h *Spaces) List(c *Ctx) error {
+func (h *Spaces) List(c *ctx.Ctx) error {
 	var userSpaces []*models.Space
 	var err error
 	if c.IsAdmin(c.User) {
@@ -43,7 +44,7 @@ func (h *Spaces) List(c *Ctx) error {
 
 	// handle new empty installation
 	if c.IsAdmin(c.User) && len(userSpaces) == 0 {
-		c.AddFlash(Flash{
+		c.AddFlash(ctx.Flash{
 			Type: "info",
 			Body: "Create an initial space to get started",
 		})
@@ -69,18 +70,18 @@ func (h *Spaces) List(c *Ctx) error {
 	})
 }
 
-func (h *Spaces) Show(c *Ctx) error {
+func (h *Spaces) Show(c *ctx.Ctx) error {
 	return h.show(c, &models.Folder{}, nil)
 }
 
-func (h *Spaces) New(c *Ctx) error {
+func (h *Spaces) New(c *ctx.Ctx) error {
 	return c.HTML(http.StatusOK, "layouts/page", "new_space", Map{
 		"space":            &models.Space{},
 		"validationErrors": validate.NewErrors(),
 	})
 }
 
-func (h *Spaces) Create(c *Ctx) error {
+func (h *Spaces) Create(c *ctx.Ctx) error {
 	b := SpaceForm{}
 	if err := bind.Form(c.Req, &b); err != nil {
 		return errors.Join(httperror.BadRequest, err)
@@ -104,7 +105,7 @@ func (h *Spaces) Create(c *Ctx) error {
 		})
 	}
 
-	c.AddFlash(Flash{
+	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Space created succesfully",
 		DismissAfter: 3 * time.Second,
@@ -114,7 +115,7 @@ func (h *Spaces) Create(c *Ctx) error {
 	return nil
 }
 
-func (h *Spaces) CreateFolder(c *Ctx) error {
+func (h *Spaces) CreateFolder(c *ctx.Ctx) error {
 	spaceName := c.Path("spaceName")
 
 	space, err := h.repo.SpaceByName(c.Context(), spaceName)
@@ -142,7 +143,7 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 		return h.show(c, folder, err)
 	}
 
-	c.AddFlash(Flash{
+	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder created succesfully",
 		DismissAfter: 3 * time.Second,
@@ -152,7 +153,7 @@ func (h *Spaces) CreateFolder(c *Ctx) error {
 	return nil
 }
 
-func (h *Spaces) Edit(c *Ctx) error {
+func (h *Spaces) Edit(c *ctx.Ctx) error {
 	spaceName := c.Path("spaceName")
 
 	space, err := h.repo.SpaceByName(c.Context(), spaceName)
@@ -166,7 +167,7 @@ func (h *Spaces) Edit(c *Ctx) error {
 	})
 }
 
-func (h *Spaces) Update(c *Ctx) error {
+func (h *Spaces) Update(c *ctx.Ctx) error {
 	spaceName := c.Path("spaceName")
 
 	space, err := h.repo.SpaceByName(c.Context(), spaceName)
@@ -197,7 +198,7 @@ func (h *Spaces) Update(c *Ctx) error {
 	return nil
 }
 
-func (h *Spaces) show(c *Ctx, folder *models.Folder, err error) error {
+func (h *Spaces) show(c *ctx.Ctx, folder *models.Folder, err error) error {
 	spaceName := c.Path("spaceName")
 
 	validationErrors := validate.NewErrors()
