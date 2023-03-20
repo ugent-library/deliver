@@ -10,8 +10,11 @@ import "io"
 import "bytes"
 
 // GoExpression
-import "fmt"
-import "github.com/ugent-library/deliver/controllers/ctx"
+import (
+    "fmt"
+
+    "github.com/ugent-library/deliver/controllers/ctx"
+)
 
 // TODO {{if .User}} c-sidebar--dark-gray{{end}}
 

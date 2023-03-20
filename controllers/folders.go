@@ -13,6 +13,7 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
@@ -195,16 +196,9 @@ func (h *Folders) show(c *ctx.Ctx, err error) error {
 	}
 
 	if turbo.Request(c.Req) {
-		s := turbo.Update("files")
-		err = c.WriteHTML(&s.Template, "", "show_folder/files", Map{
-			"folder": folder,
-		})
-		if err != nil {
-			return err
-		}
-		return turbo.Render(http.StatusOK, c.Res,
+		return turbo.Render(c.Res, c.Req, http.StatusOK,
 			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
-			s,
+			turbo.Update("files").Render(views.FolderFiles(c, folder)),
 		)
 	}
 

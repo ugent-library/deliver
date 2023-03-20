@@ -1,7 +1,10 @@
 package views
 
-import "fmt"
-import "github.com/ugent-library/deliver/controllers/ctx"
+import (
+    "fmt"
+
+    "github.com/ugent-library/deliver/controllers/ctx"
+)
 
 // TODO {{if .User}} c-sidebar--dark-gray{{end}}
 templ Page(c *ctx.Ctx, title string, content templ.Component) {

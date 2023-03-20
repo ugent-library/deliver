@@ -180,19 +180,14 @@ var appCmd = &cobra.Command{
 
 		wsRouter.Add("home", func(c *turbo.Client[ClientData], params map[string]string) {
 			nameSwapper(params["name"])
-			// c.Join("publication.1234")
-			s := turbo.Stream{
-				Action:         turbo.ReplaceAction,
-				TargetSelector: ".bc-avatar-text",
-			}
-			s.Template.WriteString(
-				`<span class="bc-avatar-text">Hi ` +
-					params["name"] +
-					`(user: ` +
-					c.Data.User.Name +
+			c.Send(turbo.ReplaceMatch(
+				".bc-avatar-text",
+				`<span class="bc-avatar-text">Hi `+
+					params["name"]+
+					`(user: `+
+					c.Data.User.Name+
 					`)<span id="current-time"></span></span>`,
-			)
-			c.Send()
+			))
 		})
 
 		hub := turbo.NewHub(turbo.Config[ClientData]{
@@ -215,12 +210,7 @@ var appCmd = &cobra.Command{
 					mu.RLock()
 					name := greetName
 					mu.RUnlock()
-					s := turbo.Stream{
-						Action:         turbo.ReplaceAction,
-						TargetSelector: "h1.bc-toolbar-title",
-					}
-					s.Template.WriteString(`<h1 class="bc-toolbar-title">Hi ` + name + `</h1>`)
-					hub.Broadcast()
+					hub.Broadcast(turbo.ReplaceMatch("h1.bc-toolbar-title", `<h1 class="bc-toolbar-title">Hi `+name+`</h1>`))
 				}
 			}
 		}()

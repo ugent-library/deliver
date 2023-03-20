@@ -12,7 +12,7 @@ import "bytes"
 // GoExpression
 import "github.com/ugent-library/deliver/controllers/ctx"
 
-func HomePage(c *ctx.Ctx) templ.Component {
+func Home(c *ctx.Ctx) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {

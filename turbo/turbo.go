@@ -2,6 +2,7 @@ package turbo
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"log"
 	"net/http"
@@ -57,66 +58,84 @@ type Client[T any] struct {
 	Data      T
 }
 
+type Renderer interface {
+	Render(context.Context, io.Writer) error
+}
+
 type Stream struct {
 	Action         Action
 	Target         string
 	TargetSelector string
-	Template       bytes.Buffer
+	Template       string
+	Renderer       Renderer
 }
 
-func Append(target string) Stream {
+func (s Stream) Render(r Renderer) Stream {
+	s.Renderer = r
+	return s
+}
+
+func Append(target string, tmpls ...string) Stream {
 	return Stream{
-		Action: AppendAction,
-		Target: target,
+		Action:   AppendAction,
+		Target:   target,
+		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func AppendMatch(target string) Stream {
+func AppendMatch(target string, tmpls ...string) Stream {
 	return Stream{
 		Action:         AppendAction,
 		TargetSelector: target,
+		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Prepend(target string) Stream {
+func Prepend(target string, tmpls ...string) Stream {
 	return Stream{
-		Action: PrependAction,
-		Target: target,
+		Action:   PrependAction,
+		Target:   target,
+		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func PrependMatch(target string) Stream {
+func PrependMatch(target string, tmpls ...string) Stream {
 	return Stream{
 		Action:         PrependAction,
 		TargetSelector: target,
+		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Replace(target string) Stream {
+func Replace(target string, tmpls ...string) Stream {
 	return Stream{
-		Action: ReplaceAction,
-		Target: target,
+		Action:   ReplaceAction,
+		Target:   target,
+		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func ReplaceMatch(target string) Stream {
+func ReplaceMatch(target string, tmpls ...string) Stream {
 	return Stream{
 		Action:         ReplaceAction,
 		TargetSelector: target,
+		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Update(target string) Stream {
+func Update(target string, tmpls ...string) Stream {
 	return Stream{
-		Action: UpdateAction,
-		Target: target,
+		Action:   UpdateAction,
+		Target:   target,
+		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func UpdateMatch(target string) Stream {
+func UpdateMatch(target string, tmpls ...string) Stream {
 	return Stream{
 		Action:         UpdateAction,
 		TargetSelector: target,
+		Template:       strings.Join(tmpls, ""),
 	}
 }
 
@@ -134,45 +153,54 @@ func RemoveMatch(target string) Stream {
 	}
 }
 
-func Before(target string) Stream {
+func Before(target string, tmpls ...string) Stream {
 	return Stream{
-		Action: BeforeAction,
-		Target: target,
+		Action:   BeforeAction,
+		Target:   target,
+		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func BeforeMatch(target string) Stream {
+func BeforeMatch(target string, tmpls ...string) Stream {
 	return Stream{
 		Action:         BeforeAction,
 		TargetSelector: target,
+		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func After(target string) Stream {
+func After(target string, tmpls ...string) Stream {
 	return Stream{
-		Action: AfterAction,
-		Target: target,
+		Action:   AfterAction,
+		Target:   target,
+		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func AfterMatch(target string) Stream {
+func AfterMatch(target string, tmpls ...string) Stream {
 	return Stream{
 		Action:         AfterAction,
 		TargetSelector: target,
+		Template:       strings.Join(tmpls, ""),
 	}
 }
 
+// TODO context, error handling
 func (c *Client[T]) Send(streams ...Stream) {
 	if len(streams) == 0 {
 		return
 	}
-	c.msgs <- serializeStreams(streams)
+	msgs, err := serializeStreams(context.TODO(), streams)
+	if err != nil {
+		return
+	}
+	c.msgs <- msgs
 }
 
-func (c *Client[T]) Write(b []byte) (int, error) {
-	c.msgs <- b
-	return len(b), nil
-}
+// func (c *Client[T]) Write(b []byte) (int, error) {
+// 	c.msgs <- b
+// 	return len(b), nil
+// }
 
 func (c *Client[T]) Join(keys ...string) {
 	for _, k := range keys {
@@ -241,22 +269,30 @@ func NewHub[T any](config Config[T]) *Hub[T] {
 	}
 }
 
+// TODO context, error handling
 func (h *Hub[T]) Broadcast(streams ...Stream) {
 	if len(streams) == 0 {
 		return
 	}
-	msg := serializeStreams(streams)
+	msg, err := serializeStreams(context.TODO(), streams)
+	if err != nil {
+		return
+	}
 	for c := range h.clients {
 		c.msgs <- msg
 	}
 }
 
+// TODO context, error handling
 func (h *Hub[T]) Send(k string, streams ...Stream) {
 	if len(streams) == 0 {
 		return
 	}
 
-	msg := serializeStreams(streams)
+	msg, err := serializeStreams(context.TODO(), streams)
+	if err != nil {
+		return
+	}
 
 	h.indexMu.RLock()
 	defer h.indexMu.RUnlock()
@@ -269,9 +305,7 @@ func (h *Hub[T]) Send(k string, streams ...Stream) {
 }
 
 func (h *Hub[T]) disconnect(c *Client[T]) {
-	for _, k := range c.indexKeys {
-		h.removeClientFromIndex(k, c)
-	}
+	c.LeaveAll()
 	h.clientsMu.Lock()
 	delete(h.clients, c)
 	h.clientsMu.Unlock()
@@ -385,11 +419,16 @@ func readPump[T any](h *Hub[T], c *Client[T]) {
 	}
 }
 
-func serializeStreams(streams []Stream) []byte {
-	b := bytes.Buffer{}
+func serializeStreams(ctx context.Context, streams []Stream) ([]byte, error) {
+	b := bufPool.Get().(*bytes.Buffer)
+	defer func() {
+		b.Reset()
+		bufPool.Put(b)
+	}()
+
 	for _, s := range streams {
 		b.WriteString(`<turbo-stream action="`)
-		b.Write([]byte(s.Action))
+		b.WriteString(string(s.Action))
 		b.WriteString(`" `)
 		if s.Target != "" {
 			b.WriteString(`target="`)
@@ -399,23 +438,36 @@ func serializeStreams(streams []Stream) []byte {
 			b.WriteString(s.TargetSelector)
 		}
 		b.WriteString(`">`)
-		if tmpl := s.Template.Bytes(); len(tmpl) > 0 {
-			b.WriteString(`<template>`)
-			b.Write(tmpl)
-			b.WriteString(`</template>`)
+		if s.Action != RemoveAction {
+			if s.Renderer != nil {
+				s.Renderer.Render(ctx, b)
+			} else {
+				b.WriteString(`<template>`)
+				b.WriteString(s.Template)
+				b.WriteString(`</template>`)
+
+			}
 		}
 		b.WriteString(`</turbo-stream>`)
 	}
-	return b.Bytes()
+	return b.Bytes(), nil
 }
 
-func Render(code int, w io.Writer, streams ...Stream) error {
-	if rw, ok := w.(http.ResponseWriter); ok {
-		if rw.Header().Get("Content-Type") == "" {
-			rw.Header().Set("Content-Type", ContentType)
-		}
-		rw.WriteHeader(code)
+func Render(w http.ResponseWriter, r *http.Request, code int, streams ...Stream) error {
+	if hdr := w.Header(); hdr.Get("Content-Type") == "" {
+		hdr.Set("Content-Type", ContentType)
 	}
-	_, err := w.Write(serializeStreams(streams))
+	w.WriteHeader(code)
+	b, err := serializeStreams(r.Context(), streams)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(b)
 	return err
+}
+
+var bufPool = sync.Pool{
+	New: func() any {
+		return &bytes.Buffer{}
+	},
 }
