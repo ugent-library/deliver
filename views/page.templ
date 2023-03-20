@@ -8,160 +8,160 @@ import (
 
 // TODO {{if .User}} c-sidebar--dark-gray{{end}}
 templ Page(c *ctx.Ctx, title string, content templ.Component) {
-<!DOCTYPE html>
-<html class="u-maximize-height" dir="ltr" lang="en">
+    <!DOCTYPE html>
+    <html class="u-maximize-height" dir="ltr" lang="en">
 
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="robots" content="noindex"/>
-    <meta name="csrf-token" content={ c.CSRFToken }/>
-    <link rel="stylesheet" href={ c.AssetPath("/css/app.css") }/>
-    <link rel="icon" href={ c.AssetPath("/favicon.ico") }/>
-    <script type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
-    <title>{ title }</title>
-</head>
-<body class="u-maximize-height overflow-hidden u-scroll-wrapper">
-    <header>
-        <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
-            <div class="bc-toolbar bc-toolbar-sm">
-                <div class="bc-toolbar-left">
-                    <div class="bc-toolbar-item">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                    <a href={ templ.SafeURL(c.PathTo("home").String()) }>
-                                        <img class="d-none d-lg-inline-block" src={ c.AssetPath("/images/ghent-university-library-logo.svg") } alt="Ghent University Library"/>
-                                        <img class="d-inline-block d-lg-none" src={ c.AssetPath("/images/ghent-university-library-mark.svg") } alt="Ghent University Library"/>
-                                    </a>
-                                </li>
-                                <li class="breadcrumb-item" aria-current="page">
-                                    <a href={ templ.SafeURL(c.PathTo("home").String()) } class="text-muted">Home</a>
-                                </li>
-                            </ol>
-                        </nav>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="robots" content="noindex"/>
+        <meta name="csrf-token" content={ c.CSRFToken }/>
+        <link rel="stylesheet" href={ c.AssetPath("/css/app.css") }/>
+        <link rel="icon" href={ c.AssetPath("/favicon.ico") }/>
+        <script type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
+        <title>{ title }</title>
+    </head>
+    <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
+        <header>
+            <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
+                <div class="bc-toolbar bc-toolbar-sm">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href={ templ.SafeURL(c.PathTo("home").String()) }>
+                                            <img class="d-none d-lg-inline-block" src={ c.AssetPath("/images/ghent-university-library-logo.svg") } alt="Ghent University Library"/>
+                                            <img class="d-inline-block d-lg-none" src={ c.AssetPath("/images/ghent-university-library-mark.svg") } alt="Ghent University Library"/>
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item" aria-current="page">
+                                        <a href={ templ.SafeURL(c.PathTo("home").String()) } class="text-muted">Home</a>
+                                    </li>
+                                </ol>
+                            </nav>
+                        </div>
                     </div>
-                </div>
 
-                <div class="bc-toolbar-right">
-                    <div class="bc-toolbar-item">
-                        <div id="side-panels">
-                            <ul class="nav nav-main">
-                                if c.User != nil {
-                                <li class="nav-item">
-                                    <a class="nav-link" href="https://forms.office.com/e/6D3PEnpV9M" target="_blank">
-                                        <i class="if if-service"></i>
-                                        <span class="btn-text">Geef feedback</span>
-                                    </a>
-                                </li>
-                                }
-                                <li class="nav-item">
-                                    <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
-                                        <i class="if if-book"></i>
-                                        <span class="btn-text">Handleiding</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                 	if u := c.User; u != nil {
-                                    <div class="dropdown position-static">
-                                        <button class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <div class="bc-avatar-and-text">
-                                                <div class="bc-avatar bc-avatar--sm bc-avatar--small mr-2">
-                                                    <i class="if if-user"></i>
-                                                </div>
-                                                <div class="bc-avatar-text">{ u.Name }</div>
-                                            </div>
-                                        </button>
-                                        <div class="dropdown-menu mt-8">
-                                            <div class="bc-avatar-and-text m-4">
-                                                <div class="bc-avatar bc-avatar--sm">
-                                                    <i class="if if-user"></i>
-                                                </div>
-                                                <div class="bc-avatar-text">
-                                                    <h4>{ u.Name }</h4>
-                                                    <p class="text-muted c-body-small">{ u.Email }</p>
-                                                </div>
-                                            </div>
-                                            <hr class="dropdown-divider"/>
-                                            <a class="dropdown-item" href={ templ.SafeURL(c.PathTo("logout").String()) }>
-                                                <i class="if if-log-out"></i>
-                                                <span>Log out</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    } else {
-                                    <a class="btn btn-link btn-sm" href={ templ.SafeURL(c.PathTo("login").String()) }>
-                                        <i class="if if-arrow-right mt-0 ml-2"></i>
-                                        <span class="btn-text mr-2">Log in</span>
-                                    </a>
+                    <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <div id="side-panels">
+                                <ul class="nav nav-main">
+                                    if c.User != nil {
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="https://forms.office.com/e/6D3PEnpV9M" target="_blank">
+                                            <i class="if if-service"></i>
+                                            <span class="btn-text">Geef feedback</span>
+                                        </a>
+                                    </li>
                                     }
-                                </li>
-                            </ul>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
+                                            <i class="if if-book"></i>
+                                            <span class="btn-text">Handleiding</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        if u := c.User; u != nil {
+                                        <div class="dropdown position-static">
+                                            <button class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <div class="bc-avatar-and-text">
+                                                    <div class="bc-avatar bc-avatar--sm bc-avatar--small mr-2">
+                                                        <i class="if if-user"></i>
+                                                    </div>
+                                                    <div class="bc-avatar-text">{ u.Name }</div>
+                                                </div>
+                                            </button>
+                                            <div class="dropdown-menu mt-8">
+                                                <div class="bc-avatar-and-text m-4">
+                                                    <div class="bc-avatar bc-avatar--sm">
+                                                        <i class="if if-user"></i>
+                                                    </div>
+                                                    <div class="bc-avatar-text">
+                                                        <h4>{ u.Name }</h4>
+                                                        <p class="text-muted c-body-small">{ u.Email }</p>
+                                                    </div>
+                                                </div>
+                                                <hr class="dropdown-divider"/>
+                                                <a class="dropdown-item" href={ templ.SafeURL(c.PathTo("logout").String()) }>
+                                                    <i class="if if-log-out"></i>
+                                                    <span>Log out</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        } else {
+                                        <a class="btn btn-link btn-sm" href={ templ.SafeURL(c.PathTo("login").String()) }>
+                                            <i class="if if-arrow-right mt-0 ml-2"></i>
+                                            <span class="btn-text mr-2">Log in</span>
+                                        </a>
+                                        }
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
-    <main>
-        <div class="d-flex u-maximize-height">
-            <div class="c-sidebar d-none d-lg-flex">
-                <div class="c-sidebar__menu">
-                    <nav>
-                        <ul class="c-sidebar-menu">
-                            <li class="c-sidebar__item c-sidebar__item--active">
-                                <a href={ templ.SafeURL(c.PathTo("home").String()) }>
-                                    <span class="c-sidebar__icon">
-                                        <i class="if if-file"></i>
-                                    </span>
-                                    <span class="c-sidebar__label">Deliver</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+        </header>
+        <main>
+            <div class="d-flex u-maximize-height">
+                <div class="c-sidebar d-none d-lg-flex">
+                    <div class="c-sidebar__menu">
+                        <nav>
+                            <ul class="c-sidebar-menu">
+                                <li class="c-sidebar__item c-sidebar__item--active">
+                                    <a href={ templ.SafeURL(c.PathTo("home").String()) }>
+                                        <span class="c-sidebar__icon">
+                                            <i class="if if-file"></i>
+                                        </span>
+                                        <span class="c-sidebar__label">Deliver</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="c-sidebar__bottom">
+                        <img src={ c.AssetPath("/images/logo-ugent-white.svg") } alt="Logo UGent" height="48px" width="auto"/>
+                    </div>
                 </div>
-                <div class="c-sidebar__bottom">
-                    <img src={ c.AssetPath("/images/logo-ugent-white.svg") } alt="Logo UGent" height="48px" width="auto"/>
-                </div>
+
+                {! content }
             </div>
+        </main>
 
-            {! content }
-        </div>
-    </main>
-
-    <div id="flash-messages">
-        for _, f := range c.Flash {
-        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-body">
-				switch f.Type {
-					case "success":
-					<i class="if if--success if-check-circle-fill"></i>
-					case "info":
-					<i class="if if--primary if-info-circle-filled"></i>
-					case "warning":
-					<i class="if if--warning if-alert-fill"></i>
-					case "error":
-					<i class="if if--error if-error-circle-fill"></i>
-                }
-                <div class="toast-content">
-                    if f.Title != "" {
-                    	<h3 class="alert-title">{ f.Title }</h3>
+        <div id="flash-messages">
+            for _, f := range c.Flash {
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-body">
+                    switch f.Type {
+                        case "success":
+                        <i class="if if--success if-check-circle-fill"></i>
+                        case "info":
+                        <i class="if if--primary if-info-circle-filled"></i>
+                        case "warning":
+                        <i class="if if--warning if-alert-fill"></i>
+                        case "error":
+                        <i class="if if--error if-error-circle-fill"></i>
                     }
-                    { f.Body }
+                    <div class="toast-content">
+                        if f.Title != "" {
+                            <h3 class="alert-title">{ f.Title }</h3>
+                        }
+                        { f.Body }
+                    </div>
+                    if f.DismissAfter > 0 {
+                    <button class="close" type="button" aria-label="Close" data-dismiss="toast" data-delay={ fmt.Sprintf("%d", f.DismissAfter.Milliseconds()) }>
+                        <i class="if if-close"></i>
+                    </button>
+                    } else {
+                    <button class="close" type="button" aria-label="Close" data-dismiss="toast" data-autohide="false">
+                        <i class="if if-close"></i>
+                    </button>
+                    }
                 </div>
-                if f.DismissAfter > 0 {
-                <button class="close" type="button" aria-label="Close" data-dismiss="toast" data-delay={ fmt.Sprintf("%d", f.DismissAfter.Milliseconds()) }>
-                    <i class="if if-close"></i>
-                </button>
-				} else {
-                <button class="close" type="button" aria-label="Close" data-dismiss="toast" data-autohide="false">
-                    <i class="if if-close"></i>
-                </button>
-                }
             </div>
+            }
         </div>
-        }
-    </div>
-</body>
-</html>
+    </body>
+    </html>
 }

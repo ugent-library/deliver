@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"github.com/a-h/templ"
+	"net/http"
+
 	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/views"
 )
@@ -18,6 +19,5 @@ func (h *Pages) Home(c *ctx.Ctx) error {
 		c.RedirectTo("spaces")
 		return nil
 	}
-	templ.Handler(views.Home(c)).ServeHTTP(c.Res, c.Req)
-	return nil
+	return c.RenderHTML(http.StatusOK, views.Home(c))
 }

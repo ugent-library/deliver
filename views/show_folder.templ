@@ -6,114 +6,261 @@ import (
     "github.com/ugent-library/friendly"
     "github.com/ugent-library/deliver/controllers/ctx"
     "github.com/ugent-library/deliver/models"
+    "github.com/ugent-library/deliver/turbo"
 )
 
-templ FolderFiles(c *ctx.Ctx, f *models.Folder) {
-<div class="card-header">
-    <div class="bc-toolbar">
-        <div class="bc-toolbar-left">
-            <div class="bc-toolbar-item">
-                <h5>Available files</h5>
-            </div>
-        </div>
-        <div class="bc-toolbar-right">
-            <div class="bc-toolbar-item">
-                <p id="folder-number-of-files">{ fmt.Sprintf("%d", len(f.Files)) } items</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-if len(f.Files) > 0 {
-<div class="table-responsive">
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
-                <th class="text-nowrap">Size</th>
-                <th class="text-nowrap">Type</th>
-                <th class="text-nowrap">Downloads</th>
-                <th class="text-nowrap">Created at</th>
-                <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
-            </tr>
-        </thead>
-        <tbody>
-            for _, file := range f.Files {
-            <tr class="clickable-table-row">
-                <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                    <a href={ templ.SafeURL(c.PathTo("download_file", "fileID", file.ID).String()) }>
-                        <i class="if if-download"></i>
-                        <span>{ file.Name }</span>
-                    </a>
-                    <br/>
-                    <small class="text-muted">md5 checksum: { file.MD5 }</small>
-                </td>
-                <td class="text-nowrap">
-                    <p>{ friendly.Bytes(file.Size) }</p>
-                </td>
-                <td class="text-nowrap">
-                    <p>{ file.ContentType }</p>
-                </td>
-                <td class="text-nowrap">
-                    <p>{ fmt.Sprintf("%d", file.Downloads) }</p>
-                </td>
-                <td class="text-nowrap">
-                    <p>{ file.CreatedAt.Format("2006-01-02 15:04") }</p>
-                </td>
-                <td class="table-col-sm-fixed table-col-sm-fixed-right">
-                    <div class="c-button-toolbar flex-nowrap">
-                        <button class="btn btn-link" data-toggle="modal" data-target="#confirm-delete-file-{ file.ID }">
-                            <i class="if if-delete"></i>
-                            <span class="btn-text">Delete</span>
-                        </button>
-                        <a class="btn btn-link" href={ templ.SafeURL(c.PathTo("download_file", "fileID", file.ID).String()) }>
-                            <i class="if if-download"></i>
-                            <span class="btn-text">Download</span>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
-</div>
-} else {
-<div class="c-blank-slate c-blank-slate-muted">
-    <div class="bc-avatar">
-        <i class="if if-info-circle"></i>
-    </div>
-    <p>Upload files to get started</p>
-</div>
+templ ShowFolder(c *ctx.Ctx, f *models.Folder, maxFileSize int64) {
+	{! Page(c, f.Name, showFolderContent(c, f, maxFileSize)) }
 }
 
-<div id="confirm-delete-file-modals">
-    for _, file := range f.Files {
-    <div id="confirm-delete-file-{ file.ID }" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
+templ showFolderContent(c *ctx.Ctx, f *models.Folder, maxFileSize int64) {
+    <div class="w-100 u-scroll-wrapper">
+        <div class="bg-white">
+            <div class="border-bottom py-5 px-6">
+                <div class="bc-toolbar bc-toolbar--auto">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <h4 class="bc-toolbar-title">
+                                <a href={ templ.SafeURL(c.PathTo("space", "spaceName", f.Space.Name).String()) }>
+                                    <i class="if if-arrow-left"></i>
+                                    <span>{ f.Space.Name }</span>
+                                </a>
+                                &nbsp;&mdash; { f.Name }
+                            </h4>
                         </div>
-                        <h4>
-                            Are you sure you want to delete the file
-                            <br/>
-                            <strong>{ file.Name }</strong>?
-                        </h4>
-                        <p>You cannot undo this action.</p>
+                        <div class="bc-toolbar-item">
+                            <p>expires on { f.ExpiresAt.Format("2006-01-02 15:04") }</p>
+                        </div>
+                    </div>
+                    <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <a class="btn btn-link btn-link-muted" href={ templ.SafeURL(c.PathTo("space", "spaceName", f.Space.Name).String()) }>
+                                <i class="if if-add"></i>
+                                <span class="btn-text">Make new folder</span>
+                            </a>
+                        </div>
+                        <div class="bc-toolbar-item">
+                            <a class="btn btn-link btn-link-muted" href={ templ.SafeURL(c.PathTo("edit_folder", "folderID", f.ID).String()) }>
+                                <i class="if if-edit"></i>
+                                <span class="btn-text">Edit</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <form action={ c.PathTo("delete_file", "fileID", file.ID).String() } method="POST" data-turbo-stream="">
-                        <input type="hidden" name="_method" value="DELETE"/>
-                        <button class="btn btn-danger" type="submit">Yes, delete this file</button>
+                <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item col-lg-8 col-sm-12 pl-0">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value={ c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() }>
+                                        <i class="if if-copy text-primary"></i>
+                                        <span class="btn-text text-primary">Copy public shareable link</span>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control input-select-text" readonly value={ c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() }/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="u-scroll-wrapper__body p-6">
+            <div class="card w-100 mb-6">
+                <div class="card-header sr-only">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <h2 class="bc-toolbar-item">Upload files</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form
+                        action={ c.PathTo("upload_file", "folderID", f.ID).String() }
+                        enctype="multipart/form-data"
+                        method="POST"
+                    >
+                        <input type="hidden" name="_csrf_token" value={ c.CSRFToken }/>
+                        <div class="c-file-upload c-file-upload--small">
+                            <input type="file" name="file" multiple
+                                data-upload-progress-target="file-upload-progress"
+                                data-upload-max-file-size={ fmt.Sprintf("%d", maxFileSize) }
+                                data-upload-msg-file-aborted="File upload aborted by you"
+                                data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
+                                data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
+                                data-upload-msg-file-too-large={ "File is too large. Maximum file size is " + friendly.Bytes(maxFileSize) }
+                                data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
+                                data-upload-msg-unexpected="File upload failed: unexpected server error"
+                            />
+                            <div class="c-file-upload__content">
+                                <p class="pt-2">Drag and drop or</p>
+                                <button class="btn btn-outline-primary" data-loading="Uploading...">
+                                    Upload files
+                                </button>
+                                <p class="small pt-2 mb-0">Maximum file size: { friendly.Bytes(maxFileSize) }</p>
+                            </div>
+                        </div>
                     </form>
+                    <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
+                </div>
+            </div>
+
+            <div class="card w-100 mb-6" id="files">
+                {! FolderFiles(c, f) }
+            </div>
+        </div>
+    </div>
+
+    <template id="tmpl-upload-progress">
+        <li class="list-group-item">
+            <div class="list-group-item-inner">
+                <div class="list-group-item-main u-min-w-0">
+                    <div class="bc-toolbar bc-toolbar--auto">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">
+                                <h4 class="list-group-item-title mb-0 upload-name"></h4>
+                            </div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item ml-auto ml-lg-0">
+                                <button class="btn btn-sm btn-cancel-upload" type="button">
+                                    <i class="if if-close"></i>
+                                    <span class="btn-text">Cancel upload</span>
+                                </button>
+                                <button class="btn btn-sm btn-remove-upload d-none" type="button">
+                                    <i class="if if-close"></i>
+                                    <span class="btn-text">Remove</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress w-100 mt-4">
+                        <div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="bc-toolbar bc-toolbar--auto mt-2">
+                        <div class="bc-toolbar-left">
+                            <span class="small text-muted upload-msg"></span>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <span class="small text-muted"><span class="upload-size"></span> &mdash; <span class="upload-percent">0</span>%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </template>
+}
+
+templ FolderFiles(c *ctx.Ctx, f *models.Folder) {
+    <div class="card-header">
+        <div class="bc-toolbar">
+            <div class="bc-toolbar-left">
+                <div class="bc-toolbar-item">
+                    <h5>Available files</h5>
+                </div>
+            </div>
+            <div class="bc-toolbar-right">
+                <div class="bc-toolbar-item">
+                    <p id="folder-number-of-files">{ fmt.Sprintf("%d", len(f.Files)) } items</p>
                 </div>
             </div>
         </div>
     </div>
+
+    if len(f.Files) > 0 {
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
+                    <th class="text-nowrap">Size</th>
+                    <th class="text-nowrap">Type</th>
+                    <th class="text-nowrap">Downloads</th>
+                    <th class="text-nowrap">Created at</th>
+                    <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
+                </tr>
+            </thead>
+            <tbody>
+                for _, file := range f.Files {
+                <tr class="clickable-table-row">
+                    <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                        <a href={ templ.SafeURL(c.PathTo("download_file", "fileID", file.ID).String()) }>
+                            <i class="if if-download"></i>
+                            <span>{ file.Name }</span>
+                        </a>
+                        <br/>
+                        <small class="text-muted">md5 checksum: { file.MD5 }</small>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>{ friendly.Bytes(file.Size) }</p>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>{ file.ContentType }</p>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>{ fmt.Sprintf("%d", file.Downloads) }</p>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>{ file.CreatedAt.Format("2006-01-02 15:04") }</p>
+                    </td>
+                    <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                        <div class="c-button-toolbar flex-nowrap">
+                            <button class="btn btn-link" data-toggle="modal" data-target={ "#confirm-delete-file-" + file.ID }>
+                                <i class="if if-delete"></i>
+                                <span class="btn-text">Delete</span>
+                            </button>
+                            <a class="btn btn-link" href={ templ.SafeURL(c.PathTo("download_file", "fileID", file.ID).String()) }>
+                                <i class="if if-download"></i>
+                                <span class="btn-text">Download</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    } else {
+    <div class="c-blank-slate c-blank-slate-muted">
+        <div class="bc-avatar">
+            <i class="if if-info-circle"></i>
+        </div>
+        <p>Upload files to get started</p>
+    </div>
     }
-</div>
+
+    <div id="confirm-delete-file-modals">
+        for _, file := range f.Files {
+        <div id={ "confirm-delete-file-" + file.ID } class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="c-blank-slate c-blank-slate-muted">
+                            <div class="bc-avatar">
+                                <i class="if if-alert"></i>
+                            </div>
+                            <h4>
+                                Are you sure you want to delete the file
+                                <br/>
+                                <strong>{ file.Name }</strong>?
+                            </h4>
+                            <p>You cannot undo this action.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                        <form
+                            action={ c.PathTo("delete_file", "fileID", file.ID).String() }
+                            method="POST"
+                            enctype={ turbo.ContentType }
+                        >
+                            <input type="hidden" name="_method" value="DELETE"/>
+                            <button class="btn btn-danger" type="submit">Yes, delete this file</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
 }

@@ -3,7 +3,6 @@ package ctx
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"io"
 	"net/http"
 	"net/url"
@@ -29,7 +28,6 @@ type Ctx struct {
 	Req       *http.Request
 	Res       http.ResponseWriter
 	CSRFToken string
-	CSRFTag   template.HTML
 	Cookies   *crumb.CookieJar
 	User      *models.User
 	*models.Permissions
@@ -78,8 +76,11 @@ func (t TemplateData) IsSpaceAdmin(user *models.User, space *models.Space) bool 
 	return t.ctx.IsSpaceAdmin(user, space)
 }
 
+//	type Renderer interface {
+//		Render(http.ResponseWriter, any) error
+//	}
 type Renderer interface {
-	Render(http.ResponseWriter, any) error
+	Render(context.Context, io.Writer) error
 }
 
 type Config struct {
@@ -94,6 +95,15 @@ func (c *Ctx) Context() context.Context {
 	return c.Req.Context()
 }
 
+func (c *Ctx) RenderHTML(status int, renderer Renderer) error {
+	if hdr := c.Res.Header(); hdr.Get("Content-Type") == "" {
+		hdr.Set("Content-Type", "text/html")
+	}
+	c.Res.WriteHeader(status)
+	return renderer.Render(c.Context(), c.Res)
+}
+
+// TODO deprecated
 func (c *Ctx) HTML(status int, layout, tmpl string, data any) error {
 	return c.Render.HTML(c.Res, status, tmpl, TemplateData{
 		ctx:       c,
@@ -105,6 +115,7 @@ func (c *Ctx) HTML(status int, layout, tmpl string, data any) error {
 	})
 }
 
+// TODO deprecated
 // TODO use render.TemplateLookup?
 func (c *Ctx) WriteHTML(w io.Writer, layout, tmpl string, data any) error {
 	return c.Render.HTML(w, http.StatusOK, tmpl, TemplateData{

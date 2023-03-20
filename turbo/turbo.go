@@ -439,14 +439,13 @@ func serializeStreams(ctx context.Context, streams []Stream) ([]byte, error) {
 		}
 		b.WriteString(`">`)
 		if s.Action != RemoveAction {
+			b.WriteString(`<template>`)
 			if s.Renderer != nil {
 				s.Renderer.Render(ctx, b)
 			} else {
-				b.WriteString(`<template>`)
 				b.WriteString(s.Template)
-				b.WriteString(`</template>`)
-
 			}
+			b.WriteString(`</template>`)
 		}
 		b.WriteString(`</turbo-stream>`)
 	}

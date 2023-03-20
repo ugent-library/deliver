@@ -41,7 +41,6 @@ func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
 				Res:         w,
 				Req:         r,
 				CSRFToken:   csrf.Token(r),
-				CSRFTag:     csrf.TemplateField(r),
 				Cookies:     crumb.Cookies(r),
 				Permissions: config.Permissions,
 				Router:      config.Router,
