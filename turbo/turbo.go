@@ -54,7 +54,7 @@ func FrameRequest(r *http.Request) bool {
 
 type Client struct {
 	hub     *Hub
-	conn    *websocket.Conn
+	ws      *websocket.Conn
 	streams []string
 	msgs    chan []byte
 }
@@ -377,7 +377,7 @@ func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams stri
 
 	c := &Client{
 		hub:     h,
-		conn:    conn,
+		ws:      conn,
 		streams: streams,
 		msgs:    make(chan []byte, 64),
 	}
@@ -390,10 +390,8 @@ func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams stri
 		h.addClientToStream(stream, c)
 	}
 
-	log.Printf("streams: %+v", h.streams)
-
-	go writePump(h, c)
-	go readPump(h, c)
+	go wsWrite(h, c)
+	go wsRead(h, c)
 
 	return nil
 }
@@ -419,68 +417,56 @@ func (h *Hub) removeClientFromStream(stream string, c *Client) {
 	h.streamsMu.Unlock()
 }
 
-func writePump(h *Hub, c *Client) {
-	ticker := time.NewTicker(h.config.PingPeriod)
+// TODO logging
+func wsWrite(h *Hub, c *Client) {
+	pingTicker := time.NewTicker(h.config.PingPeriod)
 
 	defer func() {
-		ticker.Stop()
-		c.conn.Close()
+		pingTicker.Stop()
+		c.ws.Close()
 	}()
 
 	for {
 		select {
-		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(h.config.WriteWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+		case <-pingTicker.C:
+			c.ws.SetWriteDeadline(time.Now().Add(h.config.WriteWait))
+			if err := c.ws.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		case msg, ok := <-c.msgs:
-			c.conn.SetWriteDeadline(time.Now().Add(h.config.WriteWait))
+			c.ws.SetWriteDeadline(time.Now().Add(h.config.WriteWait))
+
 			if !ok {
 				// The hub closed the channel.
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.ws.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
+			if err := c.ws.WriteMessage(websocket.TextMessage, msg); err != nil {
 				log.Print(err)
-				return
-			}
-			if _, err := w.Write(msg); err != nil {
-				log.Print(err)
-				return
-			}
-			if err := w.Close(); err != nil {
 				return
 			}
 		}
 	}
 }
 
-func readPump(h *Hub, c *Client) {
+func wsRead(h *Hub, c *Client) {
 	defer func() {
 		h.disconnect(c)
-		c.conn.Close()
+		c.ws.Close()
 	}()
 
-	c.conn.SetReadLimit(h.config.MaxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(h.config.PongWait))
-	c.conn.SetPongHandler(func(string) error {
-		c.conn.SetReadDeadline(time.Now().Add(h.config.PongWait))
+	c.ws.SetReadLimit(h.config.MaxMessageSize)
+	c.ws.SetReadDeadline(time.Now().Add(h.config.PongWait))
+	c.ws.SetPongHandler(func(string) error {
+		c.ws.SetReadDeadline(time.Now().Add(h.config.PongWait))
 		return nil
 	})
 
 	for {
-		_, msg, err := c.conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
+		if _, _, err := c.ws.ReadMessage(); err != nil {
 			break
 		}
-		log.Printf("message: %s", msg)
-		// h.config.Responder.Respond(c, msg)
 	}
 }
 
