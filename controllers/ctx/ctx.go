@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/mix"
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
@@ -22,6 +23,10 @@ const (
 	rememberCookie = "deliver.remember"
 	flashCookie    = "deliver.flash"
 )
+
+type TurboCtx struct {
+	User *models.User
+}
 
 type Ctx struct {
 	Log       *zap.SugaredLogger // TODO use plain logger
@@ -36,6 +41,7 @@ type Ctx struct {
 	PathVars map[string]string
 	Render   *render.Render
 	Assets   mix.Manifest
+	Turbo    *turbo.Hub[TurboCtx]
 }
 
 type Flash struct {
@@ -81,14 +87,6 @@ func (t TemplateData) IsSpaceAdmin(user *models.User, space *models.Space) bool 
 //	}
 type Renderer interface {
 	Render(context.Context, io.Writer) error
-}
-
-type Config struct {
-	UserFunc     func(context.Context, string) (*models.User, error)
-	Router       *mux.Router
-	ErrorHandler func(*Ctx, error)
-	Permissions  *models.Permissions
-	Render       *render.Render
 }
 
 func (c *Ctx) Context() context.Context {
@@ -187,4 +185,20 @@ func (c *Ctx) AssetPath(asset string) string {
 
 func (c *Ctx) AddFlash(f Flash) {
 	c.Cookies.Append(flashCookie, f, time.Now().Add(3*time.Minute))
+}
+
+func (c *Ctx) TurboStreamTag(names ...string) string {
+	cryptedNames, err := c.Turbo.EncryptStreamNames(names)
+	if err != nil {
+		c.Log.Error(err)
+		return ""
+	}
+	src := c.URLTo("ws", "streams", string(cryptedNames))
+	// TODO
+	if c.Req.URL.Scheme == "https" {
+		src.Scheme = "wss"
+	} else {
+		src.Scheme = "ws"
+	}
+	return `<turbo-stream-source src="` + src.String() + `"></turbo-stream-source>`
 }

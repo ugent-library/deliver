@@ -14,6 +14,8 @@ templ ShowFolder(c *ctx.Ctx, f *models.Folder, maxFileSize int64) {
 }
 
 templ showFolderContent(c *ctx.Ctx, f *models.Folder, maxFileSize int64) {
+    {! raw(c.TurboStreamTag("folder."+f.ID)) }
+
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
             <div class="border-bottom py-5 px-6">
@@ -198,7 +200,7 @@ templ FolderFiles(c *ctx.Ctx, f *models.Folder) {
                         <p>{ file.ContentType }</p>
                     </td>
                     <td class="text-nowrap">
-                        <p>{ fmt.Sprintf("%d", file.Downloads) }</p>
+                        <p id={ fmt.Sprintf("file-%s-downloads", file.ID) }>{ fmt.Sprintf("%d", file.Downloads) }</p>
                     </td>
                     <td class="text-nowrap">
                         <p>{ file.CreatedAt.Format("2006-01-02 15:04") }</p>

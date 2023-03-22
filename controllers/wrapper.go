@@ -9,6 +9,7 @@ import (
 	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/zaphttp"
@@ -30,6 +31,7 @@ type Config struct {
 	Permissions  *models.Permissions
 	Render       *render.Render
 	Assets       mix.Manifest
+	Turbo        *turbo.Hub[ctx.TurboCtx]
 }
 
 // TODO add Ctx as request Context value in middleware?
@@ -47,6 +49,7 @@ func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
 				PathVars:    mux.Vars(r),
 				Render:      config.Render,
 				Assets:      config.Assets,
+				Turbo:       config.Turbo,
 			}
 			if err := LoadSession(config.UserFunc, c); err != nil {
 				config.ErrorHandler(c, err)

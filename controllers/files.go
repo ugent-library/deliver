@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/httperror"
 )
 
@@ -18,12 +21,24 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
+// TODO double downloads?
 func (h *Files) Download(c *ctx.Ctx) error {
 	fileID := c.Path("fileID")
+
 	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
 	}
+
+	file, err := h.repo.FileByID(c.Context(), fileID)
+	if err != nil {
+		return err
+	}
+
+	c.Turbo.Send("folder."+file.FolderID,
+		turbo.Update("file-"+fileID+"-downloads", fmt.Sprint(file.Downloads)))
+
 	c.Res.Header().Add("Content-Disposition", "attachment")
+
 	return h.file.Get(c.Context(), fileID, c.Res)
 }
 

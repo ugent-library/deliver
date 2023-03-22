@@ -9,9 +9,9 @@ import modalClose from './modal_close.js'
 import clipboard from './clipboard.js'
 
 window.addEventListener("DOMContentLoaded", (evt) => {
-    let ws = new WebSocket("ws://" + document.location.host + "/ws")
+    // let ws = new WebSocket("ws://" + document.location.host + "/ws")
 
-    Turbo.connectStreamSource(ws);
+    // Turbo.connectStreamSource(ws);
 
     document.body.addEventListener('turbo:load', evt => {
         BSN.initCallback(rootEl)
@@ -23,22 +23,22 @@ window.addEventListener("DOMContentLoaded", (evt) => {
         clipboard(rootEl)    
     })
     
-    document.querySelectorAll('.breadcrumb').forEach(el => {
-        let n = 0
-        el.addEventListener('click', evt => {
-            evt.preventDefault()
-            n++
-            ws.send(JSON.stringify({
-                type: "turbo",
-                body: {
-                    route: 'home',
-                    params: {
-                        name: "Matthias " + n
-                    }    
-                }
-            }))
-        })
-    })
+    // document.querySelectorAll('.breadcrumb').forEach(el => {
+    //     let n = 0
+    //     el.addEventListener('click', evt => {
+    //         evt.preventDefault()
+    //         n++
+    //         ws.send(JSON.stringify({
+    //             type: "turbo",
+    //             body: {
+    //                 route: 'home',
+    //                 params: {
+    //                     name: "Matthias " + n
+    //                 }    
+    //             }
+    //         }))
+    //     })
+    // })
 })
 
 // configure htmx

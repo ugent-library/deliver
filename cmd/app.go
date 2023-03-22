@@ -4,12 +4,10 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gorilla/csrf"
@@ -24,7 +22,6 @@ import (
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
-	"github.com/ugent-library/deliver/turborouter"
 	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
@@ -106,6 +103,13 @@ var appCmd = &cobra.Command{
 		r.StrictSlash(true)
 		r.UseEncodedPath()
 
+		// turbo
+		turboHub := turbo.NewHub(turbo.Config[ctx.TurboCtx]{
+			// TODO own secret
+			Secret: []byte(config.CookieSecret),
+			// Responder: wsRouter,
+		})
+
 		// controllers
 		errs := c.NewErrors()
 		auth := c.NewAuth(repoService, oidcAuth)
@@ -122,6 +126,7 @@ var appCmd = &cobra.Command{
 			Permissions:  permissions,
 			Render:       renderer,
 			Assets:       assets,
+			Turbo:        turboHub,
 		})
 
 		// routes
@@ -129,6 +134,9 @@ var appCmd = &cobra.Command{
 		// TODO don't apply all middleware to static file server
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
+		r.Handle("/ws/{streams}", wrap(func(c *ctx.Ctx) error {
+			return turboHub.Handle(c.Res, c.Req, c.Path("streams"))
+		})).Name("ws")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
@@ -148,72 +156,56 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
-		type WebSocketRequest struct {
-			Type string
-			Body struct {
-				Route  string
-				Params map[string]string
-			}
-		}
+		// type WebSocketRequest struct {
+		// 	Type string
+		// 	Body struct {
+		// 		Route  string
+		// 		Params map[string]string
+		// 	}
+		// }
 
-		type ClientData struct {
-			User *models.User
-		}
+		// wsRouter := &turborouter.Router[ClientData, map[string]string]{
+		// 	Deserializer: func(msg []byte) (string, map[string]string, error) {
+		// 		r := &WebSocketRequest{}
+		// 		if err := json.Unmarshal(msg, r); err != nil {
+		// 			return "", nil, err
+		// 		}
+		// 		return r.Body.Route, r.Body.Params, nil
+		// 	},
+		// }
 
-		wsRouter := &turborouter.Router[ClientData, map[string]string]{
-			Deserializer: func(msg []byte) (string, map[string]string, error) {
-				r := &WebSocketRequest{}
-				if err := json.Unmarshal(msg, r); err != nil {
-					return "", nil, err
-				}
-				return r.Body.Route, r.Body.Params, nil
-			},
-		}
+		// mu := sync.RWMutex{}
+		// var greetName string
+		// nameSwapper := func(str string) {
+		// 	mu.Lock()
+		// 	greetName = str
+		// 	mu.Unlock()
+		// }
 
-		mu := sync.RWMutex{}
-		var greetName string
-		nameSwapper := func(str string) {
-			mu.Lock()
-			greetName = str
-			mu.Unlock()
-		}
+		// wsRouter.Add("home", func(c *turbo.Client[ClientData], params map[string]string) {
+		// 	nameSwapper(params["name"])
+		// 	c.Send(turbo.ReplaceMatch(
+		// 		".bc-avatar-text",
+		// 		`<span class="bc-avatar-text">Hi `+
+		// 			params["name"]+
+		// 			`(user: `+
+		// 			c.Data.User.Name+
+		// 			`)<span id="current-time"></span></span>`,
+		// 	))
+		// })
 
-		wsRouter.Add("home", func(c *turbo.Client[ClientData], params map[string]string) {
-			nameSwapper(params["name"])
-			c.Send(turbo.ReplaceMatch(
-				".bc-avatar-text",
-				`<span class="bc-avatar-text">Hi `+
-					params["name"]+
-					`(user: `+
-					c.Data.User.Name+
-					`)<span id="current-time"></span></span>`,
-			))
-		})
-
-		hub := turbo.NewHub(turbo.Config[ClientData]{
-			Responder: wsRouter,
-		})
-
-		r.Handle("/ws", wrap(func(ctx *ctx.Ctx) error {
-			hub.Handle(ctx.Res, ctx.Req, func(c *turbo.Client[ClientData]) {
-				c.Data = ClientData{User: ctx.User}
-				c.Join(ctx.User.ID)
-			})
-			return nil
-		}))
-
-		tick := time.NewTicker(5 * time.Second)
-		go func() {
-			for {
-				select {
-				case <-tick.C:
-					mu.RLock()
-					name := greetName
-					mu.RUnlock()
-					hub.Broadcast(turbo.ReplaceMatch("h1.bc-toolbar-title", `<h1 class="bc-toolbar-title">Hi `+name+`</h1>`))
-				}
-			}
-		}()
+		// tick := time.NewTicker(5 * time.Second)
+		// go func() {
+		// 	for {
+		// 		select {
+		// 		case <-tick.C:
+		// 			mu.RLock()
+		// 			name := greetName
+		// 			mu.RUnlock()
+		// 			hub.Broadcast(turbo.ReplaceMatch("h1.bc-toolbar-title", `<h1 class="bc-toolbar-title">Hi `+name+`</h1>`))
+		// 		}
+		// 	}
+		// }()
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,

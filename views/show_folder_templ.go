@@ -57,6 +57,11 @@ func showFolderContent(c *ctx.Ctx, f *models.Folder, maxFileSize int64) templ.Co
 			var_2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		// CallTemplate
+		err = raw(c.TurboStreamTag("folder."+f.ID)).Render(ctx, templBuffer)
+		if err != nil {
+			return err
+		}
 		// Element (standard)
 		_, err = templBuffer.WriteString("<div")
 		if err != nil {
@@ -2255,7 +2260,28 @@ func FolderFiles(c *ctx.Ctx, f *models.Folder) templ.Component {
 					return err
 				}
 				// Element (standard)
-				_, err = templBuffer.WriteString("<p>")
+				_, err = templBuffer.WriteString("<p")
+				if err != nil {
+					return err
+				}
+				// Element Attributes
+				_, err = templBuffer.WriteString(" id=")
+				if err != nil {
+					return err
+				}
+				_, err = templBuffer.WriteString("\"")
+				if err != nil {
+					return err
+				}
+				_, err = templBuffer.WriteString(templ.EscapeString(fmt.Sprintf("file-%s-downloads", file.ID)))
+				if err != nil {
+					return err
+				}
+				_, err = templBuffer.WriteString("\"")
+				if err != nil {
+					return err
+				}
+				_, err = templBuffer.WriteString(">")
 				if err != nil {
 					return err
 				}

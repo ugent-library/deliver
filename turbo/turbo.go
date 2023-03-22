@@ -3,6 +3,11 @@ package turbo
 import (
 	"bytes"
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -13,8 +18,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Action string
+type StreamAction string
 
+// TODO move timeouts to config
 const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
@@ -25,16 +31,24 @@ const (
 	// Maximum message size allowed from peer.
 	maxMessageSize = 512
 
-	AppendAction  Action = "append"
-	PrependAction Action = "prepend"
-	ReplaceAction Action = "replace"
-	UpdateAction  Action = "update"
-	RemoveAction  Action = "remove"
-	BeforeAction  Action = "before"
-	AfterAction   Action = "after"
+	AppendAction  StreamAction = "append"
+	PrependAction StreamAction = "prepend"
+	ReplaceAction StreamAction = "replace"
+	UpdateAction  StreamAction = "update"
+	RemoveAction  StreamAction = "remove"
+	BeforeAction  StreamAction = "before"
+	AfterAction   StreamAction = "after"
 )
 
 const ContentType = "text/vnd.turbo-stream.html"
+
+var bufPool = sync.Pool{
+	New: func() any {
+		return &bytes.Buffer{}
+	},
+}
+
+var ErrInvalid = errors.New("invalid stream names")
 
 func Request(r *http.Request) bool {
 	return strings.HasPrefix(r.Header.Get("Accept"), ContentType)
@@ -51,134 +65,134 @@ func FrameRequest(r *http.Request) bool {
 // TODO give each client a unique id
 // add exclude to Send to avoid jitter etc
 type Client[T any] struct {
-	hub       *Hub[T]
-	conn      *websocket.Conn
-	indexKeys []string
-	msgs      chan []byte
-	Data      T
+	hub     *Hub[T]
+	conn    *websocket.Conn
+	streams []string
+	msgs    chan []byte
+	Data    T
 }
 
 type Renderer interface {
 	Render(context.Context, io.Writer) error
 }
 
-type Stream struct {
-	Action         Action
+type StreamMessage struct {
+	Action         StreamAction
 	Target         string
 	TargetSelector string
 	Template       string
 	Renderer       Renderer
 }
 
-func (s Stream) Render(r Renderer) Stream {
+func (s StreamMessage) Render(r Renderer) StreamMessage {
 	s.Renderer = r
 	return s
 }
 
-func Append(target string, tmpls ...string) Stream {
-	return Stream{
+func Append(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:   AppendAction,
 		Target:   target,
 		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func AppendMatch(target string, tmpls ...string) Stream {
-	return Stream{
+func AppendMatch(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:         AppendAction,
 		TargetSelector: target,
 		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Prepend(target string, tmpls ...string) Stream {
-	return Stream{
+func Prepend(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:   PrependAction,
 		Target:   target,
 		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func PrependMatch(target string, tmpls ...string) Stream {
-	return Stream{
+func PrependMatch(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:         PrependAction,
 		TargetSelector: target,
 		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Replace(target string, tmpls ...string) Stream {
-	return Stream{
+func Replace(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:   ReplaceAction,
 		Target:   target,
 		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func ReplaceMatch(target string, tmpls ...string) Stream {
-	return Stream{
+func ReplaceMatch(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:         ReplaceAction,
 		TargetSelector: target,
 		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Update(target string, tmpls ...string) Stream {
-	return Stream{
+func Update(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:   UpdateAction,
 		Target:   target,
 		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func UpdateMatch(target string, tmpls ...string) Stream {
-	return Stream{
+func UpdateMatch(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:         UpdateAction,
 		TargetSelector: target,
 		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func Remove(target string) Stream {
-	return Stream{
+func Remove(target string) StreamMessage {
+	return StreamMessage{
 		Action: RemoveAction,
 		Target: target,
 	}
 }
 
-func RemoveMatch(target string) Stream {
-	return Stream{
+func RemoveMatch(target string) StreamMessage {
+	return StreamMessage{
 		Action:         RemoveAction,
 		TargetSelector: target,
 	}
 }
 
-func Before(target string, tmpls ...string) Stream {
-	return Stream{
+func Before(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:   BeforeAction,
 		Target:   target,
 		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func BeforeMatch(target string, tmpls ...string) Stream {
-	return Stream{
+func BeforeMatch(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:         BeforeAction,
 		TargetSelector: target,
 		Template:       strings.Join(tmpls, ""),
 	}
 }
 
-func After(target string, tmpls ...string) Stream {
-	return Stream{
+func After(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:   AfterAction,
 		Target:   target,
 		Template: strings.Join(tmpls, ""),
 	}
 }
 
-func AfterMatch(target string, tmpls ...string) Stream {
-	return Stream{
+func AfterMatch(target string, tmpls ...string) StreamMessage {
+	return StreamMessage{
 		Action:         AfterAction,
 		TargetSelector: target,
 		Template:       strings.Join(tmpls, ""),
@@ -186,11 +200,11 @@ func AfterMatch(target string, tmpls ...string) Stream {
 }
 
 // TODO context, error handling
-func (c *Client[T]) Send(streams ...Stream) {
+func (c *Client[T]) Send(streams ...StreamMessage) {
 	if len(streams) == 0 {
 		return
 	}
-	msgs, err := serializeStreams(context.TODO(), streams)
+	msgs, err := serializeStreamMessages(context.TODO(), streams)
 	if err != nil {
 		return
 	}
@@ -202,44 +216,6 @@ func (c *Client[T]) Send(streams ...Stream) {
 // 	return len(b), nil
 // }
 
-func (c *Client[T]) Join(keys ...string) {
-	for _, k := range keys {
-		c.hub.addClientToIndex(k, c)
-		knownKey := false
-		for _, ik := range c.indexKeys {
-			if ik == k {
-				knownKey = true
-				break
-			}
-		}
-		if !knownKey {
-			// TODO mutex or channel
-			c.indexKeys = append(c.indexKeys, k)
-		}
-	}
-}
-
-func (c *Client[T]) Leave(keys ...string) {
-	for _, k := range keys {
-		c.hub.removeClientFromIndex(k, c)
-		// TODO mutex or channel
-		for i, ik := range c.indexKeys {
-			if ik == k {
-				c.indexKeys = append(c.indexKeys[:i], c.indexKeys[i+1:]...)
-				break
-			}
-		}
-	}
-}
-
-func (c *Client[T]) LeaveAll() {
-	// TODO mutex or channel
-	for _, k := range c.indexKeys {
-		c.hub.removeClientFromIndex(k, c)
-	}
-	c.indexKeys = nil
-}
-
 type Responder[T any] interface {
 	Respond(*Client[T], []byte)
 }
@@ -248,12 +224,14 @@ type Hub[T any] struct {
 	config    Config[T]
 	upgrader  websocket.Upgrader
 	clients   map[*Client[T]]struct{}
-	index     map[string]map[*Client[T]]struct{}
+	streams   map[string]map[*Client[T]]struct{}
 	clientsMu sync.RWMutex
-	indexMu   sync.RWMutex
+	streamsMu sync.RWMutex
 }
 
 type Config[T any] struct {
+	// Secret should be a random 256 bit key
+	Secret    []byte
 	Responder Responder[T]
 }
 
@@ -265,16 +243,84 @@ func NewHub[T any](config Config[T]) *Hub[T] {
 			WriteBufferSize: 1024,
 		},
 		clients: make(map[*Client[T]]struct{}),
-		index:   make(map[string]map[*Client[T]]struct{}),
+		streams: make(map[string]map[*Client[T]]struct{}),
 	}
 }
 
+// see https://github.com/gtank/cryptopasta/blob/master/encrypt.go
+// and https://www.alexedwards.net/blog/working-with-cookies-in-go#encrypted-cookies
+func (h *Hub[T]) EncryptStreamNames(names []string) (string, error) {
+	msg := strings.Join(names, ",")
+
+	// Create a new AES cipher block from the secret key.
+	block, err := aes.NewCipher(h.config.Secret)
+	if err != nil {
+		return "", err
+	}
+
+	// Wrap the cipher block in Galois Counter Mode.
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	// Create a unique nonce containing 12 random bytes.
+	nonce := make([]byte, gcm.NonceSize())
+	_, err = io.ReadFull(rand.Reader, nonce)
+	if err != nil {
+		return "", err
+	}
+
+	// Encrypt the data using aesGCM.Seal(). By passing the nonce as the first
+	// parameter, the encrypted message will be appended to the nonce so
+	// that the encrypted message will be in the format
+	// "{nonce}{encrypted message}".
+	cryptedMsg := gcm.Seal(nonce, nonce, []byte(msg), nil)
+
+	return base64.URLEncoding.EncodeToString(cryptedMsg), nil
+}
+
+func (h *Hub[T]) DecryptStreamNames(names string) ([]string, error) {
+	cryptedMsg, err := base64.URLEncoding.DecodeString(names)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new AES cipher block from the secret key.
+	block, err := aes.NewCipher(h.config.Secret)
+	if err != nil {
+		return nil, err
+	}
+
+	// Wrap the cipher block in Galois Counter Mode.
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonceSize := gcm.NonceSize()
+
+	// Avoid potential 'index out of range' panic in the next step.
+	if len(cryptedMsg) < nonceSize {
+		return nil, ErrInvalid
+	}
+
+	// Split cryptedMsg in nonce and encrypted message and use gcm.Open() to
+	// decrypt and authenticate the data.
+	msg, err := gcm.Open(nil, cryptedMsg[:nonceSize], cryptedMsg[nonceSize:], nil)
+	if err != nil {
+		return nil, errors.Join(err, ErrInvalid)
+	}
+
+	return strings.Split(string(msg), ","), nil
+}
+
 // TODO context, error handling
-func (h *Hub[T]) Broadcast(streams ...Stream) {
+func (h *Hub[T]) Broadcast(streams ...StreamMessage) {
 	if len(streams) == 0 {
 		return
 	}
-	msg, err := serializeStreams(context.TODO(), streams)
+	msg, err := serializeStreamMessages(context.TODO(), streams)
 	if err != nil {
 		return
 	}
@@ -284,74 +330,95 @@ func (h *Hub[T]) Broadcast(streams ...Stream) {
 }
 
 // TODO context, error handling
-func (h *Hub[T]) Send(k string, streams ...Stream) {
-	if len(streams) == 0 {
+func (h *Hub[T]) Send(k string, msgs ...StreamMessage) {
+	if len(msgs) == 0 {
 		return
 	}
 
-	msg, err := serializeStreams(context.TODO(), streams)
+	msg, err := serializeStreamMessages(context.TODO(), msgs)
 	if err != nil {
+		log.Print(err)
 		return
 	}
 
-	h.indexMu.RLock()
-	defer h.indexMu.RUnlock()
+	h.streamsMu.RLock()
+	defer h.streamsMu.RUnlock()
 
-	if clients, ok := h.index[k]; ok {
+	log.Printf("clients: %+v", h.streams)
+
+	if clients, ok := h.streams[k]; ok {
 		for c := range clients {
+			log.Printf("send msg: %+v %+v", c, msg)
 			c.msgs <- msg
 		}
 	}
 }
 
 func (h *Hub[T]) disconnect(c *Client[T]) {
-	c.LeaveAll()
+	h.streamsMu.Lock()
+	for _, k := range c.streams {
+		h.removeClientFromStream(k, c)
+	}
+	h.streamsMu.Unlock()
 	h.clientsMu.Lock()
 	delete(h.clients, c)
 	h.clientsMu.Unlock()
 }
 
-func (h *Hub[T]) Handle(w http.ResponseWriter, r *http.Request, visitors ...func(*Client[T])) {
+// TODO error handler
+func (h *Hub[T]) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
 	conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
+	}
+
+	streams, err := h.DecryptStreamNames(cryptedStreams)
+	if err != nil {
+		return err
 	}
 
 	c := &Client[T]{
-		hub:  h,
-		conn: conn,
-		msgs: make(chan []byte, 64),
-	}
-
-	for _, fn := range visitors {
-		fn(c)
+		hub:     h,
+		conn:    conn,
+		streams: streams,
+		msgs:    make(chan []byte, 64),
 	}
 
 	h.clientsMu.Lock()
 	h.clients[c] = struct{}{}
 	h.clientsMu.Unlock()
 
+	for _, stream := range streams {
+		h.addClientToStream(stream, c)
+	}
+
+	log.Printf("streams: %+v", h.streams)
+
 	go writePump(h, c)
 	go readPump(h, c)
+
+	return nil
 }
 
-func (h *Hub[T]) addClientToIndex(k string, c *Client[T]) {
-	h.indexMu.Lock()
-	if clients, ok := h.index[k]; ok {
+func (h *Hub[T]) addClientToStream(k string, c *Client[T]) {
+	h.streamsMu.Lock()
+	if clients, ok := h.streams[k]; ok {
 		clients[c] = struct{}{}
 	} else {
-		h.index[k] = map[*Client[T]]struct{}{c: {}}
+		h.streams[k] = map[*Client[T]]struct{}{c: {}}
 	}
-	h.indexMu.Unlock()
+	h.streamsMu.Unlock()
 }
 
-func (h *Hub[T]) removeClientFromIndex(k string, c *Client[T]) {
-	h.indexMu.Lock()
-	if clients, ok := h.index[k]; ok {
+func (h *Hub[T]) removeClientFromStream(stream string, c *Client[T]) {
+	h.streamsMu.Lock()
+	if clients, ok := h.streams[stream]; ok {
 		delete(clients, c)
+		if len(clients) == 0 {
+			delete(h.streams, stream)
+		}
 	}
-	h.indexMu.Unlock()
+	h.streamsMu.Unlock()
 }
 
 func writePump[T any](h *Hub[T], c *Client[T]) {
@@ -419,7 +486,7 @@ func readPump[T any](h *Hub[T], c *Client[T]) {
 	}
 }
 
-func serializeStreams(ctx context.Context, streams []Stream) ([]byte, error) {
+func serializeStreamMessages(ctx context.Context, streams []StreamMessage) ([]byte, error) {
 	b := bufPool.Get().(*bytes.Buffer)
 	defer func() {
 		b.Reset()
@@ -452,21 +519,15 @@ func serializeStreams(ctx context.Context, streams []Stream) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func Render(w http.ResponseWriter, r *http.Request, code int, streams ...Stream) error {
+func Render(w http.ResponseWriter, r *http.Request, code int, streams ...StreamMessage) error {
 	if hdr := w.Header(); hdr.Get("Content-Type") == "" {
 		hdr.Set("Content-Type", ContentType)
 	}
 	w.WriteHeader(code)
-	b, err := serializeStreams(r.Context(), streams)
+	b, err := serializeStreamMessages(r.Context(), streams)
 	if err != nil {
 		return err
 	}
 	_, err = w.Write(b)
 	return err
-}
-
-var bufPool = sync.Pool{
-	New: func() any {
-		return &bytes.Buffer{}
-	},
 }
