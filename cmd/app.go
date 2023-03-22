@@ -1,5 +1,3 @@
-//go:generate go get -u github.com/valyala/quicktemplate/qtc
-//go:generate qtc -dir=views
 package cmd
 
 import (
@@ -104,10 +102,9 @@ var appCmd = &cobra.Command{
 		r.UseEncodedPath()
 
 		// turbo
-		turboHub := turbo.NewHub(turbo.Config[ctx.TurboCtx]{
-			// TODO own secret
+		turboHub := turbo.NewHub(turbo.Config{
+			// TODO turbo secret config
 			Secret: []byte(config.CookieSecret),
-			// Responder: wsRouter,
 		})
 
 		// controllers
@@ -155,57 +152,6 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
-
-		// type WebSocketRequest struct {
-		// 	Type string
-		// 	Body struct {
-		// 		Route  string
-		// 		Params map[string]string
-		// 	}
-		// }
-
-		// wsRouter := &turborouter.Router[ClientData, map[string]string]{
-		// 	Deserializer: func(msg []byte) (string, map[string]string, error) {
-		// 		r := &WebSocketRequest{}
-		// 		if err := json.Unmarshal(msg, r); err != nil {
-		// 			return "", nil, err
-		// 		}
-		// 		return r.Body.Route, r.Body.Params, nil
-		// 	},
-		// }
-
-		// mu := sync.RWMutex{}
-		// var greetName string
-		// nameSwapper := func(str string) {
-		// 	mu.Lock()
-		// 	greetName = str
-		// 	mu.Unlock()
-		// }
-
-		// wsRouter.Add("home", func(c *turbo.Client[ClientData], params map[string]string) {
-		// 	nameSwapper(params["name"])
-		// 	c.Send(turbo.ReplaceMatch(
-		// 		".bc-avatar-text",
-		// 		`<span class="bc-avatar-text">Hi `+
-		// 			params["name"]+
-		// 			`(user: `+
-		// 			c.Data.User.Name+
-		// 			`)<span id="current-time"></span></span>`,
-		// 	))
-		// })
-
-		// tick := time.NewTicker(5 * time.Second)
-		// go func() {
-		// 	for {
-		// 		select {
-		// 		case <-tick.C:
-		// 			mu.RLock()
-		// 			name := greetName
-		// 			mu.RUnlock()
-		// 			hub.Broadcast(turbo.ReplaceMatch("h1.bc-toolbar-title", `<h1 class="bc-toolbar-title">Hi `+name+`</h1>`))
-		// 		}
-		// 	}
-		// }()
 
 		// apply these before request reaches the router
 		handler := middleware.Apply(r,

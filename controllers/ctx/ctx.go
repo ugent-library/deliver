@@ -41,7 +41,7 @@ type Ctx struct {
 	PathVars map[string]string
 	Render   *render.Render
 	Assets   mix.Manifest
-	Turbo    *turbo.Hub[TurboCtx]
+	Turbo    *turbo.Hub
 }
 
 type Flash struct {
@@ -82,9 +82,6 @@ func (t TemplateData) IsSpaceAdmin(user *models.User, space *models.Space) bool 
 	return t.ctx.IsSpaceAdmin(user, space)
 }
 
-//	type Renderer interface {
-//		Render(http.ResponseWriter, any) error
-//	}
 type Renderer interface {
 	Render(context.Context, io.Writer) error
 }

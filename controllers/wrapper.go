@@ -31,7 +31,7 @@ type Config struct {
 	Permissions  *models.Permissions
 	Render       *render.Render
 	Assets       mix.Manifest
-	Turbo        *turbo.Hub[ctx.TurboCtx]
+	Turbo        *turbo.Hub
 }
 
 // TODO add Ctx as request Context value in middleware?
