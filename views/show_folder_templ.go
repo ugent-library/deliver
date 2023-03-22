@@ -1134,30 +1134,8 @@ func showFolderContent(c *ctx.Ctx, f *models.Folder, maxFileSize int64) templ.Co
 		if err != nil {
 			return err
 		}
-		// Element (standard)
-		_, err = templBuffer.WriteString("<div")
-		if err != nil {
-			return err
-		}
-		// Element Attributes
-		_, err = templBuffer.WriteString(" class=\"card w-100 mb-6\"")
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString(" id=\"files\"")
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString(">")
-		if err != nil {
-			return err
-		}
 		// CallTemplate
 		err = FolderFiles(c, f).Render(ctx, templBuffer)
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("</div>")
 		if err != nil {
 			return err
 		}
@@ -1702,6 +1680,28 @@ func FolderFiles(c *ctx.Ctx, f *models.Folder) templ.Component {
 			var_20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		// Element (standard)
+		_, err = templBuffer.WriteString("<div")
+		if err != nil {
+			return err
+		}
+		// Element Attributes
+		_, err = templBuffer.WriteString(" data-controller=\"base\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(" class=\"card w-100 mb-6\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(" id=\"files\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(">")
+		if err != nil {
+			return err
+		}
 		// Element (standard)
 		_, err = templBuffer.WriteString("<div")
 		if err != nil {
@@ -2991,6 +2991,10 @@ func FolderFiles(c *ctx.Ctx, f *models.Folder) templ.Component {
 			if err != nil {
 				return err
 			}
+		}
+		_, err = templBuffer.WriteString("</div>")
+		if err != nil {
+			return err
 		}
 		_, err = templBuffer.WriteString("</div>")
 		if err != nil {

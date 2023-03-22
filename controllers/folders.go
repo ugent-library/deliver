@@ -45,7 +45,7 @@ func (h *Folders) Show(c *ctx.Ctx) error {
 	if turbo.Request(c.Req) {
 		return turbo.Render(c.Res, c.Req, http.StatusOK,
 			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
-			turbo.Update("files").Render(views.FolderFiles(c, folder)),
+			turbo.Replace("files").Render(views.FolderFiles(c, folder)),
 		)
 	}
 
@@ -181,7 +181,7 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 	}
 
 	return turbo.Render(c.Res, c.Req, http.StatusOK,
-		turbo.Update("files").Render(views.FolderFiles(c, folder)),
+		turbo.Replace("files").Render(views.FolderFiles(c, folder)),
 	)
 }
 

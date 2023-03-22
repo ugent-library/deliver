@@ -16,3 +16,11 @@ window.addEventListener("DOMContentLoaded", (evt) => {
     modalClose(document)
     clipboard(document)
 })
+
+// old above, new below
+
+import { Application } from "@hotwired/stimulus"
+import BaseController from "./controllers/base_controller"
+
+const app = Application.start()
+app.register("base", BaseController)

@@ -119,8 +119,6 @@ export default function(rootEl) {
                   if (req.status == 200 || req.status == 201) {
                     tmpl.parentElement.removeChild(tmpl)
                     Turbo.renderStreamMessage(req.response)
-                    // TODO use stimulus controller to init js
-                    let files = document.getElementById("files")
                   }
 
                   /*
