@@ -171,7 +171,6 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 	// TODO
 	if err = h.repo.CreateFile(c.Context(), file); err != nil {
 		return err
-		// return h.show(c, err)
 	}
 
 	// reload folder
@@ -181,10 +180,9 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "", "show_folder/files", Map{
-		"folder":      folder,
-		"maxFileSize": h.maxFileSize,
-	})
+	return turbo.Render(c.Res, c.Req, http.StatusOK,
+		turbo.Update("files").Render(views.FolderFiles(c, folder)),
+	)
 }
 
 func (h *Folders) Share(c *ctx.Ctx) error {
@@ -197,29 +195,3 @@ func (h *Folders) Share(c *ctx.Ctx) error {
 		"folder": folder,
 	})
 }
-
-// func (h *Folders) show(c *ctx.Ctx, err error) error {
-// 	validationErrors := validate.NewErrors()
-// 	if err != nil && !errors.As(err, &validationErrors) {
-// 		return err
-// 	}
-
-// 	folderID := c.Path("folderID")
-// 	folder, err := h.repo.FolderByID(c.Context(), folderID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	if turbo.Request(c.Req) {
-// 		return turbo.Render(c.Res, c.Req, http.StatusOK,
-// 			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
-// 			turbo.Update("files").Render(views.FolderFiles(c, folder)),
-// 		)
-// 	}
-
-// 	return c.HTML(http.StatusOK, "layouts/page", "show_folder", Map{
-// 		"folder":           folder,
-// 		"validationErrors": validationErrors,
-// 		"maxFileSize":      h.maxFileSize,
-// 	})
-// }

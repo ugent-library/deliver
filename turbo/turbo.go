@@ -342,11 +342,8 @@ func (h *Hub) Send(k string, msgs ...StreamMessage) {
 	h.streamsMu.RLock()
 	defer h.streamsMu.RUnlock()
 
-	log.Printf("clients: %+v", h.streams)
-
 	if clients, ok := h.streams[k]; ok {
 		for c := range clients {
-			log.Printf("send msg: %+v %+v", c, msg)
 			c.msgs <- msg
 		}
 	}
@@ -379,7 +376,7 @@ func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams stri
 		hub:     h,
 		ws:      conn,
 		streams: streams,
-		msgs:    make(chan []byte, 64),
+		msgs:    make(chan []byte),
 	}
 
 	h.clientsMu.Lock()

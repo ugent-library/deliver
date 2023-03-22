@@ -117,13 +117,10 @@ export default function(rootEl) {
 
                   // file created
                   if (req.status == 200 || req.status == 201) {
-
                     tmpl.parentElement.removeChild(tmpl)
-                    let filesBody = document.getElementById('files')
-                    filesBody.innerHTML = req.response
-                    // trigger htmx on newly added elements
-                    htmx.process(filesBody)
-                    htmx.trigger(filesBody, 'htmx:load')
+                    Turbo.renderStreamMessage(req.response)
+                    // TODO use stimulus controller to init js
+                    let files = document.getElementById("files")
                   }
 
                   /*

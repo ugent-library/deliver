@@ -6,7 +6,14 @@ import (
     "github.com/ugent-library/deliver/controllers/ctx"
 )
 
-// TODO {{if .User}} c-sidebar--dark-gray{{end}}
+func sidebarClass(c *ctx.Ctx) templ.CSSClasses {
+	classes := []templ.CSSClass{templ.Class("c-sidebar"), templ.Class("d-none"), templ.Class("d-lg-flex")}
+	if c.User != nil {
+		classes = append(classes, templ.Class("c-sidebar--dark-gray"))
+	}
+	return templ.Classes(classes...)
+}
+
 templ Page(c *ctx.Ctx, title string, content templ.Component) {
     <!DOCTYPE html>
     <html class="u-maximize-height" dir="ltr" lang="en">
@@ -105,7 +112,7 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
         </header>
         <main>
             <div class="d-flex u-maximize-height">
-                <div class="c-sidebar d-none d-lg-flex">
+                <div class={ sidebarClass(c) }>
                     <div class="c-sidebar__menu">
                         <nav>
                             <ul class="c-sidebar-menu">

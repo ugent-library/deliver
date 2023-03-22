@@ -16,7 +16,13 @@ import (
     "github.com/ugent-library/deliver/controllers/ctx"
 )
 
-// TODO {{if .User}} c-sidebar--dark-gray{{end}}
+func sidebarClass(c *ctx.Ctx) templ.CSSClasses {
+	classes := []templ.CSSClass{templ.Class("c-sidebar"), templ.Class("d-none"), templ.Class("d-lg-flex")}
+	if c.User != nil {
+		classes = append(classes, templ.Class("c-sidebar--dark-gray"))
+	}
+	return templ.Classes(classes...)
+}
 
 func Page(c *ctx.Ctx, title string, content templ.Component) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
@@ -1276,12 +1282,30 @@ if err != nil {
 			return err
 		}
 		// Element (standard)
+		// Element CSS
+		var var_12 templ.CSSClasses = sidebarClass(c)
+		err = templ.RenderCSSItems(ctx, templBuffer, var_12...)
+		if err != nil {
+			return err
+		}
 		_, err = templBuffer.WriteString("<div")
 		if err != nil {
 			return err
 		}
 		// Element Attributes
-		_, err = templBuffer.WriteString(" class=\"c-sidebar d-none d-lg-flex\"")
+		_, err = templBuffer.WriteString(" class=")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(var_12.String()))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\"")
 		if err != nil {
 			return err
 		}
@@ -1350,8 +1374,8 @@ if err != nil {
 		if err != nil {
 			return err
 		}
-		var var_12 templ.SafeURL = templ.SafeURL(c.PathTo("home").String())
-		_, err = templBuffer.WriteString(templ.EscapeString(string(var_12)))
+		var var_13 templ.SafeURL = templ.SafeURL(c.PathTo("home").String())
+		_, err = templBuffer.WriteString(templ.EscapeString(string(var_13)))
 		if err != nil {
 			return err
 		}
@@ -1414,8 +1438,8 @@ if err != nil {
 			return err
 		}
 		// Text
-		var_13 := `Deliver`
-		_, err = templBuffer.WriteString(var_13)
+		var_14 := `Deliver`
+		_, err = templBuffer.WriteString(var_14)
 		if err != nil {
 			return err
 		}
