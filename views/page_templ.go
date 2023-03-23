@@ -273,6 +273,10 @@ if err != nil {
 			return err
 		}
 		// Element Attributes
+		_, err = templBuffer.WriteString(" data-controller=\"base\"")
+		if err != nil {
+			return err
+		}
 		_, err = templBuffer.WriteString(" class=\"u-maximize-height overflow-hidden u-scroll-wrapper\"")
 		if err != nil {
 			return err
