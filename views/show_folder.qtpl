@@ -105,9 +105,7 @@ type ShowFolder struct {
                 </div>
             </div>
 
-            <div class="card w-100 mb-6" id="files">
-                {{template "show_folder/files" .}}
-            </div>
+            {%= Files(c, v.Folder.Files) %}
         </div>
     </div>
 

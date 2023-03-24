@@ -10,6 +10,7 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
@@ -75,10 +76,10 @@ func (h *Spaces) Show(c *ctx.Ctx) error {
 }
 
 func (h *Spaces) New(c *ctx.Ctx) error {
-	return c.HTMLX(http.StatusOK, "layouts/page", "new_space", Map{
-		"space":            &models.Space{},
-		"validationErrors": validate.NewErrors(),
-	})
+	return c.HTML(http.StatusOK, views.Page(c, &views.NewSpace{
+		Space:            &models.Space{},
+		ValidationErrors: validate.NewErrors(),
+	}))
 }
 
 func (h *Spaces) Create(c *ctx.Ctx) error {
@@ -99,10 +100,10 @@ func (h *Spaces) Create(c *ctx.Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTMLX(http.StatusOK, "layouts/page", "new_space", Map{
-			"space":            space,
-			"validationErrors": validationErrors,
-		})
+		return c.HTML(http.StatusOK, views.Page(c, &views.NewSpace{
+			Space:            space,
+			ValidationErrors: validationErrors,
+		}))
 	}
 
 	c.AddFlash(ctx.Flash{
@@ -111,7 +112,6 @@ func (h *Spaces) Create(c *ctx.Ctx) error {
 		DismissAfter: 3 * time.Second,
 	})
 	c.RedirectTo("space", "spaceName", space.Name)
-
 	return nil
 }
 

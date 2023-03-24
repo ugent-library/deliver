@@ -218,9 +218,11 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 </div>
             </div>
 
-            <div class="card w-100 mb-6" id="files">
-                {{template "show_folder/files" .}}
-            </div>
+            `)
+//line views/show_folder.qtpl:108
+	StreamFiles(qw422016, c, v.Folder.Files)
+//line views/show_folder.qtpl:108
+	qw422016.N().S(`
         </div>
     </div>
 
@@ -263,31 +265,31 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </li>
     </template>
 `)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 }
 
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 func (v *ShowFolder) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	v.StreamContent(qw422016, c)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	qt422016.ReleaseWriter(qw422016)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 }
 
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 func (v *ShowFolder) Content(c *ctx.Ctx) string {
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	v.WriteContent(qb422016, c)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	qs422016 := string(qb422016.B)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 	return qs422016
-//line views/show_folder.qtpl:152
+//line views/show_folder.qtpl:150
 }

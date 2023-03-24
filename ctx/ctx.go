@@ -3,7 +3,6 @@ package ctx
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -23,10 +22,6 @@ const (
 	rememberCookie = "deliver.remember"
 	flashCookie    = "deliver.flash"
 )
-
-type TurboCtx struct {
-	User *models.User
-}
 
 type Ctx struct {
 	Log       *zap.SugaredLogger // TODO use plain logger
@@ -83,10 +78,6 @@ func (t TemplateData) IsSpaceAdmin(user *models.User, space *models.Space) bool 
 	return t.ctx.IsSpaceAdmin(user, space)
 }
 
-type RendererX interface {
-	Render(context.Context, io.Writer) error
-}
-
 func (c *Ctx) Context() context.Context {
 	return c.Req.Context()
 }
@@ -101,30 +92,8 @@ func (c *Ctx) HTML(status int, body string) error {
 }
 
 // TODO deprecated
-func (c *Ctx) RenderHTMLX(status int, renderer RendererX) error {
-	if hdr := c.Res.Header(); hdr.Get("Content-Type") == "" {
-		hdr.Set("Content-Type", "text/html")
-	}
-	c.Res.WriteHeader(status)
-	return renderer.Render(c.Context(), c.Res)
-}
-
-// TODO deprecated
 func (c *Ctx) HTMLX(status int, layout, tmpl string, data any) error {
 	return c.Render.HTML(c.Res, status, tmpl, TemplateData{
-		ctx:       c,
-		CSRFToken: csrf.Token(c.Req),
-		CSRFTag:   string(csrf.TemplateField(c.Req)),
-		Data:      data,
-	}, render.HTMLOptions{
-		Layout: layout,
-	})
-}
-
-// TODO deprecated
-// TODO use render.TemplateLookup?
-func (c *Ctx) WriteHTMLX(w io.Writer, layout, tmpl string, data any) error {
-	return c.Render.HTML(w, http.StatusOK, tmpl, TemplateData{
 		ctx:       c,
 		CSRFToken: csrf.Token(c.Req),
 		CSRFTag:   string(csrf.TemplateField(c.Req)),

@@ -30,222 +30,224 @@ var (
 func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:5
 	qw422016.N().S(`
-<div class="card-header">
-    <div class="bc-toolbar">
-        <div class="bc-toolbar-left">
-            <div class="bc-toolbar-item">
-                <h5>Available files</h5>
+<div class="card w-100 mb-6" id="files">
+    <div class="card-header">
+        <div class="bc-toolbar">
+            <div class="bc-toolbar-left">
+                <div class="bc-toolbar-item">
+                    <h5>Available files</h5>
+                </div>
             </div>
-        </div>
-        <div class="bc-toolbar-right">
-            <div class="bc-toolbar-item">
-                <p id="folder-number-of-files">`)
-//line views/files.qtpl:15
+            <div class="bc-toolbar-right">
+                <div class="bc-toolbar-item">
+                    <p id="folder-number-of-files">`)
+//line views/files.qtpl:16
 	qw422016.N().D(len(files))
-//line views/files.qtpl:15
+//line views/files.qtpl:16
 	qw422016.N().S(` items</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
-`)
-//line views/files.qtpl:20
+    `)
+//line views/files.qtpl:21
 	if len(files) > 0 {
-//line views/files.qtpl:20
+//line views/files.qtpl:21
 		qw422016.N().S(`
-<div class="table-responsive">
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
-                <th class="text-nowrap">Size</th>
-                <th class="text-nowrap">Type</th>
-                <th class="text-nowrap">Downloads</th>
-                <th class="text-nowrap">Created at</th>
-                <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
-            </tr>
-        </thead>
-        <tbody>
-            `)
-//line views/files.qtpl:34
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">File name</th>
+                    <th class="text-nowrap">Size</th>
+                    <th class="text-nowrap">Type</th>
+                    <th class="text-nowrap">Downloads</th>
+                    <th class="text-nowrap">Created at</th>
+                    <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
+                </tr>
+            </thead>
+            <tbody>
+                `)
+//line views/files.qtpl:35
 		for _, f := range files {
-//line views/files.qtpl:34
+//line views/files.qtpl:35
 			qw422016.N().S(`
-            <tr class="clickable-table-row">
-                <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                    <a href="`)
-//line views/files.qtpl:37
+                <tr class="clickable-table-row">
+                    <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                        <a href="`)
+//line views/files.qtpl:38
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
-//line views/files.qtpl:37
-			qw422016.N().S(`">
-                        <i class="if if-download"></i>
-                        <span>`)
-//line views/files.qtpl:39
-			qw422016.E().S(f.Name)
-//line views/files.qtpl:39
-			qw422016.N().S(`</span>
-                    </a>
-                    <br>
-                    <small class="text-muted">md5 checksum: `)
-//line views/files.qtpl:42
-			qw422016.E().S(f.MD5)
-//line views/files.qtpl:42
-			qw422016.N().S(`</small>
-                </td>
-                <td class="text-nowrap">
-                    <p>`)
-//line views/files.qtpl:45
-			qw422016.E().S(friendly.Bytes(f.Size))
-//line views/files.qtpl:45
-			qw422016.N().S(`</p>
-                </td>
-                <td class="text-nowrap">
-                    <p>`)
-//line views/files.qtpl:48
-			qw422016.E().S(f.ContentType)
-//line views/files.qtpl:48
-			qw422016.N().S(`</p>
-                </td>
-                <td class="text-nowrap">
-                    <p id="file-`)
-//line views/files.qtpl:51
-			qw422016.E().S(f.ID)
-//line views/files.qtpl:51
-			qw422016.N().S(`-downloads">`)
-//line views/files.qtpl:51
-			qw422016.N().DL(f.Downloads)
-//line views/files.qtpl:51
-			qw422016.N().S(`</p>
-                </td>
-                <td class="text-nowrap">
-                    <p>`)
-//line views/files.qtpl:54
-			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
-//line views/files.qtpl:54
-			qw422016.N().S(`</p>
-                </td>
-                <td class="table-col-sm-fixed table-col-sm-fixed-right">
-                    <div class="c-button-toolbar flex-nowrap">
-                        <button class="btn btn-link" data-toggle="modal" data-target="#confirm-delete-file-`)
-//line views/files.qtpl:58
-			qw422016.E().S(f.ID)
-//line views/files.qtpl:58
-			qw422016.N().S(`">
-                            <i class="if if-delete"></i>
-                            <span class="btn-text">Delete</span>
-                        </button>
-                        <a class="btn btn-link" href="`)
-//line views/files.qtpl:62
-			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
-//line views/files.qtpl:62
+//line views/files.qtpl:38
 			qw422016.N().S(`">
                             <i class="if if-download"></i>
-                            <span class="btn-text">Download</span>
+                            <span>`)
+//line views/files.qtpl:40
+			qw422016.E().S(f.Name)
+//line views/files.qtpl:40
+			qw422016.N().S(`</span>
                         </a>
-                    </div>
-                </td>
-            </tr>
-            `)
-//line views/files.qtpl:69
+                        <br>
+                        <small class="text-muted">md5 checksum: `)
+//line views/files.qtpl:43
+			qw422016.E().S(f.MD5)
+//line views/files.qtpl:43
+			qw422016.N().S(`</small>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>`)
+//line views/files.qtpl:46
+			qw422016.E().S(friendly.Bytes(f.Size))
+//line views/files.qtpl:46
+			qw422016.N().S(`</p>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>`)
+//line views/files.qtpl:49
+			qw422016.E().S(f.ContentType)
+//line views/files.qtpl:49
+			qw422016.N().S(`</p>
+                    </td>
+                    <td class="text-nowrap">
+                        <p id="file-`)
+//line views/files.qtpl:52
+			qw422016.E().S(f.ID)
+//line views/files.qtpl:52
+			qw422016.N().S(`-downloads">`)
+//line views/files.qtpl:52
+			qw422016.N().DL(f.Downloads)
+//line views/files.qtpl:52
+			qw422016.N().S(`</p>
+                    </td>
+                    <td class="text-nowrap">
+                        <p>`)
+//line views/files.qtpl:55
+			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
+//line views/files.qtpl:55
+			qw422016.N().S(`</p>
+                    </td>
+                    <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                        <div class="c-button-toolbar flex-nowrap">
+                            <button class="btn btn-link" data-toggle="modal" data-target="#confirm-delete-file-`)
+//line views/files.qtpl:59
+			qw422016.E().S(f.ID)
+//line views/files.qtpl:59
+			qw422016.N().S(`">
+                                <i class="if if-delete"></i>
+                                <span class="btn-text">Delete</span>
+                            </button>
+                            <a class="btn btn-link" href="`)
+//line views/files.qtpl:63
+			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
+//line views/files.qtpl:63
+			qw422016.N().S(`">
+                                <i class="if if-download"></i>
+                                <span class="btn-text">Download</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                `)
+//line views/files.qtpl:70
 		}
-//line views/files.qtpl:69
+//line views/files.qtpl:70
 		qw422016.N().S(`
-        </tbody>
-    </table>
-</div>
-`)
-//line views/files.qtpl:73
-	} else {
-//line views/files.qtpl:73
-		qw422016.N().S(`
-<div class="c-blank-slate c-blank-slate-muted">
-    <div class="bc-avatar">
-        <i class="if if-info-circle"></i>
+            </tbody>
+        </table>
     </div>
-    <p>Upload files to get started</p>
-</div>
-`)
-//line views/files.qtpl:80
+    `)
+//line views/files.qtpl:74
+	} else {
+//line views/files.qtpl:74
+		qw422016.N().S(`
+    <div class="c-blank-slate c-blank-slate-muted">
+        <div class="bc-avatar">
+            <i class="if if-info-circle"></i>
+        </div>
+        <p>Upload files to get started</p>
+    </div>
+    `)
+//line views/files.qtpl:81
 	}
-//line views/files.qtpl:80
+//line views/files.qtpl:81
 	qw422016.N().S(`
 
-<div id="confirm-delete-file-modals">
-    `)
-//line views/files.qtpl:83
+    <div id="confirm-delete-file-modals">
+        `)
+//line views/files.qtpl:84
 	for _, f := range files {
-//line views/files.qtpl:83
+//line views/files.qtpl:84
 		qw422016.N().S(`
-    <div id="confirm-delete-file-`)
-//line views/files.qtpl:84
+        <div id="confirm-delete-file-`)
+//line views/files.qtpl:85
 		qw422016.E().S(f.ID)
-//line views/files.qtpl:84
+//line views/files.qtpl:85
 		qw422016.N().S(`" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
-                        </div>
-                        <h4>
-                            Are you sure you want to delete the file
-                            <br>
-                            <strong>`)
-//line views/files.qtpl:95
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="c-blank-slate c-blank-slate-muted">
+                            <div class="bc-avatar">
+                                <i class="if if-alert"></i>
+                            </div>
+                            <h4>
+                                Are you sure you want to delete the file
+                                <br>
+                                <strong>`)
+//line views/files.qtpl:96
 		qw422016.E().S(f.Name)
-//line views/files.qtpl:95
+//line views/files.qtpl:96
 		qw422016.N().S(`</strong>?
-                        </h4>
-                        <p>You cannot undo this action.</p>
+                            </h4>
+                            <p>You cannot undo this action.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <form action="`)
-//line views/files.qtpl:102
+                    <div class="modal-footer">
+                        <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                        <form action="`)
+//line views/files.qtpl:103
 		qw422016.E().S(c.PathTo("delete_file", "fileID", f.ID).String())
-//line views/files.qtpl:102
+//line views/files.qtpl:103
 		qw422016.N().S(`" method="POST" data-turbo-stream>
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button class="btn btn-danger" type="submit">Yes, delete this file</button>
-                    </form>
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button class="btn btn-danger" type="submit">Yes, delete this file</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    `)
-//line views/files.qtpl:110
+        `)
+//line views/files.qtpl:111
 	}
-//line views/files.qtpl:110
+//line views/files.qtpl:111
 	qw422016.N().S(`
+    </div>
 </div>
 `)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 }
 
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 func WriteFiles(qq422016 qtio422016.Writer, c *ctx.Ctx, files []*models.File) {
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	StreamFiles(qw422016, c, files)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	qt422016.ReleaseWriter(qw422016)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 }
 
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 func Files(c *ctx.Ctx, files []*models.File) string {
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	WriteFiles(qb422016, c, files)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	qs422016 := string(qb422016.B)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 	return qs422016
-//line views/files.qtpl:112
+//line views/files.qtpl:114
 }

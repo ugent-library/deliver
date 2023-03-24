@@ -1,0 +1,79 @@
+{% import "strings" %}
+{% import "github.com/ugent-library/deliver/ctx" %}
+{% import "github.com/ugent-library/deliver/models" %}
+{% import "github.com/ugent-library/deliver/validate" %}
+
+{% code
+type NewSpace struct {
+    Space            *models.Space
+    ValidationErrors *validate.Errors
+}
+%}
+
+{% func (v *NewSpace) Title(c *ctx.Ctx) %}New space{% endfunc %}
+
+{% func (v *NewSpace) Content(c *ctx.Ctx) %}
+    <div class="w-100 u-scroll-wrapper">
+        <div class="bg-white">
+            <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <h4 class="bc-toolbar-title">Make a new space</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="u-scroll-wrapper__body p-6">
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">Make a new space</div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item">
+                                <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("spaces").String() %}">
+                                    <i class="if if-close"></i>
+                                    <span class="btn-text">Cancel</span>
+                                </a>
+                            </div>
+                            <div class="bc-toolbar-item">
+                                <button class="btn btn-primary" data-submit-target="#create-space">
+                                    <i class="if if-check"></i>
+                                    <span class="btn-text">Make Space</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="{%s c.PathTo("create_space").String() %}" method="POST" id="create-space">
+                        {%s= c.CSRFTag %}
+                        <div class="form-group">
+                            <div class="form-row form-group">
+                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>
+                                <div class="col-lg-5 col-xl-4">
+                                    {% if err := v.ValidationErrors.Get("name"); err != nil %}
+                                    <input class="form-control is-invalid" type="text" value="{%s v.Space.Name  %}" id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid">
+                                    <small class="invalid-feedback" id="space-name-invalid">{%s err.Error() %}</small>
+                                    {% else %}
+                                    <input class="form-control" type="text" value="{%s v.Space.Name %}" id="space-name" name="name">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-row form-group">
+                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
+                                <div class="col-lg-5 col-xl-4">
+                                    <input class="form-control" type="text" value="{%s strings.Join(v.Space.Admins, ",") %}" id="space-admins" name="admins">
+                                    <p class="small form-text text-muted">Separate usernames with a comma.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfunc %}
