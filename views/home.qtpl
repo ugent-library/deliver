@@ -1,12 +1,13 @@
-package views
+{% import "github.com/ugent-library/deliver/ctx" %}
 
-import "github.com/ugent-library/deliver/controllers/ctx"
-
-templ Home(c *ctx.Ctx) {
-	{! Page(c, "Deliver", homeContent(c)) }
+{% code
+type Home struct {
 }
+%}
 
-templ homeContent(c *ctx.Ctx) {
+{% func (v *Home) Title(c *ctx.Ctx) %}Deliver{% endfunc %}
+
+{% func (v *Home) Content(c *ctx.Ctx) %}
     <div class="w-100 u-scroll-wrapper">
         <div class="u-scroll-wrapper__body p-8">
             <div class="bc-toolbar bc-toolbar--auto align-items-start">
@@ -18,7 +19,7 @@ templ homeContent(c *ctx.Ctx) {
                 </div>
                 <div class="bc-toolbar-right">
                     <div class="bc-toolbar-item">
-                        <a class="btn btn-primary" href={ templ.SafeURL(c.PathTo("login").String()) }>
+                        <a class="btn btn-primary" href="{%s c.PathTo("login").String() %}">
                             <i class="if if-arrow-right mt-0 ml-2"></i>
                             <span class="btn-text mr-2">Log in</span>
                         </a>
@@ -82,4 +83,4 @@ templ homeContent(c *ctx.Ctx) {
             </div>
         </div>
     </div>
-}
+{% endfunc %}

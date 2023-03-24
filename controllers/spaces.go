@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ugent-library/bind"
-	"github.com/ugent-library/deliver/controllers/ctx"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/httperror"
@@ -62,7 +62,7 @@ func (h *Spaces) List(c *ctx.Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "layouts/page", "show_space", Map{
+	return c.HTMLX(http.StatusOK, "layouts/page", "show_space", Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
 		"folder":           &models.Folder{},
@@ -75,7 +75,7 @@ func (h *Spaces) Show(c *ctx.Ctx) error {
 }
 
 func (h *Spaces) New(c *ctx.Ctx) error {
-	return c.HTML(http.StatusOK, "layouts/page", "new_space", Map{
+	return c.HTMLX(http.StatusOK, "layouts/page", "new_space", Map{
 		"space":            &models.Space{},
 		"validationErrors": validate.NewErrors(),
 	})
@@ -99,7 +99,7 @@ func (h *Spaces) Create(c *ctx.Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "layouts/page", "new_space", Map{
+		return c.HTMLX(http.StatusOK, "layouts/page", "new_space", Map{
 			"space":            space,
 			"validationErrors": validationErrors,
 		})
@@ -161,7 +161,7 @@ func (h *Spaces) Edit(c *ctx.Ctx) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "layouts/page", "edit_space", Map{
+	return c.HTMLX(http.StatusOK, "layouts/page", "edit_space", Map{
 		"space":            space,
 		"validationErrors": validate.NewErrors(),
 	})
@@ -187,7 +187,7 @@ func (h *Spaces) Update(c *ctx.Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "layouts/page", "edit_space", Map{
+		return c.HTMLX(http.StatusOK, "layouts/page", "edit_space", Map{
 			"space":            space,
 			"validationErrors": validationErrors,
 		})
@@ -225,7 +225,7 @@ func (h *Spaces) show(c *ctx.Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, "layouts/page", "show_space", Map{
+	return c.HTMLX(http.StatusOK, "layouts/page", "show_space", Map{
 		"space":            space,
 		"userSpaces":       userSpaces,
 		"folder":           folder,

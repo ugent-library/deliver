@@ -1,34 +1,28 @@
-package views
+{% import "github.com/ugent-library/deliver/ctx" %}
 
-import (
-    "fmt"
-
-    "github.com/ugent-library/deliver/controllers/ctx"
-)
-
-func sidebarClass(c *ctx.Ctx) templ.CSSClasses {
-	classes := []templ.CSSClass{templ.Class("c-sidebar"), templ.Class("d-none"), templ.Class("d-lg-flex")}
-	if c.User != nil {
-		classes = append(classes, templ.Class("c-sidebar--dark-gray"))
-	}
-	return templ.Classes(classes...)
+{%
+interface PageView {
+    Title(c *ctx.Ctx)
+    Content(c *ctx.Ctx)
 }
+%}
 
-templ Page(c *ctx.Ctx, title string, content templ.Component) {
+{% func Page(c *ctx.Ctx, v PageView) %}
     <!DOCTYPE html>
     <html class="u-maximize-height" dir="ltr" lang="en">
 
     <head>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <meta name="robots" content="noindex"/>
-        <meta name="csrf-token" content={ c.CSRFToken }/>
-        <link rel="stylesheet" href={ c.AssetPath("/css/app.css") }/>
-        <link rel="icon" href={ c.AssetPath("/favicon.ico") }/>
-        <script type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
-        <title>{ title }</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noindex">
+        <meta name="csrf-token" content="{%s c.CSRFToken %}">
+        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}">
+        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}">
+        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}"></script>
+        <title>{%s v.Title(c) %}</title>
     </head>
-    <body data-controller="base" class="u-maximize-height overflow-hidden u-scroll-wrapper">
+
+    <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
         <header>
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">
@@ -37,13 +31,13 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href={ templ.SafeURL(c.PathTo("home").String()) }>
-                                            <img class="d-none d-lg-inline-block" src={ c.AssetPath("/images/ghent-university-library-logo.svg") } alt="Ghent University Library"/>
-                                            <img class="d-inline-block d-lg-none" src={ c.AssetPath("/images/ghent-university-library-mark.svg") } alt="Ghent University Library"/>
+                                        <a href="{%s c.PathTo("home").String() %}">
+                                            <img class="d-none d-lg-inline-block" src="{%s c.AssetPath("/images/ghent-university-library-logo.svg") %}" alt="Ghent University Library">
+                                            <img class="d-inline-block d-lg-none" src="{%s c.AssetPath("/images/ghent-university-library-mark.svg") %}" alt="Ghent University Library">
                                         </a>
                                     </li>
                                     <li class="breadcrumb-item" aria-current="page">
-                                        <a href={ templ.SafeURL(c.PathTo("home").String()) } class="text-muted">Home</a>
+                                        <a href="{%s c.PathTo("home").String() %}" class="text-muted">Home</a>
                                     </li>
                                 </ol>
                             </nav>
@@ -54,14 +48,14 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
                         <div class="bc-toolbar-item">
                             <div id="side-panels">
                                 <ul class="nav nav-main">
-                                    if c.User != nil {
+                                    {% if c.User != nil %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="https://forms.office.com/e/6D3PEnpV9M" target="_blank">
                                             <i class="if if-service"></i>
                                             <span class="btn-text">Geef feedback</span>
                                         </a>
                                     </li>
-                                    }
+                                    {% endif %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
                                             <i class="if if-book"></i>
@@ -69,14 +63,14 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        if u := c.User; u != nil {
+                                        {% if c.User != nil %}
                                         <div class="dropdown position-static">
                                             <button class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <div class="bc-avatar-and-text">
                                                     <div class="bc-avatar bc-avatar--sm bc-avatar--small mr-2">
                                                         <i class="if if-user"></i>
                                                     </div>
-                                                    <div class="bc-avatar-text">{ u.Name }</div>
+                                                    <div class="bc-avatar-text">{%s c.User.Name %}</div>
                                                 </div>
                                             </button>
                                             <div class="dropdown-menu mt-8">
@@ -85,23 +79,23 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
                                                         <i class="if if-user"></i>
                                                     </div>
                                                     <div class="bc-avatar-text">
-                                                        <h4>{ u.Name }</h4>
-                                                        <p class="text-muted c-body-small">{ u.Email }</p>
+                                                        <h4>{%s c.User.Name %}</h4>
+                                                        <p class="text-muted c-body-small">{%s c.User.Email %}</p>
                                                     </div>
                                                 </div>
-                                                <hr class="dropdown-divider"/>
-                                                <a class="dropdown-item" href={ templ.SafeURL(c.PathTo("logout").String()) }>
+                                                <hr class="dropdown-divider">
+                                                <a class="dropdown-item" href="{%s c.PathTo("logout").String() %}">
                                                     <i class="if if-log-out"></i>
                                                     <span>Log out</span>
                                                 </a>
                                             </div>
                                         </div>
-                                        } else {
-                                        <a class="btn btn-link btn-sm" href={ templ.SafeURL(c.PathTo("login").String()) }>
+                                        {% else %}
+                                        <a class="btn btn-link btn-sm" href="{%s c.PathTo("login").String() %}">
                                             <i class="if if-arrow-right mt-0 ml-2"></i>
                                             <span class="btn-text mr-2">Log in</span>
                                         </a>
-                                        }
+                                        {% endif %}
                                     </li>
                                 </ul>
                             </div>
@@ -112,12 +106,12 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
         </header>
         <main>
             <div class="d-flex u-maximize-height">
-                <div class={ sidebarClass(c) }>
+                <div class="c-sidebar{% if c.User != nil %} c-sidebar--dark-gray{% endif %} d-none d-lg-flex">
                     <div class="c-sidebar__menu">
                         <nav>
                             <ul class="c-sidebar-menu">
                                 <li class="c-sidebar__item c-sidebar__item--active">
-                                    <a href={ templ.SafeURL(c.PathTo("home").String()) }>
+                                    <a href="{%s c.PathTo("home").String() %}">
                                         <span class="c-sidebar__icon">
                                             <i class="if if-file"></i>
                                         </span>
@@ -128,47 +122,48 @@ templ Page(c *ctx.Ctx, title string, content templ.Component) {
                         </nav>
                     </div>
                     <div class="c-sidebar__bottom">
-                        <img src={ c.AssetPath("/images/logo-ugent-white.svg") } alt="Logo UGent" height="48px" width="auto"/>
+                        <img src="{%s c.AssetPath("/images/logo-ugent-white.svg") %}" alt="Logo UGent" height="48px" width="auto">
                     </div>
                 </div>
 
-                {! content }
+                {%= v.Content(c) %}
             </div>
         </main>
 
         <div id="flash-messages">
-            for _, f := range c.Flash {
+            {% for _, f := range c.Flash %}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-body">
-                    switch f.Type {
-                        case "success":
-                        <i class="if if--success if-check-circle-fill"></i>
-                        case "info":
-                        <i class="if if--primary if-info-circle-filled"></i>
-                        case "warning":
-                        <i class="if if--warning if-alert-fill"></i>
-                        case "error":
-                        <i class="if if--error if-error-circle-fill"></i>
-                    }
+                    {% switch f.Type %}
+                    {% case "success" %}
+                    <i class="if if--success if-check-circle-fill"></i>
+                    {% case "info" %}
+                    <i class="if if--primary if-info-circle-filled"></i>
+                    {% case "warning" %}
+                    <i class="if if--warning if-alert-fill"></i>
+                    {% case "error" %}
+                    <i class="if if--error if-error-circle-fill"></i>
+                    {% endswitch %}
                     <div class="toast-content">
-                        if f.Title != "" {
-                            <h3 class="alert-title">{ f.Title }</h3>
-                        }
-                        { f.Body }
+                        {% if f.Title != "" %}
+                        <h3 class="alert-title">{%s f.Title %}</h3>
+                        {% endif %}
+                        {%s f.Body %}
                     </div>
-                    if f.DismissAfter > 0 {
-                    <button class="close" type="button" aria-label="Close" data-dismiss="toast" data-delay={ fmt.Sprintf("%d", f.DismissAfter.Milliseconds()) }>
+                    <button class="close" type="button" aria-label="Close"
+                        data-dismiss="toast"
+                        {% if f.DismissAfter != 0 %}
+                        data-delay="{%dl f.DismissAfter.Milliseconds() %}"
+                        {% else %}
+                        data-autohide="false"
+                        {% endif %}
+                    >
                         <i class="if if-close"></i>
                     </button>
-                    } else {
-                    <button class="close" type="button" aria-label="Close" data-dismiss="toast" data-autohide="false">
-                        <i class="if if-close"></i>
-                    </button>
-                    }
                 </div>
             </div>
-            }
+            {% endfor %}
         </div>
     </body>
     </html>
-}
+{% endfunc %}

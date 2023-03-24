@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 
-	"github.com/ugent-library/deliver/controllers/ctx"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/httperror"

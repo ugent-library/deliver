@@ -6,8 +6,8 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/ugent-library/deliver/controllers/ctx"
 	"github.com/ugent-library/deliver/crumb"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/httperror"
@@ -43,6 +43,7 @@ func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
 				Res:         w,
 				Req:         r,
 				CSRFToken:   csrf.Token(r),
+				CSRFTag:     string(csrf.TemplateField(r)),
 				Cookies:     crumb.Cookies(r),
 				Permissions: config.Permissions,
 				Router:      config.Router,

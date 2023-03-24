@@ -1,5 +1,5 @@
-//go:generate go get -u github.com/a-h/templ/cmd/templ
-//go:generate templ generate
+//go:generate go get -u github.com/valyala/quicktemplate/qtc
+//go:generate qtc -dir=views
 package views
 
 import (

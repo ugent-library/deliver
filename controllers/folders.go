@@ -9,7 +9,7 @@ import (
 
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/bind"
-	"github.com/ugent-library/deliver/controllers/ctx"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/validate"
@@ -45,11 +45,14 @@ func (h *Folders) Show(c *ctx.Ctx) error {
 	if turbo.Request(c.Req) {
 		return turbo.Render(c.Res, c.Req, http.StatusOK,
 			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
-			turbo.Replace("files").Render(views.FolderFiles(c, folder)),
+			turbo.Replace("files", views.Files(c, folder.Files)),
 		)
 	}
 
-	return c.RenderHTML(http.StatusOK, views.ShowFolder(c, folder, h.maxFileSize))
+	return c.HTML(http.StatusOK, views.Page(c, &views.ShowFolder{
+		Folder:      folder,
+		MaxFileSize: h.maxFileSize,
+	}))
 }
 
 func (h *Folders) Edit(c *ctx.Ctx) error {
@@ -64,7 +67,7 @@ func (h *Folders) Edit(c *ctx.Ctx) error {
 		return httperror.Forbidden
 	}
 
-	return c.HTML(http.StatusOK, "layouts/page", "edit_folder", Map{
+	return c.HTMLX(http.StatusOK, "layouts/page", "edit_folder", Map{
 		"folder":           folder,
 		"validationErrors": validate.NewErrors(),
 	})
@@ -94,7 +97,7 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "layouts/page", "edit_folder", Map{
+		return c.HTMLX(http.StatusOK, "layouts/page", "edit_folder", Map{
 			"folder":           folder,
 			"validationErrors": validationErrors,
 		})
@@ -181,7 +184,7 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 	}
 
 	return turbo.Render(c.Res, c.Req, http.StatusOK,
-		turbo.Replace("files").Render(views.FolderFiles(c, folder)),
+		turbo.Replace("files", views.Files(c, folder.Files)),
 	)
 }
 
@@ -191,7 +194,7 @@ func (h *Folders) Share(c *ctx.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.HTML(http.StatusOK, "layouts/public_page", "share_folder", Map{
+	return c.HTMLX(http.StatusOK, "layouts/public_page", "share_folder", Map{
 		"folder": folder,
 	})
 }

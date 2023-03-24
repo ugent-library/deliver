@@ -59,21 +59,11 @@ type Client struct {
 	msgs    chan []byte
 }
 
-type Renderer interface {
-	Render(context.Context, io.Writer) error
-}
-
 type StreamMessage struct {
 	Action         StreamAction
 	Target         string
 	TargetSelector string
 	Template       string
-	Renderer       Renderer
-}
-
-func (s StreamMessage) Render(r Renderer) StreamMessage {
-	s.Renderer = r
-	return s
 }
 
 func Append(target string, tmpls ...string) StreamMessage {
@@ -488,11 +478,7 @@ func serializeStreamMessages(ctx context.Context, streams []StreamMessage) ([]by
 		b.WriteString(`">`)
 		if s.Action != RemoveAction {
 			b.WriteString(`<template>`)
-			if s.Renderer != nil {
-				s.Renderer.Render(ctx, b)
-			} else {
-				b.WriteString(s.Template)
-			}
+			b.WriteString(s.Template)
 			b.WriteString(`</template>`)
 		}
 		b.WriteString(`</turbo-stream>`)

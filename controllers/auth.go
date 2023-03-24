@@ -3,7 +3,7 @@ package controllers
 import (
 	"time"
 
-	"github.com/ugent-library/deliver/controllers/ctx"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/oidc"
 )

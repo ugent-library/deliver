@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/ugent-library/deliver/controllers/ctx"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/views"
 )
 
@@ -19,5 +19,5 @@ func (h *Pages) Home(c *ctx.Ctx) error {
 		c.RedirectTo("spaces")
 		return nil
 	}
-	return c.RenderHTML(http.StatusOK, views.Home(c))
+	return c.HTML(http.StatusOK, views.Page(c, &views.Home{}))
 }

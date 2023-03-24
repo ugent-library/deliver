@@ -23,12 +23,14 @@ require (
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
 	github.com/ugent-library/middleware v0.0.0-20230227155910-03965f71a3db
 	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
+	github.com/valyala/quicktemplate v1.7.0
 	go.uber.org/zap v1.24.0
 )
 
 require (
 	github.com/coreos/go-oidc/v3 v3.5.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
 )
 
