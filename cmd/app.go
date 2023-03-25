@@ -3,9 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/csrf"
@@ -20,12 +18,10 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
-	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
-	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
@@ -83,19 +79,6 @@ var appCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
-		// setup renderer
-		renderer := render.New(render.Options{
-			Directory:          "templates",
-			Extensions:         []string{".gohtml"},
-			RequirePartials:    true,
-			HTMLTemplateOption: "missingkey=error",
-			Funcs: []template.FuncMap{{
-				"assetPath":     assets.AssetPath,
-				"friendlyBytes": friendly.Bytes,
-				"join":          strings.Join,
-			}},
-		})
-
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
@@ -121,7 +104,6 @@ var appCmd = &cobra.Command{
 			Router:       r,
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
-			Render:       renderer,
 			Assets:       assets,
 			Turbo:        turboHub,
 		})

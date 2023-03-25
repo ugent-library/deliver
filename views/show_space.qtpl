@@ -1,0 +1,199 @@
+{% import "github.com/ugent-library/friendly" %}
+{% import "github.com/ugent-library/deliver/ctx" %}
+{% import "github.com/ugent-library/deliver/models" %}
+{% import "github.com/ugent-library/deliver/validate" %}
+
+{% code
+type ShowSpace struct {
+    Space            *models.Space
+    UserSpaces       []*models.Space
+    Folder           *models.Folder
+    ValidationErrors *validate.Errors
+}
+%}
+
+{% func (v *ShowSpace) Title(c *ctx.Ctx) %}{%s v.Space.Name %}{% endfunc %}
+
+{% func (v *ShowSpace) Content(c *ctx.Ctx) %}
+    <div class="c-sub-sidebar c-sidebar--bordered">
+        <div class="bc-navbar bc-navbar--xlarge bc-navbar--bordered-bottom">
+            <div class="bc-toolbar">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item">
+                        <h1 class="bc-toolbar-title">Your deliver spaces</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="c-sub-sidebar__menu my-6">
+            <nav>
+                <ul class="c-sub-sidebar-menu">
+                    {% for _, s := range v.UserSpaces %}
+                    <li class="c-sub-sidebar__item{% if s.ID == v.Space.ID %} c-sub-sidebar__item--active{% endif %}">
+                        <a href="{%s c.PathTo("space", "spaceName", s.Name).String() %}">
+                            <span class="c-sidebar__label">{%s s.Name %}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% if c.IsAdmin(c.User) %}
+                    <li class="c-sub-sidebar__item">
+                        <a href="{%s c.PathTo("new_space").String() %}">
+                            <span class="c-sidebar__label">
+                                <i class="if if-add"></i>
+                                Make a new space
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="w-100 u-scroll-wrapper">
+        <div class="bg-white">
+            <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <h1 class="bc-toolbar-title">{%s v.Space.Name %} folders</h1>
+                        </div>
+                    </div>
+                    {% if c.IsAdmin(c.User) %}
+                    <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("edit_space", "spaceName", v.Space.Name).String() %}">
+                                <i class="if if-edit"></i>
+                                <span class="btn-text">Edit space</span>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="u-scroll-wrapper__body p-6">
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">
+                                <h2>Make a folder</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="{%s c.PathTo("create_folder", "spaceName", v.Space.Name).String() %}" method="POST">
+                        {%s= c.CSRFTag %}
+                        <div class="form-group{% if v.ValidationErrors.Get("name") != nil %} is-invalid{% endif %}">
+                            <label class="c-label" for="folder-name">Folder name</label>
+                            <div class="form-row">
+                                <div class="col-md-6">
+                                    {% if err := v.ValidationErrors.Get("name"); err != nil %}
+                                    <input class="form-control is-invalid" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid">
+                                    <small class="invalid-feedback" id="folder-name-invalid">{%s err.Error() %}</small>
+                                    {% else %}
+                                    <input class="form-control" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name">
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        We will generate a shareable public link for you.
+                                        <br>
+                                        Each folder will expire one month after creation date.
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary ml-4" type="submit">
+                                        <i class="if if-check"></i>
+                                        <span class="btn-text">Make folder</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">
+                                <h2>Folders</h2>
+                            </div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item">
+                                <p>Showing {%d len(v.Space.Folders) %} of {%d len(v.Space.Folders) %} folders</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if len(v.Space.Folders) > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
+                                <th class="text-nowrap">Public shareable link</th>
+                                <th class="text-nowrap">Expires on</th>
+                                <th class="text-nowrap">Documents</th>
+                                <th class="text-nowrap">Created at</th>
+                                <th class="text-nowrap">Updated at</th>
+                                <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for _, f := range v.Space.Folders %}
+                            <tr>
+                                <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                                    <a href="{%s c.PathTo("folder", "folderID", f.ID).String() %}">{%s f.Name %}</a>
+                                </td>
+                                <td class="text-nowrap">
+                                    <div class="input-group" style="min-width: 375px;">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}">
+                                                <i class="if if-copy text-primary"></i>
+                                                <span class="btn-text">Copy link</span>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control input-select-text" readonly value="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}" style="min-width: 250px;">
+                                    </div>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{%s f.ExpiresAt.Format("2006-01-02 15:04") %}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{%d f.FileCount %} files</p>
+                                    <p class="small">{%s friendly.Bytes(f.Size) %}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{%s f.CreatedAt.Format("2006-01-02 15:04") %}</p>
+                                </td>
+                                <td class="text-nowrap">
+                                    <p>{%s f.UpdatedAt.Format("2006-01-02 15:04") %}</p>
+                                </td>
+                                <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                                    <div class="c-button-toolbar">
+                                        <a class="btn btn-link" href="{%s c.PathTo("folder", "folderID", f.ID).String() %}">
+                                            <i class="if if-draft"></i>
+                                            <span class="btn-text">Open</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="c-blank-slate c-blank-slate-muted">
+                    <div class="bc-avatar">
+                        <i class="if if-info-circle"></i>
+                    </div>
+                    <p>Make a folder to get started</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfunc %}

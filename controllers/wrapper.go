@@ -13,7 +13,6 @@ import (
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/zaphttp"
-	"github.com/unrolled/render"
 )
 
 // TODO set __Host- cookie prefix in production
@@ -29,7 +28,6 @@ type Config struct {
 	Router       *mux.Router
 	ErrorHandler func(*ctx.Ctx, error)
 	Permissions  *models.Permissions
-	Render       *render.Render
 	Assets       mix.Manifest
 	Turbo        *turbo.Hub
 }
@@ -48,7 +46,6 @@ func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
 				Permissions: config.Permissions,
 				Router:      config.Router,
 				PathVars:    mux.Vars(r),
-				Render:      config.Render,
 				Assets:      config.Assets,
 				Turbo:       config.Turbo,
 			}

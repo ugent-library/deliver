@@ -7,8 +7,7 @@ import (
 	"github.com/ugent-library/deliver/views"
 )
 
-type Pages struct {
-}
+type Pages struct{}
 
 func NewPages() *Pages {
 	return &Pages{}

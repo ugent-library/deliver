@@ -6,22 +6,22 @@ import (
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
-type Errors struct {
-}
+type Errors struct{}
 
 func NewErrors() *Errors {
 	return &Errors{}
 }
 
 func (h *Errors) Forbidden(c *ctx.Ctx) error {
-	return c.HTMLX(http.StatusForbidden, "layouts/public_page", "errors/forbidden", nil)
+	return c.HTML(http.StatusForbidden, views.PublicPage(c, &views.Forbidden{}))
 }
 
 func (h *Errors) NotFound(c *ctx.Ctx) error {
-	return c.HTMLX(http.StatusNotFound, "layouts/public_page", "errors/not_found", nil)
+	return c.HTML(http.StatusNotFound, views.PublicPage(c, &views.NotFound{}))
 }
 
 func (h *Errors) HandleError(c *ctx.Ctx, err error) {

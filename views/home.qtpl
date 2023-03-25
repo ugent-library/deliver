@@ -1,8 +1,7 @@
 {% import "github.com/ugent-library/deliver/ctx" %}
 
 {% code
-type Home struct {
-}
+type Home struct {}
 %}
 
 {% func (v *Home) Title(c *ctx.Ctx) %}Deliver{% endfunc %}

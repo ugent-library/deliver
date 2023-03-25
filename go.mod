@@ -73,7 +73,6 @@ require (
 	github.com/ugent-library/friendly v0.0.0-20230207160741-a7eb22dfe944
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
 	github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2
-	github.com/unrolled/render v1.6.0
 	github.com/zclconf/go-cty v1.13.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect

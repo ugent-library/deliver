@@ -21,45 +21,44 @@ var (
 )
 
 //line views/home.qtpl:4
-type Home struct {
-}
+type Home struct{}
 
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 func (v *Home) StreamTitle(qw422016 *qt422016.Writer, c *ctx.Ctx) {
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	qw422016.N().S(`Deliver`)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 }
 
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 func (v *Home) WriteTitle(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	v.StreamTitle(qw422016, c)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	qt422016.ReleaseWriter(qw422016)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 }
 
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 func (v *Home) Title(c *ctx.Ctx) string {
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	v.WriteTitle(qb422016, c)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	qs422016 := string(qb422016.B)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 	return qs422016
-//line views/home.qtpl:8
+//line views/home.qtpl:7
 }
 
-//line views/home.qtpl:10
+//line views/home.qtpl:9
 func (v *Home) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
-//line views/home.qtpl:10
+//line views/home.qtpl:9
 	qw422016.N().S(`
     <div class="w-100 u-scroll-wrapper">
         <div class="u-scroll-wrapper__body p-8">
@@ -73,9 +72,9 @@ func (v *Home) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 <div class="bc-toolbar-right">
                     <div class="bc-toolbar-item">
                         <a class="btn btn-primary" href="`)
-//line views/home.qtpl:22
+//line views/home.qtpl:21
 	qw422016.E().S(c.PathTo("login").String())
-//line views/home.qtpl:22
+//line views/home.qtpl:21
 	qw422016.N().S(`">
                             <i class="if if-arrow-right mt-0 ml-2"></i>
                             <span class="btn-text mr-2">Log in</span>
@@ -141,31 +140,31 @@ func (v *Home) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </div>
     </div>
 `)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 }
 
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 func (v *Home) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	v.StreamContent(qw422016, c)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	qt422016.ReleaseWriter(qw422016)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 }
 
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 func (v *Home) Content(c *ctx.Ctx) string {
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	v.WriteContent(qb422016, c)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	qs422016 := string(qb422016.B)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 	return qs422016
-//line views/home.qtpl:86
+//line views/home.qtpl:85
 }

@@ -385,3 +385,127 @@ func Page(c *ctx.Ctx, v PageView) string {
 	return qs422016
 //line views/page.qtpl:169
 }
+
+//line views/page.qtpl:171
+func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
+//line views/page.qtpl:171
+	qw422016.N().S(`
+    <!DOCTYPE html>
+    <html class="u-maximize-height" dir="ltr" lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noindex">
+        <link rel="stylesheet" href="`)
+//line views/page.qtpl:179
+	qw422016.E().S(c.AssetPath("/css/app.css"))
+//line views/page.qtpl:179
+	qw422016.N().S(`">
+        <link rel="icon" href="`)
+//line views/page.qtpl:180
+	qw422016.E().S(c.AssetPath("/favicon.ico"))
+//line views/page.qtpl:180
+	qw422016.N().S(`">
+        <title>`)
+//line views/page.qtpl:181
+	v.StreamTitle(qw422016, c)
+//line views/page.qtpl:181
+	qw422016.N().S(`</title>
+    </head>
+
+    <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
+        <div class="u-horizontal-scroll h-100 w-100">
+            <div class="u-min-w-750 h-100">
+                <header>
+                    <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
+                        <div class="bc-toolbar bc-toolbar-sm">
+                            <div class="bc-toolbar-left">
+                                <div class="bc-toolbar-item">
+                                    <nav aria-label="breadcrumb">
+                                        <ol class="breadcrumb">
+                                            <li class="breadcrumb-item">
+                                                <a href="`)
+//line views/page.qtpl:195
+	qw422016.E().S(c.PathTo("home").String())
+//line views/page.qtpl:195
+	qw422016.N().S(`">
+                                                    <img class="d-none d-lg-inline-block" src="`)
+//line views/page.qtpl:196
+	qw422016.E().S(c.AssetPath("/images/ghent-university-library-logo.svg"))
+//line views/page.qtpl:196
+	qw422016.N().S(`" alt="Ghent University Library">
+                                                    <img class="d-inline-block d-lg-none" src="`)
+//line views/page.qtpl:197
+	qw422016.E().S(c.AssetPath("/images/ghent-university-library-mark.svg"))
+//line views/page.qtpl:197
+	qw422016.N().S(`" alt="Ghent University Library">
+                                                </a>
+                                            </li>
+                                            <li class="breadcrumb-item" aria-current="page">
+                                                <a href="`)
+//line views/page.qtpl:201
+	qw422016.E().S(c.PathTo("home").String())
+//line views/page.qtpl:201
+	qw422016.N().S(`">Home</a>
+                                            </li>
+                                        </ol>
+                                    </nav>
+                                </div>
+                            </div>
+                            <div class="bc-toolbar-right">
+                                <div class="bc-toolbar-item">
+                                    <div id="side-panels">
+                                        <ul class="nav nav-main"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <main>
+                    `)
+//line views/page.qtpl:218
+	v.StreamContent(qw422016, c)
+//line views/page.qtpl:218
+	qw422016.N().S(`
+                </main>
+            </div>
+        </div>  
+
+        <script type="application/javascript" src="`)
+//line views/page.qtpl:223
+	qw422016.E().S(c.AssetPath("/js/app.js"))
+//line views/page.qtpl:223
+	qw422016.N().S(`"></script>
+    </body>
+    </html>
+`)
+//line views/page.qtpl:226
+}
+
+//line views/page.qtpl:226
+func WritePublicPage(qq422016 qtio422016.Writer, c *ctx.Ctx, v PageView) {
+//line views/page.qtpl:226
+	qw422016 := qt422016.AcquireWriter(qq422016)
+//line views/page.qtpl:226
+	StreamPublicPage(qw422016, c, v)
+//line views/page.qtpl:226
+	qt422016.ReleaseWriter(qw422016)
+//line views/page.qtpl:226
+}
+
+//line views/page.qtpl:226
+func PublicPage(c *ctx.Ctx, v PageView) string {
+//line views/page.qtpl:226
+	qb422016 := qt422016.AcquireByteBuffer()
+//line views/page.qtpl:226
+	WritePublicPage(qb422016, c, v)
+//line views/page.qtpl:226
+	qs422016 := string(qb422016.B)
+//line views/page.qtpl:226
+	qt422016.ReleaseByteBuffer(qb422016)
+//line views/page.qtpl:226
+	return qs422016
+//line views/page.qtpl:226
+}

@@ -301,8 +301,6 @@ github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62 h1:TWb788Kaux7Y
 github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62/go.mod h1:2LCM3IglxvIwUSO610PQUJ9aA3kROToNfUGCip6/Ozs=
 github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2 h1:FZFcxps2peVWfyiFDRLH2ZvVs/4X5n7Xe1M5s78ZF/4=
 github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2/go.mod h1:NNb8N0IFmnHlnGV3C7GwQ1GUwNgw7DVLTlqovnNaC7M=
-github.com/unrolled/render v1.6.0 h1:CMhr7HKRAzVI1RltKSo8JMRaokFi60ObV9I5uSxETJE=
-github.com/unrolled/render v1.6.0/go.mod h1:NoaP3JGGHcYDAqu6gTDz01E2TMqBybJ8dpR6qqRBVPQ=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.30.0/go.mod h1:2rsYD01CKFrjjsvFxx75KlEUNpWNBY9JWD3K/7o2Cus=

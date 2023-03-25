@@ -63,12 +63,12 @@ func (h *Spaces) List(c *ctx.Ctx) error {
 		return err
 	}
 
-	return c.HTMLX(http.StatusOK, "layouts/page", "show_space", Map{
-		"space":            space,
-		"userSpaces":       userSpaces,
-		"folder":           &models.Folder{},
-		"validationErrors": validate.NewErrors(),
-	})
+	return c.HTML(http.StatusOK, views.Page(c, &views.ShowSpace{
+		Space:            space,
+		UserSpaces:       userSpaces,
+		Folder:           &models.Folder{},
+		ValidationErrors: validate.NewErrors(),
+	}))
 }
 
 func (h *Spaces) Show(c *ctx.Ctx) error {
@@ -225,10 +225,10 @@ func (h *Spaces) show(c *ctx.Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	return c.HTMLX(http.StatusOK, "layouts/page", "show_space", Map{
-		"space":            space,
-		"userSpaces":       userSpaces,
-		"folder":           folder,
-		"validationErrors": validationErrors,
-	})
+	return c.HTML(http.StatusOK, views.Page(c, &views.ShowSpace{
+		Space:            space,
+		UserSpaces:       userSpaces,
+		Folder:           folder,
+		ValidationErrors: validationErrors,
+	}))
 }

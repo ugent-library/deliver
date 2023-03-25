@@ -67,10 +67,10 @@ func (h *Folders) Edit(c *ctx.Ctx) error {
 		return httperror.Forbidden
 	}
 
-	return c.HTMLX(http.StatusOK, "layouts/page", "edit_folder", Map{
-		"folder":           folder,
-		"validationErrors": validate.NewErrors(),
-	})
+	return c.HTML(http.StatusOK, views.Page(c, &views.EditFolder{
+		Folder:           folder,
+		ValidationErrors: validate.NewErrors(),
+	}))
 }
 
 func (h *Folders) Update(c *ctx.Ctx) error {
@@ -97,10 +97,10 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTMLX(http.StatusOK, "layouts/page", "edit_folder", Map{
-			"folder":           folder,
-			"validationErrors": validationErrors,
-		})
+		return c.HTML(http.StatusOK, views.Page(c, &views.EditFolder{
+			Folder:           folder,
+			ValidationErrors: validationErrors,
+		}))
 	}
 
 	c.RedirectTo("folder", "folderID", folder.ID)
@@ -194,7 +194,7 @@ func (h *Folders) Share(c *ctx.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.HTMLX(http.StatusOK, "layouts/public_page", "share_folder", Map{
-		"folder": folder,
-	})
+	return c.HTML(http.StatusOK, views.PublicPage(c, &views.ShareFolder{
+		Folder: folder,
+	}))
 }

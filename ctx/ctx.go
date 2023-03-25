@@ -7,13 +7,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/mix"
-	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
@@ -35,7 +33,6 @@ type Ctx struct {
 	Flash    []Flash
 	Router   *mux.Router
 	PathVars map[string]string
-	Render   *render.Render
 	Assets   mix.Manifest
 	Turbo    *turbo.Hub
 }
@@ -45,37 +42,6 @@ type Flash struct {
 	Title        string
 	Body         string
 	DismissAfter time.Duration
-}
-
-type TemplateData struct {
-	ctx       *Ctx
-	CSRFToken string
-	CSRFTag   string
-	Data      any
-}
-
-func (t TemplateData) User() *models.User {
-	return t.ctx.User
-}
-
-func (t TemplateData) Flash() []Flash {
-	return t.ctx.Flash
-}
-
-func (t TemplateData) URLTo(name string, pairs ...string) *url.URL {
-	return t.ctx.URLTo(name, pairs...)
-}
-
-func (t TemplateData) PathTo(name string, pairs ...string) *url.URL {
-	return t.ctx.PathTo(name, pairs...)
-}
-
-func (t TemplateData) IsAdmin(user *models.User) bool {
-	return t.ctx.IsAdmin(user)
-}
-
-func (t TemplateData) IsSpaceAdmin(user *models.User, space *models.Space) bool {
-	return t.ctx.IsSpaceAdmin(user, space)
 }
 
 func (c *Ctx) Context() context.Context {
@@ -89,18 +55,6 @@ func (c *Ctx) HTML(status int, body string) error {
 	c.Res.WriteHeader(status)
 	_, err := c.Res.Write([]byte(body))
 	return err
-}
-
-// TODO deprecated
-func (c *Ctx) HTMLX(status int, layout, tmpl string, data any) error {
-	return c.Render.HTML(c.Res, status, tmpl, TemplateData{
-		ctx:       c,
-		CSRFToken: csrf.Token(c.Req),
-		CSRFTag:   string(csrf.TemplateField(c.Req)),
-		Data:      data,
-	}, render.HTMLOptions{
-		Layout: layout,
-	})
 }
 
 func (c *Ctx) Path(param string) string {
