@@ -50,7 +50,7 @@ func (c *Ctx) Context() context.Context {
 
 func (c *Ctx) HTML(status int, body string) error {
 	if hdr := c.Res.Header(); hdr.Get("Content-Type") == "" {
-		hdr.Set("Content-Type", "text/html")
+		hdr.Set("Content-Type", "text/html; charset=utf-8")
 	}
 	c.Res.WriteHeader(status)
 	_, err := c.Res.Write([]byte(body))

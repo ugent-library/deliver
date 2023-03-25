@@ -29,7 +29,7 @@ const (
 	BeforeAction  StreamAction = "before"
 	AfterAction   StreamAction = "after"
 
-	ContentType = "text/vnd.turbo-stream.html"
+	ContentType = "text/vnd.turbo-stream.html; charset=utf-8"
 )
 
 var bufPool = sync.Pool{
