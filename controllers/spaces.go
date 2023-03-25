@@ -161,10 +161,10 @@ func (h *Spaces) Edit(c *ctx.Ctx) error {
 		return err
 	}
 
-	return c.HTMLX(http.StatusOK, "layouts/page", "edit_space", Map{
-		"space":            space,
-		"validationErrors": validate.NewErrors(),
-	})
+	return c.HTML(http.StatusOK, views.Page(c, &views.EditSpace{
+		Space:            space,
+		ValidationErrors: validate.NewErrors(),
+	}))
 }
 
 func (h *Spaces) Update(c *ctx.Ctx) error {
@@ -187,10 +187,10 @@ func (h *Spaces) Update(c *ctx.Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTMLX(http.StatusOK, "layouts/page", "edit_space", Map{
-			"space":            space,
-			"validationErrors": validationErrors,
-		})
+		return c.HTML(http.StatusOK, views.Page(c, &views.EditSpace{
+			Space:            space,
+			ValidationErrors: validationErrors,
+		}))
 	}
 
 	c.RedirectTo("space", "spaceName", space.Name)

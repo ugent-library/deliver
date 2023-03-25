@@ -1,0 +1,69 @@
+{% import "strings" %}
+{% import "github.com/ugent-library/deliver/ctx" %}
+{% import "github.com/ugent-library/deliver/models" %}
+{% import "github.com/ugent-library/deliver/validate" %}
+
+{% code
+type EditSpace struct {
+    Space            *models.Space
+    ValidationErrors *validate.Errors
+}
+%}
+
+{% func (v *EditSpace) Title(c *ctx.Ctx) %}Edit {%s v.Space.Name %}{% endfunc %}
+
+{% func (v *EditSpace) Content(c *ctx.Ctx) %}
+    <div class="w-100 u-scroll-wrapper">
+        <div class="bg-white">
+            <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+                <div class="bc-toolbar">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <h4 class="bc-toolbar-title">Edit {%s v.Space.Name %}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="u-scroll-wrapper__body p-6">
+            <div class="card w-100 mb-6">
+                <div class="card-header">
+                    <div class="bc-toolbar">
+                        <div class="bc-toolbar-left">
+                            <div class="bc-toolbar-item">Edit {%s v.Space.Name %}</div>
+                        </div>
+                        <div class="bc-toolbar-right">
+                            <div class="bc-toolbar-item">
+                                <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("space", "spaceName", v.Space.Name).String() %}">
+                                    <i class="if if-close"></i>
+                                    <span class="btn-text">Discard changes</span>
+                                </a>
+                            </div>
+                            <div class="bc-toolbar-item">
+                                <button class="btn btn-primary" data-submit-target="#update-space">
+                                    <i class="if if-check"></i>
+                                    <span class="btn-text">Save changes</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="{%s c.PathTo("update_space", "spaceName", v.Space.Name).String() %}" method="POST" id="update-space">
+                        <input type="hidden" name="_method" value="PUT">
+                        {%s= c.CSRFTag %}
+                        <div class="form-group">
+                            <div class="form-row form-group">
+                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
+                                <div class="col-lg-5 col-xl-4">
+                                    <input class="form-control" type="text" value="{%s strings.Join(v.Space.Admins, ",") %}" id="space-admins" name="admins">
+                                    <p class="small form-text text-muted">Separate usernames with a comma.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfunc %}
