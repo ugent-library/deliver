@@ -139,30 +139,31 @@ func (h *Hub) DecryptStreamNames(names string) ([]string, error) {
 	return strings.Split(string(msg), ","), nil
 }
 
-// TODO context, error handling
-func (h *Hub) Broadcast(msgs ...StreamMessage) {
+func (h *Hub) Broadcast(msgs ...StreamMessage) error {
 	if len(msgs) == 0 {
-		return
+		return nil
 	}
 	b, err := Encode(msgs)
 	if err != nil {
-		return
+		return err
+
 	}
 	for c := range h.clients {
 		c.msgs <- b
 	}
+
+	return nil
 }
 
 // TODO context, error handling
-func (h *Hub) Send(stream string, msgs ...StreamMessage) {
+func (h *Hub) Send(stream string, msgs ...StreamMessage) error {
 	if len(msgs) == 0 {
-		return
+		return nil
 	}
 
 	b, err := Encode(msgs)
 	if err != nil {
-		log.Print(err)
-		return
+		return err
 	}
 
 	h.streamsMu.RLock()
@@ -173,10 +174,11 @@ func (h *Hub) Send(stream string, msgs ...StreamMessage) {
 			c.msgs <- b
 		}
 	}
+
+	return nil
 }
 
-// TODO error handler
-// TODO middleware
+// TODO middleware with error handler
 func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
 	conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -235,7 +237,7 @@ func (h *Hub) removeClient(c *client) {
 	h.clientsMu.Unlock()
 }
 
-// TODO logging
+// TODO logging, error handler
 func wsWrite(h *Hub, c *client) {
 	pingTicker := time.NewTicker(h.config.PingPeriod)
 
@@ -268,7 +270,7 @@ func wsWrite(h *Hub, c *client) {
 	}
 }
 
-// TODO logging
+// TODO logging, error handler
 func wsRead(h *Hub, c *client) {
 	defer func() {
 		h.removeClient(c)
