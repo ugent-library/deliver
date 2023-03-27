@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	DefaultWebSocketWriteTimeout  = 5 * time.Second
-	DefaultWebSocketMessageBuffer = 16
+	DefaultWriteTimeout  = 5 * time.Second
+	DefaultMessageBuffer = 16
 )
 
 var (
@@ -53,12 +53,14 @@ type Config struct {
 	MessageBuffer int
 }
 
+// TODO rate limiter
+// TODO support SSE
 func NewHub(config Config) *Hub {
 	if config.WriteTimeout == 0 {
-		config.WriteTimeout = DefaultWebSocketWriteTimeout
+		config.WriteTimeout = DefaultWriteTimeout
 	}
 	if config.MessageBuffer == 0 {
-		config.MessageBuffer = DefaultWebSocketMessageBuffer
+		config.MessageBuffer = DefaultMessageBuffer
 	}
 
 	return &Hub{
@@ -224,7 +226,7 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, streams 
 	for {
 		select {
 		case msg := <-c.msgs:
-			err := writeTimeout(ctx, h.config.WriteTimeout, ws, msg)
+			err := writeWithTimeout(ctx, h.config.WriteTimeout, ws, msg)
 			if err != nil {
 				return err
 			}
@@ -267,7 +269,7 @@ func (h *Hub) removeClient(c *client) {
 	h.clientsMu.Unlock()
 }
 
-func writeTimeout(ctx context.Context, timeout time.Duration, ws *websocket.Conn, msg []byte) error {
+func writeWithTimeout(ctx context.Context, timeout time.Duration, ws *websocket.Conn, msg []byte) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
