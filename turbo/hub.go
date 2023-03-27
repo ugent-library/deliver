@@ -39,8 +39,7 @@ type client struct {
 }
 
 type Hub struct {
-	config Config
-	// upgrader  websocket.Upgrader
+	config    Config
 	clients   map[*client]struct{}
 	streams   map[string]map[*client]struct{}
 	clientsMu sync.RWMutex
@@ -58,7 +57,6 @@ type Config struct {
 }
 
 // TODO rate limiter
-// TODO support SSE
 func NewHub(config Config) *Hub {
 	if config.WriteTimeout == 0 {
 		config.WriteTimeout = DefaultWriteTimeout
