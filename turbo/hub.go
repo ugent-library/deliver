@@ -1,19 +1,24 @@
 package turbo
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/gorilla/websocket"
+	"nhooyr.io/websocket"
+)
+
+const (
+	DefaultWebSocketWriteTimeout  = 5 * time.Second
+	DefaultWebSocketMessageBuffer = 16
 )
 
 var ErrInvalidStreamNames = errors.New("invalid stream names")
@@ -25,8 +30,8 @@ type client struct {
 }
 
 type Hub struct {
-	config    Config
-	upgrader  websocket.Upgrader
+	config Config
+	// upgrader  websocket.Upgrader
 	clients   map[*client]struct{}
 	streams   map[string]map[*client]struct{}
 	clientsMu sync.RWMutex
@@ -34,38 +39,25 @@ type Hub struct {
 }
 
 type Config struct {
-	// Secret should be a random 256 bit key
+	// Secret should be a random 256 bit key.
 	Secret []byte
-	// Time allowed to write a message to the peer.
-	WriteWait time.Duration
-	// Time allowed to read the next pong message from the peer.
-	PongWait time.Duration
-	// Send pings to peer with this period. Must be less than pongWait.
-	PingPeriod time.Duration
-	// Maximum message size allowed from peer.
-	MaxMessageSize int64
+	// WriteTimeout is the time allowed to write a message. Defaults to 5
+	// seconds.
+	WriteTimeout time.Duration
+	// MessageBuffer is the maximum number of queued messages. Defaults to 16.
+	MessageBuffer int
 }
 
 func NewHub(config Config) *Hub {
-	if config.WriteWait == 0 {
-		config.WriteWait = 10 * time.Second
+	if config.WriteTimeout == 0 {
+		config.WriteTimeout = DefaultWebSocketWriteTimeout
 	}
-	if config.PongWait == 0 {
-		config.PongWait = 60 * time.Second
-	}
-	if config.PingPeriod == 0 {
-		config.PingPeriod = (config.PongWait * 9) / 10
-	}
-	if config.MaxMessageSize == 0 {
-		config.MaxMessageSize = 512
+	if config.MessageBuffer == 0 {
+		config.MessageBuffer = DefaultWebSocketMessageBuffer
 	}
 
 	return &Hub{
-		config: config,
-		upgrader: websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-		},
+		config:  config,
 		clients: make(map[*client]struct{}),
 		streams: make(map[string]map[*client]struct{}),
 	}
@@ -155,7 +147,6 @@ func (h *Hub) Broadcast(msgs ...StreamMessage) error {
 	return nil
 }
 
-// TODO context, error handling
 func (h *Hub) Send(stream string, msgs ...StreamMessage) error {
 	if len(msgs) == 0 {
 		return nil
@@ -180,37 +171,61 @@ func (h *Hub) Send(stream string, msgs ...StreamMessage) error {
 
 // TODO middleware with error handler
 func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
-	conn, err := h.upgrader.Upgrade(w, r, nil)
+	ws, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		return err
 	}
+	defer ws.Close(websocket.StatusInternalError, "")
 
 	streams, err := h.DecryptStreamNames(cryptedStreams)
 	if err != nil {
 		return err
 	}
 
-	c := &client{
-		ws:      conn,
-		streams: streams,
-		msgs:    make(chan []byte),
+	err = h.connectWebSocket(r.Context(), ws, streams)
+	if errors.Is(err, context.Canceled) {
+		return nil
 	}
-
-	h.addClient(c, streams)
-
-	go wsWrite(h, c)
-	go wsRead(h, c)
-
-	return nil
+	if cs := websocket.CloseStatus(err); cs == websocket.StatusNormalClosure || cs == websocket.StatusGoingAway {
+		return nil
+	}
+	return err
 }
 
-func (h *Hub) addClient(c *client, streams []string) {
+func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, streams []string) error {
+	c := &client{
+		ws:      ws,
+		streams: streams,
+		msgs:    make(chan []byte, h.config.MessageBuffer),
+	}
+
+	h.addClient(c)
+	defer h.removeClient(c)
+
+	ctx = ws.CloseRead(ctx)
+
+	for {
+		select {
+		case msg := <-c.msgs:
+			err := writeTimeout(ctx, h.config.WriteTimeout, ws, msg)
+			if err != nil {
+				return err
+			}
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+
+	// return nil
+}
+
+func (h *Hub) addClient(c *client) {
 	h.clientsMu.Lock()
 	h.clients[c] = struct{}{}
 	h.clientsMu.Unlock()
 
 	h.streamsMu.Lock()
-	for _, stream := range streams {
+	for _, stream := range c.streams {
 		if clients, ok := h.streams[stream]; ok {
 			clients[c] = struct{}{}
 		} else {
@@ -237,56 +252,9 @@ func (h *Hub) removeClient(c *client) {
 	h.clientsMu.Unlock()
 }
 
-// TODO logging, error handler
-func wsWrite(h *Hub, c *client) {
-	pingTicker := time.NewTicker(h.config.PingPeriod)
+func writeTimeout(ctx context.Context, timeout time.Duration, c *websocket.Conn, msg []byte) error {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
-	defer func() {
-		pingTicker.Stop()
-		c.ws.Close()
-	}()
-
-	for {
-		select {
-		case <-pingTicker.C:
-			c.ws.SetWriteDeadline(time.Now().Add(h.config.WriteWait))
-			if err := c.ws.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
-			}
-		case msg, ok := <-c.msgs:
-			c.ws.SetWriteDeadline(time.Now().Add(h.config.WriteWait))
-
-			if !ok {
-				// The hub closed the channel.
-				c.ws.WriteMessage(websocket.CloseMessage, []byte{})
-				return
-			}
-
-			if err := c.ws.WriteMessage(websocket.TextMessage, msg); err != nil {
-				log.Print(err)
-				return
-			}
-		}
-	}
-}
-
-// TODO logging, error handler
-func wsRead(h *Hub, c *client) {
-	defer func() {
-		h.removeClient(c)
-		c.ws.Close()
-	}()
-
-	c.ws.SetReadLimit(h.config.MaxMessageSize)
-	c.ws.SetReadDeadline(time.Now().Add(h.config.PongWait))
-	c.ws.SetPongHandler(func(string) error {
-		c.ws.SetReadDeadline(time.Now().Add(h.config.PongWait))
-		return nil
-	})
-
-	for {
-		if _, _, err := c.ws.ReadMessage(); err != nil {
-			break
-		}
-	}
+	return c.Write(ctx, websocket.MessageText, msg)
 }
