@@ -10,7 +10,11 @@ import (
 	"strings"
 )
 
-// see https://github.com/gtank/cryptopasta/blob/master/encrypt.go
+var ErrInvalidStreamNames = errors.New("invalid stream names")
+
+// EncryptStreamNames encrypts turbo stream names with AES GCM for safe client
+// side use. The encrypted string is url safe.
+// See https://github.com/gtank/cryptopasta/blob/master/encrypt.go
 // and https://www.alexedwards.net/blog/working-with-cookies-in-go#encrypted-cookies
 func EncryptStreamNames(secret []byte, names []string) (string, error) {
 	msg := strings.Join(names, ",")
@@ -40,10 +44,13 @@ func EncryptStreamNames(secret []byte, names []string) (string, error) {
 	// "{nonce}{encrypted message}".
 	cryptedMsg := gcm.Seal(nonce, nonce, []byte(msg), nil)
 
+	// Encode as a url safe base64 string.
 	return base64.URLEncoding.EncodeToString(cryptedMsg), nil
 }
 
+// DecryptStreamNames decrypts turbo stream names with AES GCM by EncryptStreamNames.
 func DecryptStreamNames(secret []byte, names string) ([]string, error) {
+	// Decode base64.
 	cryptedMsg, err := base64.URLEncoding.DecodeString(names)
 	if err != nil {
 		return nil, err

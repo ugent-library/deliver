@@ -23,7 +23,6 @@ var (
 	ConnectionTooSlowText   = "Connection too slow"
 	InternalServerErrorText = "Internal server error"
 
-	ErrInvalidStreamNames    = errors.New("invalid stream names")
 	ErrStreamingNotSupported = errors.New("streaming not supported")
 )
 

@@ -1,9 +1,7 @@
 package turbo
 
-// func FrameRequestID(r *http.Request) string {
-// 	return r.Header.Get("Turbo-Frame")
-// }
+import "net/http"
 
-// func FrameRequest(r *http.Request) bool {
-// 	return FrameRequestID(r) != ""
-// }
+func FrameRequest(r *http.Request) bool {
+	return r.Header.Get("Turbo-Frame") != ""
+}
