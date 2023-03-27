@@ -17,12 +17,22 @@ const (
 	RemoveAction  StreamAction = "remove"
 	BeforeAction  StreamAction = "before"
 	AfterAction   StreamAction = "after"
+
+	StreamContentType = "text/vnd.turbo-stream.html; charset=utf-8"
 )
 
 var bufPool = sync.Pool{
 	New: func() any {
 		return &bytes.Buffer{}
 	},
+}
+
+func StreamRequest(r *http.Request) bool {
+	return strings.HasPrefix(r.Header.Get("Accept"), "text/vnd.turbo-stream.html")
+}
+
+func StreamSourceTag(src string) string {
+	return `<turbo-stream-source src="` + src + `"></turbo-stream-source>`
 }
 
 func Encode(streams []StreamMessage) ([]byte, error) {
@@ -173,7 +183,7 @@ func AfterMatch(target string, tmpls ...string) StreamMessage {
 
 func Render(w http.ResponseWriter, r *http.Request, code int, streams ...StreamMessage) error {
 	if hdr := w.Header(); hdr.Get("Content-Type") == "" {
-		hdr.Set("Content-Type", ContentType)
+		hdr.Set("Content-Type", StreamContentType)
 	}
 	w.WriteHeader(code)
 	b, err := Encode(streams)

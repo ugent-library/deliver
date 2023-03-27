@@ -42,7 +42,7 @@ func (h *Folders) Show(c *ctx.Ctx) error {
 		return err
 	}
 
-	if turbo.Request(c.Req) {
+	if turbo.StreamRequest(c.Req) {
 		return turbo.Render(c.Res, c.Req, http.StatusOK,
 			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
 			turbo.Replace("files", views.Files(c, folder.Files)),

@@ -118,18 +118,20 @@ func (c *Ctx) AddFlash(f Flash) {
 	c.Cookies.Append(flashCookie, f, time.Now().Add(3*time.Minute))
 }
 
+// TODO move to views?
 func (c *Ctx) TurboStreamTag(names ...string) string {
 	cryptedNames, err := c.Turbo.EncryptStreamNames(names)
 	if err != nil {
 		c.Log.Error(err)
 		return ""
 	}
-	src := c.URLTo("ws", "streams", string(cryptedNames))
-	// TODO
-	if c.Req.URL.Scheme == "https" {
-		src.Scheme = "wss"
-	} else {
-		src.Scheme = "ws"
-	}
-	return `<turbo-stream-source src="` + src.String() + `"></turbo-stream-source>`
+	return turbo.StreamSourceTag(c.PathTo("streams", "streams", cryptedNames).String())
+	// websocket example:
+	// src := c.URLTo("ws", "streams", cryptedNames)
+	// if c.Req.URL.Scheme == "https" {
+	// 	src.Scheme = "wss"
+	// } else {
+	// 	src.Scheme = "ws"
+	// }
+	// return turbo.StreamSourceTag(src.String())
 }

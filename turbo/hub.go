@@ -242,6 +242,7 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, streams 
 }
 
 // TODO write timeout
+// TODO how to avoid "http: superfluous response.WriteHeader"
 func (h *Hub) HandleSSE(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -271,18 +272,18 @@ func (h *Hub) HandleSSE(w http.ResponseWriter, r *http.Request, cryptedStreams s
 		select {
 		case <-r.Context().Done():
 			if err := r.Context().Err(); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
+				// w.WriteHeader(http.StatusInternalServerError)
 				return err
 			}
-			w.WriteHeader(http.StatusOK)
+			// w.WriteHeader(http.StatusOK)
 			return nil
 		case <-c.tooSlow:
-			w.WriteHeader(http.StatusRequestTimeout)
+			// w.WriteHeader(http.StatusRequestTimeout)
 			return nil
 		case msg := <-c.msgs:
 			err = writeMessage(w, seq, "message", msg)
 			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
+				// w.WriteHeader(http.StatusInternalServerError)
 				return err
 			}
 			flusher.Flush()
@@ -309,11 +310,7 @@ func writeMessage(w io.Writer, id int, event string, b []byte) error {
 	}
 
 	_, err = fmt.Fprint(w, "\n")
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (h *Hub) addClient(c *client) {

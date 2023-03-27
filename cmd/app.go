@@ -113,9 +113,9 @@ var appCmd = &cobra.Command{
 		// TODO don't apply all middleware to static file server
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
-		r.Handle("/ws/{streams}", wrap(func(c *ctx.Ctx) error {
-			return turboHub.HandleWebSocket(c.Res, c.Req, c.Path("streams"))
-		})).Name("ws")
+		r.Handle("/streams/{streams}", wrap(func(c *ctx.Ctx) error {
+			return turboHub.HandleSSE(c.Res, c.Req, c.Path("streams"))
+		})).Name("streams")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
