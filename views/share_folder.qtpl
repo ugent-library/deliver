@@ -72,7 +72,7 @@ type ShareFolder struct {
                                 {% for _, f := range v.Folder.Files %}
                                 <tr class="clickable-table-row">
                                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
+                                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}" data-turbo="false">
                                             <span>{%s f.Name %}</span>
                                         </a>
                                         <br><small class="text-muted">md5 checksum: {%s f.MD5 %}</small>
