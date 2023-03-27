@@ -21,7 +21,12 @@ const (
 	DefaultWebSocketMessageBuffer = 16
 )
 
-var ErrInvalidStreamNames = errors.New("invalid stream names")
+var (
+	ConnectionTooSlowText   = "Connection too slow"
+	InternalServerErrorText = "Internal server error"
+
+	ErrInvalidStreamNames = errors.New("invalid stream names")
+)
 
 type client struct {
 	ws      *websocket.Conn
@@ -135,13 +140,19 @@ func (h *Hub) Broadcast(msgs ...StreamMessage) error {
 	if len(msgs) == 0 {
 		return nil
 	}
+
 	b, err := Encode(msgs)
 	if err != nil {
 		return err
 
 	}
+
 	for c := range h.clients {
-		c.msgs <- b
+		select {
+		case c.msgs <- b:
+		default:
+			go c.ws.Close(websocket.StatusPolicyViolation, ConnectionTooSlowText)
+		}
 	}
 
 	return nil
@@ -162,7 +173,11 @@ func (h *Hub) Send(stream string, msgs ...StreamMessage) error {
 
 	if clients, ok := h.streams[stream]; ok {
 		for c := range clients {
-			c.msgs <- b
+			select {
+			case c.msgs <- b:
+			default:
+				go c.ws.Close(websocket.StatusPolicyViolation, ConnectionTooSlowText)
+			}
 		}
 	}
 
@@ -175,7 +190,9 @@ func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams stri
 	if err != nil {
 		return err
 	}
-	defer ws.Close(websocket.StatusInternalError, "")
+
+	// Close with error status unless already closed normally.
+	defer ws.Close(websocket.StatusInternalError, InternalServerErrorText)
 
 	streams, err := h.DecryptStreamNames(cryptedStreams)
 	if err != nil {
@@ -215,8 +232,6 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, streams 
 			return ctx.Err()
 		}
 	}
-
-	// return nil
 }
 
 func (h *Hub) addClient(c *client) {
@@ -252,9 +267,9 @@ func (h *Hub) removeClient(c *client) {
 	h.clientsMu.Unlock()
 }
 
-func writeTimeout(ctx context.Context, timeout time.Duration, c *websocket.Conn, msg []byte) error {
+func writeTimeout(ctx context.Context, timeout time.Duration, ws *websocket.Conn, msg []byte) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	return c.Write(ctx, websocket.MessageText, msg)
+	return ws.Write(ctx, websocket.MessageText, msg)
 }
