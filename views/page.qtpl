@@ -16,9 +16,9 @@ interface PageView {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex">
         <meta name="csrf-token" content="{%s c.CSRFToken %}">
-        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}">
-        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}">
-        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}"></script>
+        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}" data-turbo-track="reload">
+        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}" data-turbo-track="reload">
+        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}" data-turbo-track="reload"></script>
         <title>{%s v.Title(c) %}</title>
     </head>
 
@@ -176,8 +176,9 @@ interface PageView {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex">
-        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}">
-        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}">
+        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}" data-turbo-track="reload">
+        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}" data-turbo-track="reload">
+        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}" data-turbo-track="reload"></script>
         <title>{%= v.Title(c) %}</title>
     </head>
 
@@ -219,8 +220,6 @@ interface PageView {
                 </main>
             </div>
         </div>  
-
-        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}"></script>
     </body>
     </html>
 {% endfunc %}

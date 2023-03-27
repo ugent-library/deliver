@@ -166,7 +166,11 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/share_folder.qtpl:75
 			qw422016.N().S(`">
-                                            <span>{{.Name}}</span>
+                                            <span>`)
+//line views/share_folder.qtpl:76
+			qw422016.E().S(f.Name)
+//line views/share_folder.qtpl:76
+			qw422016.N().S(`</span>
                                         </a>
                                         <br><small class="text-muted">md5 checksum: `)
 //line views/share_folder.qtpl:78
@@ -208,7 +212,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 //line views/share_folder.qtpl:94
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/share_folder.qtpl:94
-			qw422016.N().S(`">
+			qw422016.N().S(`" data-turbo="false">
                                                 <i class="if if-download"></i>
                                                 <span class="btn-txt">Download</span>
                                             </a>

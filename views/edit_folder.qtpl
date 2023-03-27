@@ -115,7 +115,7 @@ type EditFolder struct {
                         <h4>
                             Are you sure you want to delete the folder
                             <br>
-                            <strong>{{.Data.folder.Name}}</strong>
+                            <strong>{%s v.Folder.Name %}</strong>
                             and its files?
                         </h4>
                         <p>You cannot undo this action or recover the files.</p>

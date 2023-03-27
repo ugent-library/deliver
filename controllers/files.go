@@ -21,7 +21,6 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-// TODO why double downloads?
 func (h *Files) Download(c *ctx.Ctx) error {
 	fileID := c.Path("fileID")
 

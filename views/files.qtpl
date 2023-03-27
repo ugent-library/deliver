@@ -35,7 +35,7 @@
                 {% for _, f := range files %}
                 <tr class="clickable-table-row">
                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
+                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}" data-turbo="false">
                             <i class="if if-download"></i>
                             <span>{%s f.Name %}</span>
                         </a>
@@ -60,7 +60,7 @@
                                 <i class="if if-delete"></i>
                                 <span class="btn-text">Delete</span>
                             </button>
-                            <a class="btn btn-link" href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
+                            <a class="btn btn-link" href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}" data-turbo="false">
                                 <i class="if if-download"></i>
                                 <span class="btn-text">Download</span>
                             </a>

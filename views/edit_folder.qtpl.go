@@ -244,7 +244,11 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                         <h4>
                             Are you sure you want to delete the folder
                             <br>
-                            <strong>{{.Data.folder.Name}}</strong>
+                            <strong>`)
+//line views/edit_folder.qtpl:118
+	qw422016.E().S(v.Folder.Name)
+//line views/edit_folder.qtpl:118
+	qw422016.N().S(`</strong>
                             and its files?
                         </h4>
                         <p>You cannot undo this action or recover the files.</p>

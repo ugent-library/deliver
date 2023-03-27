@@ -78,7 +78,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:38
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/files.qtpl:38
-			qw422016.N().S(`">
+			qw422016.N().S(`" data-turbo="false">
                             <i class="if if-download"></i>
                             <span>`)
 //line views/files.qtpl:40
@@ -139,7 +139,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:63
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/files.qtpl:63
-			qw422016.N().S(`">
+			qw422016.N().S(`" data-turbo="false">
                                 <i class="if if-download"></i>
                                 <span class="btn-text">Download</span>
                             </a>
