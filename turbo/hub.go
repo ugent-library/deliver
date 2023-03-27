@@ -1,12 +1,15 @@
 package turbo
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -25,13 +28,14 @@ var (
 	ConnectionTooSlowText   = "Connection too slow"
 	InternalServerErrorText = "Internal server error"
 
-	ErrInvalidStreamNames = errors.New("invalid stream names")
+	ErrInvalidStreamNames    = errors.New("invalid stream names")
+	ErrStreamingNotSupported = errors.New("streaming not supported")
 )
 
 type client struct {
-	ws      *websocket.Conn
 	streams []string
 	msgs    chan []byte
+	tooSlow chan bool
 }
 
 type Hub struct {
@@ -153,7 +157,7 @@ func (h *Hub) Broadcast(msgs ...StreamMessage) error {
 		select {
 		case c.msgs <- b:
 		default:
-			go c.ws.Close(websocket.StatusPolicyViolation, ConnectionTooSlowText)
+			c.tooSlow <- true
 		}
 	}
 
@@ -178,7 +182,7 @@ func (h *Hub) Send(stream string, msgs ...StreamMessage) error {
 			select {
 			case c.msgs <- b:
 			default:
-				go c.ws.Close(websocket.StatusPolicyViolation, ConnectionTooSlowText)
+				c.tooSlow <- true
 			}
 		}
 	}
@@ -187,7 +191,7 @@ func (h *Hub) Send(stream string, msgs ...StreamMessage) error {
 }
 
 // TODO middleware with error handler
-func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
+func (h *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
 	ws, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		return err
@@ -213,7 +217,6 @@ func (h *Hub) Handle(w http.ResponseWriter, r *http.Request, cryptedStreams stri
 
 func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, streams []string) error {
 	c := &client{
-		ws:      ws,
 		streams: streams,
 		msgs:    make(chan []byte, h.config.MessageBuffer),
 	}
@@ -225,15 +228,92 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, streams 
 
 	for {
 		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-c.tooSlow:
+			return ws.Close(websocket.StatusPolicyViolation, ConnectionTooSlowText)
 		case msg := <-c.msgs:
 			err := writeWithTimeout(ctx, h.config.WriteTimeout, ws, msg)
 			if err != nil {
 				return err
 			}
-		case <-ctx.Done():
-			return ctx.Err()
 		}
 	}
+}
+
+// TODO write timeout
+func (h *Hub) HandleSSE(w http.ResponseWriter, r *http.Request, cryptedStreams string) error {
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		return ErrStreamingNotSupported
+	}
+
+	streams, err := h.DecryptStreamNames(cryptedStreams)
+	if err != nil {
+		return err
+	}
+
+	c := &client{
+		streams: streams,
+		msgs:    make(chan []byte, h.config.MessageBuffer),
+	}
+
+	h.addClient(c)
+	defer h.removeClient(c)
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	seq := 0
+
+	for {
+		select {
+		case <-r.Context().Done():
+			if err := r.Context().Err(); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return err
+			}
+			w.WriteHeader(http.StatusOK)
+			return nil
+		case <-c.tooSlow:
+			w.WriteHeader(http.StatusRequestTimeout)
+			return nil
+		case msg := <-c.msgs:
+			err = writeMessage(w, seq, "message", msg)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return err
+			}
+			flusher.Flush()
+			seq++
+		}
+	}
+}
+
+func writeMessage(w io.Writer, id int, event string, b []byte) error {
+	_, err := fmt.Fprintf(w, "event: %s\nid: %d\n", event, id)
+	if err != nil {
+		return err
+	}
+
+	scanner := bufio.NewScanner(bytes.NewReader(b))
+	for scanner.Scan() {
+		_, err = fmt.Fprintf(w, "data: %s\n", scanner.Text())
+		if err != nil {
+			return err
+		}
+	}
+	if err = scanner.Err(); err != nil {
+		return err
+	}
+
+	_, err = fmt.Fprint(w, "\n")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (h *Hub) addClient(c *client) {
