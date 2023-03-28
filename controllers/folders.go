@@ -183,6 +183,10 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 		return err
 	}
 
+	// TODO exclude originator of the request
+	c.Turbo.Send("folder."+file.FolderID,
+		turbo.Replace("files", views.Files(c, folder.Files)))
+
 	return turbo.Render(c.Res, c.Req, http.StatusOK,
 		turbo.Replace("files", views.Files(c, folder.Files)),
 	)

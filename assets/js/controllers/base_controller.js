@@ -3,7 +3,7 @@ import bsnPopper from '../lib/bsn_popper.js'
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-    connect () {
+    connect() {
         BSN.initCallback(this.element)
         bsnPopper(this.element)
     }

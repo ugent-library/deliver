@@ -50,14 +50,21 @@ type ShowFolder struct {
                 <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item col-lg-8 col-sm-12 pl-0">
-                            <div class="input-group">
+                            <div class="input-group" data-controller="clipboard">
                                 <div class="input-group-prepend">
-                                <button type="button" class="btn btn-outline-secondary btn-copy-to-clipboard" data-value="{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}">
-                                    <i class="if if-copy text-primary"></i>
-                                    <span class="btn-text text-primary">Copy public shareable link</span>
-                                </button>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        data-action="clipboard#copy"
+                                        data-clipboard-target="button"
+                                    >
+                                        <i class="if if-copy text-primary"></i>
+                                        <span class="btn-text text-primary">Copy public shareable link</span>
+                                    </button>
                                 </div>
-                                <input type="text" class="form-control input-select-text" readonly value="{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}">
+                                <input type="text" class="form-control input-select-text" readonly
+                                    value="{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
+                                    data-action="click->clipboard#select"
+                                    data-clipboard-target="source"
+                                >
                             </div>
                         </div>
                     </div>
