@@ -30,7 +30,7 @@ var (
 func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:5
 	qw422016.N().S(`
-<div class="card w-100 mb-6" id="files">
+<div class="card w-100 mb-6" id="files" data-controller="base">
     <div class="card-header">
         <div class="bc-toolbar">
             <div class="bc-toolbar-left">
@@ -171,83 +171,81 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:81
 	qw422016.N().S(`
 
-    <div id="confirm-delete-file-modals">
-        `)
-//line views/files.qtpl:84
+    `)
+//line views/files.qtpl:83
 	for _, f := range files {
-//line views/files.qtpl:84
+//line views/files.qtpl:83
 		qw422016.N().S(`
-        <div id="confirm-delete-file-`)
-//line views/files.qtpl:85
+    <div id="confirm-delete-file-`)
+//line views/files.qtpl:84
 		qw422016.E().S(f.ID)
-//line views/files.qtpl:85
+//line views/files.qtpl:84
 		qw422016.N().S(`" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="c-blank-slate c-blank-slate-muted">
-                            <div class="bc-avatar">
-                                <i class="if if-alert"></i>
-                            </div>
-                            <h4>
-                                Are you sure you want to delete the file
-                                <br>
-                                <strong>`)
-//line views/files.qtpl:96
-		qw422016.E().S(f.Name)
-//line views/files.qtpl:96
-		qw422016.N().S(`</strong>?
-                            </h4>
-                            <p>You cannot undo this action.</p>
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="c-blank-slate c-blank-slate-muted">
+                        <div class="bc-avatar">
+                            <i class="if if-alert"></i>
                         </div>
+                        <h4>
+                            Are you sure you want to delete the file
+                            <br>
+                            <strong>`)
+//line views/files.qtpl:95
+		qw422016.E().S(f.Name)
+//line views/files.qtpl:95
+		qw422016.N().S(`</strong>?
+                        </h4>
+                        <p>You cannot undo this action.</p>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                        <form action="`)
-//line views/files.qtpl:103
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                    <form action="`)
+//line views/files.qtpl:102
 		qw422016.E().S(c.PathTo("delete_file", "fileID", f.ID).String())
-//line views/files.qtpl:103
+//line views/files.qtpl:102
 		qw422016.N().S(`" method="POST" data-turbo-stream>
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button class="btn btn-danger" type="submit">Yes, delete this file</button>
-                        </form>
-                    </div>
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button class="btn btn-danger" type="submit">Yes, delete this file</button>
+                    </form>
                 </div>
             </div>
         </div>
-        `)
-//line views/files.qtpl:111
-	}
-//line views/files.qtpl:111
-	qw422016.N().S(`
     </div>
+    `)
+//line views/files.qtpl:110
+	}
+//line views/files.qtpl:110
+	qw422016.N().S(`
 </div>
 `)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 }
 
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 func WriteFiles(qq422016 qtio422016.Writer, c *ctx.Ctx, files []*models.File) {
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	StreamFiles(qw422016, c, files)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	qt422016.ReleaseWriter(qw422016)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 }
 
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 func Files(c *ctx.Ctx, files []*models.File) string {
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	WriteFiles(qb422016, c, files)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	qs422016 := string(qb422016.B)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 	return qs422016
-//line views/files.qtpl:114
+//line views/files.qtpl:112
 }
