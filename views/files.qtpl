@@ -35,7 +35,7 @@
                 {% for _, f := range files %}
                 <tr class="clickable-table-row">
                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}" data-turbo="false">
+                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
                             <i class="if if-download"></i>
                             <span>{%s f.Name %}</span>
                         </a>
@@ -60,7 +60,7 @@
                                 <i class="if if-delete"></i>
                                 <span class="btn-text">Delete</span>
                             </button>
-                            <a class="btn btn-link" href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}" data-turbo="false">
+                            <a class="btn btn-link" href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
                                 <i class="if if-download"></i>
                                 <span class="btn-text">Download</span>
                             </a>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <form action="{%s c.PathTo("delete_file", "fileID", f.ID).String() %}" method="POST" data-turbo-stream>
+                    <form action="{%s c.PathTo("delete_file", "fileID", f.ID).String() %}" method="POST" data-turbo="true" data-turbo-stream>
                         <input type="hidden" name="_method" value="DELETE">
                         <button class="btn btn-danger" type="submit">Yes, delete this file</button>
                     </form>

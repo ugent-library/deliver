@@ -78,7 +78,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:38
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/files.qtpl:38
-			qw422016.N().S(`" data-turbo="false">
+			qw422016.N().S(`">
                             <i class="if if-download"></i>
                             <span>`)
 //line views/files.qtpl:40
@@ -139,7 +139,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:63
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/files.qtpl:63
-			qw422016.N().S(`" data-turbo="false">
+			qw422016.N().S(`">
                                 <i class="if if-download"></i>
                                 <span class="btn-text">Download</span>
                             </a>
@@ -206,7 +206,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:102
 		qw422016.E().S(c.PathTo("delete_file", "fileID", f.ID).String())
 //line views/files.qtpl:102
-		qw422016.N().S(`" method="POST" data-turbo-stream>
+		qw422016.N().S(`" method="POST" data-turbo="true" data-turbo-stream>
                         <input type="hidden" name="_method" value="DELETE">
                         <button class="btn btn-danger" type="submit">Yes, delete this file</button>
                     </form>

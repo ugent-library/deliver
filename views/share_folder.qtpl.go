@@ -165,7 +165,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 //line views/share_folder.qtpl:75
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/share_folder.qtpl:75
-			qw422016.N().S(`" data-turbo="false">
+			qw422016.N().S(`">
                                             <span>`)
 //line views/share_folder.qtpl:76
 			qw422016.E().S(f.Name)
@@ -212,7 +212,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 //line views/share_folder.qtpl:94
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
 //line views/share_folder.qtpl:94
-			qw422016.N().S(`" data-turbo="false">
+			qw422016.N().S(`">
                                                 <i class="if if-download"></i>
                                                 <span class="btn-txt">Download</span>
                                             </a>
