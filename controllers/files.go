@@ -27,7 +27,7 @@ func (h *Files) Download(c *Ctx) error {
 	if err != nil && errors.Is(err, models.ErrNotFound) {
 		return httperror.NotFound
 	} else if err != nil {
-		return httperror.InternalServerError
+		return err
 	}
 	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
