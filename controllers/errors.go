@@ -25,7 +25,6 @@ func (h *Errors) NotFound(c *Ctx) error {
 
 func (h *Errors) HandleError(c *Ctx, err error) {
 	if err == models.ErrNotFound {
-
 		err = httperror.NotFound
 	}
 
