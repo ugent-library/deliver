@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/ugent-library/deliver/models"
@@ -21,10 +23,16 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 
 func (h *Files) Download(c *Ctx) error {
 	fileID := c.Path("fileID")
+	file, err := h.repo.FileByID(c.Context(), fileID)
+	if err != nil && errors.Is(err, models.ErrNotFound) {
+		return httperror.NotFound
+	} else if err != nil {
+		return err
+	}
 	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
 	}
-	c.Res.Header().Add("Content-Disposition", "attachment")
+	c.Res.Header().Add("Content-Disposition", fmt.Sprintf("attachment;  filename*=UTF-8''%s", file.Name))
 	return h.file.Get(c.Context(), fileID, c.Res)
 }
 
