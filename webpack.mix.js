@@ -13,8 +13,8 @@ mix.copy('assets/ugent/fonts/**', 'static/fonts');
 // set the resourceroot for fonts so it points to the static assets path
 mix.setResourceRoot('../')
 
+mix.sourceMaps()
+
 if (mix.inProduction()) {
   mix.version()
-} else {
-  mix.sourceMaps()
 }

@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
-	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/middleware"
@@ -108,14 +107,21 @@ var appCmd = &cobra.Command{
 			Turbo:        turboHub,
 		})
 
+		// router middleware
+		r.Use(
+			func(next http.Handler) http.Handler {
+				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
+			},
+			crumb.Enable(
+				crumb.WithErrorHandler(func(err error) {
+					logger.Error(err)
+				}),
+			),
+		)
+
 		// routes
 		r.NotFoundHandler = wrap(errs.NotFound)
-		// TODO don't apply all middleware to static file server
-		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
-		r.Handle("/streams/{streams}", wrap(func(c *ctx.Ctx) error {
-			return turboHub.HandleSSE(c.Res, c.Req, c.Path("streams"))
-		})).Name("streams")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
 		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
@@ -135,8 +141,16 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
+		mux := http.NewServeMux()
+		mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+		mux.HandleFunc("/turbo", func(w http.ResponseWriter, r *http.Request) {
+			// TODO handle error
+			turboHub.HandleSSE(w, r, r.URL.Query().Get("streams"))
+		})
+		mux.Handle("/", r)
+
 		// apply these before request reaches the router
-		handler := middleware.Apply(r,
+		handler := middleware.Apply(mux,
 			middleware.Recover(func(err any) {
 				if config.Production {
 					logger.With(zap.Stack("stack")).Error(err)
@@ -144,9 +158,6 @@ var appCmd = &cobra.Command{
 					logger.Error(err)
 				}
 			}),
-			func(next http.Handler) http.Handler {
-				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
-			},
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
 				[]byte(config.CookieSecret),
@@ -166,11 +177,6 @@ var appCmd = &cobra.Command{
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests(logger.Desugar()),
-			crumb.Enable(
-				crumb.WithErrorHandler(func(err error) {
-					logger.Error(err)
-				}),
-			),
 		)
 
 		// start server

@@ -125,13 +125,5 @@ func (c *Ctx) TurboStreamTag(names ...string) string {
 		c.Log.Error(err)
 		return ""
 	}
-	return turbo.StreamSourceTag(c.PathTo("streams", "streams", cryptedNames).String())
-	// websocket example:
-	// src := c.URLTo("ws", "streams", cryptedNames)
-	// if c.Req.URL.Scheme == "https" {
-	// 	src.Scheme = "wss"
-	// } else {
-	// 	src.Scheme = "ws"
-	// }
-	// return turbo.StreamSourceTag(src.String())
+	return turbo.StreamSourceTag("/turbo?streams=" + cryptedNames)
 }
