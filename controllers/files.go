@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
+	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
@@ -57,6 +59,13 @@ func (h *Files) Delete(c *ctx.Ctx) error {
 		return err
 	}
 
+	c.Turbo.Send("folder."+file.Folder.ID,
+		turbo.Append("flash-messages", views.Flash(ctx.Flash{
+			Type:         "info",
+			Body:         fmt.Sprintf("%s just deleted the file %s.", c.User.Name, file.Name),
+			DismissAfter: 3 * time.Second,
+		})),
+	)
 	c.RedirectTo("folder", "folderID", file.FolderID)
 
 	return nil

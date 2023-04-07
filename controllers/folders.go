@@ -214,6 +214,13 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 		return err
 	}
 
+	c.Turbo.Send("folder."+folder.ID,
+		turbo.Append("flash-messages", views.Flash(ctx.Flash{
+			Type:         "info",
+			Body:         fmt.Sprintf("%s just added the file %s.", c.User.Name, file.Name),
+			DismissAfter: 3 * time.Second,
+		})),
+	)
 	return turbo.Render(c.Res, c.Req, http.StatusOK,
 		turbo.Replace("files", views.Files(c, folder.Files)),
 	)

@@ -1,7 +1,7 @@
 {% import "github.com/ugent-library/deliver/ctx" %}
 
 {% func Flash(f ctx.Flash) %}
-    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-controller="base">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-controller="toast">
         <div class="toast-body">
             {% switch f.Type %}
             {% case "success" %}

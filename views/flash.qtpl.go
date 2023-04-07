@@ -24,7 +24,7 @@ var (
 func StreamFlash(qw422016 *qt422016.Writer, f ctx.Flash) {
 //line views/flash.qtpl:3
 	qw422016.N().S(`
-    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-controller="base">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-controller="toast">
         <div class="toast-body">
             `)
 //line views/flash.qtpl:6
