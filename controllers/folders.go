@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -90,6 +91,8 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 		return errors.Join(httperror.BadRequest, err)
 	}
 
+	oldName := folder.Name
+
 	folder.Name = b.Name
 
 	if err := h.repo.UpdateFolder(c.Context(), folder); err != nil {
@@ -103,6 +106,20 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 		}))
 	}
 
+	c.Turbo.Send("space."+folder.Space.ID,
+		turbo.Append("flash-messages", views.Flash(ctx.Flash{
+			Type:         "info",
+			Body:         fmt.Sprintf("%s just renamed the folder %s to %s.", c.User.Name, oldName, folder.Name),
+			DismissAfter: 3 * time.Second,
+		})),
+	)
+	c.Turbo.Send("folder."+folder.ID,
+		turbo.Append("flash-messages", views.Flash(ctx.Flash{
+			Type:         "info",
+			Body:         fmt.Sprintf("%s just renamed this folder to %s.", c.User.Name, folder.Name),
+			DismissAfter: 3 * time.Second,
+		})),
+	)
 	c.RedirectTo("folder", "folderID", folder.ID)
 
 	return nil
@@ -124,6 +141,20 @@ func (h *Folders) Delete(c *ctx.Ctx) error {
 		return err
 	}
 
+	c.Turbo.Send("space."+folder.Space.ID,
+		turbo.Append("flash-messages", views.Flash(ctx.Flash{
+			Type:         "info",
+			Body:         fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
+			DismissAfter: 3 * time.Second,
+		})),
+	)
+	c.Turbo.Send("folder."+folder.ID,
+		turbo.Append("flash-messages", views.Flash(ctx.Flash{
+			Type:         "error",
+			Body:         fmt.Sprintf("%s just deleted this folder.", c.User.Name),
+			DismissAfter: 3 * time.Second,
+		})),
+	)
 	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
