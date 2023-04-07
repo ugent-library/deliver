@@ -265,130 +265,52 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 	for _, f := range c.Flash {
 //line views/page.qtpl:134
 		qw422016.N().S(`
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-body">
-                    `)
-//line views/page.qtpl:137
-		switch f.Type {
-//line views/page.qtpl:138
-		case "success":
-//line views/page.qtpl:138
-			qw422016.N().S(`
-                    <i class="if if--success if-check-circle-fill"></i>
-                    `)
-//line views/page.qtpl:140
-		case "info":
-//line views/page.qtpl:140
-			qw422016.N().S(`
-                    <i class="if if--primary if-info-circle-filled"></i>
-                    `)
-//line views/page.qtpl:142
-		case "warning":
-//line views/page.qtpl:142
-			qw422016.N().S(`
-                    <i class="if if--warning if-alert-fill"></i>
-                    `)
-//line views/page.qtpl:144
-		case "error":
-//line views/page.qtpl:144
-			qw422016.N().S(`
-                    <i class="if if--error if-error-circle-fill"></i>
-                    `)
-//line views/page.qtpl:146
-		}
-//line views/page.qtpl:146
-		qw422016.N().S(`
-                    <div class="toast-content">
-                        `)
-//line views/page.qtpl:148
-		if f.Title != "" {
-//line views/page.qtpl:148
-			qw422016.N().S(`
-                        <h3 class="alert-title">`)
-//line views/page.qtpl:149
-			qw422016.E().S(f.Title)
-//line views/page.qtpl:149
-			qw422016.N().S(`</h3>
-                        `)
-//line views/page.qtpl:150
-		}
-//line views/page.qtpl:150
-		qw422016.N().S(`
-                        `)
-//line views/page.qtpl:151
-		qw422016.E().S(f.Body)
-//line views/page.qtpl:151
-		qw422016.N().S(`
-                    </div>
-                    <button class="close" type="button" aria-label="Close"
-                        data-dismiss="toast"
-                        `)
-//line views/page.qtpl:155
-		if f.DismissAfter != 0 {
-//line views/page.qtpl:155
-			qw422016.N().S(`
-                        data-delay="`)
-//line views/page.qtpl:156
-			qw422016.N().DL(f.DismissAfter.Milliseconds())
-//line views/page.qtpl:156
-			qw422016.N().S(`"
-                        `)
-//line views/page.qtpl:157
-		} else {
-//line views/page.qtpl:157
-			qw422016.N().S(`
-                        data-autohide="false"
-                        `)
-//line views/page.qtpl:159
-		}
-//line views/page.qtpl:159
-		qw422016.N().S(`
-                    >
-                        <i class="if if-close"></i>
-                    </button>
-                </div>
-            </div>
             `)
-//line views/page.qtpl:165
+//line views/page.qtpl:135
+		StreamFlash(qw422016, f)
+//line views/page.qtpl:135
+		qw422016.N().S(`
+            `)
+//line views/page.qtpl:136
 	}
-//line views/page.qtpl:165
+//line views/page.qtpl:136
 	qw422016.N().S(`
         </div>
     </body>
     </html>
 `)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 }
 
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 func WritePage(qq422016 qtio422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	StreamPage(qw422016, c, v)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	qt422016.ReleaseWriter(qw422016)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 }
 
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 func Page(c *ctx.Ctx, v PageView) string {
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	WritePage(qb422016, c, v)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	qs422016 := string(qb422016.B)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 	return qs422016
-//line views/page.qtpl:169
+//line views/page.qtpl:140
 }
 
-//line views/page.qtpl:171
+//line views/page.qtpl:142
 func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:171
+//line views/page.qtpl:142
 	qw422016.N().S(`
     <!DOCTYPE html>
     <html class="u-maximize-height" dir="ltr" lang="en">
@@ -398,24 +320,24 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex">
         <link rel="stylesheet" href="`)
-//line views/page.qtpl:179
+//line views/page.qtpl:150
 	qw422016.E().S(c.AssetPath("/css/app.css"))
-//line views/page.qtpl:179
+//line views/page.qtpl:150
 	qw422016.N().S(`" data-turbo-track="reload">
         <link rel="icon" href="`)
-//line views/page.qtpl:180
+//line views/page.qtpl:151
 	qw422016.E().S(c.AssetPath("/favicon.ico"))
-//line views/page.qtpl:180
+//line views/page.qtpl:151
 	qw422016.N().S(`" data-turbo-track="reload">
         <script type="application/javascript" src="`)
-//line views/page.qtpl:181
+//line views/page.qtpl:152
 	qw422016.E().S(c.AssetPath("/js/app.js"))
-//line views/page.qtpl:181
+//line views/page.qtpl:152
 	qw422016.N().S(`" data-turbo-track="reload"></script>
         <title>`)
-//line views/page.qtpl:182
+//line views/page.qtpl:153
 	v.StreamTitle(qw422016, c)
-//line views/page.qtpl:182
+//line views/page.qtpl:153
 	qw422016.N().S(`</title>
     </head>
 
@@ -431,27 +353,27 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item">
                                                 <a href="`)
-//line views/page.qtpl:196
+//line views/page.qtpl:167
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:196
+//line views/page.qtpl:167
 	qw422016.N().S(`">
                                                     <img class="d-none d-lg-inline-block" src="`)
-//line views/page.qtpl:197
+//line views/page.qtpl:168
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-logo.svg"))
-//line views/page.qtpl:197
+//line views/page.qtpl:168
 	qw422016.N().S(`" alt="Ghent University Library">
                                                     <img class="d-inline-block d-lg-none" src="`)
-//line views/page.qtpl:198
+//line views/page.qtpl:169
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-mark.svg"))
-//line views/page.qtpl:198
+//line views/page.qtpl:169
 	qw422016.N().S(`" alt="Ghent University Library">
                                                 </a>
                                             </li>
                                             <li class="breadcrumb-item" aria-current="page">
                                                 <a href="`)
-//line views/page.qtpl:202
+//line views/page.qtpl:173
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:202
+//line views/page.qtpl:173
 	qw422016.N().S(`">Home</a>
                                             </li>
                                         </ol>
@@ -470,9 +392,9 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                 </header>
                 <main>
                     `)
-//line views/page.qtpl:219
+//line views/page.qtpl:190
 	v.StreamContent(qw422016, c)
-//line views/page.qtpl:219
+//line views/page.qtpl:190
 	qw422016.N().S(`
                 </main>
             </div>
@@ -480,31 +402,31 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
     </body>
     </html>
 `)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 }
 
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 func WritePublicPage(qq422016 qtio422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	StreamPublicPage(qw422016, c, v)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	qt422016.ReleaseWriter(qw422016)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 }
 
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 func PublicPage(c *ctx.Ctx, v PageView) string {
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	WritePublicPage(qb422016, c, v)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	qs422016 := string(qb422016.B)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 	return qs422016
-//line views/page.qtpl:225
+//line views/page.qtpl:196
 }

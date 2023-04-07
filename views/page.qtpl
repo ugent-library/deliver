@@ -132,36 +132,7 @@ interface PageView {
 
         <div id="flash-messages">
             {% for _, f := range c.Flash %}
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-body">
-                    {% switch f.Type %}
-                    {% case "success" %}
-                    <i class="if if--success if-check-circle-fill"></i>
-                    {% case "info" %}
-                    <i class="if if--primary if-info-circle-filled"></i>
-                    {% case "warning" %}
-                    <i class="if if--warning if-alert-fill"></i>
-                    {% case "error" %}
-                    <i class="if if--error if-error-circle-fill"></i>
-                    {% endswitch %}
-                    <div class="toast-content">
-                        {% if f.Title != "" %}
-                        <h3 class="alert-title">{%s f.Title %}</h3>
-                        {% endif %}
-                        {%s f.Body %}
-                    </div>
-                    <button class="close" type="button" aria-label="Close"
-                        data-dismiss="toast"
-                        {% if f.DismissAfter != 0 %}
-                        data-delay="{%dl f.DismissAfter.Milliseconds() %}"
-                        {% else %}
-                        data-autohide="false"
-                        {% endif %}
-                    >
-                        <i class="if if-close"></i>
-                    </button>
-                </div>
-            </div>
+            {%= Flash(f) %}
             {% endfor %}
         </div>
     </body>

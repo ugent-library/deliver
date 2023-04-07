@@ -1,9 +1,7 @@
-import toast from './toast.js'
 import formSubmit from './form_submit.js'
 import formUploadProgress from './form_upload_progress.js'
 
 window.addEventListener("DOMContentLoaded", (evt) => {
-    toast(document)
     formSubmit(document)
     formUploadProgress(document)
 })
