@@ -17,7 +17,7 @@ type CookieJar struct {
 	responseCookies map[string]responseCookie
 }
 
-func NewCookieJar(cookies []*http.Cookie) *CookieJar {
+func New(cookies []*http.Cookie) *CookieJar {
 	return &CookieJar{
 		cookies: cookies,
 	}
@@ -71,19 +71,22 @@ func (j *CookieJar) Delete(name string) {
 
 func (j *CookieJar) Write(w http.ResponseWriter) error {
 	for name, c := range j.responseCookies {
-		var value string
-		if v, ok := c.data.(string); ok {
-			value = v
-		} else {
+		var val string
+		switch v := c.data.(type) {
+		case string:
+			val = v
+		case []byte:
+			val = string(v)
+		default:
 			b, err := json.Marshal(c.data)
 			if err != nil {
 				return err
 			}
-			value = base64.URLEncoding.EncodeToString(b)
+			val = base64.URLEncoding.EncodeToString(b)
 		}
 		http.SetCookie(w, &http.Cookie{
 			Name:     name,
-			Value:    value,
+			Value:    val,
 			Expires:  c.expires,
 			HttpOnly: true,
 			Path:     "/",
