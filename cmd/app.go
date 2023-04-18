@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
+	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/middleware"
@@ -88,6 +89,11 @@ var appCmd = &cobra.Command{
 			// TODO turbo secret config
 			Secret: []byte(config.CookieSecret),
 		})
+		// htmx message hub
+		hub := htmx.NewHub(htmx.Config{
+			// TODO turbo secret config
+			Secret: []byte(config.CookieSecret),
+		})
 
 		// controllers
 		errs := c.NewErrors()
@@ -105,6 +111,7 @@ var appCmd = &cobra.Command{
 			Permissions:  permissions,
 			Assets:       assets,
 			Turbo:        turboHub,
+			Hub:          hub,
 		})
 
 		// router middleware
@@ -146,6 +153,10 @@ var appCmd = &cobra.Command{
 		mux.HandleFunc("/turbo", func(w http.ResponseWriter, r *http.Request) {
 			// TODO handle error
 			turboHub.HandleSSE(w, r, r.URL.Query().Get("streams"))
+		})
+		mux.HandleFunc("/sse", func(w http.ResponseWriter, r *http.Request) {
+			// TODO handle error
+			hub.HandleSSE(w, r, r.URL.Query().Get("channels"))
 		})
 		mux.Handle("/", r)
 

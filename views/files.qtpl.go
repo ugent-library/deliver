@@ -30,7 +30,7 @@ var (
 func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
 //line views/files.qtpl:5
 	qw422016.N().S(`
-<div class="card w-100 mb-6" id="files" data-controller="base">
+<div class="card w-100 mb-6" id="files">
     <div class="card-header">
         <div class="bc-toolbar">
             <div class="bc-toolbar-left">
@@ -127,18 +127,27 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
                     </td>
                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                         <div class="c-button-toolbar flex-nowrap">
-                            <button class="btn btn-link" data-toggle="modal" data-target="#confirm-delete-file-`)
-//line views/files.qtpl:59
-			qw422016.E().S(f.ID)
-//line views/files.qtpl:59
-			qw422016.N().S(`">
+                            <button class="btn btn-link"
+                                 hx-delete="`)
+//line views/files.qtpl:60
+			qw422016.E().S(c.PathTo("delete_file", "fileID", f.ID).String())
+//line views/files.qtpl:60
+			qw422016.N().S(`"
+                                 data-confirm="true"
+                                 data-confirm-header='Are you sure you want to delete the file<br><strong>`)
+//line views/files.qtpl:62
+			qw422016.E().S(f.Name)
+//line views/files.qtpl:62
+			qw422016.N().S(`</strong>?'
+                                 data-confirm-proceed='Yes, delete this file'
+                            >
                                 <i class="if if-delete"></i>
                                 <span class="btn-text">Delete</span>
                             </button>
                             <a class="btn btn-link" href="`)
-//line views/files.qtpl:63
+//line views/files.qtpl:68
 			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
-//line views/files.qtpl:63
+//line views/files.qtpl:68
 			qw422016.N().S(`">
                                 <i class="if if-download"></i>
                                 <span class="btn-text">Download</span>
@@ -147,17 +156,17 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
                     </td>
                 </tr>
                 `)
-//line views/files.qtpl:70
+//line views/files.qtpl:75
 		}
-//line views/files.qtpl:70
+//line views/files.qtpl:75
 		qw422016.N().S(`
             </tbody>
         </table>
     </div>
     `)
-//line views/files.qtpl:74
+//line views/files.qtpl:79
 	} else {
-//line views/files.qtpl:74
+//line views/files.qtpl:79
 		qw422016.N().S(`
     <div class="c-blank-slate c-blank-slate-muted">
         <div class="bc-avatar">
@@ -166,86 +175,37 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
         <p>Upload files to get started</p>
     </div>
     `)
-//line views/files.qtpl:81
+//line views/files.qtpl:86
 	}
-//line views/files.qtpl:81
-	qw422016.N().S(`
-
-    `)
-//line views/files.qtpl:83
-	for _, f := range files {
-//line views/files.qtpl:83
-		qw422016.N().S(`
-    <div id="confirm-delete-file-`)
-//line views/files.qtpl:84
-		qw422016.E().S(f.ID)
-//line views/files.qtpl:84
-		qw422016.N().S(`" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
-                        </div>
-                        <h4>
-                            Are you sure you want to delete the file
-                            <br>
-                            <strong>`)
-//line views/files.qtpl:95
-		qw422016.E().S(f.Name)
-//line views/files.qtpl:95
-		qw422016.N().S(`</strong>?
-                        </h4>
-                        <p>You cannot undo this action.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <form action="`)
-//line views/files.qtpl:102
-		qw422016.E().S(c.PathTo("delete_file", "fileID", f.ID).String())
-//line views/files.qtpl:102
-		qw422016.N().S(`" method="POST" data-turbo="true" data-turbo-stream>
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button class="btn btn-danger" type="submit">Yes, delete this file</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    `)
-//line views/files.qtpl:110
-	}
-//line views/files.qtpl:110
+//line views/files.qtpl:86
 	qw422016.N().S(`
 </div>
 `)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 }
 
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 func WriteFiles(qq422016 qtio422016.Writer, c *ctx.Ctx, files []*models.File) {
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	StreamFiles(qw422016, c, files)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	qt422016.ReleaseWriter(qw422016)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 }
 
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 func Files(c *ctx.Ctx, files []*models.File) string {
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	WriteFiles(qb422016, c, files)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	qs422016 := string(qb422016.B)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 	return qs422016
-//line views/files.qtpl:112
+//line views/files.qtpl:88
 }

@@ -221,11 +221,21 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 </div>
             </div>
 
-            `)
-//line views/show_folder.qtpl:115
+            <div
+                hx-get="`)
+//line views/show_folder.qtpl:116
+	qw422016.E().S(c.PathTo("folder", "folderID", v.Folder.ID).String())
+//line views/show_folder.qtpl:116
+	qw422016.N().S(`"
+                hx-swap="innerHTML"
+                hx-trigger="refresh-files from:body"
+            >
+                `)
+//line views/show_folder.qtpl:120
 	StreamFiles(qw422016, c, v.Folder.Files)
-//line views/show_folder.qtpl:115
+//line views/show_folder.qtpl:120
 	qw422016.N().S(`
+            </div>
         </div>
     </div>
 
@@ -268,31 +278,31 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </li>
     </template>
 `)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 }
 
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 func (v *ShowFolder) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	v.StreamContent(qw422016, c)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	qt422016.ReleaseWriter(qw422016)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 }
 
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 func (v *ShowFolder) Content(c *ctx.Ctx) string {
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	v.WriteContent(qb422016, c)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	qs422016 := string(qb422016.B)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 	return qs422016
-//line views/show_folder.qtpl:157
+//line views/show_folder.qtpl:163
 }

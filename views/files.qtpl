@@ -3,7 +3,7 @@
 {% import "github.com/ugent-library/deliver/models" %}
 
 {% func Files(c *ctx.Ctx, files []*models.File) %}
-<div class="card w-100 mb-6" id="files" data-controller="base">
+<div class="card w-100 mb-6" id="files">
     <div class="card-header">
         <div class="bc-toolbar">
             <div class="bc-toolbar-left">
@@ -56,7 +56,12 @@
                     </td>
                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                         <div class="c-button-toolbar flex-nowrap">
-                            <button class="btn btn-link" data-toggle="modal" data-target="#confirm-delete-file-{%s f.ID %}">
+                            <button class="btn btn-link"
+                                 hx-delete="{%s c.PathTo("delete_file", "fileID", f.ID).String() %}"
+                                 data-confirm="true"
+                                 data-confirm-header='Are you sure you want to delete the file<br><strong>{%s f.Name %}</strong>?'
+                                 data-confirm-proceed='Yes, delete this file'
+                            >
                                 <i class="if if-delete"></i>
                                 <span class="btn-text">Delete</span>
                             </button>
@@ -79,34 +84,5 @@
         <p>Upload files to get started</p>
     </div>
     {% endif %}
-
-    {% for _, f := range files %}
-    <div id="confirm-delete-file-{%s f.ID %}" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
-                        </div>
-                        <h4>
-                            Are you sure you want to delete the file
-                            <br>
-                            <strong>{%s f.Name %}</strong>?
-                        </h4>
-                        <p>You cannot undo this action.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                    <form action="{%s c.PathTo("delete_file", "fileID", f.ID).String() %}" method="POST" data-turbo="true" data-turbo-stream>
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button class="btn btn-danger" type="submit">Yes, delete this file</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
 </div>
 {% endfunc %}

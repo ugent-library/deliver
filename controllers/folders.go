@@ -11,6 +11,7 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/validate"
@@ -43,12 +44,15 @@ func (h *Folders) Show(c *ctx.Ctx) error {
 		return err
 	}
 
-	if turbo.StreamRequest(c.Req) {
-		return turbo.Render(c.Res, c.Req, http.StatusOK,
-			turbo.RemoveMatch(".modal.show, .modal-backdrop"),
-			turbo.Replace("files", views.Files(c, folder.Files)),
-		)
+	if htmx.Request(c.Req) {
+		return c.HTML(http.StatusOK, views.Files(c, folder.Files))
 	}
+	// if turbo.StreamRequest(c.Req) {
+	// 	return turbo.Render(c.Res, c.Req, http.StatusOK,
+	// 		turbo.RemoveMatch(".modal.show, .modal-backdrop"),
+	// 		turbo.Replace("files", views.Files(c, folder.Files)),
+	// 	)
+	// }
 
 	return c.HTML(http.StatusOK, views.Page(c, &views.ShowFolder{
 		Folder:      folder,

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/views"
@@ -66,7 +67,15 @@ func (h *Files) Delete(c *ctx.Ctx) error {
 			DismissAfter: 3 * time.Second,
 		})),
 	)
-	c.RedirectTo("folder", "folderID", file.FolderID)
+
+	htmx.AddTrigger(c.Res, "refresh-files")
+	// htmx.Location(c.Res, htmx.LocationConfig{
+	// 	Path:   c.PathTo("folder", "folderID", file.FolderID).String(),
+	// 	Target: "#files",
+	// 	Swap:   "outerHTML",
+	// })
+
+	// c.RedirectTo("folder", "folderID", file.FolderID)
 
 	return nil
 }

@@ -112,7 +112,13 @@ type ShowFolder struct {
                 </div>
             </div>
 
-            {%= Files(c, v.Folder.Files) %}
+            <div
+                hx-get="{%s c.PathTo("folder", "folderID", v.Folder.ID).String() %}"
+                hx-swap="innerHTML"
+                hx-trigger="refresh-files from:body"
+            >
+                {%= Files(c, v.Folder.Files) %}
+            </div>
         </div>
     </div>
 

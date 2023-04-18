@@ -22,7 +22,7 @@ interface PageView {
         <title>{%s v.Title(c) %}</title>
     </head>
 
-    <body class="u-maximize-height overflow-hidden u-scroll-wrapper" data-controller="base">
+    <body class="u-maximize-height overflow-hidden u-scroll-wrapper" data-controller="base" hx-swap="none">
         <header>
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">
@@ -135,6 +135,28 @@ interface PageView {
             {%= Flash(f) %}
             {% endfor %}
         </div>
+
+        <template id="modal-confirm">
+            <div class="modal fade" aria-modal="true" aria-hidden="true" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="c-blank-slate c-blank-slate-muted">
+                                <div class="bc-avatar">
+                                    <i class="if if-alert"></i>
+                                </div>
+                                <h4 class="confirm-header">Are you sure?</h4>
+                                <p>You cannot undo this action.</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                            <button class="btn btn-danger confirm-proceed" data-dismiss="modal">Yes, proceed</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
     </body>
     </html>
 {% endfunc %}
@@ -190,7 +212,7 @@ interface PageView {
                     {%= v.Content(c) %}
                 </main>
             </div>
-        </div>  
+        </div>
     </body>
     </html>
 {% endfunc %}
