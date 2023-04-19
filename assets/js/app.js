@@ -1,37 +1,23 @@
-import formSubmit from './form_submit.js'
-import formUploadProgress from './form_upload_progress.js'
-
-window.addEventListener("DOMContentLoaded", (evt) => {
-    formSubmit(document)
-    formUploadProgress(document)
-})
-
-// import '@hotwired/turbo'
-// Turbo.session.drive = false
-
-// import { Application } from "@hotwired/stimulus"
-// import BaseController from "./controllers/base_controller"
-// import ClipboardController from "./controllers/clipboard_controller"
-// import ToastController from "./controllers/toast_controller"
-
-// const app = Application.start()
-// app.register("base", BaseController)
-// app.register("clipboard", ClipboardController)
-// app.register("toast", ToastController)
-
-// old above, new below
 
 import htmx from 'htmx.org'
 import bsn from 'bootstrap.native/dist/bootstrap-native-v4'
-import bsnPopper from './lib/bsn_popper.js'
+import bsnPopper from './bsn_popper.js'
+import formSubmit from './form_submit.js'
+import formUploadProgress from './form_upload_progress.js'
 
 window.htmx = htmx
+require('htmx.org/dist/ext/ws.js');
 
 htmx.config.defaultFocusScroll = true
 
 htmx.onLoad(function(el) {
     bsn.initCallback(el)
     bsnPopper(el)
+    el.querySelectorAll('[data-dismiss="toast"]').forEach((el) => {
+        el.Toast.show()
+    })
+    formSubmit(el)
+    formUploadProgress(el)
 })
 
 htmx.on('htmx:config-request', (evt) => {

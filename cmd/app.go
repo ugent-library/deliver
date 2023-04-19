@@ -17,7 +17,6 @@ import (
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -84,11 +83,6 @@ var appCmd = &cobra.Command{
 		r.StrictSlash(true)
 		r.UseEncodedPath()
 
-		// turbo
-		turboHub := turbo.NewHub(turbo.Config{
-			// TODO turbo secret config
-			Secret: []byte(config.CookieSecret),
-		})
 		// htmx message hub
 		hub := htmx.NewHub(htmx.Config{
 			// TODO turbo secret config
@@ -110,7 +104,6 @@ var appCmd = &cobra.Command{
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
 			Assets:       assets,
-			Turbo:        turboHub,
 			Hub:          hub,
 		})
 
@@ -150,13 +143,9 @@ var appCmd = &cobra.Command{
 
 		mux := http.NewServeMux()
 		mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-		mux.HandleFunc("/turbo", func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 			// TODO handle error
-			turboHub.HandleSSE(w, r, r.URL.Query().Get("streams"))
-		})
-		mux.HandleFunc("/sse", func(w http.ResponseWriter, r *http.Request) {
-			// TODO handle error
-			hub.HandleSSE(w, r, r.URL.Query().Get("channels"))
+			hub.HandleWebSocket(w, r, r.URL.Query().Get("channels"))
 		})
 		mux.Handle("/", r)
 

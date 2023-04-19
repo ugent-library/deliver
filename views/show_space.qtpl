@@ -15,9 +15,10 @@ type ShowSpace struct {
 {% func (v *ShowSpace) Title(c *ctx.Ctx) %}{%s v.Space.Name %}{% endfunc %}
 
 {% func (v *ShowSpace) Content(c *ctx.Ctx) %}
-    {%s= c.TurboStreamTag("space."+v.Space.ID) %}
-
-    <div class="c-sub-sidebar c-sidebar--bordered">
+    <div class="c-sub-sidebar c-sidebar--bordered"
+        hx-ext="ws"
+        ws-connect="{%s c.WebSocketPath("space."+v.Space.ID) %}"
+    >
         <div class="bc-navbar bc-navbar--xlarge bc-navbar--bordered-bottom">
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
@@ -151,20 +152,15 @@ type ShowSpace struct {
                                     <a href="{%s c.PathTo("folder", "folderID", f.ID).String() %}">{%s f.Name %}</a>
                                 </td>
                                 <td class="text-nowrap">
-                                    <div class="input-group" style="min-width: 375px;" data-controller="clipboard">
+                                    <div class="input-group" style="min-width: 375px;">
                                         <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                data-action="clipboard#copy"
-                                                data-clipboard-target="button"
-                                            >
+                                            <button type="button" class="btn btn-outline-secondary">
                                                 <i class="if if-copy text-primary"></i>
                                                 <span class="btn-text">Copy link</span>
                                             </button>
                                         </div>
                                         <input type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
                                             value="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
-                                            data-action="click->clipboard#select"
-                                            data-clipboard-target="source"
                                         >
                                     </div>
                                 </td>

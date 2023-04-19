@@ -75,7 +75,7 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 	qw422016.N().S(`</title>
     </head>
 
-    <body class="u-maximize-height overflow-hidden u-scroll-wrapper" data-controller="base" hx-swap="none">
+    <body class="u-maximize-height overflow-hidden u-scroll-wrapper" hx-swap="none">
         <header>
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">

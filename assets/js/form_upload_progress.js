@@ -118,7 +118,7 @@ export default function(rootEl) {
                   // file created
                   if (req.status == 200 || req.status == 201) {
                     tmpl.parentElement.removeChild(tmpl)
-                    // Turbo.renderStreamMessage(req.response)
+                    htmx.process(req.response)
                   }
 
                   /*

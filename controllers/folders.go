@@ -13,7 +13,6 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
@@ -95,8 +94,6 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 		return errors.Join(httperror.BadRequest, err)
 	}
 
-	oldName := folder.Name
-
 	folder.Name = b.Name
 
 	if err := h.repo.UpdateFolder(c.Context(), folder); err != nil {
@@ -110,20 +107,6 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 		}))
 	}
 
-	c.Turbo.Send("space."+folder.Space.ID,
-		turbo.Append("flash-messages", views.Flash(ctx.Flash{
-			Type:         "info",
-			Body:         fmt.Sprintf("%s just renamed the folder %s to %s.", c.User.Name, oldName, folder.Name),
-			DismissAfter: 3 * time.Second,
-		})),
-	)
-	c.Turbo.Send("folder."+folder.ID,
-		turbo.Append("flash-messages", views.Flash(ctx.Flash{
-			Type:         "info",
-			Body:         fmt.Sprintf("%s just renamed this folder to %s.", c.User.Name, folder.Name),
-			DismissAfter: 3 * time.Second,
-		})),
-	)
 	c.RedirectTo("folder", "folderID", folder.ID)
 
 	return nil
@@ -145,20 +128,16 @@ func (h *Folders) Delete(c *ctx.Ctx) error {
 		return err
 	}
 
-	c.Turbo.Send("space."+folder.Space.ID,
-		turbo.Append("flash-messages", views.Flash(ctx.Flash{
-			Type:         "info",
-			Body:         fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
-			DismissAfter: 3 * time.Second,
-		})),
-	)
-	c.Turbo.Send("folder."+folder.ID,
-		turbo.Append("flash-messages", views.Flash(ctx.Flash{
-			Type:         "error",
-			Body:         fmt.Sprintf("%s just deleted this folder.", c.User.Name),
-			DismissAfter: 3 * time.Second,
-		})),
-	)
+	c.Hub.Send("space."+folder.Space.ID, views.AddFlash(ctx.Flash{
+		Type:         "info",
+		Body:         fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
+		DismissAfter: 3 * time.Second,
+	}))
+	c.Hub.Send("folder."+folder.ID, views.AddFlash(ctx.Flash{
+		Type:         "error",
+		Body:         fmt.Sprintf("%s just deleted this folder.", c.User.Name),
+		DismissAfter: 3 * time.Second,
+	}))
 	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
@@ -212,22 +191,16 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 	}
 
 	// reload folder
-	folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
+	// folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	c.Turbo.Send("folder."+folder.ID,
-		turbo.Append("flash-messages", views.Flash(ctx.Flash{
-			Type:         "info",
-			Body:         fmt.Sprintf("%s just added the file %s.", c.User.Name, file.Name),
-			DismissAfter: 3 * time.Second,
-		})),
-	)
-	return turbo.Render(c.Res, c.Req, http.StatusOK,
-		turbo.Replace("files", views.Files(c, folder.Files)),
-	)
+	// return turbo.Render(c.Res, c.Req, http.StatusOK,
+	// 	turbo.Replace("files", views.Files(c, folder.Files)),
+	// )
+	return nil
 }
 
 func (h *Folders) Share(c *ctx.Ctx) error {

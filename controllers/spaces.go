@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
@@ -145,13 +143,6 @@ func (h *Spaces) CreateFolder(c *ctx.Ctx) error {
 		return h.show(c, folder, err)
 	}
 
-	c.Turbo.Send("space."+space.ID,
-		turbo.Append("flash-messages", views.Flash(ctx.Flash{
-			Type:         "info",
-			Body:         fmt.Sprintf("%s just created the folder %s.", c.User.Name, folder.Name),
-			DismissAfter: 3 * time.Second,
-		})),
-	)
 	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder created succesfully",

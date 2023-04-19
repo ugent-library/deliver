@@ -12,9 +12,10 @@ type ShowFolder struct {
 {% func (v *ShowFolder) Title(c *ctx.Ctx) %}{%s v.Folder.Name %}{% endfunc %}
 
 {% func (v *ShowFolder) Content(c *ctx.Ctx) %}
-    {%s= c.TurboStreamTag("folder."+v.Folder.ID) %}
-
-    <div class="w-100 u-scroll-wrapper">
+    <div class="w-100 u-scroll-wrapper"
+        hx-ext="ws"
+        ws-connect="{%s c.WebSocketPath("folder."+v.Folder.ID) %}"
+    >
         <div class="bg-white">
             <div class="border-bottom py-5 px-6">
                 <div class="bc-toolbar bc-toolbar--auto">
@@ -50,20 +51,15 @@ type ShowFolder struct {
                 <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item col-lg-8 col-sm-12 pl-0">
-                            <div class="input-group" data-controller="clipboard">
+                            <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <button type="button" class="btn btn-outline-secondary"
-                                        data-action="clipboard#copy"
-                                        data-clipboard-target="button"
-                                    >
+                                    <button type="button" class="btn btn-outline-secondary">
                                         <i class="if if-copy text-primary"></i>
                                         <span class="btn-text text-primary">Copy public shareable link</span>
                                     </button>
                                 </div>
                                 <input type="text" class="form-control input-select-text" readonly
                                     value="{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
-                                    data-action="click->clipboard#select"
-                                    data-clipboard-target="source"
                                 >
                             </div>
                         </div>

@@ -11,7 +11,6 @@ import (
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/mix"
 	"go.uber.org/zap"
 )
@@ -35,7 +34,6 @@ type Ctx struct {
 	Router   *mux.Router
 	PathVars map[string]string
 	Assets   mix.Manifest
-	Turbo    *turbo.Hub
 	Hub      *htmx.Hub
 }
 
@@ -120,20 +118,11 @@ func (c *Ctx) AddFlash(f Flash) {
 	c.Cookies.Append(flashCookie, f, time.Now().Add(3*time.Minute))
 }
 
-func (c *Ctx) SSEPath(channels ...string) string {
+func (c *Ctx) WebSocketPath(channels ...string) string {
 	h, err := c.Hub.EncryptChannelNames(channels)
 	if err != nil {
 		c.Log.Error(err)
 		return ""
 	}
-	return "/sse?channels=" + h
-}
-
-func (c *Ctx) TurboStreamTag(names ...string) string {
-	cryptedNames, err := c.Turbo.EncryptStreamNames(names)
-	if err != nil {
-		c.Log.Error(err)
-		return ""
-	}
-	return turbo.StreamSourceTag("/turbo?streams=" + cryptedNames)
+	return "/ws?channels=" + url.QueryEscape(h)
 }

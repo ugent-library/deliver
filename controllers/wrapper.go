@@ -10,7 +10,6 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/turbo"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/zaphttp"
@@ -30,7 +29,6 @@ type Config struct {
 	ErrorHandler func(*ctx.Ctx, error)
 	Permissions  *models.Permissions
 	Assets       mix.Manifest
-	Turbo        *turbo.Hub
 	Hub          *htmx.Hub
 }
 
@@ -49,7 +47,6 @@ func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
 				Router:      config.Router,
 				PathVars:    mux.Vars(r),
 				Assets:      config.Assets,
-				Turbo:       config.Turbo,
 				Hub:         config.Hub,
 			}
 			if err := LoadSession(config.UserFunc, c); err != nil {

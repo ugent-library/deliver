@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -99,6 +100,8 @@ func (h *Hub) Send(channel string, msgs ...string) error {
 
 	msg := strings.Join(msgs, "")
 
+	log.Print(msg)
+
 	h.streamsMu.RLock()
 	defer h.streamsMu.RUnlock()
 
@@ -151,6 +154,8 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, channels
 
 	ctx = ws.CloseRead(ctx)
 
+	log.Printf("listening to channels: %+v", channels)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -158,6 +163,7 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, channels
 		case <-c.tooSlow:
 			return ws.Close(websocket.StatusPolicyViolation, ConnectionTooSlowText)
 		case msg := <-c.msgs:
+			log.Print(msg)
 			err := writeWithTimeout(ctx, h.config.WriteTimeout, ws, msg)
 			if err != nil {
 				return err
