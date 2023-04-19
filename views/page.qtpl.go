@@ -57,17 +57,17 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 //line views/page.qtpl:19
 	qw422016.E().S(c.AssetPath("/css/app.css"))
 //line views/page.qtpl:19
-	qw422016.N().S(`" data-turbo-track="reload">
+	qw422016.N().S(`">
         <link rel="icon" href="`)
 //line views/page.qtpl:20
 	qw422016.E().S(c.AssetPath("/favicon.ico"))
 //line views/page.qtpl:20
-	qw422016.N().S(`" data-turbo-track="reload">
+	qw422016.N().S(`">
         <script type="application/javascript" src="`)
 //line views/page.qtpl:21
 	qw422016.E().S(c.AssetPath("/js/app.js"))
 //line views/page.qtpl:21
-	qw422016.N().S(`" data-turbo-track="reload"></script>
+	qw422016.N().S(`"></script>
         <title>`)
 //line views/page.qtpl:22
 	qw422016.E().S(v.Title(c))
@@ -345,17 +345,17 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 //line views/page.qtpl:172
 	qw422016.E().S(c.AssetPath("/css/app.css"))
 //line views/page.qtpl:172
-	qw422016.N().S(`" data-turbo-track="reload">
+	qw422016.N().S(`">
         <link rel="icon" href="`)
 //line views/page.qtpl:173
 	qw422016.E().S(c.AssetPath("/favicon.ico"))
 //line views/page.qtpl:173
-	qw422016.N().S(`" data-turbo-track="reload">
+	qw422016.N().S(`">
         <script type="application/javascript" src="`)
 //line views/page.qtpl:174
 	qw422016.E().S(c.AssetPath("/js/app.js"))
 //line views/page.qtpl:174
-	qw422016.N().S(`" data-turbo-track="reload"></script>
+	qw422016.N().S(`"></script>
         <title>`)
 //line views/page.qtpl:175
 	v.StreamTitle(qw422016, c)

@@ -8,8 +8,6 @@
         "uglify-js": "^3.14.2"
     },
     "dependencies": {
-        "@hotwired/stimulus": "^3.2.1",
-        "@hotwired/turbo": "^7.2.5",
         "bootstrap": "^4.6.0",
         "bootstrap.native": "4.1.0",
         "htmx.org": "^1.9.0",

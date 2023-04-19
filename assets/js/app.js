@@ -2,10 +2,15 @@
 import htmx from 'htmx.org'
 import bsn from 'bootstrap.native/dist/bootstrap-native-v4'
 import bsnPopper from './bsn_popper.js'
+import toast from './toast.js'
 import formSubmit from './form_submit.js'
 import formUploadProgress from './form_upload_progress.js'
+import clipboard from './clipboard.js'
+import selectValue from './select_value.js'
 
 window.htmx = htmx
+
+// load htmx extensions
 require('htmx.org/dist/ext/ws.js');
 
 htmx.config.defaultFocusScroll = true
@@ -13,11 +18,11 @@ htmx.config.defaultFocusScroll = true
 htmx.onLoad(function(el) {
     bsn.initCallback(el)
     bsnPopper(el)
-    el.querySelectorAll('[data-dismiss="toast"]').forEach((el) => {
-        el.Toast.show()
-    })
+    toast(el)
     formSubmit(el)
     formUploadProgress(el)
+    clipboard(el)
+    selectValue(el)
 })
 
 htmx.on('htmx:config-request', (evt) => {

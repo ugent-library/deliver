@@ -85,7 +85,7 @@ var appCmd = &cobra.Command{
 
 		// htmx message hub
 		hub := htmx.NewHub(htmx.Config{
-			// TODO turbo secret config
+			// TODO htmx secret config
 			Secret: []byte(config.CookieSecret),
 		})
 

@@ -12,7 +12,7 @@ import (
 
 var ErrInvalidChannelNames = errors.New("invalid channel names")
 
-// EncryptChannelNames encrypts turbo Channel names with AES GCM for safe client
+// EncryptChannelNames encrypts htmx channel names with AES GCM for safe client
 // side use. The encrypted string is url safe.
 // See https://github.com/gtank/cryptopasta/blob/master/encrypt.go
 // and https://www.alexedwards.net/blog/working-with-cookies-in-go#encrypted-cookies
@@ -48,7 +48,7 @@ func EncryptChannelNames(secret []byte, names []string) (string, error) {
 	return base64.URLEncoding.EncodeToString(cryptedMsg), nil
 }
 
-// DecryptChannelNames decrypts turbo Channel names with AES GCM by EncryptChannelNames.
+// DecryptChannelNames decrypts htmx channel names with AES GCM by EncryptChannelNames.
 func DecryptChannelNames(secret []byte, names string) ([]string, error) {
 	// Decode base64.
 	cryptedMsg, err := base64.URLEncoding.DecodeString(names)

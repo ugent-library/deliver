@@ -154,13 +154,16 @@ type ShowSpace struct {
                                 <td class="text-nowrap">
                                     <div class="input-group" style="min-width: 375px;">
                                         <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-outline-secondary">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                data-clipboard="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
+                                            >
                                                 <i class="if if-copy text-primary"></i>
                                                 <span class="btn-text">Copy link</span>
                                             </button>
                                         </div>
-                                        <input type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
+                                        <input id="" type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
                                             value="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
+                                            data-select-value
                                         >
                                     </div>
                                 </td>

@@ -118,7 +118,11 @@ export default function(rootEl) {
                   // file created
                   if (req.status == 200 || req.status == 201) {
                     tmpl.parentElement.removeChild(tmpl)
-                    htmx.process(req.response)
+                    let filesBody = document.getElementById('files')
+                    filesBody.innerHTML = req.response
+                    // trigger htmx on newly added elements
+                    htmx.process(filesBody)
+                    htmx.trigger(filesBody, 'htmx:load')
                   }
 
                   /*
