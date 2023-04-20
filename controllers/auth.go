@@ -3,6 +3,7 @@ package controllers
 import (
 	"time"
 
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/oidc"
 )
@@ -19,7 +20,7 @@ func NewAuth(repo models.RepositoryService, oidcAuth *oidc.Auth) *Auth {
 	}
 }
 
-func (h *Auth) Callback(c *Ctx) error {
+func (h *Auth) Callback(c *ctx.Ctx) error {
 	claims := oidc.Claims{}
 	if err := h.oidcAuth.CompleteAuth(c.Res, c.Req, &claims); err != nil {
 		return err
@@ -38,11 +39,11 @@ func (h *Auth) Callback(c *Ctx) error {
 	return nil
 }
 
-func (h *Auth) Login(c *Ctx) error {
+func (h *Auth) Login(c *ctx.Ctx) error {
 	return h.oidcAuth.BeginAuth(c.Res, c.Req)
 }
 
-func (h *Auth) Logout(c *Ctx) error {
+func (h *Auth) Logout(c *ctx.Ctx) error {
 	c.Cookies.Delete(rememberCookie)
 	if err := h.repo.RenewUserRememberToken(c.Context(), c.User.ID); err != nil {
 		return err

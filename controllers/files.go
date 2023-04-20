@@ -3,8 +3,9 @@ package controllers
 import (
 	"errors"
 	"fmt"
-	"net/http"
 
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/httperror"
 )
@@ -21,22 +22,35 @@ func NewFiles(r models.RepositoryService, f models.FileService) *Files {
 	}
 }
 
-func (h *Files) Download(c *Ctx) error {
+func (h *Files) Download(c *ctx.Ctx) error {
 	fileID := c.Path("fileID")
-	file, err := h.repo.FileByID(c.Context(), fileID)
+
+	_, err := h.repo.FileByID(c.Context(), fileID)
 	if err != nil && errors.Is(err, models.ErrNotFound) {
 		return httperror.NotFound
 	} else if err != nil {
 		return err
 	}
+
 	if err := h.repo.AddFileDownload(c.Context(), fileID); err != nil {
 		return err
 	}
+
+	file, err := h.repo.FileByID(c.Context(), fileID)
+	if err != nil {
+		return err
+	}
+
+	c.Hub.Send("folder."+file.FolderID,
+		fmt.Sprintf(`"<span id="file-%s-downloads">%d</span>`, file.ID, file.Downloads),
+	)
+
 	c.Res.Header().Add("Content-Disposition", fmt.Sprintf("attachment;  filename*=UTF-8''%s", file.Name))
+
 	return h.file.Get(c.Context(), fileID, c.Res)
 }
 
-func (h *Files) Delete(c *Ctx) error {
+func (h *Files) Delete(c *ctx.Ctx) error {
 	fileID := c.Path("fileID")
 
 	file, err := h.repo.FileByID(c.Context(), fileID)
@@ -52,13 +66,7 @@ func (h *Files) Delete(c *Ctx) error {
 		return err
 	}
 
-	// reload folder
-	folder, err := h.repo.FolderByID(c.Context(), file.FolderID)
-	if err != nil {
-		return err
-	}
+	htmx.AddTrigger(c.Res, "refresh-files")
 
-	return c.HTML(http.StatusOK, "", "show_folder/refresh_files", Map{
-		"folder": folder,
-	})
+	return nil
 }

@@ -44,7 +44,7 @@ func Enable(opts ...Option) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			jar := NewCookieJar(r.Cookies())
+			jar := New(r.Cookies())
 			written := false
 
 			w = httpsnoop.Wrap(w, httpsnoop.Hooks{

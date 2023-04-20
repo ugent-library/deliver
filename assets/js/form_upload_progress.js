@@ -7,7 +7,7 @@ export default function(rootEl) {
 
             let target = document.getElementById(input.dataset.uploadProgressTarget)
             let form = input.closest('form')
-            let csrfToken = document.querySelector('meta[name=csrf_token]').content
+            let csrfToken = document.querySelector('meta[name=csrf-token]').content
 
             files.forEach((file, i) => {
                 let tmpl = document.getElementById('tmpl-upload-progress').content.firstElementChild.cloneNode(true)
@@ -65,6 +65,7 @@ export default function(rootEl) {
 
                 // send headers along with request
                 let headers = [
+                  // set in header or middleware tries to read token from form
                   ['X-CSRF-Token', csrfToken],
                   // weird, but makes sure that middleware does not try to read _method from form
                   ['X-HTTP-Method-Override', 'POST'],
@@ -117,13 +118,9 @@ export default function(rootEl) {
 
                   // file created
                   if (req.status == 200 || req.status == 201) {
-
                     tmpl.parentElement.removeChild(tmpl)
-                    let filesBody = document.getElementById('files')
-                    filesBody.innerHTML = req.response
-                    // trigger htmx on newly added elements
-                    htmx.process(filesBody)
-                    htmx.trigger(filesBody, 'htmx:load')
+
+                    htmx.trigger("body", "refresh-files");
                   }
 
                   /*

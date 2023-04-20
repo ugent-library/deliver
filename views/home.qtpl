@@ -1,0 +1,85 @@
+{% import "github.com/ugent-library/deliver/ctx" %}
+
+{% code
+type Home struct {}
+%}
+
+{% func (v *Home) Title(c *ctx.Ctx) %}Deliver{% endfunc %}
+
+{% func (v *Home) Content(c *ctx.Ctx) %}
+    <div class="w-100 u-scroll-wrapper">
+        <div class="u-scroll-wrapper__body p-8">
+            <div class="bc-toolbar bc-toolbar--auto align-items-start">
+                <div class="bc-toolbar-left">
+                    <div class="bc-toolbar-item">
+                        <h1>Deliver</h1>
+                        <p class="c-intro">Supporting library services for UGent Librarians.</p>
+                    </div>
+                </div>
+                <div class="bc-toolbar-right">
+                    <div class="bc-toolbar-item">
+                        <a class="btn btn-primary" href="{%s c.PathTo("login").String() %}">
+                            <i class="if if-arrow-right mt-0 ml-2"></i>
+                            <span class="btn-text mr-2">Log in</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-8">
+                <div class="col-12 col-lg-6 mb-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="bc-avatar-and-text mb-6">
+                                <div class="bc-avatar bc-avatar--medium bc-avatar--rounded bc-avatar--light-blue">
+                                    <i class="if if-copy"></i>
+                                </div>
+                                <div class="bc-avatar-text">
+                                    <h3>Share folders</h3>
+                                </div>
+                            </div>
+                            <p class="text-muted">Create temporary folders to share
+                            library specific documents with the
+                            library&nbsp;public.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 mb-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="bc-avatar-and-text mb-6">
+                                <div class="bc-avatar bc-avatar--medium bc-avatar--rounded bc-avatar--light-blue">
+                                    <i class="if if-file"></i>
+                                </div>
+                                <div class="bc-avatar-text">
+                                    <h3>Upload &amp; monitor documents</h3>
+                                </div>
+                            </div>
+                            <p class="text-muted">Upload any type of document, up to
+                            2GB. See whether documents have been
+                            downloaded&nbsp;already.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 mb-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="bc-avatar-and-text mb-6">
+                                <div class="bc-avatar bc-avatar--medium bc-avatar--rounded bc-avatar--light-blue">
+                                    <i class="if if-edit"></i>
+                                </div>
+                                <div class="bc-avatar-text">
+                                    <h3>Manage folder content &amp; acces</h3>
+                                </div>
+                            </div>
+                            <p class="text-muted">Swap out documents and adapt
+                            expiration dates for folders whenever you
+                            need&nbsp;to.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfunc %}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -9,8 +10,11 @@ import (
 
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/bind"
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
@@ -32,11 +36,24 @@ func NewFolders(r models.RepositoryService, f models.FileService, maxFileSize in
 	}
 }
 
-func (h *Folders) Show(c *Ctx) error {
-	return h.show(c, nil)
+func (h *Folders) Show(c *ctx.Ctx) error {
+	folderID := c.Path("folderID")
+	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	if err != nil {
+		return err
+	}
+
+	if htmx.Request(c.Req) {
+		return c.HTML(http.StatusOK, views.Files(c, folder.Files))
+	}
+
+	return c.HTML(http.StatusOK, views.Page(c, &views.ShowFolder{
+		Folder:      folder,
+		MaxFileSize: h.maxFileSize,
+	}))
 }
 
-func (h *Folders) Edit(c *Ctx) error {
+func (h *Folders) Edit(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -48,13 +65,13 @@ func (h *Folders) Edit(c *Ctx) error {
 		return httperror.Forbidden
 	}
 
-	return c.HTML(http.StatusOK, "layouts/page", "edit_folder", Map{
-		"folder":           folder,
-		"validationErrors": validate.NewErrors(),
-	})
+	return c.HTML(http.StatusOK, views.Page(c, &views.EditFolder{
+		Folder:           folder,
+		ValidationErrors: validate.NewErrors(),
+	}))
 }
 
-func (h *Folders) Update(c *Ctx) error {
+func (h *Folders) Update(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -78,10 +95,10 @@ func (h *Folders) Update(c *Ctx) error {
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
 		}
-		return c.HTML(http.StatusOK, "layouts/page", "edit_folder", Map{
-			"folder":           folder,
-			"validationErrors": validationErrors,
-		})
+		return c.HTML(http.StatusOK, views.Page(c, &views.EditFolder{
+			Folder:           folder,
+			ValidationErrors: validationErrors,
+		}))
 	}
 
 	c.RedirectTo("folder", "folderID", folder.ID)
@@ -89,7 +106,7 @@ func (h *Folders) Update(c *Ctx) error {
 	return nil
 }
 
-func (h *Folders) Delete(c *Ctx) error {
+func (h *Folders) Delete(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -105,7 +122,17 @@ func (h *Folders) Delete(c *Ctx) error {
 		return err
 	}
 
-	c.AddFlash(Flash{
+	c.Hub.Send("space."+folder.Space.ID, views.AddFlash(ctx.Flash{
+		Type:         "info",
+		Body:         fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
+		DismissAfter: 3 * time.Second,
+	}))
+	c.Hub.Send("folder."+folder.ID, views.AddFlash(ctx.Flash{
+		Type:         "error",
+		Body:         fmt.Sprintf("%s just deleted this folder.", c.User.Name),
+		DismissAfter: 3 * time.Second,
+	}))
+	c.AddFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
 		DismissAfter: 3 * time.Second,
@@ -115,7 +142,7 @@ func (h *Folders) Delete(c *Ctx) error {
 	return nil
 }
 
-func (h *Folders) UploadFile(c *Ctx) error {
+func (h *Folders) UploadFile(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
@@ -152,48 +179,16 @@ func (h *Folders) UploadFile(c *Ctx) error {
 
 	file.MD5 = md5
 
-	if err = h.repo.CreateFile(c.Context(), file); err != nil {
-		return h.show(c, err)
-	}
-
-	// reload folder
-	folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
-
-	if err != nil {
-		return err
-	}
-
-	return c.HTML(http.StatusOK, "", "show_folder/files", Map{
-		"folder":      folder,
-		"maxFileSize": h.maxFileSize,
-	})
+	return h.repo.CreateFile(c.Context(), file)
 }
 
-func (h *Folders) Share(c *Ctx) error {
+func (h *Folders) Share(c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 	folder, err := h.repo.FolderByID(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
-	return c.HTML(http.StatusOK, "layouts/public_page", "share_folder", Map{
-		"folder": folder,
-	})
-}
-
-func (h *Folders) show(c *Ctx, err error) error {
-	validationErrors := validate.NewErrors()
-	if err != nil && !errors.As(err, &validationErrors) {
-		return err
-	}
-
-	folderID := c.Path("folderID")
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
-	if err != nil {
-		return err
-	}
-	return c.HTML(http.StatusOK, "layouts/page", "show_folder", Map{
-		"folder":           folder,
-		"validationErrors": validationErrors,
-		"maxFileSize":      h.maxFileSize,
-	})
+	return c.HTML(http.StatusOK, views.PublicPage(c, &views.ShareFolder{
+		Folder: folder,
+	}))
 }

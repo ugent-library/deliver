@@ -3,9 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/csrf"
@@ -17,13 +15,12 @@ import (
 	"github.com/spf13/viper"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
+	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
-	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
@@ -81,23 +78,16 @@ var appCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
-		// setup renderer
-		renderer := render.New(render.Options{
-			Directory:          "templates",
-			Extensions:         []string{".gohtml"},
-			RequirePartials:    true,
-			HTMLTemplateOption: "missingkey=error",
-			Funcs: []template.FuncMap{{
-				"assetPath":     assets.AssetPath,
-				"friendlyBytes": friendly.Bytes,
-				"join":          strings.Join,
-			}},
-		})
-
 		// setup router
 		r := mux.NewRouter()
 		r.StrictSlash(true)
 		r.UseEncodedPath()
+
+		// htmx message hub
+		hub := htmx.NewHub(htmx.Config{
+			// TODO htmx secret config
+			Secret: []byte(config.CookieSecret),
+		})
 
 		// controllers
 		errs := c.NewErrors()
@@ -113,13 +103,24 @@ var appCmd = &cobra.Command{
 			Router:       r,
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
-			Render:       renderer,
+			Assets:       assets,
+			Hub:          hub,
 		})
+
+		// router middleware
+		r.Use(
+			func(next http.Handler) http.Handler {
+				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
+			},
+			crumb.Enable(
+				crumb.WithErrorHandler(func(err error) {
+					logger.Error(err)
+				}),
+			),
+		)
 
 		// routes
 		r.NotFoundHandler = wrap(errs.NotFound)
-		// TODO don't apply all middleware to static file server
-		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
 		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
 		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
@@ -140,8 +141,16 @@ var appCmd = &cobra.Command{
 		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
 		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
 
+		mux := http.NewServeMux()
+		mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+		mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+			// TODO handle error
+			hub.HandleWebSocket(w, r, r.URL.Query().Get("channels"))
+		})
+		mux.Handle("/", r)
+
 		// apply these before request reaches the router
-		handler := middleware.Apply(r,
+		handler := middleware.Apply(mux,
 			middleware.Recover(func(err any) {
 				if config.Production {
 					logger.With(zap.Stack("stack")).Error(err)
@@ -149,9 +158,6 @@ var appCmd = &cobra.Command{
 					logger.Error(err)
 				}
 			}),
-			func(next http.Handler) http.Handler {
-				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
-			},
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
 				[]byte(config.CookieSecret),
@@ -171,11 +177,6 @@ var appCmd = &cobra.Command{
 			}),
 			zaphttp.SetLogger(logger.Desugar()),
 			zaphttp.LogRequests(logger.Desugar()),
-			crumb.Enable(
-				crumb.WithErrorHandler(func(err error) {
-					logger.Error(err)
-				}),
-			),
 		)
 
 		// start server

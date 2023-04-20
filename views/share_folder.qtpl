@@ -1,0 +1,121 @@
+{% import "github.com/ugent-library/friendly" %}
+{% import "github.com/ugent-library/deliver/ctx" %}
+{% import "github.com/ugent-library/deliver/models" %}
+
+{% code
+type ShareFolder struct {
+    Folder *models.Folder
+}
+%}
+
+{% func (v *ShareFolder) Title(c *ctx.Ctx) %}{%s v.Folder.Name %}{% endfunc %}
+
+{% func (v *ShareFolder) Content(c *ctx.Ctx) %}
+    <div class="d-flex u-maximize-height">
+        <div class="w-100 u-scroll-wrapper">
+            <div class="bg-white">
+                <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+                    <div class="w-100">
+                        <div class="bc-toolbar bc-toolbar--auto">
+                            <div class="bc-toolbar-left">
+                                <div class="bc-toolbar-item">
+                                    <h4 class="bc-toolbar-title">Library delivery from {%s v.Folder.Space.Name %}: {%s v.Folder.Name %}</h4>
+                                </div>
+                                <div class="bc-toolbar-item">
+                                    <p>Expires on {%s v.Folder.ExpiresAt.Format("2006-01-02 15:04") %}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bc-toolbar bc-toolbar--auto mt-2">
+                            <div class="bc-toolbar-left">
+                                <div class="bc-toolbar-item">
+                                    <p class="text-muted">
+                                        Public shareable link: {%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="u-scroll-wrapper__body p-6">
+                <div class="card w-100 mb-6">
+                    <div class="card-header">
+                        <div class="bc-toolbar">
+                            <div class="bc-toolbar-left">
+                                <div class="bc-toolbar-item">
+                                    <h5>Download your files before {%s v.Folder.ExpiresAt.Format("2006-01-02 15:04") %}</h5>
+                                </div>
+                            </div>
+                            <div class="bc-toolbar-right">
+                                <div class="bc-toolbar-item">
+                                    <p>{%d len(v.Folder.Files) %} items</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if len(v.Folder.Files) > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap align-middle">File name</th>
+                                    <th class="text-nowrap align-middle">Size</th>
+                                    <th class="text-nowrap align-middle">Type</th>
+                                    <th class="text-nowrap align-middle">Downloads</th>
+                                    <th class="text-nowrap align-middle">Created at</th>
+                                    <th class="table-col-sm-fixed table-col-sm-fixed-right text-right align-middle">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for _, f := range v.Folder.Files %}
+                                <tr class="clickable-table-row">
+                                    <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+                                        <a href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
+                                            <span>{%s f.Name %}</span>
+                                        </a>
+                                        <br><small class="text-muted">md5 checksum: {%s f.MD5 %}</small>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <p>{%s friendly.Bytes(f.Size) %}</p>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <p>{%s f.ContentType %}</p>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <p>{%dl f.Downloads %}</p>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <p>{%s f.CreatedAt.Format("2006-01-02 15:04") %}</p>
+                                    </td>
+                                    <td class="table-col-sm-fixed table-col-sm-fixed-right">
+                                        <div class="c-button-toolbar">
+                                            <a class="btn btn-link" href="{%s c.PathTo("download_file", "fileID", f.ID).String() %}">
+                                                <i class="if if-download"></i>
+                                                <span class="btn-txt">Download</span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="c-blank-slate c-blank-slate-muted">
+                        <div class="bc-avatar">
+                            <i class="if if-info-circle"></i>
+                        </div>
+                        <p>
+                            No files to display.
+                            <br>
+                            Please get in touch with the person that sent you this link.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfunc %}

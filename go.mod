@@ -22,12 +22,15 @@ require (
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
 	github.com/ugent-library/middleware v0.0.0-20230227155910-03965f71a3db
 	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
+	github.com/valyala/quicktemplate v1.7.0
 	go.uber.org/zap v1.24.0
 )
 
 require (
 	github.com/coreos/go-oidc/v3 v3.5.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/klauspost/compress v1.13.5 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
 )
 
@@ -70,7 +73,6 @@ require (
 	github.com/ugent-library/friendly v0.0.0-20230207160741-a7eb22dfe944
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
 	github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2
-	github.com/unrolled/render v1.6.0
 	github.com/zclconf/go-cty v1.13.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
@@ -83,4 +85,5 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	nhooyr.io/websocket v1.8.7
 )
