@@ -65,6 +65,7 @@ export default function(rootEl) {
 
                 // send headers along with request
                 let headers = [
+                  // set in header or middleware tries to read token from form
                   ['X-CSRF-Token', csrfToken],
                   // weird, but makes sure that middleware does not try to read _method from form
                   ['X-HTTP-Method-Override', 'POST'],
