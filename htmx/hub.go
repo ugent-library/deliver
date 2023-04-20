@@ -1,11 +1,8 @@
 package htmx
 
 import (
-	"bufio"
 	"context"
 	"errors"
-	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -33,11 +30,11 @@ type client struct {
 }
 
 type Hub struct {
-	config    Config
-	clients   map[*client]struct{}
-	channels  map[string]map[*client]struct{}
-	clientsMu sync.RWMutex
-	streamsMu sync.RWMutex
+	config     Config
+	clients    map[*client]struct{}
+	channels   map[string]map[*client]struct{}
+	clientsMu  sync.RWMutex
+	channelsMu sync.RWMutex
 }
 
 type Config struct {
@@ -99,8 +96,8 @@ func (h *Hub) Send(channel string, msgs ...string) error {
 
 	msg := strings.Join(msgs, "")
 
-	h.streamsMu.RLock()
-	defer h.streamsMu.RUnlock()
+	h.channelsMu.RLock()
+	defer h.channelsMu.RUnlock()
 
 	if clients, ok := h.channels[channel]; ok {
 		for c := range clients {
@@ -167,75 +164,75 @@ func (h *Hub) connectWebSocket(ctx context.Context, ws *websocket.Conn, channels
 }
 
 // TODO write timeout, error handling
-func (h *Hub) HandleSSE(w http.ResponseWriter, r *http.Request, cryptedChannels string) error {
-	flusher, ok := w.(http.Flusher)
-	if !ok {
-		return ErrStreamingNotSupported
-	}
+// func (h *Hub) HandleSSE(w http.ResponseWriter, r *http.Request, cryptedChannels string) error {
+// 	flusher, ok := w.(http.Flusher)
+// 	if !ok {
+// 		return ErrStreamingNotSupported
+// 	}
 
-	channels, err := h.DecryptChannelNames(cryptedChannels)
-	if err != nil {
-		return err
-	}
+// 	channels, err := h.DecryptChannelNames(cryptedChannels)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	c := &client{
-		channels: channels,
-		msgs:     make(chan string, h.config.MessageBuffer),
-	}
+// 	c := &client{
+// 		channels: channels,
+// 		msgs:     make(chan string, h.config.MessageBuffer),
+// 	}
 
-	h.addClient(c)
-	defer h.removeClient(c)
+// 	h.addClient(c)
+// 	defer h.removeClient(c)
 
-	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
+// 	w.Header().Set("Content-Type", "text/event-stream")
+// 	w.Header().Set("Cache-Control", "no-cache")
+// 	w.Header().Set("Connection", "keep-alive")
 
-	seq := 0
+// 	seq := 0
 
-	for {
-		select {
-		case <-r.Context().Done():
-			return r.Context().Err()
-		case <-c.tooSlow:
-			return nil
-		case msg := <-c.msgs:
-			err = writeMessage(w, seq, "message", msg)
-			if err != nil {
-				return err
-			}
-			flusher.Flush()
-			seq++
-		}
-	}
-}
+// 	for {
+// 		select {
+// 		case <-r.Context().Done():
+// 			return r.Context().Err()
+// 		case <-c.tooSlow:
+// 			return nil
+// 		case msg := <-c.msgs:
+// 			err = writeMessage(w, seq, "message", msg)
+// 			if err != nil {
+// 				return err
+// 			}
+// 			flusher.Flush()
+// 			seq++
+// 		}
+// 	}
+// }
 
-func writeMessage(w io.Writer, id int, event, msg string) error {
-	_, err := fmt.Fprintf(w, "event: %s\nid: %d\n", event, id)
-	if err != nil {
-		return err
-	}
+// func writeMessage(w io.Writer, id int, event, msg string) error {
+// 	_, err := fmt.Fprintf(w, "event: %s\nid: %d\n", event, id)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	scanner := bufio.NewScanner(strings.NewReader(msg))
-	for scanner.Scan() {
-		_, err = fmt.Fprintf(w, "data: %s\n", scanner.Text())
-		if err != nil {
-			return err
-		}
-	}
-	if err = scanner.Err(); err != nil {
-		return err
-	}
+// 	scanner := bufio.NewScanner(strings.NewReader(msg))
+// 	for scanner.Scan() {
+// 		_, err = fmt.Fprintf(w, "data: %s\n", scanner.Text())
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+// 	if err = scanner.Err(); err != nil {
+// 		return err
+// 	}
 
-	_, err = fmt.Fprint(w, "\n")
-	return err
-}
+// 	_, err = fmt.Fprint(w, "\n")
+// 	return err
+// }
 
 func (h *Hub) addClient(c *client) {
 	h.clientsMu.Lock()
 	h.clients[c] = struct{}{}
 	h.clientsMu.Unlock()
 
-	h.streamsMu.Lock()
+	h.channelsMu.Lock()
 	for _, stream := range c.channels {
 		if clients, ok := h.channels[stream]; ok {
 			clients[c] = struct{}{}
@@ -243,11 +240,11 @@ func (h *Hub) addClient(c *client) {
 			h.channels[stream] = map[*client]struct{}{c: {}}
 		}
 	}
-	h.streamsMu.Unlock()
+	h.channelsMu.Unlock()
 }
 
 func (h *Hub) removeClient(c *client) {
-	h.streamsMu.Lock()
+	h.channelsMu.Lock()
 	for _, stream := range c.channels {
 		if clients, ok := h.channels[stream]; ok {
 			delete(clients, c)
@@ -256,7 +253,7 @@ func (h *Hub) removeClient(c *client) {
 			}
 		}
 	}
-	h.streamsMu.Unlock()
+	h.channelsMu.Unlock()
 
 	h.clientsMu.Lock()
 	delete(h.clients, c)

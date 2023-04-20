@@ -46,12 +46,6 @@ func (h *Folders) Show(c *ctx.Ctx) error {
 	if htmx.Request(c.Req) {
 		return c.HTML(http.StatusOK, views.Files(c, folder.Files))
 	}
-	// if turbo.StreamRequest(c.Req) {
-	// 	return turbo.Render(c.Res, c.Req, http.StatusOK,
-	// 		turbo.RemoveMatch(".modal.show, .modal-backdrop"),
-	// 		turbo.Replace("files", views.Files(c, folder.Files)),
-	// 	)
-	// }
 
 	return c.HTML(http.StatusOK, views.Page(c, &views.ShowFolder{
 		Folder:      folder,
@@ -185,22 +179,7 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 
 	file.MD5 = md5
 
-	// TODO
-	if err = h.repo.CreateFile(c.Context(), file); err != nil {
-		return err
-	}
-
-	// reload folder
-	// folder, err = h.repo.FolderByID(c.Context(), file.FolderID)
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// return turbo.Render(c.Res, c.Req, http.StatusOK,
-	// 	turbo.Replace("files", views.Files(c, folder.Files)),
-	// )
-	return nil
+	return h.repo.CreateFile(c.Context(), file)
 }
 
 func (h *Folders) Share(c *ctx.Ctx) error {
