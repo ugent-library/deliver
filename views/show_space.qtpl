@@ -1,3 +1,4 @@
+{% import "time" %}
 {% import "github.com/ugent-library/friendly" %}
 {% import "github.com/ugent-library/deliver/ctx" %}
 {% import "github.com/ugent-library/deliver/models" %}
@@ -169,6 +170,12 @@ type ShowSpace struct {
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{%s f.ExpiresAt.Format("2006-01-02 15:04") %}</p>
+                                    {% if time.Until(f.ExpiresAt) < time.Hour * 24 * 7 %}
+                                    <p class="badge badge-pill badge-default mt-2">
+                                        <i class="if if-info-circle"></I>
+                                        <span class="badge-text">Expires in {%s friendly.TimeRemaining(time.Until(f.ExpiresAt), friendly.EnglishTimeUnits) %}.</span>
+                                    </p>
+                                    {% endif %}
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{%d f.FileCount %} files</p>

@@ -70,7 +70,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	github.com/ugent-library/friendly v0.0.0-20230207160741-a7eb22dfe944
+	github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
 	github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2
 	github.com/zclconf/go-cty v1.13.0 // indirect

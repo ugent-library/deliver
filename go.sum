@@ -320,6 +320,8 @@ github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f h1:KqaSxb7cYVFk
 github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f/go.mod h1:QN9gGk5/ux2xoIia5EQbkw7XdO7yYQ5dG7/p6WSvp0o=
 github.com/ugent-library/friendly v0.0.0-20230207160741-a7eb22dfe944 h1:qG0wVZ4Td+jd5IXtaIozUgZjwy3CmffHSAUgPQTtUAg=
 github.com/ugent-library/friendly v0.0.0-20230207160741-a7eb22dfe944/go.mod h1:KYJUv8cy7qJ9UGCpLpfBYFbtWUNb0MQ5x3H07ofYAQs=
+github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38 h1:guIHiXQJrDSsRq7vnH/9YD7QTOjiG39eEBHPgOIrQo0=
+github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38/go.mod h1:Al0v+CBt6ljkL5U+lyCLq3BQUZLxonIMrbdHbuX3lUI=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20 h1:djFbAZZWAHkbqTmDjOkd1LwnirpiVe4nyp0sp3lQ9Ds=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20/go.mod h1:QuEpmxsRkH6YuLjj1xAS2g1xywDUxxdfuN0bBfkB1oc=
 github.com/ugent-library/middleware v0.0.0-20230227155910-03965f71a3db h1:QibiWLCpHrdq0w2nQW8cnhOjnrxDeasnoq7O/fMh3nU=
