@@ -24,6 +24,15 @@ interface PageView {
 
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper" hx-swap="none">
         <header>
+<!--    Scaffolding for warning message for development environment.
+            {% if eq appMode "development" %}
+                <div class="alert alert-warning mb-0 py-1" role="alert">
+                    <p>
+                        This <strong>development environment</strong> is used for testing new developments. Data entered will not be retained. Get in touch with <a href="mailto:libservice@ugent.be.">libservice@ugent.be</a> for more information.
+                    </p>
+                </div>
+            {% endfunc %} -->
+
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">
                     <div class="bc-toolbar-left">
