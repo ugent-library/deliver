@@ -120,7 +120,7 @@ export default function(rootEl) {
                   if (req.status == 200 || req.status == 201) {
                     tmpl.parentElement.removeChild(tmpl)
 
-                    htmx.trigger("body", "refresh-files");
+                    htmx.trigger("body", "refresh-files")
                   }
 
                   /*
