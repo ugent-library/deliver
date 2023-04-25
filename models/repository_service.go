@@ -398,9 +398,9 @@ func rowToSpace(row *ent.Space) *Space {
 				ExpiresAt: r.ExpiresAt,
 			}
 			if r.Edges.Files != nil {
-				f.FileCount = len(r.Edges.Files)
-				for _, r := range r.Edges.Files {
-					f.Size += r.Size
+				f.Files = make([]*File, len(r.Edges.Files))
+				for i, r := range r.Edges.Files {
+					f.Files[i] = rowToFile(r)
 				}
 			}
 
@@ -423,12 +423,9 @@ func rowToFolder(row *ent.Folder) *Folder {
 		f.Space = rowToSpace(row.Edges.Space)
 	}
 	if row.Edges.Files != nil {
-		f.FileCount = len(row.Edges.Files)
 		f.Files = make([]*File, len(row.Edges.Files))
 		for i, r := range row.Edges.Files {
-			ff := rowToFile(r)
-			f.Size += ff.Size
-			f.Files[i] = ff
+			f.Files[i] = rowToFile(r)
 		}
 	}
 	return f

@@ -178,8 +178,15 @@ type ShowSpace struct {
                                     {% endif %}
                                 </td>
                                 <td class="text-nowrap">
-                                    <p>{%d f.FileCount %} files</p>
-                                    <p class="small">{%s friendly.Bytes(f.Size) %}</p>
+                                    <p>{%d len(f.Files) %} files</p>
+                                    <ul class="c-meta-list c-meta-list-horizontal">
+                                        <li class="c-meta-item">
+                                            <span>{%s friendly.Bytes(f.TotalSize()) %}</span>
+                                        </li>
+                                        <li class="c-meta-item">
+                                            <span>{%dl f.TotalDownloads() %} downloads</span>
+                                        </li>
+                                    </ul>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>{%s f.CreatedAt.Format("2006-01-02 15:04") %}</p>

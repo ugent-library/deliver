@@ -385,35 +385,46 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <td class="text-nowrap">
                                     <p>`)
 //line views/show_space.qtpl:181
-			qw422016.N().D(f.FileCount)
+			qw422016.N().D(len(f.Files))
 //line views/show_space.qtpl:181
 			qw422016.N().S(` files</p>
-                                    <p class="small">`)
-//line views/show_space.qtpl:182
-			qw422016.E().S(friendly.Bytes(f.Size))
-//line views/show_space.qtpl:182
-			qw422016.N().S(`</p>
+                                    <ul class="c-meta-list c-meta-list-horizontal">
+                                        <li class="c-meta-item">
+                                            <span>`)
+//line views/show_space.qtpl:184
+			qw422016.E().S(friendly.Bytes(f.TotalSize()))
+//line views/show_space.qtpl:184
+			qw422016.N().S(`</span>
+                                        </li>
+                                        <li class="c-meta-item">
+                                            <span>`)
+//line views/show_space.qtpl:187
+			qw422016.N().DL(f.TotalDownloads())
+//line views/show_space.qtpl:187
+			qw422016.N().S(` downloads</span>
+                                        </li>
+                                    </ul>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
-//line views/show_space.qtpl:185
+//line views/show_space.qtpl:192
 			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
-//line views/show_space.qtpl:185
+//line views/show_space.qtpl:192
 			qw422016.N().S(`</p>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
-//line views/show_space.qtpl:188
+//line views/show_space.qtpl:195
 			qw422016.E().S(f.UpdatedAt.Format("2006-01-02 15:04"))
-//line views/show_space.qtpl:188
+//line views/show_space.qtpl:195
 			qw422016.N().S(`</p>
                                 </td>
                                 <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                     <div class="c-button-toolbar">
                                         <a class="btn btn-link" href="`)
-//line views/show_space.qtpl:192
+//line views/show_space.qtpl:199
 			qw422016.E().S(c.PathTo("folder", "folderID", f.ID).String())
-//line views/show_space.qtpl:192
+//line views/show_space.qtpl:199
 			qw422016.N().S(`">
                                             <i class="if if-draft"></i>
                                             <span class="btn-text">Open</span>
@@ -422,17 +433,17 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 </td>
                             </tr>
                             `)
-//line views/show_space.qtpl:199
+//line views/show_space.qtpl:206
 		}
-//line views/show_space.qtpl:199
+//line views/show_space.qtpl:206
 		qw422016.N().S(`
                         </tbody>
                     </table>
                 </div>
                 `)
-//line views/show_space.qtpl:203
+//line views/show_space.qtpl:210
 	} else {
-//line views/show_space.qtpl:203
+//line views/show_space.qtpl:210
 		qw422016.N().S(`
                 <div class="c-blank-slate c-blank-slate-muted">
                     <div class="bc-avatar">
@@ -441,39 +452,39 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                     <p>Make a folder to get started</p>
                 </div>
                 `)
-//line views/show_space.qtpl:210
+//line views/show_space.qtpl:217
 	}
-//line views/show_space.qtpl:210
+//line views/show_space.qtpl:217
 	qw422016.N().S(`
             </div>
         </div>
     </div>
 `)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 }
 
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 func (v *ShowSpace) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	v.StreamContent(qw422016, c)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	qt422016.ReleaseWriter(qw422016)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 }
 
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 func (v *ShowSpace) Content(c *ctx.Ctx) string {
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	v.WriteContent(qb422016, c)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	qs422016 := string(qb422016.B)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 	return qs422016
-//line views/show_space.qtpl:214
+//line views/show_space.qtpl:221
 }

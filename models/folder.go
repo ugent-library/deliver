@@ -19,10 +19,22 @@ type Folder struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// relations (can be empty)
-	Size      int64   `json:"size"`
-	FileCount int     `json:"file_count"`
-	Space     *Space  `json:"space,omitempty"`
-	Files     []*File `json:"files,omitempty"`
+	Space *Space  `json:"space,omitempty"`
+	Files []*File `json:"files,omitempty"`
+}
+
+func (f *Folder) TotalSize() (n int64) {
+	for _, file := range f.Files {
+		n += file.Size
+	}
+	return
+}
+
+func (f *Folder) TotalDownloads() (n int64) {
+	for _, file := range f.Files {
+		n += file.Downloads
+	}
+	return
 }
 
 func (f *Folder) Slug() string {
