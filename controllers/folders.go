@@ -123,14 +123,12 @@ func (h *Folders) Delete(c *ctx.Ctx) error {
 	}
 
 	c.Hub.Send("space."+folder.Space.ID, views.AddFlash(ctx.Flash{
-		Type:         "info",
-		Body:         fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
-		DismissAfter: 3 * time.Second,
+		Type: "info",
+		Body: fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
 	}))
 	c.Hub.Send("folder."+folder.ID, views.AddFlash(ctx.Flash{
-		Type:         "error",
-		Body:         fmt.Sprintf("%s just deleted this folder.", c.User.Name),
-		DismissAfter: 3 * time.Second,
+		Type: "error",
+		Body: fmt.Sprintf("%s just deleted this folder.", c.User.Name),
 	}))
 	c.AddFlash(ctx.Flash{
 		Type:         "info",
