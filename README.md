@@ -6,16 +6,20 @@
 
 Deliver is configured with these environment variables:
 
+* `DELIVER_PRODUCTION`
 * `DELIVER_HOST`
 * `DELIVER_PORT`
 * `DELIVER_ADMINS`
 * `DELIVER_REPO_CONN`
+* `DELIVER_STORAGE_BACKEND`
 * `DELIVER_STORAGE_CONN`
 * `DELIVER_OIDC_URL`
 * `DELIVER_OIDC_ID`
 * `DELIVER_OIDC_SECRET`
 * `DELIVER_OIDC_REDIRECT_URL`
 * `DELIVER_COOKIE_SECRET`
+* `DELIVER_MAX_FILE_SIZE`
+* `DELIVER_BANNER`
 
 If a `.env` file is present in the project root, it's environment variables will be loaded.
 
