@@ -83,11 +83,11 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 //line views/page.qtpl:27
 		qw422016.N().S(`
                 <div class="alert alert-warning mb-0 py-1" role="alert">
-                    <p>This <strong>development environment</strong> is used for
-                    testing new features. Data entered will not be retained. Get
-                    in touch with <a
-                    href="mailto:libservice@ugent.be">libservice@ugent.be</a>
-                    for more information.
+                    <p>
+                        <strong>Test environment</strong>: data entered will not
+                        be saved. Contact <a
+                        href="mailto:libservice@ugent.be.">libservice@ugent.be</a>
+                        for more information.
                     </p>
                 </div>
             `)
@@ -383,91 +383,103 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
     </head>
 
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
-        <div class="u-horizontal-scroll h-100 w-100">
-            <div class="u-min-w-750 h-100">
-                <header>
-                    <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
-                        <div class="bc-toolbar bc-toolbar-sm">
-                            <div class="bc-toolbar-left">
-                                <div class="bc-toolbar-item">
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item">
-                                                <a href="`)
-//line views/page.qtpl:200
+        <header>
+            `)
+//line views/page.qtpl:191
+	if c.Banner == "development" {
+//line views/page.qtpl:191
+		qw422016.N().S(`
+                <div class="alert alert-warning mb-0 py-1" role="alert">
+                    <p>
+                        <strong>Test environment</strong>: all files and information in this environment are for testing purposes only.
+                    </p>
+                </div>
+            `)
+//line views/page.qtpl:197
+	}
+//line views/page.qtpl:197
+	qw422016.N().S(`
+
+            <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
+                <div class="bc-toolbar bc-toolbar-sm">
+                    <div class="bc-toolbar-left">
+                        <div class="bc-toolbar-item">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="`)
+//line views/page.qtpl:206
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:200
+//line views/page.qtpl:206
 	qw422016.N().S(`">
-                                                    <img class="d-none d-lg-inline-block" src="`)
-//line views/page.qtpl:201
+                                            <img class="d-none d-lg-inline-block" src="`)
+//line views/page.qtpl:207
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-logo.svg"))
-//line views/page.qtpl:201
+//line views/page.qtpl:207
 	qw422016.N().S(`" alt="Ghent University Library">
-                                                    <img class="d-inline-block d-lg-none" src="`)
-//line views/page.qtpl:202
+                                            <img class="d-inline-block d-lg-none" src="`)
+//line views/page.qtpl:208
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-mark.svg"))
-//line views/page.qtpl:202
+//line views/page.qtpl:208
 	qw422016.N().S(`" alt="Ghent University Library">
-                                                </a>
-                                            </li>
-                                            <li class="breadcrumb-item" aria-current="page">
-                                                <a href="`)
-//line views/page.qtpl:206
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item" aria-current="page">
+                                        <a href="`)
+//line views/page.qtpl:212
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:206
+//line views/page.qtpl:212
 	qw422016.N().S(`">Home</a>
-                                            </li>
-                                        </ol>
-                                    </nav>
-                                </div>
-                            </div>
-                            <div class="bc-toolbar-right">
-                                <div class="bc-toolbar-item">
-                                    <div id="side-panels">
-                                        <ul class="nav nav-main"></ul>
-                                    </div>
-                                </div>
+                                    </li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="bc-toolbar-right">
+                        <div class="bc-toolbar-item">
+                            <div id="side-panels">
+                                <ul class="nav nav-main"></ul>
                             </div>
                         </div>
                     </div>
-                </header>
-                <main>
-                    `)
-//line views/page.qtpl:223
-	v.StreamContent(qw422016, c)
-//line views/page.qtpl:223
-	qw422016.N().S(`
-                </main>
+                </div>
             </div>
-        </div>
+        </header>
+        <main>
+            `)
+//line views/page.qtpl:229
+	v.StreamContent(qw422016, c)
+//line views/page.qtpl:229
+	qw422016.N().S(`
+        </main>
     </body>
     </html>
 `)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 }
 
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 func WritePublicPage(qq422016 qtio422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	StreamPublicPage(qw422016, c, v)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	qt422016.ReleaseWriter(qw422016)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 }
 
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 func PublicPage(c *ctx.Ctx, v PageView) string {
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	WritePublicPage(qb422016, c, v)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	qs422016 := string(qb422016.B)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 	return qs422016
-//line views/page.qtpl:229
+//line views/page.qtpl:233
 }
