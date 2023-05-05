@@ -13,14 +13,16 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
-type Folders struct {
-	repo        models.RepositoryService
-	file        models.FileService
+type FoldersController struct {
+	repo        *repositories.Repo
+	storage     objectstore.Store
 	maxFileSize int64
 }
 
@@ -28,22 +30,22 @@ type FolderForm struct {
 	Name string `form:"name"`
 }
 
-func NewFolders(r models.RepositoryService, f models.FileService, maxFileSize int64) *Folders {
-	return &Folders{
+func NewFoldersController(r *repositories.Repo, s objectstore.Store, maxFileSize int64) *FoldersController {
+	return &FoldersController{
 		repo:        r,
-		file:        f,
+		storage:     s,
 		maxFileSize: maxFileSize,
 	}
 }
 
-func (h *Folders) Show(c *ctx.Ctx) error {
+func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	folder, err := h.repo.Folders.Get(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
 
-	if htmx.Request(c.Req) {
+	if htmx.Request(r) {
 		return c.HTML(http.StatusOK, views.Files(c, folder.Files))
 	}
 
@@ -53,10 +55,10 @@ func (h *Folders) Show(c *ctx.Ctx) error {
 	}))
 }
 
-func (h *Folders) Edit(c *ctx.Ctx) error {
+func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	folder, err := h.repo.Folders.Get(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -71,10 +73,10 @@ func (h *Folders) Edit(c *ctx.Ctx) error {
 	}))
 }
 
-func (h *Folders) Update(c *ctx.Ctx) error {
+func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	folder, err := h.repo.Folders.Get(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -84,13 +86,13 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 	}
 
 	b := FolderForm{}
-	if err := bind.Form(c.Req, &b); err != nil {
+	if err := bind.Form(r, &b); err != nil {
 		return errors.Join(httperror.BadRequest, err)
 	}
 
 	folder.Name = b.Name
 
-	if err := h.repo.UpdateFolder(c.Context(), folder); err != nil {
+	if err := h.repo.Folders.Update(c.Context(), folder); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
@@ -106,10 +108,10 @@ func (h *Folders) Update(c *ctx.Ctx) error {
 	return nil
 }
 
-func (h *Folders) Delete(c *ctx.Ctx) error {
+func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	folder, err := h.repo.Folders.Get(c.Context(), folderID)
 	if err != nil {
 		return err
 	}
@@ -118,7 +120,7 @@ func (h *Folders) Delete(c *ctx.Ctx) error {
 		return httperror.Forbidden
 	}
 
-	if err := h.repo.DeleteFolder(c.Context(), folderID); err != nil {
+	if err := h.repo.Folders.Delete(c.Context(), folderID); err != nil {
 		return err
 	}
 
@@ -140,10 +142,10 @@ func (h *Folders) Delete(c *ctx.Ctx) error {
 	return nil
 }
 
-func (h *Folders) UploadFile(c *ctx.Ctx) error {
+func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
 
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	folder, err := h.repo.Folders.Get(c.Context(), folderID)
 	if err != nil {
 		return httperror.NotFound
 	}
@@ -156,33 +158,33 @@ func (h *Folders) UploadFile(c *ctx.Ctx) error {
 		TODO: retrieve content type by content sniffing
 		without interfering with streaming body
 	*/
-	contentLength, _ := strconv.ParseInt(c.Req.Header.Get("Content-Length"), 10, 64)
+	contentLength, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
 
 	// request header only accepts ISO-8859-1 so we had to escape it
-	uploadFilename, _ := url.QueryUnescape(c.Req.Header.Get("X-Upload-Filename"))
+	uploadFilename, _ := url.QueryUnescape(r.Header.Get("X-Upload-Filename"))
 
 	file := &models.File{
 		FolderID:    folderID,
 		ID:          ulid.Make().String(),
 		Name:        uploadFilename,
-		ContentType: c.Req.Header.Get("Content-Type"),
+		ContentType: r.Header.Get("Content-Type"),
 		Size:        contentLength,
 	}
 
 	// TODO get size
-	md5, err := h.file.Add(c.Context(), file.ID, c.Req.Body)
+	md5, err := h.storage.Add(c.Context(), file.ID, r.Body)
 	if err != nil {
 		return err
 	}
 
 	file.MD5 = md5
 
-	return h.repo.CreateFile(c.Context(), file)
+	return h.repo.Files.Create(c.Context(), file)
 }
 
-func (h *Folders) Share(c *ctx.Ctx) error {
+func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	folderID := c.Path("folderID")
-	folder, err := h.repo.FolderByID(c.Context(), folderID)
+	folder, err := h.repo.Folders.Get(c.Context(), folderID)
 	if err != nil {
 		return err
 	}

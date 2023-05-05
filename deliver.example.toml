@@ -1,25 +1,27 @@
 host = "localhost"
-port = 3000
+port = 3002
 
-cookie_secret = ""
-
-# array of admin usernames
+// array of usernames
 admins = [
-  "",
+  "user1"
 ]
 
-db = "postgres://user:pass@localhost:5432/deliver_dev?sslmode=disable"
+[repo]
 
-[s3]
+conn = "postgres://nsteenla:@localhost:5432/dilliver_dev?sslmode=disable"
 
-url = ""
-id = ""
-secret = ""
-bucket = ""
+[storage]
+
+conn = "https://id:secret@endpoint/bucket?region=region"
 
 [oidc]
 
 url = ""
 id = ""
-redirect_url = "http://localhost:3000/auth/callback"
+secret = ""
+redirect_url = "http://localhost:3002/auth/callback"
+
+[cookies]
+
+// 32 byte random string
 secret = ""

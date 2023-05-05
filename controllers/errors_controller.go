@@ -10,21 +10,21 @@ import (
 	"github.com/ugent-library/httperror"
 )
 
-type Errors struct{}
+type ErrorsController struct{}
 
-func NewErrors() *Errors {
-	return &Errors{}
+func NewErrorsController() *ErrorsController {
+	return &ErrorsController{}
 }
 
-func (h *Errors) Forbidden(c *ctx.Ctx) error {
+func (h *ErrorsController) Forbidden(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	return c.HTML(http.StatusForbidden, views.PublicPage(c, &views.Forbidden{}))
 }
 
-func (h *Errors) NotFound(c *ctx.Ctx) error {
+func (h *ErrorsController) NotFound(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	return c.HTML(http.StatusNotFound, views.PublicPage(c, &views.NotFound{}))
 }
 
-func (h *Errors) HandleError(c *ctx.Ctx, err error) {
+func (h *ErrorsController) HandleError(w http.ResponseWriter, r *http.Request, c *ctx.Ctx, err error) {
 	if err == models.ErrNotFound {
 		err = httperror.NotFound
 	}
@@ -38,15 +38,15 @@ func (h *Errors) HandleError(c *ctx.Ctx, err error) {
 	case http.StatusUnauthorized:
 		c.RedirectTo("login")
 	case http.StatusForbidden:
-		if err := h.Forbidden(c); err != nil {
-			h.HandleError(c, err)
+		if err := h.Forbidden(w, r, c); err != nil {
+			h.HandleError(w, r, c, err)
 		}
 	case http.StatusNotFound:
-		if err := h.NotFound(c); err != nil {
-			h.HandleError(c, err)
+		if err := h.NotFound(w, r, c); err != nil {
+			h.HandleError(w, r, c, err)
 		}
 	default:
 		c.Log.Error(err)
-		http.Error(c.Res, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
+		http.Error(w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
 	}
 }

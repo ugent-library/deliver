@@ -12,11 +12,12 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -33,20 +34,12 @@ var appCmd = &cobra.Command{
 	Short: "Start the web app server",
 	Run: func(cmd *cobra.Command, args []string) {
 		// setup services
-		repoService, err := models.NewRepositoryService(models.RepositoryConfig{
-			DB: config.DB,
-		})
+		repo, err := repositories.New(config.Repo.Conn)
 		if err != nil {
 			logger.Fatal(err)
 		}
 
-		fileService, err := models.NewFileService(models.FileConfig{
-			S3URL:    config.S3.URL,
-			S3ID:     config.S3.ID,
-			S3Secret: config.S3.Secret,
-			S3Bucket: config.S3.Bucket,
-			S3Region: config.S3.Region,
-		})
+		storage, err := objectstore.New(config.Storage.Backend, config.Storage.Conn)
 		if err != nil {
 			logger.Fatal(err)
 		}
@@ -63,7 +56,7 @@ var appCmd = &cobra.Command{
 			ClientSecret: config.OIDC.Secret,
 			RedirectURL:  config.OIDC.RedirectURL,
 			CookieName:   "deliver.state",
-			CookieSecret: []byte(config.CookieSecret),
+			CookieSecret: []byte(config.Cookies.Secret),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -86,20 +79,20 @@ var appCmd = &cobra.Command{
 		// htmx message hub
 		hub := htmx.NewHub(htmx.Config{
 			// TODO htmx secret config
-			Secret: []byte(config.CookieSecret),
+			Secret: []byte(config.Cookies.Secret),
 		})
 
 		// controllers
-		errs := c.NewErrors()
-		auth := c.NewAuth(repoService, oidcAuth)
-		pages := c.NewPages()
-		spaces := c.NewSpaces(repoService)
-		folders := c.NewFolders(repoService, fileService, viper.GetInt64("max_file_size"))
-		files := c.NewFiles(repoService, fileService)
+		errs := c.NewErrorsController()
+		auth := c.NewAuthController(repo, oidcAuth)
+		pages := c.NewPagesController()
+		spaces := c.NewSpacesController(repo)
+		folders := c.NewFoldersController(repo, storage, config.MaxFileSize)
+		files := c.NewFilesController(repo, storage)
 
 		// request context wrapper
 		wrap := c.Wrapper(c.Config{
-			UserFunc:     repoService.UserByRememberToken,
+			UserFunc:     repo.Users.GetByRememberToken,
 			Router:       r,
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
@@ -110,7 +103,7 @@ var appCmd = &cobra.Command{
 		// router middleware
 		r.Use(
 			func(next http.Handler) http.Handler {
-				return http.MaxBytesHandler(next, viper.GetInt64("max_file_size"))
+				return http.MaxBytesHandler(next, config.MaxFileSize)
 			},
 			crumb.Enable(
 				crumb.WithErrorHandler(func(err error) {
@@ -160,7 +153,7 @@ var appCmd = &cobra.Command{
 			}),
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
-				[]byte(config.CookieSecret),
+				[]byte(config.Cookies.Secret),
 				csrf.CookieName("deliver.csrf"),
 				csrf.Path("/"),
 				csrf.Secure(config.Production),

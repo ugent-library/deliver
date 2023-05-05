@@ -26,15 +26,17 @@ type Map = map[string]any
 type Config struct {
 	UserFunc     func(context.Context, string) (*models.User, error)
 	Router       *mux.Router
-	ErrorHandler func(*ctx.Ctx, error)
+	ErrorHandler func(http.ResponseWriter, *http.Request, *ctx.Ctx, error)
 	Permissions  *models.Permissions
 	Assets       mix.Manifest
 	Hub          *htmx.Hub
 }
 
+type Handler func(http.ResponseWriter, *http.Request, *ctx.Ctx) error
+
 // TODO add Ctx as request Context value in middleware?
-func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
-	return func(handlers ...func(*ctx.Ctx) error) http.Handler {
+func Wrapper(config Config) func(...Handler) http.Handler {
+	return func(handlers ...Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := &ctx.Ctx{
 				Log:         zaphttp.Logger(r.Context()).Sugar(),
@@ -50,12 +52,12 @@ func Wrapper(config Config) func(...func(*ctx.Ctx) error) http.Handler {
 				Hub:         config.Hub,
 			}
 			if err := LoadSession(config.UserFunc, c); err != nil {
-				config.ErrorHandler(c, err)
+				config.ErrorHandler(w, r, c, err)
 				return
 			}
 			for _, fn := range handlers {
-				if err := fn(c); err != nil {
-					config.ErrorHandler(c, err)
+				if err := fn(w, r, c); err != nil {
+					config.ErrorHandler(w, r, c, err)
 					return
 				}
 			}
@@ -78,14 +80,14 @@ func LoadSession(userFunc func(context.Context, string) (*models.User, error), c
 	return nil
 }
 
-func RequireUser(c *ctx.Ctx) error {
+func RequireUser(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	if c.User == nil {
 		return httperror.Unauthorized
 	}
 	return nil
 }
 
-func RequireAdmin(c *ctx.Ctx) error {
+func RequireAdmin(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	if c.User == nil {
 		return httperror.Unauthorized
 	}

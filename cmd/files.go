@@ -6,6 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/repositories"
 )
 
 func init() {
@@ -24,27 +26,19 @@ var gcFilesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 
-		repoService, err := models.NewRepositoryService(models.RepositoryConfig{
-			DB: config.DB,
-		})
+		repo, err := repositories.New(config.Repo.Conn)
 		if err != nil {
 			logger.Fatal(err)
 		}
-		fileService, err := models.NewFileService(models.FileConfig{
-			S3URL:    config.S3.URL,
-			S3ID:     config.S3.ID,
-			S3Secret: config.S3.Secret,
-			S3Bucket: config.S3.Bucket,
-			S3Region: config.S3.Region,
-		})
+		storage, err := objectstore.New(config.Storage.Backend, config.Storage.Conn)
 		if err != nil {
 			logger.Fatal(err)
 		}
 
-		err = fileService.EachID(ctx, func(id string) bool {
-			_, err = repoService.FileByID(ctx, id)
+		err = storage.EachID(ctx, func(id string) bool {
+			_, err = repo.Files.Get(ctx, id)
 			if errors.Is(err, models.ErrNotFound) {
-				err = fileService.Delete(ctx, id)
+				err = storage.Delete(ctx, id)
 			}
 			if err != nil {
 				logger.Fatal(err)

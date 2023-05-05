@@ -7,13 +7,13 @@ import (
 	"github.com/ugent-library/deliver/views"
 )
 
-type Pages struct{}
+type PagesController struct{}
 
-func NewPages() *Pages {
-	return &Pages{}
+func NewPagesController() *PagesController {
+	return &PagesController{}
 }
 
-func (h *Pages) Home(c *ctx.Ctx) error {
+func (h *PagesController) Home(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	if c.User != nil {
 		c.RedirectTo("spaces")
 		return nil

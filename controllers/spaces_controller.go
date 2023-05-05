@@ -9,17 +9,18 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
 
-type Spaces struct {
-	repo models.RepositoryService
+type SpacesController struct {
+	repo *repositories.Repo
 }
 
-func NewSpaces(r models.RepositoryService) *Spaces {
-	return &Spaces{
+func NewSpacesController(r *repositories.Repo) *SpacesController {
+	return &SpacesController{
 		repo: r,
 	}
 }
@@ -31,13 +32,13 @@ type SpaceForm struct {
 	Admins string `form:"admins"`
 }
 
-func (h *Spaces) List(c *ctx.Ctx) error {
+func (h *SpacesController) List(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	var userSpaces []*models.Space
 	var err error
 	if c.IsAdmin(c.User) {
-		userSpaces, err = h.repo.Spaces(c.Context())
+		userSpaces, err = h.repo.Spaces.GetAll(c.Context())
 	} else {
-		userSpaces, err = h.repo.SpacesByUsername(c.Context(), c.User.Username)
+		userSpaces, err = h.repo.Spaces.GetAllByUsername(c.Context(), c.User.Username)
 	}
 	if err != nil {
 		return err
@@ -58,7 +59,7 @@ func (h *Spaces) List(c *ctx.Ctx) error {
 		return httperror.Forbidden
 	}
 
-	space, err := h.repo.SpaceByID(c.Context(), userSpaces[0].ID)
+	space, err := h.repo.Spaces.Get(c.Context(), userSpaces[0].ID)
 	if err != nil {
 		return err
 	}
@@ -71,20 +72,20 @@ func (h *Spaces) List(c *ctx.Ctx) error {
 	}))
 }
 
-func (h *Spaces) Show(c *ctx.Ctx) error {
+func (h *SpacesController) Show(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	return h.show(c, &models.Folder{}, nil)
 }
 
-func (h *Spaces) New(c *ctx.Ctx) error {
+func (h *SpacesController) New(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	return c.HTML(http.StatusOK, views.Page(c, &views.NewSpace{
 		Space:            &models.Space{},
 		ValidationErrors: validate.NewErrors(),
 	}))
 }
 
-func (h *Spaces) Create(c *ctx.Ctx) error {
+func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	b := SpaceForm{}
-	if err := bind.Form(c.Req, &b); err != nil {
+	if err := bind.Form(r, &b); err != nil {
 		return errors.Join(httperror.BadRequest, err)
 	}
 
@@ -95,7 +96,7 @@ func (h *Spaces) Create(c *ctx.Ctx) error {
 		Admins: reSplitAdmins.Split(b.Admins, -1),
 	}
 
-	if err := h.repo.CreateSpace(c.Context(), space); err != nil {
+	if err := h.repo.Spaces.Create(c.Context(), space); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
@@ -115,10 +116,10 @@ func (h *Spaces) Create(c *ctx.Ctx) error {
 	return nil
 }
 
-func (h *Spaces) CreateFolder(c *ctx.Ctx) error {
+func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	spaceName := c.Path("spaceName")
 
-	space, err := h.repo.SpaceByName(c.Context(), spaceName)
+	space, err := h.repo.Spaces.GetByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
@@ -128,7 +129,7 @@ func (h *Spaces) CreateFolder(c *ctx.Ctx) error {
 	}
 
 	b := FolderForm{}
-	if err := bind.Form(c.Req, &b); err != nil {
+	if err := bind.Form(r, &b); err != nil {
 		return errors.Join(httperror.BadRequest, err)
 	}
 
@@ -139,7 +140,7 @@ func (h *Spaces) CreateFolder(c *ctx.Ctx) error {
 		ExpiresAt: time.Now().AddDate(0, 1, 0),
 	}
 
-	if err := h.repo.CreateFolder(c.Context(), folder); err != nil {
+	if err := h.repo.Folders.Create(c.Context(), folder); err != nil {
 		return h.show(c, folder, err)
 	}
 
@@ -153,10 +154,10 @@ func (h *Spaces) CreateFolder(c *ctx.Ctx) error {
 	return nil
 }
 
-func (h *Spaces) Edit(c *ctx.Ctx) error {
+func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	spaceName := c.Path("spaceName")
 
-	space, err := h.repo.SpaceByName(c.Context(), spaceName)
+	space, err := h.repo.Spaces.GetByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
@@ -167,22 +168,22 @@ func (h *Spaces) Edit(c *ctx.Ctx) error {
 	}))
 }
 
-func (h *Spaces) Update(c *ctx.Ctx) error {
+func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
 	spaceName := c.Path("spaceName")
 
-	space, err := h.repo.SpaceByName(c.Context(), spaceName)
+	space, err := h.repo.Spaces.GetByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
 
 	b := SpaceForm{}
-	if err := bind.Form(c.Req, &b); err != nil {
+	if err := bind.Form(r, &b); err != nil {
 		return errors.Join(httperror.BadRequest, err)
 	}
 
 	space.Admins = reSplitAdmins.Split(b.Admins, -1)
 
-	if err := h.repo.UpdateSpace(c.Context(), space); err != nil {
+	if err := h.repo.Spaces.Update(c.Context(), space); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			return err
@@ -198,7 +199,7 @@ func (h *Spaces) Update(c *ctx.Ctx) error {
 	return nil
 }
 
-func (h *Spaces) show(c *ctx.Ctx, folder *models.Folder, err error) error {
+func (h *SpacesController) show(c *ctx.Ctx, folder *models.Folder, err error) error {
 	spaceName := c.Path("spaceName")
 
 	validationErrors := validate.NewErrors()
@@ -206,7 +207,7 @@ func (h *Spaces) show(c *ctx.Ctx, folder *models.Folder, err error) error {
 		return err
 	}
 
-	space, err := h.repo.SpaceByName(c.Context(), spaceName)
+	space, err := h.repo.Spaces.GetByName(c.Context(), spaceName)
 	if err != nil {
 		return err
 	}
@@ -217,9 +218,9 @@ func (h *Spaces) show(c *ctx.Ctx, folder *models.Folder, err error) error {
 
 	var userSpaces []*models.Space
 	if c.IsAdmin(c.User) {
-		userSpaces, err = h.repo.Spaces(c.Context())
+		userSpaces, err = h.repo.Spaces.GetAll(c.Context())
 	} else {
-		userSpaces, err = h.repo.SpacesByUsername(c.Context(), c.User.Username)
+		userSpaces, err = h.repo.Spaces.GetAllByUsername(c.Context(), c.User.Username)
 	}
 	if err != nil {
 		return err
