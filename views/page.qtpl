@@ -190,6 +190,14 @@ interface PageView {
         <div class="u-horizontal-scroll h-100 w-100">
             <div class="u-min-w-750 h-100">
                 <header>
+                    {% if c.Banner == "development" %}
+                        <div class="alert alert-warning mb-0 py-1" role="alert">
+                            <p>
+                                <strong>Test environment</strong>: all files and information in this environment are for testing purposes only.
+                            </p>
+                        </div>
+                    {% endif %}
+
                     <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                         <div class="bc-toolbar bc-toolbar-sm">
                             <div class="bc-toolbar-left">
