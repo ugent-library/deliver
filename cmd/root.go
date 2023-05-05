@@ -4,6 +4,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+
+	// register objectstore backends
+	_ "github.com/ugent-library/deliver/objectstore/s3"
 )
 
 var (
@@ -20,10 +23,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	viper.SetEnvPrefix("deliver")
 	viper.SetDefault("port", 3000)
-	viper.SetDefault("s3.region", "us-east-1")
-	viper.SetDefault("s3.bucket", "deliver")
-	viper.SetDefault("session.name", "deliver")
-	viper.SetDefault("session.max_age", 86400*30) // 30 days
+	viper.SetDefault("storage.backend", "s3")
 	viper.SetDefault("max_file_size", 2_000_000_000)
 
 	cobra.OnInitialize(initConfig, initLogger)
