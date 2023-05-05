@@ -43,6 +43,10 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	cobra.CheckErr(viper.Unmarshal(&config))
+
+	if !config.Production && config.Banner == "" {
+		config.Banner = "development"
+	}
 }
 
 func initLogger() {

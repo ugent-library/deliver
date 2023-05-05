@@ -35,6 +35,7 @@ type Ctx struct {
 	PathVars map[string]string
 	Assets   mix.Manifest
 	Hub      *htmx.Hub
+	Banner   string
 }
 
 type Flash struct {

@@ -98,6 +98,7 @@ var appCmd = &cobra.Command{
 			Permissions:  permissions,
 			Assets:       assets,
 			Hub:          hub,
+			Banner:       config.Banner,
 		})
 
 		// router middleware

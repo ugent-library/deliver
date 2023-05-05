@@ -22,4 +22,6 @@ type Config struct {
 		Secret string
 	}
 	MaxFileSize int64 `mapstructure:"max_file_size"`
+
+	Banner string
 }

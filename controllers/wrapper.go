@@ -30,6 +30,7 @@ type Config struct {
 	Permissions  *models.Permissions
 	Assets       mix.Manifest
 	Hub          *htmx.Hub
+	Banner       string
 }
 
 type Handler func(http.ResponseWriter, *http.Request, *ctx.Ctx) error
@@ -50,6 +51,7 @@ func Wrapper(config Config) func(...Handler) http.Handler {
 				PathVars:    mux.Vars(r),
 				Assets:      config.Assets,
 				Hub:         config.Hub,
+				Banner:      config.Banner,
 			}
 			if err := LoadSession(config.UserFunc, c); err != nil {
 				config.ErrorHandler(w, r, c, err)
