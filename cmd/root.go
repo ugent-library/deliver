@@ -1,18 +1,18 @@
 package cmd
 
 import (
+	"github.com/caarlos0/env/v8"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
+
+	// load .env file if present
+	_ "github.com/joho/godotenv/autoload"
 
 	// register objectstore backends
 	_ "github.com/ugent-library/deliver/objectstore/s3"
 )
 
-var (
-	configFile string
-	config     Config
-)
+var config Config
 
 var logger *zap.SugaredLogger
 
@@ -21,32 +21,17 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	viper.SetEnvPrefix("deliver")
-	viper.SetDefault("port", 3000)
-	viper.SetDefault("storage.backend", "s3")
-	viper.SetDefault("max_file_size", 2_000_000_000)
-
 	cobra.OnInitialize(initConfig, initLogger)
 	cobra.OnFinalize(func() {
 		logger.Sync()
 	})
-
-	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file")
 }
 
 func initConfig() {
-	if configFile != "" {
-		viper.SetConfigFile(configFile)
-		cobra.CheckErr(viper.ReadInConfig())
-	}
-
-	viper.AutomaticEnv()
-
-	cobra.CheckErr(viper.Unmarshal(&config))
-
-	if !config.Production && config.Banner == "" {
-		config.Banner = "development"
-	}
+	cobra.CheckErr(env.ParseWithOptions(&config, env.Options{
+		Prefix: "DELIVER_",
+	}))
+	config.AfterLoad()
 }
 
 func initLogger() {

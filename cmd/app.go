@@ -56,7 +56,7 @@ var appCmd = &cobra.Command{
 			ClientSecret: config.OIDC.Secret,
 			RedirectURL:  config.OIDC.RedirectURL,
 			CookieName:   "deliver.state",
-			CookieSecret: []byte(config.Cookies.Secret),
+			CookieSecret: []byte(config.Cookie.Secret),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -79,7 +79,7 @@ var appCmd = &cobra.Command{
 		// htmx message hub
 		hub := htmx.NewHub(htmx.Config{
 			// TODO htmx secret config
-			Secret: []byte(config.Cookies.Secret),
+			Secret: []byte(config.Cookie.Secret),
 		})
 
 		// controllers
@@ -154,7 +154,7 @@ var appCmd = &cobra.Command{
 			}),
 			// apply before ProxyHeaders to avoid invalid referer errors
 			csrf.Protect(
-				[]byte(config.Cookies.Secret),
+				[]byte(config.Cookie.Secret),
 				csrf.CookieName("deliver.csrf"),
 				csrf.Path("/"),
 				csrf.Secure(config.Production),

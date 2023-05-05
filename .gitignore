@@ -21,4 +21,4 @@ node_modules
 .reflex.conf
 
 # Config
-deliver.toml
+.env
