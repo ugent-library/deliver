@@ -61,16 +61,16 @@ interface PageView {
                                 <ul class="nav nav-main">
                                     {% if c.User != nil %}
                                     <li class="nav-item">
-                                        <a class="nav-link" href="https://forms.office.com/e/6D3PEnpV9M" target="_blank">
+                                        <a class="nav-link" href="mailto:libservice@ugent.be" target="_blank">
                                             <i class="if if-service"></i>
-                                            <span class="btn-text">Geef feedback</span>
+                                            <span class="btn-text">Ask help</span>
                                         </a>
                                     </li>
                                     {% endif %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
                                             <i class="if if-book"></i>
-                                            <span class="btn-text">Handleiding</span>
+                                            <span class="btn-text">Manual &ndash; NL</span>
                                         </a>
                                     </li>
                                     <li class="nav-item">
