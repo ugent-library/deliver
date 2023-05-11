@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 type Config struct {
 	Production bool     `env:"PRODUCTION"`

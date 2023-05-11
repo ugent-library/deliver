@@ -1,7 +1,7 @@
 package main
 
-import "github.com/ugent-library/deliver/cmd"
+import "github.com/ugent-library/deliver/cli"
 
 func main() {
-	cmd.Execute()
+	cli.Run()
 }

@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/oklog/ulid/v2"
 	"github.com/ory/graceful"
-	"github.com/spf13/cobra"
 	c "github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
@@ -22,26 +21,23 @@ import (
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
+	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 )
 
-func init() {
-	rootCmd.AddCommand(appCmd)
-}
-
-var appCmd = &cobra.Command{
-	Use:   "app",
-	Short: "Start the web app server",
-	Run: func(cmd *cobra.Command, args []string) {
+var appCmd = &cli.Command{
+	Name:  "app",
+	Usage: "Start the web app server",
+	Action: func(*cli.Context) error {
 		// setup services
 		repo, err := repositories.New(config.Repo.Conn)
 		if err != nil {
-			logger.Fatal(err)
+			return err
 		}
 
 		storage, err := objectstore.New(config.Storage.Backend, config.Storage.Conn)
 		if err != nil {
-			logger.Fatal(err)
+			return err
 		}
 
 		// setup permissions
@@ -50,7 +46,7 @@ var appCmd = &cobra.Command{
 		}
 
 		// setup auth
-		oidcAuth, err := oidc.NewAuth(context.TODO(), oidc.Config{
+		oidcAuth, err := oidc.NewAuth(context.Background(), oidc.Config{
 			URL:          config.OIDC.URL,
 			ClientID:     config.OIDC.ID,
 			ClientSecret: config.OIDC.Secret,
@@ -59,7 +55,7 @@ var appCmd = &cobra.Command{
 			CookieSecret: []byte(config.Cookie.Secret),
 		})
 		if err != nil {
-			logger.Fatal(err)
+			return err
 		}
 
 		// setup assets
@@ -68,7 +64,7 @@ var appCmd = &cobra.Command{
 			PublicPath:   "/static/",
 		})
 		if err != nil {
-			logger.Fatal(err)
+			return err
 		}
 
 		// setup router
@@ -184,8 +180,10 @@ var appCmd = &cobra.Command{
 		})
 		logger.Infof("starting server at %s", addr)
 		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
-			logger.Fatal(err)
+			return err
 		}
 		logger.Info("gracefully stopped server")
+
+		return nil
 	},
 }
