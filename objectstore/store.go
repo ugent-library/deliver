@@ -11,7 +11,12 @@ type Store interface {
 	Add(context.Context, string, io.Reader) (string, error)
 	Get(context.Context, string) (io.ReadCloser, error)
 	Delete(context.Context, string) error
-	EachID(context.Context, func(string) bool) error
+	IterateID(context.Context) (Iter, error)
+}
+
+type Iter interface {
+	Next() (string, bool)
+	Err() error
 }
 
 type Factory func(string) (Store, error)

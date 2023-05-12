@@ -32,6 +32,12 @@ func (r *FilesRepo) Create(ctx context.Context, f *models.File) error {
 	return nil
 }
 
+func (r *FilesRepo) Exists(ctx context.Context, id string) (bool, error) {
+	return r.db.File.Query().
+		Where(file.IDEQ(id)).
+		Exist(ctx)
+}
+
 func (r *FilesRepo) Get(ctx context.Context, id string) (*models.File, error) {
 	row, err := r.db.File.Query().
 		Where(file.IDEQ(id)).

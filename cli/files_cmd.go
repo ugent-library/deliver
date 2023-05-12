@@ -2,9 +2,7 @@ package cli
 
 import (
 	"context"
-	"errors"
 
-	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/urfave/cli/v2"
@@ -31,17 +29,21 @@ var gcFilesCmd = &cli.Command{
 			return err
 		}
 
-		var e error
-		err = storage.EachID(ctx, func(id string) bool {
-			_, e = repo.Files.Get(ctx, id)
-			if errors.Is(e, models.ErrNotFound) {
-				e = storage.Delete(ctx, id)
-			}
-			return e == nil
-		})
+		iter, err := storage.IterateID(ctx)
 		if err != nil {
 			return err
 		}
-		return e
+		for id, ok := iter.Next(); ok; id, ok = iter.Next() {
+			exists, err := repo.Files.Exists(ctx, id)
+			if err != nil {
+				return err
+			}
+			if !exists {
+				if err = storage.Delete(ctx, id); err != nil {
+					return err
+				}
+			}
+		}
+		return iter.Err()
 	},
 }
