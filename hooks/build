@@ -1,4 +1,11 @@
 #!/bin/bash
+if [[ -z "$SOURCE_BRANCH" ]]; then
+	export SOURCE_BRANCH="${SOURCE_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+fi
+if [[ -z "$SOURCE_COMMIT" ]]; then
+	export SOURCE_COMMIT="${SOURCE_COMMIT:-$(git rev-parse HEAD)}"
+fi
+
 docker build  \
     --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
     --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
