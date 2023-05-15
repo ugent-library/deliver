@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -19,6 +18,7 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
 	"github.com/ugent-library/deliver/repositories"
+	"github.com/ugent-library/httpx"
 	mw "github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -26,6 +26,14 @@ import (
 	"github.com/ugent-library/zaphttp/zapchi"
 	"github.com/urfave/cli/v2"
 )
+
+var appInfo = &struct {
+	Branch string `json:"branch,omitempty"`
+	Commit string `json:"commit,omitempty"`
+}{
+	Branch: os.Getenv("SOURCE_BRANCH"),
+	Commit: os.Getenv("SOURCE_COMMIT"),
+}
 
 var appCmd = &cli.Command{
 	Name:  "app",
@@ -117,18 +125,7 @@ var appCmd = &cli.Command{
 		router.Get("/health", health.NewHandler(healthChecker))
 		// TODO clean this up, split off
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
-			info := &struct {
-				Branch string `json:"branch,omitempty"`
-				Commit string `json:"commit,omitempty"`
-			}{
-				Branch: os.Getenv("SOURCE_BRANCH"),
-				Commit: os.Getenv("SOURCE_COMMIT"),
-			}
-			j, err := json.MarshalIndent(info, "", "  ")
-			if err == nil {
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(j)
-			} else {
+			if err := httpx.RenderJSON(w, appInfo); err != nil {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		})
