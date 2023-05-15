@@ -2,10 +2,13 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/alexliesenfeld/health"
 	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
 	"github.com/nics/ich"
@@ -57,6 +60,10 @@ var appCmd = &cli.Command{
 			return err
 		}
 
+		// setup health checker
+		// TODO add checkers
+		healthChecker := health.NewChecker()
+
 		// setup assets
 		assets, err := mix.New(mix.Config{
 			ManifestFile: "static/mix-manifest.json",
@@ -107,11 +114,30 @@ var appCmd = &cli.Command{
 		})
 
 		// routes
+		router.Get("/health", health.NewHandler(healthChecker))
+		// TODO clean this up, split off
+		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
+			info := &struct {
+				Branch string `json:"branch,omitempty"`
+				Commit string `json:"commit,omitempty"`
+			}{
+				Branch: os.Getenv("SOURCE_BRANCH"),
+				Commit: os.Getenv("SOURCE_COMMIT"),
+			}
+			j, err := json.MarshalIndent(info, "", "  ")
+			if err == nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(j)
+			} else {
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
+		})
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 			// TODO handle error
 			hub.HandleWebSocket(w, r, r.URL.Query().Get("channels"))
 		})
+		router.Get("/auth/callback", wrap(auth.Callback))
 		router.Group(func(r *ich.Mux) {
 			r.Use(
 				func(next http.Handler) http.Handler {
@@ -134,7 +160,6 @@ var appCmd = &cli.Command{
 
 			r.NotFound(wrap(errs.NotFound))
 			r.Get("/", wrap(pages.Home)).Name("home")
-			r.Get("/auth/callback", wrap(auth.Callback))
 			r.Get("/logout", wrap(auth.Logout)).Name("logout")
 			r.Get("/login", wrap(auth.Login)).Name("login")
 			r.Get("/spaces", wrap(controllers.RequireUser, spaces.List)).Name("spaces")
