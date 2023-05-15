@@ -126,13 +126,16 @@ var appCmd = &cli.Command{
 		// TODO clean this up, split off
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
 			if err := httpx.RenderJSON(w, appInfo); err != nil {
+				logger.Error(err)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		})
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
-			// TODO handle error
-			hub.HandleWebSocket(w, r, r.URL.Query().Get("channels"))
+			if err := hub.HandleWebSocket(w, r, r.URL.Query().Get("channels")); err != nil {
+				logger.Error(err)
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
 		})
 		router.Get("/auth/callback", wrap(auth.Callback))
 		router.Group(func(r *ich.Mux) {
