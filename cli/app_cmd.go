@@ -6,23 +6,22 @@ import (
 	"net/http"
 	"time"
 
+	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/oklog/ulid/v2"
+	"github.com/nics/ich"
 	"github.com/ory/graceful"
-	c "github.com/ugent-library/deliver/controllers"
+	"github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/ugent-library/middleware"
+	mw "github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
+	"github.com/ugent-library/zaphttp/zapchi"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 )
 
 var appCmd = &cli.Command{
@@ -68,9 +67,19 @@ var appCmd = &cli.Command{
 		}
 
 		// setup router
-		r := mux.NewRouter()
-		r.StrictSlash(true)
-		r.UseEncodedPath()
+		router := ich.New()
+		router.Use(chimw.RequestID)
+		if config.Production {
+			router.Use(chimw.RealIP)
+		}
+		router.Use(mw.MethodOverride(
+			mw.MethodFromHeader(mw.MethodHeader),
+			mw.MethodFromForm(mw.MethodParam),
+		))
+		router.Use(zaphttp.SetLogger(logger.Desugar(), zapchi.RequestID))
+		router.Use(chimw.RequestLogger(zapchi.LogFormatter()))
+		router.Use(chimw.Recoverer)
+		router.Use(chimw.StripSlashes)
 
 		// htmx message hub
 		hub := htmx.NewHub(htmx.Config{
@@ -79,17 +88,17 @@ var appCmd = &cli.Command{
 		})
 
 		// controllers
-		errs := c.NewErrorsController()
-		auth := c.NewAuthController(repo, oidcAuth)
-		pages := c.NewPagesController()
-		spaces := c.NewSpacesController(repo)
-		folders := c.NewFoldersController(repo, storage, config.MaxFileSize)
-		files := c.NewFilesController(repo, storage)
+		errs := controllers.NewErrorsController()
+		auth := controllers.NewAuthController(repo, oidcAuth)
+		pages := controllers.NewPagesController()
+		spaces := controllers.NewSpacesController(repo)
+		folders := controllers.NewFoldersController(repo, storage, config.MaxFileSize)
+		files := controllers.NewFilesController(repo, storage)
 
 		// request context wrapper
-		wrap := c.Wrapper(c.Config{
+		wrap := controllers.Wrapper(controllers.Config{
 			UserFunc:     repo.Users.GetByRememberToken,
-			Router:       r,
+			Router:       router,
 			ErrorHandler: errs.HandleError,
 			Permissions:  permissions,
 			Assets:       assets,
@@ -97,84 +106,60 @@ var appCmd = &cli.Command{
 			Banner:       config.Banner,
 		})
 
-		// router middleware
-		r.Use(
-			func(next http.Handler) http.Handler {
-				return http.MaxBytesHandler(next, config.MaxFileSize)
-			},
-			crumb.Enable(
-				crumb.WithErrorHandler(func(err error) {
-					logger.Error(err)
-				}),
-			),
-		)
-
 		// routes
-		r.NotFoundHandler = wrap(errs.NotFound)
-		r.Handle("/", wrap(pages.Home)).Methods("GET").Name("home")
-		r.Handle("/auth/callback", wrap(auth.Callback)).Methods("GET")
-		r.Handle("/logout", wrap(auth.Logout)).Methods("GET").Name("logout")
-		r.Handle("/login", wrap(auth.Login)).Methods("GET").Name("login")
-		r.Handle("/spaces", wrap(c.RequireUser, spaces.List)).Methods("GET").Name("spaces")
-		r.Handle("/spaces/{spaceName}", wrap(c.RequireUser, spaces.Show)).Methods("GET").Name("space")
-		r.Handle("/new-space", wrap(c.RequireAdmin, spaces.New)).Methods("GET").Name("new_space")
-		r.Handle("/spaces", wrap(c.RequireAdmin, spaces.Create)).Methods("POST").Name("create_space")
-		r.Handle("/spaces/{spaceName}/edit", wrap(c.RequireAdmin, spaces.Edit)).Methods("GET").Name("edit_space")
-		r.Handle("/spaces/{spaceName}", wrap(c.RequireAdmin, spaces.Update)).Methods("PUT").Name("update_space")
-		r.Handle("/spaces/{spaceName}/folders", wrap(c.RequireUser, spaces.CreateFolder)).Methods("POST").Name("create_folder")
-		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Show)).Methods("GET").Name("folder")
-		r.Handle("/folders/{folderID}/edit", wrap(c.RequireUser, folders.Edit)).Methods("GET").Name("edit_folder")
-		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Update)).Methods("PUT").Name("update_folder")
-		r.Handle("/folders/{folderID}/files", wrap(c.RequireUser, folders.UploadFile)).Methods("POST").Name("upload_file")
-		r.Handle("/folders/{folderID}", wrap(c.RequireUser, folders.Delete)).Methods("DELETE").Name("delete_folder")
-		r.Handle("/files/{fileID}", wrap(files.Download)).Methods("GET").Name("download_file")
-		r.Handle("/files/{fileID}", wrap(c.RequireUser, files.Delete)).Methods("DELETE").Name("delete_file")
-		r.Handle("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Methods("GET").Name("share_folder")
-
-		mux := http.NewServeMux()
-		mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-		mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 			// TODO handle error
 			hub.HandleWebSocket(w, r, r.URL.Query().Get("channels"))
 		})
-		mux.Handle("/", r)
+		router.Group(func(r *ich.Mux) {
+			r.Use(
+				func(next http.Handler) http.Handler {
+					return http.MaxBytesHandler(next, config.MaxFileSize)
+				},
+				csrf.Protect(
+					[]byte(config.Cookie.Secret),
+					csrf.CookieName("deliver.csrf"),
+					csrf.Path("/"),
+					csrf.Secure(config.Production),
+					csrf.SameSite(csrf.SameSiteStrictMode),
+					csrf.FieldName("_csrf_token"),
+				),
+				crumb.Enable(
+					crumb.WithErrorHandler(func(err error) {
+						logger.Error(err)
+					}),
+				),
+			)
 
-		// apply these before request reaches the router
-		handler := middleware.Apply(mux,
-			middleware.Recover(func(err any) {
-				if config.Production {
-					logger.With(zap.Stack("stack")).Error(err)
-				} else {
-					logger.Error(err)
-				}
-			}),
-			// apply before ProxyHeaders to avoid invalid referer errors
-			csrf.Protect(
-				[]byte(config.Cookie.Secret),
-				csrf.CookieName("deliver.csrf"),
-				csrf.Path("/"),
-				csrf.Secure(config.Production),
-				csrf.SameSite(csrf.SameSiteStrictMode),
-				csrf.FieldName("_csrf_token"),
-			),
-			middleware.MethodOverride(
-				middleware.MethodFromHeader(middleware.MethodHeader),
-				middleware.MethodFromForm(middleware.MethodParam),
-			),
-			middleware.If(config.Production, handlers.ProxyHeaders),
-			middleware.SetRequestID(func() string {
-				return ulid.Make().String()
-			}),
-			zaphttp.SetLogger(logger.Desugar()),
-			zaphttp.LogRequests(logger.Desugar()),
-		)
+			r.NotFound(wrap(errs.NotFound))
+			r.Get("/", wrap(pages.Home)).Name("home")
+			r.Get("/auth/callback", wrap(auth.Callback))
+			r.Get("/logout", wrap(auth.Logout)).Name("logout")
+			r.Get("/login", wrap(auth.Login)).Name("login")
+			r.Get("/spaces", wrap(controllers.RequireUser, spaces.List)).Name("spaces")
+			r.Get("/spaces/{spaceName}", wrap(controllers.RequireUser, spaces.Show)).Name("space")
+			r.Get("/new-space", wrap(controllers.RequireAdmin, spaces.New)).Name("newSpace")
+			r.Post("/spaces", wrap(controllers.RequireAdmin, spaces.Create)).Name("createSpace")
+			r.Get("/spaces/{spaceName}/edit", wrap(controllers.RequireAdmin, spaces.Edit)).Name("editSpace")
+			r.Put("/spaces/{spaceName}", wrap(controllers.RequireAdmin, spaces.Update)).Name("updateSpace")
+			r.Post("/spaces/{spaceName}/folders", wrap(controllers.RequireUser, spaces.CreateFolder)).Name("createFolder")
+			r.Get("/folders/{folderID}", wrap(controllers.RequireUser, folders.Show)).Name("folder")
+			r.Get("/folders/{folderID}/edit", wrap(controllers.RequireUser, folders.Edit)).Name("editFolder")
+			r.Put("/folders/{folderID}", wrap(controllers.RequireUser, folders.Update)).Name("updateFolder")
+			r.Post("/folders/{folderID}/files", wrap(controllers.RequireUser, folders.UploadFile)).Name("uploadFile")
+			r.Delete("/folders/{folderID}", wrap(controllers.RequireUser, folders.Delete)).Name("deleteFolder")
+			r.Get("/files/{fileID}", wrap(files.Download)).Name("downloadFile")
+			r.Delete("/files/{fileID}", wrap(controllers.RequireUser, files.Delete)).Name("deleteFile")
+			r.Get("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Name("shareFolder")
+		})
 
 		// start server
 		// TODO make timeouts configurable
 		addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 		server := graceful.WithDefaults(&http.Server{
 			Addr:         addr,
-			Handler:      handler,
+			Handler:      router,
 			ReadTimeout:  10 * time.Minute,
 			WriteTimeout: 10 * time.Minute,
 		})

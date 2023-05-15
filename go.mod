@@ -9,12 +9,12 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.55
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.5
 	github.com/felixge/httpsnoop v1.0.3
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/gorilla/csrf v1.7.1
-	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
+	github.com/nics/ich v0.0.0-20230515073809-6deee7f5ae14
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ory/graceful v0.1.3
 	github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f
@@ -66,7 +66,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
-	github.com/ugent-library/zaphttp v0.0.0-20230125082153-cdfba9e77ab2
+	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/urfave/cli/v2 v2.25.3
 	github.com/zclconf/go-cty v1.13.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect

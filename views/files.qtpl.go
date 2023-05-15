@@ -76,7 +76,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                         <a href="`)
 //line views/files.qtpl:38
-			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
+			qw422016.E().S(c.PathTo("downloadFile", "fileID", f.ID).String())
 //line views/files.qtpl:38
 			qw422016.N().S(`">
                             <i class="if if-download"></i>
@@ -130,7 +130,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
                             <button class="btn btn-link"
                                  hx-delete="`)
 //line views/files.qtpl:60
-			qw422016.E().S(c.PathTo("delete_file", "fileID", f.ID).String())
+			qw422016.E().S(c.PathTo("deleteFile", "fileID", f.ID).String())
 //line views/files.qtpl:60
 			qw422016.N().S(`"
                                  data-confirm="true"
@@ -146,7 +146,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
                             </button>
                             <a class="btn btn-link" href="`)
 //line views/files.qtpl:68
-			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
+			qw422016.E().S(c.PathTo("downloadFile", "fileID", f.ID).String())
 //line views/files.qtpl:68
 			qw422016.N().S(`">
                                 <i class="if if-download"></i>

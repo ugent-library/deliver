@@ -50,7 +50,7 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request, c *ctx.C
 			Type: "info",
 			Body: "Create an initial space to get started",
 		})
-		c.RedirectTo("new_space")
+		c.RedirectTo("newSpace")
 		return nil
 	}
 

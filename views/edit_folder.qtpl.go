@@ -125,7 +125,7 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                             <div class="bc-toolbar-item">
                                 <form action="`)
 //line views/edit_folder.qtpl:45
-	qw422016.E().S(c.PathTo("delete_folder", "folderID", v.Folder.ID).String())
+	qw422016.E().S(c.PathTo("deleteFolder", "folderID", v.Folder.ID).String())
 //line views/edit_folder.qtpl:45
 	qw422016.N().S(`" method="POST" id="delete-folder">
                                     <input type="hidden" name="_method" value="DELETE">
@@ -166,7 +166,7 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 <div class="card-body">
                     <form action="`)
 //line views/edit_folder.qtpl:74
-	qw422016.E().S(c.PathTo("update_folder", "folderID", v.Folder.ID).String())
+	qw422016.E().S(c.PathTo("updateFolder", "folderID", v.Folder.ID).String())
 //line views/edit_folder.qtpl:74
 	qw422016.N().S(`" method="POST" id="update-folder">
                         <input type="hidden" name="_method" value="PUT">
@@ -218,7 +218,7 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <div class="col-lg-7 col-xl-9">
                                     <code class="c-code">`)
 //line views/edit_folder.qtpl:94
-	qw422016.E().S(c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
+	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
 //line views/edit_folder.qtpl:94
 	qw422016.N().S(`</code>
                                     <p class="small form-text text-muted">Anyone with

@@ -41,7 +41,7 @@ type ShowFolder struct {
                             </a>
                         </div>
                         <div class="bc-toolbar-item">
-                            <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("edit_folder", "folderID", v.Folder.ID).String() %}">
+                            <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("editFolder", "folderID", v.Folder.ID).String() %}">
                                 <i class="if if-edit"></i>
                                 <span class="btn-text">Edit</span>
                             </a>
@@ -54,14 +54,14 @@ type ShowFolder struct {
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <button type="button" class="btn btn-outline-secondary"
-                                        data-clipboard="{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
+                                        data-clipboard="{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
                                     >
                                         <i class="if if-copy text-primary"></i>
                                         <span class="btn-text text-primary">Copy public shareable link</span>
                                     </button>
                                 </div>
                                 <input type="text" class="form-control input-select-text" readonly
-                                    value="{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
+                                    value="{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
                                     data-select-value
                                 >
                             </div>
@@ -82,7 +82,7 @@ type ShowFolder struct {
                 </div>
                 <div class="card-body">
                     <form
-                        action="{%s c.PathTo("upload_file", "folderID", v.Folder.ID).String() %}"
+                        action="{%s c.PathTo("uploadFile", "folderID", v.Folder.ID).String() %}"
                         enctype="multipart/form-data"
                         method="POST"
                     >

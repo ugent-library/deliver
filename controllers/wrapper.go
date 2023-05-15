@@ -4,8 +4,9 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
-	"github.com/gorilla/mux"
+	"github.com/nics/ich"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
@@ -25,7 +26,7 @@ type Map = map[string]any
 
 type Config struct {
 	UserFunc     func(context.Context, string) (*models.User, error)
-	Router       *mux.Router
+	Router       *ich.Mux
 	ErrorHandler func(http.ResponseWriter, *http.Request, *ctx.Ctx, error)
 	Permissions  *models.Permissions
 	Assets       mix.Manifest
@@ -36,9 +37,16 @@ type Config struct {
 type Handler func(http.ResponseWriter, *http.Request, *ctx.Ctx) error
 
 // TODO add Ctx as request Context value in middleware?
-func Wrapper(config Config) func(...Handler) http.Handler {
-	return func(handlers ...Handler) http.Handler {
+func Wrapper(config Config) func(...Handler) http.HandlerFunc {
+	return func(handlers ...Handler) http.HandlerFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// TODO no map
+			pathVars := make(map[string]string)
+			urlParams := chi.RouteContext(r.Context()).URLParams
+			for i := len(urlParams.Keys) - 1; i >= 0; i-- {
+				pathVars[urlParams.Keys[i]] = urlParams.Values[i]
+			}
+
 			c := &ctx.Ctx{
 				Log:         zaphttp.Logger(r.Context()).Sugar(),
 				Res:         w,
@@ -48,7 +56,7 @@ func Wrapper(config Config) func(...Handler) http.Handler {
 				Cookies:     crumb.Cookies(r),
 				Permissions: config.Permissions,
 				Router:      config.Router,
-				PathVars:    mux.Vars(r),
+				PathVars:    pathVars,
 				Assets:      config.Assets,
 				Hub:         config.Hub,
 				Banner:      config.Banner,

@@ -42,7 +42,7 @@ type EditFolder struct {
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <form action="{%s c.PathTo("delete_folder", "folderID", v.Folder.ID).String() %}" method="POST" id="delete-folder">
+                                <form action="{%s c.PathTo("deleteFolder", "folderID", v.Folder.ID).String() %}" method="POST" id="delete-folder">
                                     <input type="hidden" name="_method" value="DELETE">
                                     {%s= c.CSRFTag %}
                                     <button
@@ -71,7 +71,7 @@ type EditFolder struct {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{%s c.PathTo("update_folder", "folderID", v.Folder.ID).String() %}" method="POST" id="update-folder">
+                    <form action="{%s c.PathTo("updateFolder", "folderID", v.Folder.ID).String() %}" method="POST" id="update-folder">
                         <input type="hidden" name="_method" value="PUT">
                         {%s= c.CSRFTag %}
                         <div class="form-group">
@@ -91,7 +91,7 @@ type EditFolder struct {
                                     <p>Public shareable link</p>
                                 </label>
                                 <div class="col-lg-7 col-xl-9">
-                                    <code class="c-code">{%s c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}</code>
+                                    <code class="c-code">{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}</code>
                                     <p class="small form-text text-muted">Anyone with
                                     this automatically generated link can view the files
                                     in this folder.</p>

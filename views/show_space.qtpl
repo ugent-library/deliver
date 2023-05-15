@@ -41,7 +41,7 @@ type ShowSpace struct {
                     {% endfor %}
                     {% if c.IsAdmin(c.User) %}
                     <li class="c-sub-sidebar__item">
-                        <a href="{%s c.PathTo("new_space").String() %}">
+                        <a href="{%s c.PathTo("newSpace").String() %}">
                             <span class="c-sidebar__label">
                                 <i class="if if-add"></i>
                                 Make a new space
@@ -66,7 +66,7 @@ type ShowSpace struct {
                     {% if c.IsAdmin(c.User) %}
                     <div class="bc-toolbar-right">
                         <div class="bc-toolbar-item">
-                            <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("edit_space", "spaceName", v.Space.Name).String() %}">
+                            <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("editSpace", "spaceName", v.Space.Name).String() %}">
                                 <i class="if if-edit"></i>
                                 <span class="btn-text">Edit space</span>
                             </a>
@@ -88,7 +88,7 @@ type ShowSpace struct {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{%s c.PathTo("create_folder", "spaceName", v.Space.Name).String() %}" method="POST">
+                    <form action="{%s c.PathTo("createFolder", "spaceName", v.Space.Name).String() %}" method="POST">
                         {%s= c.CSRFTag %}
                         <div class="form-group{% if v.ValidationErrors.Get("name") != nil %} is-invalid{% endif %}">
                             <label class="c-label" for="folder-name">Folder name</label>
@@ -156,14 +156,14 @@ type ShowSpace struct {
                                     <div class="input-group" style="min-width: 375px;">
                                         <div class="input-group-prepend">
                                             <button type="button" class="btn btn-outline-secondary"
-                                                data-clipboard="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
+                                                data-clipboard="{%s c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
                                             >
                                                 <i class="if if-copy text-primary"></i>
                                                 <span class="btn-text">Copy link</span>
                                             </button>
                                         </div>
                                         <input id="" type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
-                                            value="{%s c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
+                                            value="{%s c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
                                             data-select-value
                                         >
                                     </div>

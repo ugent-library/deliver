@@ -114,7 +114,7 @@ func (v *NewSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 <div class="card-body">
                     <form action="`)
 //line views/new_space.qtpl:52
-	qw422016.E().S(c.PathTo("create_space").String())
+	qw422016.E().S(c.PathTo("createSpace").String())
 //line views/new_space.qtpl:52
 	qw422016.N().S(`" method="POST" id="create-space">
                         `)

@@ -136,7 +136,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                     <li class="c-sub-sidebar__item">
                         <a href="`)
 //line views/show_space.qtpl:44
-		qw422016.E().S(c.PathTo("new_space").String())
+		qw422016.E().S(c.PathTo("newSpace").String())
 //line views/show_space.qtpl:44
 		qw422016.N().S(`">
                             <span class="c-sidebar__label">
@@ -177,7 +177,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                         <div class="bc-toolbar-item">
                             <a class="btn btn-link btn-link-muted" href="`)
 //line views/show_space.qtpl:69
-		qw422016.E().S(c.PathTo("edit_space", "spaceName", v.Space.Name).String())
+		qw422016.E().S(c.PathTo("editSpace", "spaceName", v.Space.Name).String())
 //line views/show_space.qtpl:69
 		qw422016.N().S(`">
                                 <i class="if if-edit"></i>
@@ -207,7 +207,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 <div class="card-body">
                     <form action="`)
 //line views/show_space.qtpl:91
-	qw422016.E().S(c.PathTo("create_folder", "spaceName", v.Space.Name).String())
+	qw422016.E().S(c.PathTo("createFolder", "spaceName", v.Space.Name).String())
 //line views/show_space.qtpl:91
 	qw422016.N().S(`" method="POST">
                         `)
@@ -339,7 +339,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                             <button type="button" class="btn btn-outline-secondary"
                                                 data-clipboard="`)
 //line views/show_space.qtpl:159
-			qw422016.E().S(c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String())
+			qw422016.E().S(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String())
 //line views/show_space.qtpl:159
 			qw422016.N().S(`"
                                             >
@@ -350,7 +350,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                         <input id="" type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
                                             value="`)
 //line views/show_space.qtpl:166
-			qw422016.E().S(c.URLTo("share_folder", "folderID", f.ID, "folderSlug", f.Slug()).String())
+			qw422016.E().S(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String())
 //line views/show_space.qtpl:166
 			qw422016.N().S(`"
                                             data-select-value

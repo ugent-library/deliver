@@ -124,7 +124,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                         <div class="bc-toolbar-item">
                             <a class="btn btn-link btn-link-muted" href="`)
 //line views/show_folder.qtpl:44
-	qw422016.E().S(c.PathTo("edit_folder", "folderID", v.Folder.ID).String())
+	qw422016.E().S(c.PathTo("editFolder", "folderID", v.Folder.ID).String())
 //line views/show_folder.qtpl:44
 	qw422016.N().S(`">
                                 <i class="if if-edit"></i>
@@ -141,7 +141,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     <button type="button" class="btn btn-outline-secondary"
                                         data-clipboard="`)
 //line views/show_folder.qtpl:57
-	qw422016.E().S(c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
+	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
 //line views/show_folder.qtpl:57
 	qw422016.N().S(`"
                                     >
@@ -152,7 +152,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <input type="text" class="form-control input-select-text" readonly
                                     value="`)
 //line views/show_folder.qtpl:64
-	qw422016.E().S(c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
+	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
 //line views/show_folder.qtpl:64
 	qw422016.N().S(`"
                                     data-select-value
@@ -177,7 +177,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                     <form
                         action="`)
 //line views/show_folder.qtpl:85
-	qw422016.E().S(c.PathTo("upload_file", "folderID", v.Folder.ID).String())
+	qw422016.E().S(c.PathTo("uploadFile", "folderID", v.Folder.ID).String())
 //line views/show_folder.qtpl:85
 	qw422016.N().S(`"
                         enctype="multipart/form-data"

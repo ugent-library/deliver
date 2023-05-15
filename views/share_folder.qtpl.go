@@ -101,7 +101,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     <p class="text-muted">
                                         Public shareable link: `)
 //line views/share_folder.qtpl:33
-	qw422016.E().S(c.URLTo("share_folder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
+	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
 //line views/share_folder.qtpl:33
 	qw422016.N().S(`
                                     </p>
@@ -163,7 +163,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                                         <a href="`)
 //line views/share_folder.qtpl:75
-			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
+			qw422016.E().S(c.PathTo("downloadFile", "fileID", f.ID).String())
 //line views/share_folder.qtpl:75
 			qw422016.N().S(`">
                                             <span>`)
@@ -210,7 +210,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                         <div class="c-button-toolbar">
                                             <a class="btn btn-link" href="`)
 //line views/share_folder.qtpl:94
-			qw422016.E().S(c.PathTo("download_file", "fileID", f.ID).String())
+			qw422016.E().S(c.PathTo("downloadFile", "fileID", f.ID).String())
 //line views/share_folder.qtpl:94
 			qw422016.N().S(`">
                                                 <i class="if if-download"></i>

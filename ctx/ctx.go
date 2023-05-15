@@ -2,12 +2,11 @@ package ctx
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/nics/ich"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
@@ -31,7 +30,7 @@ type Ctx struct {
 	User      *models.User
 	*models.Permissions
 	Flash    []Flash
-	Router   *mux.Router
+	Router   *ich.Mux
 	PathVars map[string]string
 	Assets   mix.Manifest
 	Hub      *htmx.Hub
@@ -63,20 +62,9 @@ func (c *Ctx) Path(param string) string {
 }
 
 func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
-	route := c.Router.Get(name)
-	if route == nil {
-		panic(fmt.Errorf("unknown route '%s'", name))
-	}
-	u, err := route.URL(pairs...)
-	if err != nil {
-		panic(fmt.Errorf("can't reverse route '%s': %w", name, err))
-	}
-	if u.Host == "" {
-		u.Host = c.Req.Host
-	}
-	if u.Scheme == "" {
-		u.Scheme = c.Req.URL.Scheme
-	}
+	u := c.Router.PathTo(name, pairs...)
+	u.Host = c.Req.Host
+	u.Scheme = c.Req.URL.Scheme
 	if u.Scheme == "" {
 		u.Scheme = "http"
 	}
@@ -84,26 +72,12 @@ func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
 }
 
 func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
-	route := c.Router.Get(name)
-	if route == nil {
-		panic(fmt.Errorf("unknown route '%s'", name))
-	}
-	u, err := route.URLPath(pairs...)
-	if err != nil {
-		panic(fmt.Errorf("can't reverse route '%s': %w", name, err))
-	}
+	u := c.Router.PathTo(name, pairs...)
 	return u
 }
 
 func (c *Ctx) RedirectTo(name string, pairs ...string) {
-	route := c.Router.Get(name)
-	if route == nil {
-		panic(fmt.Errorf("unknown route '%s'", name))
-	}
-	u, err := route.URLPath(pairs...)
-	if err != nil {
-		panic(fmt.Errorf("can't reverse route '%s': %w", name, err))
-	}
+	u := c.Router.PathTo(name, pairs...)
 	http.Redirect(c.Res, c.Req, u.String(), http.StatusSeeOther)
 }
 

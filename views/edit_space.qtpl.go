@@ -124,7 +124,7 @@ func (v *EditSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 <div class="card-body">
                     <form action="`)
 //line views/edit_space.qtpl:52
-	qw422016.E().S(c.PathTo("update_space", "spaceName", v.Space.Name).String())
+	qw422016.E().S(c.PathTo("updateSpace", "spaceName", v.Space.Name).String())
 //line views/edit_space.qtpl:52
 	qw422016.N().S(`" method="POST" id="update-space">
                         <input type="hidden" name="_method" value="PUT">

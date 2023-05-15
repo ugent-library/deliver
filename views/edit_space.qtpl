@@ -49,7 +49,7 @@ type EditSpace struct {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{%s c.PathTo("update_space", "spaceName", v.Space.Name).String() %}" method="POST" id="update-space">
+                    <form action="{%s c.PathTo("updateSpace", "spaceName", v.Space.Name).String() %}" method="POST" id="update-space">
                         <input type="hidden" name="_method" value="PUT">
                         {%s= c.CSRFTag %}
                         <div class="form-group">
