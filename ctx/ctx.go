@@ -2,39 +2,80 @@ package ctx
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/csrf"
 	"github.com/nics/ich"
 	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
+	"github.com/ugent-library/zaphttp"
 	"go.uber.org/zap"
 )
 
+type contextKey string
+
+func (c contextKey) String() string {
+	return string(c)
+}
+
+var ctxKey = contextKey("ctx")
+
 // TODO set __Host- cookie prefix in production
 const (
-	rememberCookie = "deliver.remember"
-	flashCookie    = "deliver.flash"
+	RememberCookie = "deliver.remember"
+	FlashCookie    = "deliver.flash"
 )
 
-type Ctx struct {
-	Log       *zap.SugaredLogger // TODO use plain logger
-	Req       *http.Request
-	Res       http.ResponseWriter
-	CSRFToken string
-	CSRFTag   string
-	Cookies   *crumb.CookieJar
-	User      *models.User
-	*models.Permissions
-	Flash    []Flash
-	Router   *ich.Mux
-	PathVars map[string]string
-	Assets   mix.Manifest
-	Hub      *htmx.Hub
-	Banner   string
+// TODO reduce type requirements
+type Config struct {
+	GetUserByRememberToken func(context.Context, string) (*models.User, error)
+	Router                 *ich.Mux
+	ErrorHandlers          map[int]http.HandlerFunc
+	Permissions            *models.Permissions
+	Assets                 mix.Manifest
+	Hub                    *htmx.Hub
+	Banner                 string
+}
+
+func Set(config Config) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			c := New(config, w, r)
+			if err := loadSession(config.GetUserByRememberToken, c); err != nil {
+				c.HandleError(err)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ctxKey, c)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func Get(ctx context.Context) *Ctx {
+	return ctx.Value(ctxKey).(*Ctx)
+}
+
+func loadSession(userFunc func(context.Context, string) (*models.User, error), c *Ctx) error {
+	if token := c.Cookies.Get(RememberCookie); token != "" {
+		user, err := userFunc(c.r.Context(), token)
+		if err != nil && err != models.ErrNotFound {
+			return err
+		}
+		c.User = user
+	}
+
+	c.Cookies.Unmarshal(FlashCookie, &c.Flash)
+	c.Cookies.Delete(FlashCookie)
+
+	return nil
 }
 
 type Flash struct {
@@ -44,27 +85,69 @@ type Flash struct {
 	DismissAfter time.Duration
 }
 
-func (c *Ctx) Context() context.Context {
-	return c.Req.Context()
+type Ctx struct {
+	w             http.ResponseWriter
+	r             *http.Request
+	errorHandlers map[int]http.HandlerFunc
+	router        *ich.Mux
+	assets        mix.Manifest
+	Log           *zap.SugaredLogger // TODO use plain logger
+	Hub           *htmx.Hub
+	CSRFToken     string
+	CSRFTag       string
+	Cookies       *crumb.CookieJar
+	User          *models.User
+	Flash         []Flash
+	Banner        string
+	*models.Permissions
 }
 
-func (c *Ctx) HTML(status int, body string) error {
-	if hdr := c.Res.Header(); hdr.Get("Content-Type") == "" {
-		hdr.Set("Content-Type", "text/html; charset=utf-8")
+func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
+	c := &Ctx{
+		w:             w,
+		r:             r,
+		errorHandlers: config.ErrorHandlers,
+		Log:           zaphttp.Logger(r.Context()).Sugar(),
+		CSRFToken:     csrf.Token(r),
+		CSRFTag:       string(csrf.TemplateField(r)),
+		Cookies:       crumb.Cookies(r),
+		router:        config.Router,
+		assets:        config.Assets,
+		Hub:           config.Hub,
+		Banner:        config.Banner,
+		Permissions:   config.Permissions,
 	}
-	c.Res.WriteHeader(status)
-	_, err := c.Res.Write([]byte(body))
-	return err
+
+	return c
 }
 
-func (c *Ctx) Path(param string) string {
-	return c.PathVars[param]
+func (c *Ctx) HandleError(err error) {
+	if err == models.ErrNotFound {
+		err = httperror.NotFound
+	}
+
+	var httpErr *httperror.Error
+	if !errors.As(err, &httpErr) {
+		httpErr = httperror.InternalServerError
+	}
+
+	if h, ok := c.errorHandlers[httpErr.StatusCode]; ok {
+		h(c.w, c.r)
+		return
+	}
+
+	c.Log.Error(err)
+	http.Error(c.w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
+}
+
+func (c *Ctx) RouteParam(param string) string {
+	return chi.URLParamFromCtx(c.r.Context(), param)
 }
 
 func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
-	u := c.Router.PathTo(name, pairs...)
-	u.Host = c.Req.Host
-	u.Scheme = c.Req.URL.Scheme
+	u := c.router.PathTo(name, pairs...)
+	u.Host = c.r.Host
+	u.Scheme = c.r.URL.Scheme
 	if u.Scheme == "" {
 		u.Scheme = "http"
 	}
@@ -72,25 +155,19 @@ func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
 }
 
 func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
-	u := c.Router.PathTo(name, pairs...)
-	return u
+	return c.router.PathTo(name, pairs...)
 }
 
-func (c *Ctx) RedirectTo(name string, pairs ...string) {
-	u := c.Router.PathTo(name, pairs...)
-	http.Redirect(c.Res, c.Req, u.String(), http.StatusSeeOther)
+func (c *Ctx) PersistFlash(f Flash) {
+	c.Cookies.Append(FlashCookie, f, time.Now().Add(3*time.Minute))
 }
 
 func (c *Ctx) AssetPath(asset string) string {
-	ap, err := c.Assets.AssetPath(asset)
+	ap, err := c.assets.AssetPath(asset)
 	if err != nil {
 		panic(err)
 	}
 	return ap
-}
-
-func (c *Ctx) AddFlash(f Flash) {
-	c.Cookies.Append(flashCookie, f, time.Now().Add(3*time.Minute))
 }
 
 func (c *Ctx) WebSocketPath(channels ...string) string {

@@ -66,7 +66,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38
-	github.com/ugent-library/httpx v0.0.0-20230515135137-4055ec071df2
+	github.com/ugent-library/httpx v0.0.0-20230516121022-7b8f3af3aea9
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/urfave/cli/v2 v2.25.3

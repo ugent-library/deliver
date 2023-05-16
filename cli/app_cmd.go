@@ -14,6 +14,7 @@ import (
 	"github.com/ory/graceful"
 	"github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/crumb"
+	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
@@ -110,25 +111,10 @@ var appCmd = &cli.Command{
 		folders := controllers.NewFoldersController(repo, storage, config.MaxFileSize)
 		files := controllers.NewFilesController(repo, storage)
 
-		// request context wrapper
-		wrap := controllers.Wrapper(controllers.Config{
-			UserFunc:     repo.Users.GetByRememberToken,
-			Router:       router,
-			ErrorHandler: errs.HandleError,
-			Permissions:  permissions,
-			Assets:       assets,
-			Hub:          hub,
-			Banner:       config.Banner,
-		})
-
 		// routes
 		router.Get("/health", health.NewHandler(healthChecker))
-		// TODO clean this up, split off
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
-			if err := httpx.RenderJSON(w, appInfo); err != nil {
-				logger.Error(err)
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			}
+			httpx.RenderJSON(w, http.StatusOK, appInfo)
 		})
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +123,6 @@ var appCmd = &cli.Command{
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		})
-		router.Get("/auth/callback", wrap(auth.Callback))
 		router.Group(func(r *ich.Mux) {
 			r.Use(
 				func(next http.Handler) http.Handler {
@@ -156,27 +141,48 @@ var appCmd = &cli.Command{
 						logger.Error(err)
 					}),
 				),
+				// request context wrapper
+				ctx.Set(ctx.Config{
+					GetUserByRememberToken: repo.Users.GetByRememberToken,
+					Router:                 router,
+					ErrorHandlers: map[int]http.HandlerFunc{
+						http.StatusNotFound:     errs.NotFound,
+						http.StatusUnauthorized: errs.Unauthorized,
+						http.StatusForbidden:    errs.Forbidden,
+					},
+					Permissions: permissions,
+					Assets:      assets,
+					Hub:         hub,
+					Banner:      config.Banner,
+				}),
 			)
 
-			r.NotFound(wrap(errs.NotFound))
-			r.Get("/", wrap(pages.Home)).Name("home")
-			r.Get("/logout", wrap(auth.Logout)).Name("logout")
-			r.Get("/login", wrap(auth.Login)).Name("login")
-			r.Get("/spaces", wrap(controllers.RequireUser, spaces.List)).Name("spaces")
-			r.Get("/spaces/{spaceName}", wrap(controllers.RequireUser, spaces.Show)).Name("space")
-			r.Get("/new-space", wrap(controllers.RequireAdmin, spaces.New)).Name("newSpace")
-			r.Post("/spaces", wrap(controllers.RequireAdmin, spaces.Create)).Name("createSpace")
-			r.Get("/spaces/{spaceName}/edit", wrap(controllers.RequireAdmin, spaces.Edit)).Name("editSpace")
-			r.Put("/spaces/{spaceName}", wrap(controllers.RequireAdmin, spaces.Update)).Name("updateSpace")
-			r.Post("/spaces/{spaceName}/folders", wrap(controllers.RequireUser, spaces.CreateFolder)).Name("createFolder")
-			r.Get("/folders/{folderID}", wrap(controllers.RequireUser, folders.Show)).Name("folder")
-			r.Get("/folders/{folderID}/edit", wrap(controllers.RequireUser, folders.Edit)).Name("editFolder")
-			r.Put("/folders/{folderID}", wrap(controllers.RequireUser, folders.Update)).Name("updateFolder")
-			r.Post("/folders/{folderID}/files", wrap(controllers.RequireUser, folders.UploadFile)).Name("uploadFile")
-			r.Delete("/folders/{folderID}", wrap(controllers.RequireUser, folders.Delete)).Name("deleteFolder")
-			r.Get("/files/{fileID}", wrap(files.Download)).Name("downloadFile")
-			r.Delete("/files/{fileID}", wrap(controllers.RequireUser, files.Delete)).Name("deleteFile")
-			r.Get("/share/{folderID}:{folderSlug}", wrap(folders.Share)).Name("shareFolder")
+			r.NotFound(errs.NotFound)
+			r.Get("/auth/callback", auth.Callback)
+			r.Get("/", pages.Home).Name("home")
+			r.Get("/logout", auth.Logout).Name("logout")
+			r.Get("/login", auth.Login).Name("login")
+			r.Get("/share/{folderID}:{folderSlug}", folders.Share).Name("shareFolder")
+			r.Get("/files/{fileID}", files.Download).Name("downloadFile")
+			r.Group(func(r *ich.Mux) {
+				r.Use(controllers.RequireUser)
+				r.Get("/spaces", spaces.List).Name("spaces")
+				r.Get("/spaces/{spaceName}", spaces.Show).Name("space")
+				r.Post("/spaces/{spaceName}/folders", spaces.CreateFolder).Name("createFolder")
+				r.Get("/folders/{folderID}", folders.Show).Name("folder")
+				r.Get("/folders/{folderID}/edit", folders.Edit).Name("editFolder")
+				r.Put("/folders/{folderID}", folders.Update).Name("updateFolder")
+				r.Post("/folders/{folderID}/files", folders.UploadFile).Name("uploadFile")
+				r.Delete("/folders/{folderID}", folders.Delete).Name("deleteFolder")
+				r.Delete("/files/{fileID}", files.Delete).Name("deleteFile")
+			})
+			r.Group(func(r *ich.Mux) {
+				r.Use(controllers.RequireAdmin)
+				r.Get("/new-space", spaces.New).Name("newSpace")
+				r.Post("/spaces", spaces.Create).Name("createSpace")
+				r.Get("/spaces/{spaceName}/edit", spaces.Edit).Name("editSpace")
+				r.Put("/spaces/{spaceName}", spaces.Update).Name("updateSpace")
+			})
 		})
 
 		// start server

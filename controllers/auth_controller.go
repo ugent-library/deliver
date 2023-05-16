@@ -22,34 +22,47 @@ func NewAuthController(repo *repositories.Repo, oidcAuth *oidc.Auth) *AuthContro
 	}
 }
 
-func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
+func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
+
 	claims := oidc.Claims{}
 	if err := h.oidcAuth.CompleteAuth(w, r, &claims); err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
+
 	u := &models.User{
 		Username: claims.PreferredUsername,
 		Name:     claims.Name,
 		Email:    claims.Email,
 	}
-	if err := h.repo.Users.CreateOrUpdate(c.Context(), u); err != nil {
-		return err
+	if err := h.repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
+		c.HandleError(err)
+		return
 	}
-	c.User = u
-	c.Cookies.Set(rememberCookie, u.RememberToken, time.Now().Add(24*time.Hour*7))
-	c.RedirectTo("home")
-	return nil
+
+	c.Cookies.Set(ctx.RememberCookie, u.RememberToken, time.Now().Add(24*time.Hour*7))
+
+	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
 }
 
-func (h *AuthController) Login(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	return h.oidcAuth.BeginAuth(w, r)
+func (h *AuthController) Login(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
+
+	if err := h.oidcAuth.BeginAuth(w, r); err != nil {
+		c.HandleError(err)
+	}
 }
 
-func (h *AuthController) Logout(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	c.Cookies.Delete(rememberCookie)
-	if err := h.repo.Users.RenewRememberToken(c.Context(), c.User.ID); err != nil {
-		return err
+func (h *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
+
+	c.Cookies.Delete(ctx.RememberCookie)
+
+	if err := h.repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
+		c.HandleError(err)
+		return
 	}
-	c.RedirectTo("home")
-	return nil
+
+	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
 }

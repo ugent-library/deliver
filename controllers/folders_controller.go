@@ -18,6 +18,7 @@ import (
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
+	"github.com/ugent-library/httpx"
 )
 
 type FoldersController struct {
@@ -38,90 +39,110 @@ func NewFoldersController(r *repositories.Repo, s objectstore.Store, maxFileSize
 	}
 }
 
-func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	folderID := c.Path("folderID")
-	folder, err := h.repo.Folders.Get(c.Context(), folderID)
+func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
+
+	folderID := c.RouteParam("folderID")
+	folder, err := h.repo.Folders.Get(r.Context(), folderID)
 	if err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
 
 	if htmx.Request(r) {
-		return c.HTML(http.StatusOK, views.Files(c, folder.Files))
+		httpx.RenderHTML(w, http.StatusOK, views.Files(c, folder.Files))
+		return
 	}
 
-	return c.HTML(http.StatusOK, views.Page(c, &views.ShowFolder{
+	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.ShowFolder{
 		Folder:      folder,
 		MaxFileSize: h.maxFileSize,
 	}))
 }
 
-func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	folderID := c.Path("folderID")
+func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
 
-	folder, err := h.repo.Folders.Get(c.Context(), folderID)
+	folderID := c.RouteParam("folderID")
+
+	folder, err := h.repo.Folders.Get(r.Context(), folderID)
 	if err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
 
 	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		return httperror.Forbidden
+		c.HandleError(httperror.Forbidden)
+		return
 	}
 
-	return c.HTML(http.StatusOK, views.Page(c, &views.EditFolder{
+	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
 		Folder:           folder,
 		ValidationErrors: validate.NewErrors(),
 	}))
 }
 
-func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	folderID := c.Path("folderID")
+func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
 
-	folder, err := h.repo.Folders.Get(c.Context(), folderID)
+	folderID := c.RouteParam("folderID")
+
+	folder, err := h.repo.Folders.Get(r.Context(), folderID)
 	if err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
 
 	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		return httperror.Forbidden
+		c.HandleError(httperror.Forbidden)
+		return
 	}
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
-		return errors.Join(httperror.BadRequest, err)
+		c.HandleError(errors.Join(httperror.BadRequest, err))
+		return
 	}
 
 	folder.Name = b.Name
 
-	if err := h.repo.Folders.Update(c.Context(), folder); err != nil {
+	if err := h.repo.Folders.Update(r.Context(), folder); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
-			return err
+			c.HandleError(err)
+			return
 		}
-		return c.HTML(http.StatusOK, views.Page(c, &views.EditFolder{
+
+		httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
 			Folder:           folder,
 			ValidationErrors: validationErrors,
 		}))
+		return
 	}
 
-	c.RedirectTo("folder", "folderID", folder.ID)
-
-	return nil
+	loc := c.PathTo("folder", "folderID", folder.ID).String()
+	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	folderID := c.Path("folderID")
+func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
 
-	folder, err := h.repo.Folders.Get(c.Context(), folderID)
+	folderID := c.RouteParam("folderID")
+
+	folder, err := h.repo.Folders.Get(r.Context(), folderID)
 	if err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
 
 	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		return httperror.Forbidden
+		c.HandleError(httperror.Forbidden)
+		return
 	}
 
-	if err := h.repo.Folders.Delete(c.Context(), folderID); err != nil {
-		return err
+	if err := h.repo.Folders.Delete(r.Context(), folderID); err != nil {
+		c.HandleError(err)
+		return
 	}
 
 	c.Hub.Send("space."+folder.Space.ID, views.AddFlash(ctx.Flash{
@@ -132,32 +153,33 @@ func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request, c *ct
 		Type: "error",
 		Body: fmt.Sprintf("%s just deleted this folder.", c.User.Name),
 	}))
-	c.AddFlash(ctx.Flash{
+	c.PersistFlash(ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
 		DismissAfter: 3 * time.Second,
 	})
-	c.RedirectTo("space", "spaceName", folder.Space.Name)
 
-	return nil
+	loc := c.PathTo("space", "spaceName", folder.Space.Name).String()
+	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	folderID := c.Path("folderID")
+func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
 
-	folder, err := h.repo.Folders.Get(c.Context(), folderID)
+	folderID := c.RouteParam("folderID")
+
+	folder, err := h.repo.Folders.Get(r.Context(), folderID)
 	if err != nil {
-		return httperror.NotFound
+		c.HandleError(httperror.NotFound)
+		return
 	}
 
 	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		return httperror.Forbidden
+		c.HandleError(httperror.Forbidden)
+		return
 	}
 
-	/*
-		TODO: retrieve content type by content sniffing
-		without interfering with streaming body
-	*/
+	// TODO: retrieve content type by content sniffing without interfering with streaming body
 	contentLength, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
 
 	// request header only accepts ISO-8859-1 so we had to escape it
@@ -172,23 +194,30 @@ func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request, c
 	}
 
 	// TODO get size
-	md5, err := h.storage.Add(c.Context(), file.ID, r.Body)
+	md5, err := h.storage.Add(r.Context(), file.ID, r.Body)
 	if err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
 
 	file.MD5 = md5
 
-	return h.repo.Files.Create(c.Context(), file)
+	if err := h.repo.Files.Create(r.Context(), file); err != nil {
+		c.HandleError(err)
+	}
 }
 
-func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request, c *ctx.Ctx) error {
-	folderID := c.Path("folderID")
-	folder, err := h.repo.Folders.Get(c.Context(), folderID)
+func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r.Context())
+
+	folderID := c.RouteParam("folderID")
+	folder, err := h.repo.Folders.Get(r.Context(), folderID)
 	if err != nil {
-		return err
+		c.HandleError(err)
+		return
 	}
-	return c.HTML(http.StatusOK, views.PublicPage(c, &views.ShareFolder{
+
+	httpx.RenderHTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
 		Folder: folder,
 	}))
 }
