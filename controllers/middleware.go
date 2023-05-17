@@ -7,7 +7,7 @@ import (
 	"github.com/ugent-library/httperror"
 )
 
-func RequireUser(next http.Handler) http.Handler {
+func IsUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c := ctx.Get(r.Context())
 
@@ -19,7 +19,7 @@ func RequireUser(next http.Handler) http.Handler {
 	})
 }
 
-func RequireAdmin(next http.Handler) http.Handler {
+func IsAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c := ctx.Get(r.Context())
 

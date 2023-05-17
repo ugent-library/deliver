@@ -41,13 +41,7 @@ func NewFoldersController(r *repositories.Repo, s objectstore.Store, maxFileSize
 
 func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	folderID := c.RouteParam("folderID")
-	folder, err := h.repo.Folders.Get(r.Context(), folderID)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
+	folder := ctx.GetFolder(r.Context())
 
 	if htmx.Request(r) {
 		httpx.RenderHTML(w, http.StatusOK, views.Files(c, folder.Files))
@@ -62,19 +56,7 @@ func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
 
 func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	folderID := c.RouteParam("folderID")
-
-	folder, err := h.repo.Folders.Get(r.Context(), folderID)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		c.HandleError(httperror.Forbidden)
-		return
-	}
+	folder := ctx.GetFolder(r.Context())
 
 	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
 		Folder:           folder,
@@ -84,19 +66,7 @@ func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
 
 func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	folderID := c.RouteParam("folderID")
-
-	folder, err := h.repo.Folders.Get(r.Context(), folderID)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		c.HandleError(httperror.Forbidden)
-		return
-	}
+	folder := ctx.GetFolder(r.Context())
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -126,21 +96,9 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 
 func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
+	folder := ctx.GetFolder(r.Context())
 
-	folderID := c.RouteParam("folderID")
-
-	folder, err := h.repo.Folders.Get(r.Context(), folderID)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		c.HandleError(httperror.Forbidden)
-		return
-	}
-
-	if err := h.repo.Folders.Delete(r.Context(), folderID); err != nil {
+	if err := h.repo.Folders.Delete(r.Context(), folder.ID); err != nil {
 		c.HandleError(err)
 		return
 	}
@@ -165,19 +123,7 @@ func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	folderID := c.RouteParam("folderID")
-
-	folder, err := h.repo.Folders.Get(r.Context(), folderID)
-	if err != nil {
-		c.HandleError(httperror.NotFound)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, folder.Space) {
-		c.HandleError(httperror.Forbidden)
-		return
-	}
+	folder := ctx.GetFolder(r.Context())
 
 	// TODO: retrieve content type by content sniffing without interfering with streaming body
 	contentLength, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
@@ -186,7 +132,7 @@ func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
 	uploadFilename, _ := url.QueryUnescape(r.Header.Get("X-Upload-Filename"))
 
 	file := &models.File{
-		FolderID:    folderID,
+		FolderID:    folder.ID,
 		ID:          ulid.Make().String(),
 		Name:        uploadFilename,
 		ContentType: r.Header.Get("Content-Type"),
@@ -209,13 +155,7 @@ func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
 
 func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	folderID := c.RouteParam("folderID")
-	folder, err := h.repo.Folders.Get(r.Context(), folderID)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
+	folder := ctx.GetFolder(r.Context())
 
 	httpx.RenderHTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
 		Folder: folder,

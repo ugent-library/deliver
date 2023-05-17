@@ -134,7 +134,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 
-	spaceName := c.RouteParam("spaceName")
+	spaceName := c.PathParam("spaceName")
 
 	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
 	if err != nil {
@@ -178,7 +178,7 @@ func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) 
 func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 
-	spaceName := c.RouteParam("spaceName")
+	spaceName := c.PathParam("spaceName")
 
 	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
 	if err != nil {
@@ -195,7 +195,7 @@ func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
 func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 
-	spaceName := c.RouteParam("spaceName")
+	spaceName := c.PathParam("spaceName")
 
 	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
 	if err != nil {
@@ -229,7 +229,7 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, c *ctx.Ctx, folder *models.Folder, err error) {
-	spaceName := c.RouteParam("spaceName")
+	spaceName := c.PathParam("spaceName")
 
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {

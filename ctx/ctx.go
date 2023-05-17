@@ -140,7 +140,7 @@ func (c *Ctx) HandleError(err error) {
 	http.Error(c.w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
 }
 
-func (c *Ctx) RouteParam(param string) string {
+func (c *Ctx) PathParam(param string) string {
 	return chi.URLParamFromCtx(c.r.Context(), param)
 }
 
