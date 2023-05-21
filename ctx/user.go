@@ -1,15 +1,14 @@
-package controllers
+package ctx
 
 import (
 	"net/http"
 
-	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/httperror"
 )
 
-func IsUser(next http.Handler) http.Handler {
+func RequireUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := ctx.Get(r.Context())
+		c := Get(r.Context())
 
 		if c.User == nil {
 			c.HandleError(httperror.Unauthorized)
@@ -19,9 +18,9 @@ func IsUser(next http.Handler) http.Handler {
 	})
 }
 
-func IsAdmin(next http.Handler) http.Handler {
+func RequireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := ctx.Get(r.Context())
+		c := Get(r.Context())
 
 		if c.User == nil {
 			c.HandleError(httperror.Unauthorized)

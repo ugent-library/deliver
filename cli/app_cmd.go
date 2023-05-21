@@ -157,15 +157,17 @@ var appCmd = &cli.Command{
 				}),
 			)
 
+			// viewable by everyone
 			r.NotFound(errs.NotFound)
 			r.Get("/auth/callback", auth.Callback)
 			r.Get("/", pages.Home).Name("home")
 			r.Get("/logout", auth.Logout).Name("logout")
 			r.Get("/login", auth.Login).Name("login")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", folders.Share).Name("shareFolder")
-			r.Get("/files/{fileID}", files.Download).Name("downloadFile")
+			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", files.Download).Name("downloadFile")
+			// viewable by space owners and admins
 			r.Group(func(r *ich.Mux) {
-				r.Use(controllers.IsUser)
+				r.Use(ctx.RequireUser)
 				r.Get("/spaces", spaces.List).Name("spaces")
 				r.Get("/spaces/{spaceName}", spaces.Show).Name("space")
 				r.Post("/spaces/{spaceName}/folders", spaces.CreateFolder).Name("createFolder")
@@ -178,10 +180,15 @@ var appCmd = &cli.Command{
 					r.Post("/files", folders.UploadFile).Name("uploadFile")
 					r.Delete("/", folders.Delete).Name("deleteFolder")
 				})
-				r.Delete("/files/{fileID}", files.Delete).Name("deleteFile")
+				r.Route("/files/{fileID}", func(r *ich.Mux) {
+					r.Use(ctx.SetFile(*repo.Files))
+					r.Use(ctx.CanEditFile)
+					r.Delete("/", files.Delete).Name("deleteFile")
+				})
 			})
+			// viewable by admin only
 			r.Group(func(r *ich.Mux) {
-				r.Use(controllers.IsAdmin)
+				r.Use(ctx.RequireAdmin)
 				r.Get("/new-space", spaces.New).Name("newSpace")
 				r.Post("/spaces", spaces.Create).Name("createSpace")
 				r.Get("/spaces/{spaceName}/edit", spaces.Edit).Name("editSpace")

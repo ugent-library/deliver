@@ -44,11 +44,15 @@ type Config struct {
 	Banner                 string
 }
 
+func Get(ctx context.Context) *Ctx {
+	return ctx.Value(ctxKey).(*Ctx)
+}
+
 func Set(config Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := New(config, w, r)
-			if err := loadSession(config.GetUserByRememberToken, c); err != nil {
+			if err := c.loadSession(config.GetUserByRememberToken); err != nil {
 				c.HandleError(err)
 				return
 			}
@@ -57,25 +61,6 @@ func Set(config Config) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
-}
-
-func Get(ctx context.Context) *Ctx {
-	return ctx.Value(ctxKey).(*Ctx)
-}
-
-func loadSession(userFunc func(context.Context, string) (*models.User, error), c *Ctx) error {
-	if token := c.Cookies.Get(RememberCookie); token != "" {
-		user, err := userFunc(c.r.Context(), token)
-		if err != nil && err != models.ErrNotFound {
-			return err
-		}
-		c.User = user
-	}
-
-	c.Cookies.Unmarshal(FlashCookie, &c.Flash)
-	c.Cookies.Delete(FlashCookie)
-
-	return nil
 }
 
 type Flash struct {
@@ -138,6 +123,21 @@ func (c *Ctx) HandleError(err error) {
 
 	c.Log.Error(err)
 	http.Error(c.w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
+}
+
+func (c *Ctx) loadSession(userSource func(context.Context, string) (*models.User, error)) error {
+	if token := c.Cookies.Get(RememberCookie); token != "" {
+		user, err := userSource(c.r.Context(), token)
+		if err != nil && err != models.ErrNotFound {
+			return err
+		}
+		c.User = user
+	}
+
+	c.Cookies.Unmarshal(FlashCookie, &c.Flash)
+	c.Cookies.Delete(FlashCookie)
+
+	return nil
 }
 
 func (c *Ctx) PathParam(param string) string {

@@ -9,7 +9,6 @@ import (
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/objectstore"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/ugent-library/httperror"
 )
 
 type FilesController struct {
@@ -26,20 +25,14 @@ func NewFilesController(r *repositories.Repo, s objectstore.Store) *FilesControl
 
 func (h *FilesController) Download(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
+	file := ctx.GetFile(r.Context())
 
-	fileID := c.PathParam("fileID")
-
-	if _, err := h.repo.Files.Get(r.Context(), fileID); err != nil {
+	if err := h.repo.Files.AddDownload(r.Context(), file.ID); err != nil {
 		c.HandleError(err)
 		return
 	}
 
-	if err := h.repo.Files.AddDownload(r.Context(), fileID); err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	file, err := h.repo.Files.Get(r.Context(), fileID)
+	file, err := h.repo.Files.Get(r.Context(), file.ID)
 	if err != nil {
 		c.HandleError(err)
 		return
@@ -62,21 +55,9 @@ func (h *FilesController) Download(w http.ResponseWriter, r *http.Request) {
 
 func (h *FilesController) Delete(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
+	file := ctx.GetFile(r.Context())
 
-	fileID := c.PathParam("fileID")
-
-	file, err := h.repo.Files.Get(r.Context(), fileID)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, file.Folder.Space) {
-		c.HandleError(httperror.Forbidden)
-		return
-	}
-
-	if err := h.repo.Files.Delete(r.Context(), fileID); err != nil {
+	if err := h.repo.Files.Delete(r.Context(), file.ID); err != nil {
 		c.HandleError(err)
 		return
 	}
