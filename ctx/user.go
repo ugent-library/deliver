@@ -11,7 +11,7 @@ func RequireUser(next http.Handler) http.Handler {
 		c := Get(r.Context())
 
 		if c.User == nil {
-			c.HandleError(httperror.Unauthorized)
+			c.HandleError(w, r, httperror.Unauthorized)
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -23,11 +23,11 @@ func RequireAdmin(next http.Handler) http.Handler {
 		c := Get(r.Context())
 
 		if c.User == nil {
-			c.HandleError(httperror.Unauthorized)
+			c.HandleError(w, r, httperror.Unauthorized)
 			return
 		}
 		if !c.IsAdmin(c.User) {
-			c.HandleError(httperror.Forbidden)
+			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}
 		next.ServeHTTP(w, r)

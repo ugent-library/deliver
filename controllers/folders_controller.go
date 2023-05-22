@@ -70,7 +70,7 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
-		c.HandleError(errors.Join(httperror.BadRequest, err))
+		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
 
@@ -79,7 +79,7 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Folders.Update(r.Context(), folder); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
-			c.HandleError(err)
+			c.HandleError(w, r, err)
 			return
 		}
 
@@ -99,7 +99,7 @@ func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r.Context())
 
 	if err := h.repo.Folders.Delete(r.Context(), folder.ID); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
 		Type: "error",
 		Body: fmt.Sprintf("%s just deleted this folder.", c.User.Name),
 	}))
-	c.PersistFlash(ctx.Flash{
+	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
 		DismissAfter: 3 * time.Second,
@@ -142,14 +142,14 @@ func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
 	// TODO get size
 	md5, err := h.storage.Add(r.Context(), file.ID, r.Body)
 	if err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
 	file.MD5 = md5
 
 	if err := h.repo.Files.Create(r.Context(), file); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 	}
 }
 

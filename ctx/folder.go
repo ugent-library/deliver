@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
@@ -20,11 +21,11 @@ func SetFolder(foldersRepo repositories.FoldersRepo) func(http.Handler) http.Han
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := Get(r.Context())
 
-			folderID := c.PathParam("folderID")
+			folderID := chi.URLParam(r, "folderID")
 
 			folder, err := foldersRepo.Get(r.Context(), folderID)
 			if err != nil {
-				c.HandleError(err)
+				c.HandleError(w, r, err)
 				return
 			}
 
@@ -40,7 +41,7 @@ func CanEditFolder(next http.Handler) http.Handler {
 		folder := GetFolder(r.Context())
 
 		if !c.IsSpaceAdmin(c.User, folder.Space) {
-			c.HandleError(httperror.Forbidden)
+			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}
 

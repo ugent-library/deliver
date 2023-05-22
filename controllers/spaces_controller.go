@@ -44,13 +44,13 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 		userSpaces, err = h.repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
 	}
 	if err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
 	// handle new empty installation
 	if c.IsAdmin(c.User) && len(userSpaces) == 0 {
-		c.PersistFlash(ctx.Flash{
+		c.PersistFlash(w, ctx.Flash{
 			Type: "info",
 			Body: "Create an initial space to get started",
 		})
@@ -60,13 +60,13 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 
 	// return forbidden if user is not an admin of anything
 	if len(userSpaces) == 0 {
-		c.HandleError(httperror.Forbidden)
+		c.HandleError(w, r, httperror.Forbidden)
 		return
 	}
 
 	space, err := h.repo.Spaces.Get(r.Context(), userSpaces[0].ID)
 	if err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 
 	b := SpaceForm{}
 	if err := bind.Form(r, &b); err != nil {
-		c.HandleError(errors.Join(httperror.BadRequest, err))
+		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
 
@@ -109,7 +109,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Spaces.Create(r.Context(), space); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
-			c.HandleError(err)
+			c.HandleError(w, r, err)
 			return
 		}
 		render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
@@ -119,7 +119,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.PersistFlash(ctx.Flash{
+	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
 		Body:         "Space created succesfully",
 		DismissAfter: 3 * time.Second,
@@ -135,7 +135,7 @@ func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) 
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
-		c.HandleError(errors.Join(httperror.BadRequest, err))
+		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
 
@@ -151,7 +151,7 @@ func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	c.PersistFlash(ctx.Flash{
+	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
 		Body:         "Folder created succesfully",
 		DismissAfter: 3 * time.Second,
@@ -177,7 +177,7 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 
 	b := SpaceForm{}
 	if err := bind.Form(r, &b); err != nil {
-		c.HandleError(errors.Join(httperror.BadRequest, err))
+		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
 
@@ -186,7 +186,7 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Spaces.Update(r.Context(), space); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
-			c.HandleError(err)
+			c.HandleError(w, r, err)
 			return
 		}
 		render.HTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
@@ -206,7 +206,7 @@ func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *
 
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
@@ -217,7 +217,7 @@ func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *
 		userSpaces, err = h.repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
 	}
 	if err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 

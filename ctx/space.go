@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
@@ -20,11 +21,11 @@ func SetSpace(spacesRepo repositories.SpacesRepo) func(http.Handler) http.Handle
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := Get(r.Context())
 
-			spaceID := c.PathParam("spaceID")
+			spaceName := chi.URLParam(r, "spaceName")
 
-			space, err := spacesRepo.Get(r.Context(), spaceID)
+			space, err := spacesRepo.GetByName(r.Context(), spaceName)
 			if err != nil {
-				c.HandleError(err)
+				c.HandleError(w, r, err)
 				return
 			}
 
@@ -40,7 +41,7 @@ func CanViewSpace(next http.Handler) http.Handler {
 		space := GetSpace(r.Context())
 
 		if !c.IsSpaceAdmin(c.User, space) {
-			c.HandleError(httperror.Forbidden)
+			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}
 

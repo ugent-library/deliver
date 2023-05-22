@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
@@ -20,11 +21,11 @@ func SetFile(filesRepo repositories.FilesRepo) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := Get(r.Context())
 
-			fileID := c.PathParam("fileID")
+			fileID := chi.URLParam(r, "fileID")
 
 			file, err := filesRepo.Get(r.Context(), fileID)
 			if err != nil {
-				c.HandleError(err)
+				c.HandleError(w, r, err)
 				return
 			}
 
@@ -40,7 +41,7 @@ func CanEditFile(next http.Handler) http.Handler {
 		file := GetFile(r.Context())
 
 		if !c.IsSpaceAdmin(c.User, file.Folder.Space) {
-			c.HandleError(httperror.Forbidden)
+			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}
 

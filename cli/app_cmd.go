@@ -13,7 +13,6 @@ import (
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
 	"github.com/ugent-library/deliver/controllers"
-	"github.com/ugent-library/deliver/crumb"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
@@ -132,14 +131,9 @@ var appCmd = &cli.Command{
 					[]byte(config.Cookie.Secret),
 					csrf.CookieName("deliver.csrf"),
 					csrf.Path("/"),
-					csrf.Secure(config.Production),
+					csrf.HttpOnly(true),
 					csrf.SameSite(csrf.SameSiteStrictMode),
 					csrf.FieldName("_csrf_token"),
-				),
-				crumb.Enable(
-					crumb.WithErrorHandler(func(err error) {
-						logger.Error(err)
-					}),
 				),
 				// request context wrapper
 				ctx.Set(ctx.Config{
@@ -159,10 +153,10 @@ var appCmd = &cli.Command{
 
 			// viewable by everyone
 			r.NotFound(errs.NotFound)
-			r.Get("/auth/callback", auth.Callback)
 			r.Get("/", pages.Home).Name("home")
-			r.Get("/logout", auth.Logout).Name("logout")
+			r.Get("/auth/callback", auth.Callback)
 			r.Get("/login", auth.Login).Name("login")
+			r.Get("/logout", auth.Logout).Name("logout")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", folders.Share).Name("shareFolder")
 			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", files.Download).Name("downloadFile")
 			// viewable by space owners and admins

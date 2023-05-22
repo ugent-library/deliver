@@ -28,19 +28,19 @@ func (h *FilesController) Download(w http.ResponseWriter, r *http.Request) {
 	file := ctx.GetFile(r.Context())
 
 	if err := h.repo.Files.AddDownload(r.Context(), file.ID); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
 	file, err := h.repo.Files.Get(r.Context(), file.ID)
 	if err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
 	b, err := h.storage.Get(r.Context(), file.ID)
 	if err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (h *FilesController) Delete(w http.ResponseWriter, r *http.Request) {
 	file := ctx.GetFile(r.Context())
 
 	if err := h.repo.Files.Delete(r.Context(), file.ID); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 

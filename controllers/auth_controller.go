@@ -27,7 +27,7 @@ func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 
 	claims := oidc.Claims{}
 	if err := h.oidcAuth.CompleteAuth(w, r, &claims); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
@@ -37,11 +37,18 @@ func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 		Email:    claims.Email,
 	}
 	if err := h.repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
 
-	c.Cookies.Set(ctx.RememberCookie, u.RememberToken, time.Now().Add(24*time.Hour*7))
+	http.SetCookie(w, &http.Cookie{
+		Name:     ctx.RememberCookie,
+		Value:    u.RememberToken,
+		Expires:  time.Now().Add(24 * time.Hour * 7),
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
 	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
 }
@@ -50,19 +57,26 @@ func (h *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 
 	if err := h.oidcAuth.BeginAuth(w, r); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 	}
 }
 
 func (h *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 
-	c.Cookies.Delete(ctx.RememberCookie)
-
 	if err := h.repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
-		c.HandleError(err)
+		c.HandleError(w, r, err)
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     ctx.RememberCookie,
+		Value:    "",
+		Expires:  time.Now(),
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
 	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
 }
