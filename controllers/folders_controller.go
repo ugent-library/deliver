@@ -18,7 +18,7 @@ import (
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/httpx"
+	"github.com/ugent-library/httpx/render"
 )
 
 type FoldersController struct {
@@ -44,11 +44,11 @@ func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r.Context())
 
 	if htmx.Request(r) {
-		httpx.RenderHTML(w, http.StatusOK, views.Files(c, folder.Files))
+		render.HTML(w, http.StatusOK, views.Files(c, folder.Files))
 		return
 	}
 
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.ShowFolder{
+	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowFolder{
 		Folder:      folder,
 		MaxFileSize: h.maxFileSize,
 	}))
@@ -58,7 +58,7 @@ func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 	folder := ctx.GetFolder(r.Context())
 
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
+	render.HTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
 		Folder:           folder,
 		ValidationErrors: validate.NewErrors(),
 	}))
@@ -83,7 +83,7 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
+		render.HTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
 			Folder:           folder,
 			ValidationErrors: validationErrors,
 		}))
@@ -157,7 +157,7 @@ func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 	folder := ctx.GetFolder(r.Context())
 
-	httpx.RenderHTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
+	render.HTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
 		Folder: folder,
 	}))
 }

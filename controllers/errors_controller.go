@@ -5,7 +5,7 @@ import (
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/views"
-	"github.com/ugent-library/httpx"
+	"github.com/ugent-library/httpx/render"
 )
 
 type ErrorsController struct{}
@@ -16,7 +16,7 @@ func NewErrorsController() *ErrorsController {
 
 func (h *ErrorsController) NotFound(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-	httpx.RenderHTML(w, http.StatusNotFound, views.PublicPage(c, &views.NotFound{}))
+	render.HTML(w, http.StatusNotFound, views.PublicPage(c, &views.NotFound{}))
 }
 
 func (h *ErrorsController) Unauthorized(w http.ResponseWriter, r *http.Request) {
@@ -26,5 +26,5 @@ func (h *ErrorsController) Unauthorized(w http.ResponseWriter, r *http.Request) 
 
 func (h *ErrorsController) Forbidden(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-	httpx.RenderHTML(w, http.StatusForbidden, views.PublicPage(c, &views.Forbidden{}))
+	render.HTML(w, http.StatusForbidden, views.PublicPage(c, &views.Forbidden{}))
 }

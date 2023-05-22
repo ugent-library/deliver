@@ -5,7 +5,7 @@ import (
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/views"
-	"github.com/ugent-library/httpx"
+	"github.com/ugent-library/httpx/render"
 )
 
 type PagesController struct{}
@@ -21,5 +21,5 @@ func (h *PagesController) Home(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, c.PathTo("spaces").String(), http.StatusSeeOther)
 		return
 	}
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.Home{}))
+	render.HTML(w, http.StatusOK, views.Page(c, &views.Home{}))
 }

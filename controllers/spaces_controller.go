@@ -13,7 +13,7 @@ import (
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/httpx"
+	"github.com/ugent-library/httpx/render"
 )
 
 type SpacesController struct {
@@ -70,7 +70,7 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.ShowSpace{
+	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowSpace{
 		Space:            space,
 		UserSpaces:       userSpaces,
 		Folder:           &models.Folder{},
@@ -79,15 +79,13 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) Show(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-
-	h.show(w, r, c, &models.Folder{}, nil)
+	h.show(w, r, &models.Folder{}, nil)
 }
 
 func (h *SpacesController) New(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
 
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
+	render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
 		Space:            &models.Space{},
 		ValidationErrors: validate.NewErrors(),
 	}))
@@ -114,7 +112,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 			c.HandleError(err)
 			return
 		}
-		httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
+		render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
 			Space:            space,
 			ValidationErrors: validationErrors,
 		}))
@@ -133,19 +131,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 
 func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	spaceName := c.PathParam("spaceName")
-
-	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, space) {
-		c.HandleError(httperror.Forbidden)
-		return
-	}
+	space := ctx.GetSpace(r.Context())
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -161,7 +147,7 @@ func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := h.repo.Folders.Create(r.Context(), folder); err != nil {
-		h.show(w, r, c, folder, err)
+		h.show(w, r, folder, err)
 		return
 	}
 
@@ -177,16 +163,9 @@ func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) 
 
 func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
+	space := ctx.GetSpace(r.Context())
 
-	spaceName := c.PathParam("spaceName")
-
-	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
+	render.HTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
 		Space:            space,
 		ValidationErrors: validate.NewErrors(),
 	}))
@@ -194,14 +173,7 @@ func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
 
 func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r.Context())
-
-	spaceName := c.PathParam("spaceName")
-
-	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
+	space := ctx.GetSpace(r.Context())
 
 	b := SpaceForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -217,7 +189,7 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 			c.HandleError(err)
 			return
 		}
-		httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
+		render.HTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
 			Space:            space,
 			ValidationErrors: validationErrors,
 		}))
@@ -228,23 +200,13 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, c *ctx.Ctx, folder *models.Folder, err error) {
-	spaceName := c.PathParam("spaceName")
+func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *models.Folder, err error) {
+	c := ctx.Get(r.Context())
+	space := ctx.GetSpace(r.Context())
 
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
 		c.HandleError(err)
-		return
-	}
-
-	space, err := h.repo.Spaces.GetByName(r.Context(), spaceName)
-	if err != nil {
-		c.HandleError(err)
-		return
-	}
-
-	if !c.IsSpaceAdmin(c.User, space) {
-		c.HandleError(httperror.Forbidden)
 		return
 	}
 
@@ -259,7 +221,7 @@ func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, c *ctx.C
 		return
 	}
 
-	httpx.RenderHTML(w, http.StatusOK, views.Page(c, &views.ShowSpace{
+	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowSpace{
 		Space:            space,
 		UserSpaces:       userSpaces,
 		Folder:           folder,

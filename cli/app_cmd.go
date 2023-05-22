@@ -19,7 +19,7 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/ugent-library/httpx"
+	"github.com/ugent-library/httpx/render"
 	mw "github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -114,7 +114,7 @@ var appCmd = &cli.Command{
 		// routes
 		router.Get("/health", health.NewHandler(healthChecker))
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
-			httpx.RenderJSON(w, http.StatusOK, appInfo)
+			render.JSON(w, http.StatusOK, appInfo)
 		})
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -169,8 +169,16 @@ var appCmd = &cli.Command{
 			r.Group(func(r *ich.Mux) {
 				r.Use(ctx.RequireUser)
 				r.Get("/spaces", spaces.List).Name("spaces")
-				r.Get("/spaces/{spaceName}", spaces.Show).Name("space")
-				r.Post("/spaces/{spaceName}/folders", spaces.CreateFolder).Name("createFolder")
+				r.With(ctx.RequireAdmin).Get("/new-space", spaces.New).Name("newSpace")
+				r.With(ctx.RequireAdmin).Post("/spaces", spaces.Create).Name("createSpace")
+				r.Route("/spaces/{spaceName}", func(r *ich.Mux) {
+					r.Use(ctx.SetSpace(*repo.Spaces))
+					r.Use(ctx.CanViewSpace)
+					r.Get("/", spaces.Show).Name("space")
+					r.Post("/folders", spaces.CreateFolder).Name("createFolder")
+					r.With(ctx.RequireAdmin).Get("/edit", spaces.Edit).Name("editSpace")
+					r.With(ctx.RequireAdmin).Put("/", spaces.Update).Name("updateSpace")
+				})
 				r.Route("/folders/{folderID}", func(r *ich.Mux) {
 					r.Use(ctx.SetFolder(*repo.Folders))
 					r.Use(ctx.CanEditFolder)
@@ -185,14 +193,6 @@ var appCmd = &cli.Command{
 					r.Use(ctx.CanEditFile)
 					r.Delete("/", files.Delete).Name("deleteFile")
 				})
-			})
-			// viewable by admin only
-			r.Group(func(r *ich.Mux) {
-				r.Use(ctx.RequireAdmin)
-				r.Get("/new-space", spaces.New).Name("newSpace")
-				r.Post("/spaces", spaces.Create).Name("createSpace")
-				r.Get("/spaces/{spaceName}/edit", spaces.Edit).Name("editSpace")
-				r.Put("/spaces/{spaceName}", spaces.Update).Name("updateSpace")
 			})
 		})
 
