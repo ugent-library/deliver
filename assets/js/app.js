@@ -15,7 +15,6 @@ require('htmx.org/dist/ext/ws.js');
 htmx.config.defaultFocusScroll = true
 
 htmx.onLoad(function(el) {
-    bsnPopper(el)
     toast(el)
     formSubmit(el)
     formUploadProgress(el)
@@ -47,10 +46,10 @@ htmx.on('htmx:confirm', (evt) => {
             evt.detail.issueRequest()
         }, false)
 
-        modalEl.addEventListener('hidden.bs.modal', () => {
-            modalEl.remove()
-        }, false);
+        // modalEl.addEventListener('hidden.bs.modal', () => {
+        //     modalEl.remove()
+        // }, false);
 
-        new bsn.Modal(modalEl).show()
+        // new bsn.Modal(modalEl).show()
     }
 });
