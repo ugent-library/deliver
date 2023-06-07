@@ -1,6 +1,6 @@
 
 import htmx from 'htmx.org'
-import 'bootstrap'
+import * as bs from 'bootstrap'
 import toast from './toast.js'
 import formSubmit from './form_submit.js'
 import formUploadProgress from './form_upload_progress.js'
@@ -33,7 +33,8 @@ htmx.on('htmx:confirm', (evt) => {
         evt.preventDefault()
 
         let modalEl = document.getElementById('modal-confirm').content.firstElementChild.cloneNode(true)
-        document.body.appendChild(modalEl)
+
+        document.body.append(modalEl)
 
         if (el.dataset.confirmHeader) {
             modalEl.querySelector('.confirm-header').innerHTML = el.dataset.confirmHeader
@@ -46,10 +47,10 @@ htmx.on('htmx:confirm', (evt) => {
             evt.detail.issueRequest()
         }, false)
 
-        // modalEl.addEventListener('hidden.bs.modal', () => {
-        //     modalEl.remove()
-        // }, false);
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            modalEl.remove()
+        }, false);
 
-        // new bsn.Modal(modalEl).show()
+        new bs.Modal(modalEl).show()
     }
 });

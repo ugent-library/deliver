@@ -240,7 +240,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </div>
     </div>
 
-    <template id="tmps-upload-progress">
+    <template id="tmpl-upload-progress">
         <li class="list-group-item">
             <div class="list-group-item-inner">
                 <div class="list-group-item-main u-min-w-0">
