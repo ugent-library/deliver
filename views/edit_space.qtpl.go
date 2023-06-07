@@ -133,17 +133,15 @@ func (v *EditSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.N().S(c.CSRFTag)
 //line views/edit_space.qtpl:54
 	qw422016.N().S(`
-                        <div class="form-group">
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
-                                <div class="col-lg-5 col-xl-4">
-                                    <input class="form-control" type="text" value="`)
-//line views/edit_space.qtpl:59
+                        <div class="row">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
+                            <div class="col-lg-5 col-xl-4">
+                                <input class="form-control" type="text" value="`)
+//line views/edit_space.qtpl:58
 	qw422016.E().S(strings.Join(v.Space.Admins, ","))
-//line views/edit_space.qtpl:59
+//line views/edit_space.qtpl:58
 	qw422016.N().S(`" id="space-admins" name="admins">
-                                    <p class="small form-text text-muted">Separate usernames with a comma.</p>
-                                </div>
+                                <p class="small form-text text-muted">Separate usernames with a comma.</p>
                             </div>
                         </div>
                     </form>
@@ -152,31 +150,31 @@ func (v *EditSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </div>
     </div>
 `)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 }
 
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 func (v *EditSpace) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	v.StreamContent(qw422016, c)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	qt422016.ReleaseWriter(qw422016)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 }
 
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 func (v *EditSpace) Content(c *ctx.Ctx) string {
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	v.WriteContent(qb422016, c)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	qs422016 := string(qb422016.B)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 	return qs422016
-//line views/edit_space.qtpl:69
+//line views/edit_space.qtpl:67
 }

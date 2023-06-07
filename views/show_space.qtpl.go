@@ -130,7 +130,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.N().S(`
                     `)
 //line views/show_space.qtpl:42
-	if c.IsAdmin(c.User) {
+	if c.Permissions.IsAdmin(c.User) {
 //line views/show_space.qtpl:42
 		qw422016.N().S(`
                     <li class="c-sub-sidebar__item">
@@ -170,7 +170,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                     </div>
                     `)
 //line views/show_space.qtpl:66
-	if c.IsAdmin(c.User) {
+	if c.Permissions.IsAdmin(c.User) {
 //line views/show_space.qtpl:66
 		qw422016.N().S(`
                     <div class="bc-toolbar-right">
@@ -215,7 +215,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.N().S(c.CSRFTag)
 //line views/show_space.qtpl:92
 	qw422016.N().S(`
-                        <div class="form-group`)
+                        <div class="mb-6`)
 //line views/show_space.qtpl:93
 	if v.ValidationErrors.Get("name") != nil {
 //line views/show_space.qtpl:93
@@ -225,7 +225,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 //line views/show_space.qtpl:93
 	qw422016.N().S(`">
                             <label class="c-label" for="folder-name">Folder name</label>
-                            <div class="form-row">
+                            <div class="row">
                                 <div class="col-md-6">
                                     `)
 //line views/show_space.qtpl:97
@@ -264,7 +264,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     </small>
                                 </div>
                                 <div class="col-md-3">
-                                    <button class="btn btn-primary ml-4" type="submit">
+                                    <button class="btn btn-primary ms-4" type="submit">
                                         <i class="if if-check"></i>
                                         <span class="btn-text">Make folder</span>
                                     </button>
@@ -335,23 +335,21 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 </td>
                                 <td class="text-nowrap">
                                     <div class="input-group" style="min-width: 375px;">
-                                        <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                data-clipboard="`)
-//line views/show_space.qtpl:159
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            data-clipboard="`)
+//line views/show_space.qtpl:158
 			qw422016.E().S(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String())
-//line views/show_space.qtpl:159
+//line views/show_space.qtpl:158
 			qw422016.N().S(`"
-                                            >
-                                                <i class="if if-copy text-primary"></i>
-                                                <span class="btn-text">Copy link</span>
-                                            </button>
-                                        </div>
+                                        >
+                                            <i class="if if-copy text-primary"></i>
+                                            <span class="btn-text">Copy link</span>
+                                        </button>
                                         <input id="" type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
                                             value="`)
-//line views/show_space.qtpl:166
+//line views/show_space.qtpl:164
 			qw422016.E().S(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String())
-//line views/show_space.qtpl:166
+//line views/show_space.qtpl:164
 			qw422016.N().S(`"
                                             data-select-value
                                         >
@@ -359,72 +357,72 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
-//line views/show_space.qtpl:172
+//line views/show_space.qtpl:170
 			qw422016.E().S(f.ExpiresAt.Format("2006-01-02 15:04"))
-//line views/show_space.qtpl:172
+//line views/show_space.qtpl:170
 			qw422016.N().S(`</p>
                                     `)
-//line views/show_space.qtpl:173
+//line views/show_space.qtpl:171
 			if time.Until(f.ExpiresAt) < time.Hour*24*7 {
-//line views/show_space.qtpl:173
+//line views/show_space.qtpl:171
 				qw422016.N().S(`
-                                    <p class="badge badge-pill badge-default mt-2">
+                                    <p class="badge rounded-pill badge-default mt-2">
                                         <i class="if if-info-circle"></I>
                                         <span class="badge-text">Expires in `)
-//line views/show_space.qtpl:176
+//line views/show_space.qtpl:174
 				qw422016.E().S(friendly.TimeRemaining(time.Until(f.ExpiresAt), friendly.EnglishTimeUnits))
-//line views/show_space.qtpl:176
+//line views/show_space.qtpl:174
 				qw422016.N().S(`.</span>
                                     </p>
                                     `)
-//line views/show_space.qtpl:178
+//line views/show_space.qtpl:176
 			}
-//line views/show_space.qtpl:178
+//line views/show_space.qtpl:176
 			qw422016.N().S(`
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
-//line views/show_space.qtpl:181
+//line views/show_space.qtpl:179
 			qw422016.N().D(len(f.Files))
-//line views/show_space.qtpl:181
+//line views/show_space.qtpl:179
 			qw422016.N().S(` files</p>
                                     <ul class="c-meta-list c-meta-list-horizontal">
                                         <li class="c-meta-item">
                                             <span>`)
-//line views/show_space.qtpl:184
+//line views/show_space.qtpl:182
 			qw422016.E().S(friendly.Bytes(f.TotalSize()))
-//line views/show_space.qtpl:184
+//line views/show_space.qtpl:182
 			qw422016.N().S(`</span>
                                         </li>
                                         <li class="c-meta-item">
                                             <span>`)
-//line views/show_space.qtpl:187
+//line views/show_space.qtpl:185
 			qw422016.N().DL(f.TotalDownloads())
-//line views/show_space.qtpl:187
+//line views/show_space.qtpl:185
 			qw422016.N().S(` downloads</span>
                                         </li>
                                     </ul>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
-//line views/show_space.qtpl:192
+//line views/show_space.qtpl:190
 			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
-//line views/show_space.qtpl:192
+//line views/show_space.qtpl:190
 			qw422016.N().S(`</p>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
-//line views/show_space.qtpl:195
+//line views/show_space.qtpl:193
 			qw422016.E().S(f.UpdatedAt.Format("2006-01-02 15:04"))
-//line views/show_space.qtpl:195
+//line views/show_space.qtpl:193
 			qw422016.N().S(`</p>
                                 </td>
                                 <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                     <div class="c-button-toolbar">
                                         <a class="btn btn-link" href="`)
-//line views/show_space.qtpl:199
+//line views/show_space.qtpl:197
 			qw422016.E().S(c.PathTo("folder", "folderID", f.ID).String())
-//line views/show_space.qtpl:199
+//line views/show_space.qtpl:197
 			qw422016.N().S(`">
                                             <i class="if if-draft"></i>
                                             <span class="btn-text">Open</span>
@@ -433,17 +431,17 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 </td>
                             </tr>
                             `)
-//line views/show_space.qtpl:206
+//line views/show_space.qtpl:204
 		}
-//line views/show_space.qtpl:206
+//line views/show_space.qtpl:204
 		qw422016.N().S(`
                         </tbody>
                     </table>
                 </div>
                 `)
-//line views/show_space.qtpl:210
+//line views/show_space.qtpl:208
 	} else {
-//line views/show_space.qtpl:210
+//line views/show_space.qtpl:208
 		qw422016.N().S(`
                 <div class="c-blank-slate c-blank-slate-muted">
                     <div class="bc-avatar">
@@ -452,39 +450,39 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                     <p>Make a folder to get started</p>
                 </div>
                 `)
-//line views/show_space.qtpl:217
+//line views/show_space.qtpl:215
 	}
-//line views/show_space.qtpl:217
+//line views/show_space.qtpl:215
 	qw422016.N().S(`
             </div>
         </div>
     </div>
 `)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 }
 
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 func (v *ShowSpace) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	v.StreamContent(qw422016, c)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	qt422016.ReleaseWriter(qw422016)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 }
 
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 func (v *ShowSpace) Content(c *ctx.Ctx) string {
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	v.WriteContent(qb422016, c)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	qs422016 := string(qb422016.B)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 	return qs422016
-//line views/show_space.qtpl:221
+//line views/show_space.qtpl:219
 }

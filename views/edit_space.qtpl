@@ -52,13 +52,11 @@ type EditSpace struct {
                     <form action="{%s c.PathTo("updateSpace", "spaceName", v.Space.Name).String() %}" method="POST" id="update-space">
                         <input type="hidden" name="_method" value="PUT">
                         {%s= c.CSRFTag %}
-                        <div class="form-group">
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
-                                <div class="col-lg-5 col-xl-4">
-                                    <input class="form-control" type="text" value="{%s strings.Join(v.Space.Admins, ",") %}" id="space-admins" name="admins">
-                                    <p class="small form-text text-muted">Separate usernames with a comma.</p>
-                                </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
+                            <div class="col-lg-5 col-xl-4">
+                                <input class="form-control" type="text" value="{%s strings.Join(v.Space.Admins, ",") %}" id="space-admins" name="admins">
+                                <p class="small form-text text-muted">Separate usernames with a comma.</p>
                             </div>
                         </div>
                     </form>

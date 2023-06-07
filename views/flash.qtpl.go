@@ -120,8 +120,8 @@ func StreamFlash(qw422016 *qt422016.Writer, f ctx.Flash) {
 //line views/flash.qtpl:26
 	qw422016.N().S(`
             </div>
-            <button class="close" type="button" aria-label="Close"
-                data-dismiss="toast"
+            <button class="btn-close" type="button" aria-label="Close"
+                data-bs-dismiss="toast"
                 `)
 //line views/flash.qtpl:30
 	if f.DismissAfter != 0 {

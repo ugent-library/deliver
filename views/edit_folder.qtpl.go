@@ -136,7 +136,7 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.N().S(`
                                     <button
                                         class="btn btn-link btn-link-muted"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#confirm-delete-folder"
                                     >
                                         <i class="if if-delete"></i>
@@ -175,56 +175,54 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.N().S(c.CSRFTag)
 //line views/edit_folder.qtpl:76
 	qw422016.N().S(`
-                        <div class="form-group">
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
-                                <div class="col-lg-5 col-xl-4">
-                                    `)
-//line views/edit_folder.qtpl:81
+                        <div class="row mb-6">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
+                            <div class="col-lg-5 col-xl-4">
+                                `)
+//line views/edit_folder.qtpl:80
 	if err := v.ValidationErrors.Get("name"); err != nil {
+//line views/edit_folder.qtpl:80
+		qw422016.N().S(`
+                                <input class="form-control is-invalid" type="text" value="`)
 //line views/edit_folder.qtpl:81
-		qw422016.N().S(`
-                                    <input class="form-control is-invalid" type="text" value="`)
-//line views/edit_folder.qtpl:82
 		qw422016.E().S(v.Folder.Name)
-//line views/edit_folder.qtpl:82
+//line views/edit_folder.qtpl:81
 		qw422016.N().S(`" id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid">
-                                    <small class="invalid-feedback" id="folder-name-invalid">`)
-//line views/edit_folder.qtpl:83
+                                <small class="invalid-feedback" id="folder-name-invalid">`)
+//line views/edit_folder.qtpl:82
 		qw422016.E().S(err.Error())
-//line views/edit_folder.qtpl:83
+//line views/edit_folder.qtpl:82
 		qw422016.N().S(`</small>
-                                    `)
-//line views/edit_folder.qtpl:84
+                                `)
+//line views/edit_folder.qtpl:83
 	} else {
-//line views/edit_folder.qtpl:84
+//line views/edit_folder.qtpl:83
 		qw422016.N().S(`
-                                    <input class="form-control" type="text" value="`)
-//line views/edit_folder.qtpl:85
+                                <input class="form-control" type="text" value="`)
+//line views/edit_folder.qtpl:84
 		qw422016.E().S(v.Folder.Name)
-//line views/edit_folder.qtpl:85
+//line views/edit_folder.qtpl:84
 		qw422016.N().S(`" id="folder-name" name="name">
-                                    `)
-//line views/edit_folder.qtpl:86
+                                `)
+//line views/edit_folder.qtpl:85
 	}
-//line views/edit_folder.qtpl:86
+//line views/edit_folder.qtpl:85
 	qw422016.N().S(`
-                                </div>
                             </div>
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="URL">
-                                    <p>Public shareable link</p>
-                                </label>
-                                <div class="col-lg-7 col-xl-9">
-                                    <code class="c-code">`)
-//line views/edit_folder.qtpl:94
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="URL">
+                                <p>Public shareable link</p>
+                            </label>
+                            <div class="col-lg-7 col-xl-9">
+                                <code class="c-code">`)
+//line views/edit_folder.qtpl:93
 	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
-//line views/edit_folder.qtpl:94
+//line views/edit_folder.qtpl:93
 	qw422016.N().S(`</code>
-                                    <p class="small form-text text-muted">Anyone with
-                                    this automatically generated link can view the files
-                                    in this folder.</p>
-                                </div>
+                                <p class="small form-text text-muted">Anyone with
+                                this automatically generated link can view the files
+                                in this folder.</p>
                             </div>
                         </div>
                     </form>
@@ -245,9 +243,9 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                             Are you sure you want to delete the folder
                             <br>
                             <strong>`)
-//line views/edit_folder.qtpl:118
+//line views/edit_folder.qtpl:116
 	qw422016.E().S(v.Folder.Name)
-//line views/edit_folder.qtpl:118
+//line views/edit_folder.qtpl:116
 	qw422016.N().S(`</strong>
                             and its files?
                         </h4>
@@ -255,38 +253,38 @@ func (v *EditFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                    <button class="btn btn-link" data-bs-dismiss="modal">No, cancel</button>
                     <button class="btn btn-danger" data-submit-target="#delete-folder">Yes, delete this folder</button>
                 </div>
             </div>
         </div>
     </div>
 `)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 }
 
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 func (v *EditFolder) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	v.StreamContent(qw422016, c)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	qt422016.ReleaseWriter(qw422016)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 }
 
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 func (v *EditFolder) Content(c *ctx.Ctx) string {
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	v.WriteContent(qb422016, c)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	qs422016 := string(qb422016.B)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 	return qs422016
-//line views/edit_folder.qtpl:131
+//line views/edit_folder.qtpl:129
 }

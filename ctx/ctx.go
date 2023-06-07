@@ -170,17 +170,16 @@ func (c *Ctx) init(w http.ResponseWriter, r *http.Request, userSource func(conte
 	return nil
 }
 
+func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
+	return c.router.PathTo(name, pairs...)
+}
+
 func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
 	u := c.router.PathTo(name, pairs...)
 	u.Host = c.host
 	u.Scheme = c.scheme
 	return u
 }
-
-func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
-	return c.router.PathTo(name, pairs...)
-}
-
 func (c *Ctx) PersistFlash(w http.ResponseWriter, f Flash) {
 	j, err := json.Marshal(f)
 	if err != nil {

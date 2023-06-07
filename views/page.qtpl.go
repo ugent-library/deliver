@@ -165,9 +165,9 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 //line views/page.qtpl:77
 		qw422016.N().S(`
                                         <div class="dropdown position-static">
-                                            <button class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <button class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <div class="bc-avatar-and-text">
-                                                    <div class="bc-avatar bc-avatar--sm bc-avatar--small mr-2">
+                                                    <div class="bc-avatar bc-avatar--sm bc-avatar--small me-2">
                                                         <i class="if if-user"></i>
                                                     </div>
                                                     <div class="bc-avatar-text">`)
@@ -177,7 +177,7 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 		qw422016.N().S(`</div>
                                                 </div>
                                             </button>
-                                            <div class="dropdown-menu mt-8">
+                                            <div class="dropdown-menu">
                                                 <div class="bc-avatar-and-text m-4">
                                                     <div class="bc-avatar bc-avatar--sm">
                                                         <i class="if if-user"></i>
@@ -216,8 +216,8 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
 		qw422016.E().S(c.PathTo("login").String())
 //line views/page.qtpl:105
 		qw422016.N().S(`">
-                                            <i class="if if-arrow-right mt-0 ml-2"></i>
-                                            <span class="btn-text mr-2">Log in</span>
+                                            <i class="if if-arrow-right mt-0 ms-2"></i>
+                                            <span class="btn-text me-2">Log in</span>
                                         </a>
                                         `)
 //line views/page.qtpl:109
@@ -310,8 +310,8 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
-                            <button class="btn btn-danger confirm-proceed" data-dismiss="modal">Yes, proceed</button>
+                            <button class="btn btn-link" data-bs-dismiss="modal">No, cancel</button>
+                            <button class="btn btn-danger confirm-proceed" data-bs-dismiss="modal">Yes, proceed</button>
                         </div>
                     </div>
                 </div>

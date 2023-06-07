@@ -149,7 +149,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     <th class="text-nowrap align-middle">Type</th>
                                     <th class="text-nowrap align-middle">Downloads</th>
                                     <th class="text-nowrap align-middle">Created at</th>
-                                    <th class="table-col-sm-fixed table-col-sm-fixed-right text-right align-middle">
+                                    <th class="table-col-sm-fixed table-col-sm-fixed-right text-end align-middle">
                                     </th>
                                 </tr>
                             </thead>

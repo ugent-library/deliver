@@ -135,25 +135,23 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 </div>
                 <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
                     <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item col-lg-8 col-sm-12 pl-0">
+                        <div class="bc-toolbar-item col-lg-8 col-sm-12 ps-0">
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <button type="button" class="btn btn-outline-secondary"
-                                        data-clipboard="`)
-//line views/show_folder.qtpl:57
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-clipboard="`)
+//line views/show_folder.qtpl:56
 	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
-//line views/show_folder.qtpl:57
+//line views/show_folder.qtpl:56
 	qw422016.N().S(`"
-                                    >
-                                        <i class="if if-copy text-primary"></i>
-                                        <span class="btn-text text-primary">Copy public shareable link</span>
-                                    </button>
-                                </div>
+                                >
+                                    <i class="if if-copy text-primary"></i>
+                                    <span class="btn-text text-primary">Copy public shareable link</span>
+                                </button>
                                 <input type="text" class="form-control input-select-text" readonly
                                     value="`)
-//line views/show_folder.qtpl:64
+//line views/show_folder.qtpl:62
 	qw422016.E().S(c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String())
-//line views/show_folder.qtpl:64
+//line views/show_folder.qtpl:62
 	qw422016.N().S(`"
                                     data-select-value
                                 >
@@ -166,7 +164,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 
         <div class="u-scroll-wrapper__body p-6">
             <div class="card w-100 mb-6">
-                <div class="card-header sr-only">
+                <div class="card-header visually-hidden">
                     <div class="bc-toolbar">
                         <div class="bc-toolbar-left">
                             <h2 class="bc-toolbar-item">Upload files</h2>
@@ -176,33 +174,33 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                 <div class="card-body">
                     <form
                         action="`)
-//line views/show_folder.qtpl:85
+//line views/show_folder.qtpl:83
 	qw422016.E().S(c.PathTo("uploadFile", "folderID", v.Folder.ID).String())
-//line views/show_folder.qtpl:85
+//line views/show_folder.qtpl:83
 	qw422016.N().S(`"
                         enctype="multipart/form-data"
                         method="POST"
                     >
                         `)
-//line views/show_folder.qtpl:89
+//line views/show_folder.qtpl:87
 	qw422016.N().S(c.CSRFTag)
-//line views/show_folder.qtpl:89
+//line views/show_folder.qtpl:87
 	qw422016.N().S(`
                         <div class="c-file-upload c-file-upload--small">
                             <input type="file" name="file" multiple
                                 data-upload-progress-target="file-upload-progress"
                                 data-upload-max-file-size="`)
-//line views/show_folder.qtpl:93
+//line views/show_folder.qtpl:91
 	qw422016.N().DL(v.MaxFileSize)
-//line views/show_folder.qtpl:93
+//line views/show_folder.qtpl:91
 	qw422016.N().S(`"
                                 data-upload-msg-file-aborted="File upload aborted by you"
                                 data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
                                 data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
                                 data-upload-msg-file-too-large="File is too large. Maximum file size is `)
-//line views/show_folder.qtpl:97
+//line views/show_folder.qtpl:95
 	qw422016.E().S(friendly.Bytes(v.MaxFileSize))
-//line views/show_folder.qtpl:97
+//line views/show_folder.qtpl:95
 	qw422016.N().S(`"
                                 data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
                                 data-upload-msg-unexpected="File upload failed: unexpected server error"
@@ -213,9 +211,9 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     Upload files
                                 </button>
                                 <p class="small pt-2 mb-0">Maximum file size: `)
-//line views/show_folder.qtpl:106
+//line views/show_folder.qtpl:104
 	qw422016.E().S(friendly.Bytes(v.MaxFileSize))
-//line views/show_folder.qtpl:106
+//line views/show_folder.qtpl:104
 	qw422016.N().S(`</p>
                             </div>
                         </div>
@@ -226,23 +224,23 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 
             <div
                 hx-get="`)
-//line views/show_folder.qtpl:115
+//line views/show_folder.qtpl:113
 	qw422016.E().S(c.PathTo("folder", "folderID", v.Folder.ID).String())
-//line views/show_folder.qtpl:115
+//line views/show_folder.qtpl:113
 	qw422016.N().S(`"
                 hx-swap="innerHTML"
                 hx-trigger="refresh-files from:body"
             >
                 `)
-//line views/show_folder.qtpl:119
+//line views/show_folder.qtpl:117
 	StreamFiles(qw422016, c, v.Folder.Files)
-//line views/show_folder.qtpl:119
+//line views/show_folder.qtpl:117
 	qw422016.N().S(`
             </div>
         </div>
     </div>
 
-    <template id="tmpl-upload-progress">
+    <template id="tmps-upload-progress">
         <li class="list-group-item">
             <div class="list-group-item-inner">
                 <div class="list-group-item-main u-min-w-0">
@@ -253,7 +251,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                             </div>
                         </div>
                         <div class="bc-toolbar-right">
-                            <div class="bc-toolbar-item ml-auto ml-lg-0">
+                            <div class="bc-toolbar-item ms-auto ms-lg-0">
                                 <button class="btn btn-sm btn-cancel-upload" type="button">
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Cancel upload</span>
@@ -281,31 +279,31 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </li>
     </template>
 `)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 }
 
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 func (v *ShowFolder) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	v.StreamContent(qw422016, c)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	qt422016.ReleaseWriter(qw422016)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 }
 
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 func (v *ShowFolder) Content(c *ctx.Ctx) string {
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	v.WriteContent(qb422016, c)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	qs422016 := string(qb422016.B)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 	return qs422016
-//line views/show_folder.qtpl:162
+//line views/show_folder.qtpl:160
 }

@@ -38,7 +38,7 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 
 	var userSpaces []*models.Space
 	var err error
-	if c.IsAdmin(c.User) {
+	if c.Permissions.IsAdmin(c.User) {
 		userSpaces, err = h.repo.Spaces.GetAll(r.Context())
 	} else {
 		userSpaces, err = h.repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
@@ -49,7 +49,7 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// handle new empty installation
-	if c.IsAdmin(c.User) && len(userSpaces) == 0 {
+	if c.Permissions.IsAdmin(c.User) && len(userSpaces) == 0 {
 		c.PersistFlash(w, ctx.Flash{
 			Type: "info",
 			Body: "Create an initial space to get started",
@@ -211,7 +211,7 @@ func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *
 	}
 
 	var userSpaces []*models.Space
-	if c.IsAdmin(c.User) {
+	if c.Permissions.IsAdmin(c.User) {
 		userSpaces, err = h.repo.Spaces.GetAll(r.Context())
 	} else {
 		userSpaces, err = h.repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)

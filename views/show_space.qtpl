@@ -39,7 +39,7 @@ type ShowSpace struct {
                         </a>
                     </li>
                     {% endfor %}
-                    {% if c.IsAdmin(c.User) %}
+                    {% if c.Permissions.IsAdmin(c.User) %}
                     <li class="c-sub-sidebar__item">
                         <a href="{%s c.PathTo("newSpace").String() %}">
                             <span class="c-sidebar__label">
@@ -63,7 +63,7 @@ type ShowSpace struct {
                             <h1 class="bc-toolbar-title">{%s v.Space.Name %} folders</h1>
                         </div>
                     </div>
-                    {% if c.IsAdmin(c.User) %}
+                    {% if c.Permissions.IsAdmin(c.User) %}
                     <div class="bc-toolbar-right">
                         <div class="bc-toolbar-item">
                             <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("editSpace", "spaceName", v.Space.Name).String() %}">
@@ -90,9 +90,9 @@ type ShowSpace struct {
                 <div class="card-body">
                     <form action="{%s c.PathTo("createFolder", "spaceName", v.Space.Name).String() %}" method="POST">
                         {%s= c.CSRFTag %}
-                        <div class="form-group{% if v.ValidationErrors.Get("name") != nil %} is-invalid{% endif %}">
+                        <div class="mb-6{% if v.ValidationErrors.Get("name") != nil %} is-invalid{% endif %}">
                             <label class="c-label" for="folder-name">Folder name</label>
-                            <div class="form-row">
+                            <div class="row">
                                 <div class="col-md-6">
                                     {% if err := v.ValidationErrors.Get("name"); err != nil %}
                                     <input class="form-control is-invalid" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid">
@@ -107,7 +107,7 @@ type ShowSpace struct {
                                     </small>
                                 </div>
                                 <div class="col-md-3">
-                                    <button class="btn btn-primary ml-4" type="submit">
+                                    <button class="btn btn-primary ms-4" type="submit">
                                         <i class="if if-check"></i>
                                         <span class="btn-text">Make folder</span>
                                     </button>
@@ -154,14 +154,12 @@ type ShowSpace struct {
                                 </td>
                                 <td class="text-nowrap">
                                     <div class="input-group" style="min-width: 375px;">
-                                        <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                data-clipboard="{%s c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
-                                            >
-                                                <i class="if if-copy text-primary"></i>
-                                                <span class="btn-text">Copy link</span>
-                                            </button>
-                                        </div>
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            data-clipboard="{%s c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
+                                        >
+                                            <i class="if if-copy text-primary"></i>
+                                            <span class="btn-text">Copy link</span>
+                                        </button>
                                         <input id="" type="text" class="form-control input-select-text" style="min-width: 250px;" readonly
                                             value="{%s c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() %}"
                                             data-select-value
@@ -171,7 +169,7 @@ type ShowSpace struct {
                                 <td class="text-nowrap">
                                     <p>{%s f.ExpiresAt.Format("2006-01-02 15:04") %}</p>
                                     {% if time.Until(f.ExpiresAt) < time.Hour * 24 * 7 %}
-                                    <p class="badge badge-pill badge-default mt-2">
+                                    <p class="badge rounded-pill badge-default mt-2">
                                         <i class="if if-info-circle"></I>
                                         <span class="badge-text">Expires in {%s friendly.TimeRemaining(time.Until(f.ExpiresAt), friendly.EnglishTimeUnits) %}.</span>
                                     </p>

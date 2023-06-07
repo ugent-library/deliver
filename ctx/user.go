@@ -26,7 +26,7 @@ func RequireAdmin(next http.Handler) http.Handler {
 			c.HandleError(w, r, httperror.Unauthorized)
 			return
 		}
-		if !c.IsAdmin(c.User) {
+		if !c.Permissions.IsAdmin(c.User) {
 			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}

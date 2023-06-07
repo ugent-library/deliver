@@ -47,7 +47,7 @@ type EditFolder struct {
                                     {%s= c.CSRFTag %}
                                     <button
                                         class="btn btn-link btn-link-muted"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#confirm-delete-folder"
                                     >
                                         <i class="if if-delete"></i>
@@ -74,28 +74,26 @@ type EditFolder struct {
                     <form action="{%s c.PathTo("updateFolder", "folderID", v.Folder.ID).String() %}" method="POST" id="update-folder">
                         <input type="hidden" name="_method" value="PUT">
                         {%s= c.CSRFTag %}
-                        <div class="form-group">
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
-                                <div class="col-lg-5 col-xl-4">
-                                    {% if err := v.ValidationErrors.Get("name"); err != nil %}
-                                    <input class="form-control is-invalid" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid">
-                                    <small class="invalid-feedback" id="folder-name-invalid">{%s err.Error() %}</small>
-                                    {% else %}
-                                    <input class="form-control" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name">
-                                    {% endif %}
-                                </div>
+                        <div class="row mb-6">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
+                            <div class="col-lg-5 col-xl-4">
+                                {% if err := v.ValidationErrors.Get("name"); err != nil %}
+                                <input class="form-control is-invalid" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid">
+                                <small class="invalid-feedback" id="folder-name-invalid">{%s err.Error() %}</small>
+                                {% else %}
+                                <input class="form-control" type="text" value="{%s v.Folder.Name %}" id="folder-name" name="name">
+                                {% endif %}
                             </div>
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="URL">
-                                    <p>Public shareable link</p>
-                                </label>
-                                <div class="col-lg-7 col-xl-9">
-                                    <code class="c-code">{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}</code>
-                                    <p class="small form-text text-muted">Anyone with
-                                    this automatically generated link can view the files
-                                    in this folder.</p>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="URL">
+                                <p>Public shareable link</p>
+                            </label>
+                            <div class="col-lg-7 col-xl-9">
+                                <code class="c-code">{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}</code>
+                                <p class="small form-text text-muted">Anyone with
+                                this automatically generated link can view the files
+                                in this folder.</p>
                             </div>
                         </div>
                     </form>
@@ -122,7 +120,7 @@ type EditFolder struct {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-link" data-dismiss="modal">No, cancel</button>
+                    <button class="btn btn-link" data-bs-dismiss="modal">No, cancel</button>
                     <button class="btn btn-danger" data-submit-target="#delete-folder">Yes, delete this folder</button>
                 </div>
             </div>

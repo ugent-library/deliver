@@ -19,8 +19,8 @@ type Home struct {}
                 <div class="bc-toolbar-right">
                     <div class="bc-toolbar-item">
                         <a class="btn btn-primary" href="{%s c.PathTo("login").String() %}">
-                            <i class="if if-arrow-right mt-0 ml-2"></i>
-                            <span class="btn-text mr-2">Log in</span>
+                            <i class="if if-arrow-right mt-0 ms-2"></i>
+                            <span class="btn-text me-2">Log in</span>
                         </a>
                     </div>
                 </div>

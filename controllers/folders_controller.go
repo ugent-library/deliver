@@ -126,17 +126,17 @@ func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r.Context())
 
 	// TODO: retrieve content type by content sniffing without interfering with streaming body
-	contentLength, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
+	size, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
 
 	// request header only accepts ISO-8859-1 so we had to escape it
-	uploadFilename, _ := url.QueryUnescape(r.Header.Get("X-Upload-Filename"))
+	name, _ := url.QueryUnescape(r.Header.Get("X-Upload-Filename"))
 
 	file := &models.File{
 		FolderID:    folder.ID,
 		ID:          ulid.Make().String(),
-		Name:        uploadFilename,
+		Name:        name,
 		ContentType: r.Header.Get("Content-Type"),
-		Size:        contentLength,
+		Size:        size,
 	}
 
 	// TODO get size

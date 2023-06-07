@@ -1,7 +1,6 @@
 
 import htmx from 'htmx.org'
-import bsn from 'bootstrap.native/dist/bootstrap-native-v4'
-import bsnPopper from './bsn_popper.js'
+import 'bootstrap'
 import toast from './toast.js'
 import formSubmit from './form_submit.js'
 import formUploadProgress from './form_upload_progress.js'
@@ -16,7 +15,6 @@ require('htmx.org/dist/ext/ws.js');
 htmx.config.defaultFocusScroll = true
 
 htmx.onLoad(function(el) {
-    bsn.initCallback(el)
     bsnPopper(el)
     toast(el)
     formSubmit(el)

@@ -50,16 +50,14 @@ type ShowFolder struct {
                 </div>
                 <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
                     <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item col-lg-8 col-sm-12 pl-0">
+                        <div class="bc-toolbar-item col-lg-8 col-sm-12 ps-0">
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <button type="button" class="btn btn-outline-secondary"
-                                        data-clipboard="{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
-                                    >
-                                        <i class="if if-copy text-primary"></i>
-                                        <span class="btn-text text-primary">Copy public shareable link</span>
-                                    </button>
-                                </div>
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-clipboard="{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
+                                >
+                                    <i class="if if-copy text-primary"></i>
+                                    <span class="btn-text text-primary">Copy public shareable link</span>
+                                </button>
                                 <input type="text" class="form-control input-select-text" readonly
                                     value="{%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}"
                                     data-select-value
@@ -73,7 +71,7 @@ type ShowFolder struct {
 
         <div class="u-scroll-wrapper__body p-6">
             <div class="card w-100 mb-6">
-                <div class="card-header sr-only">
+                <div class="card-header visually-hidden">
                     <div class="bc-toolbar">
                         <div class="bc-toolbar-left">
                             <h2 class="bc-toolbar-item">Upload files</h2>
@@ -121,7 +119,7 @@ type ShowFolder struct {
         </div>
     </div>
 
-    <template id="tmpl-upload-progress">
+    <template id="tmps-upload-progress">
         <li class="list-group-item">
             <div class="list-group-item-inner">
                 <div class="list-group-item-main u-min-w-0">
@@ -132,7 +130,7 @@ type ShowFolder struct {
                             </div>
                         </div>
                         <div class="bc-toolbar-right">
-                            <div class="bc-toolbar-item ml-auto ml-lg-0">
+                            <div class="bc-toolbar-item ms-auto ms-lg-0">
                                 <button class="btn btn-sm btn-cancel-upload" type="button">
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Cancel upload</span>

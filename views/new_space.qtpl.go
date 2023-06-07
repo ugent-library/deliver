@@ -122,52 +122,50 @@ func (v *NewSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.N().S(c.CSRFTag)
 //line views/new_space.qtpl:53
 	qw422016.N().S(`
-                        <div class="form-group">
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>
-                                <div class="col-lg-5 col-xl-4">
-                                    `)
-//line views/new_space.qtpl:58
+                        <div class="row mb-6">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>
+                            <div class="col-lg-5 col-xl-4">
+                                `)
+//line views/new_space.qtpl:57
 	if err := v.ValidationErrors.Get("name"); err != nil {
+//line views/new_space.qtpl:57
+		qw422016.N().S(`
+                                <input class="form-control is-invalid" type="text" value="`)
 //line views/new_space.qtpl:58
-		qw422016.N().S(`
-                                    <input class="form-control is-invalid" type="text" value="`)
-//line views/new_space.qtpl:59
 		qw422016.E().S(v.Space.Name)
-//line views/new_space.qtpl:59
+//line views/new_space.qtpl:58
 		qw422016.N().S(`" id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid">
-                                    <small class="invalid-feedback" id="space-name-invalid">`)
-//line views/new_space.qtpl:60
+                                <small class="invalid-feedback" id="space-name-invalid">`)
+//line views/new_space.qtpl:59
 		qw422016.E().S(err.Error())
-//line views/new_space.qtpl:60
+//line views/new_space.qtpl:59
 		qw422016.N().S(`</small>
-                                    `)
-//line views/new_space.qtpl:61
+                                `)
+//line views/new_space.qtpl:60
 	} else {
-//line views/new_space.qtpl:61
+//line views/new_space.qtpl:60
 		qw422016.N().S(`
-                                    <input class="form-control" type="text" value="`)
-//line views/new_space.qtpl:62
+                                <input class="form-control" type="text" value="`)
+//line views/new_space.qtpl:61
 		qw422016.E().S(v.Space.Name)
-//line views/new_space.qtpl:62
+//line views/new_space.qtpl:61
 		qw422016.N().S(`" id="space-name" name="name">
-                                    `)
-//line views/new_space.qtpl:63
+                                `)
+//line views/new_space.qtpl:62
 	}
-//line views/new_space.qtpl:63
+//line views/new_space.qtpl:62
 	qw422016.N().S(`
-                                </div>
                             </div>
-                            <div class="form-row form-group">
-                                <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
-                                <div class="col-lg-5 col-xl-4">
-                                    <input class="form-control" type="text" value="`)
-//line views/new_space.qtpl:69
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
+                            <div class="col-lg-5 col-xl-4">
+                                <input class="form-control" type="text" value="`)
+//line views/new_space.qtpl:68
 	qw422016.E().S(strings.Join(v.Space.Admins, ","))
-//line views/new_space.qtpl:69
+//line views/new_space.qtpl:68
 	qw422016.N().S(`" id="space-admins" name="admins">
-                                    <p class="small form-text text-muted">Separate usernames with a comma.</p>
-                                </div>
+                                <p class="small form-text text-muted">Separate usernames with a comma.</p>
                             </div>
                         </div>
                     </form>
@@ -176,31 +174,31 @@ func (v *NewSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
         </div>
     </div>
 `)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 }
 
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 func (v *NewSpace) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	v.StreamContent(qw422016, c)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	qt422016.ReleaseWriter(qw422016)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 }
 
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 func (v *NewSpace) Content(c *ctx.Ctx) string {
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	v.WriteContent(qb422016, c)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	qs422016 := string(qb422016.B)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 	return qs422016
-//line views/new_space.qtpl:79
+//line views/new_space.qtpl:77
 }

@@ -96,7 +96,8 @@ $spacers: map-merge(
 // Options
 //
 // Quickly modify global styling by enabling or disabling optional features.
-$enable-shadows:              true !default;
+$enable-shadows:              true;
+$enable-negative-margins:     true;
 
 // Fonts
 //
@@ -122,6 +123,13 @@ $h4-font-size:                1.5rem;
 
 $text-muted:                  $text-muted;
 
+
+// Tables
+//
+// Customizes the `.table` component with basic values, each used across all table variations.
+
+// scss-docs-start table-variables
+$table-bg:                    #FFF;
 // Buttons + s
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
@@ -137,6 +145,7 @@ $input-btn-padding-x-sm:      .5rem;
 // For each of Bootstrap's buttons, define text, background, and border color.
 
 $btn-font-weight:             500;
+$btn-box-shadow:              none;
 
 $btn-link-disabled-color:     rgba($blue, .5);
 
@@ -147,6 +156,7 @@ $btn-border-radius-sm:        $border-radius;
 //
 // Style anchor elements.
 
+$link-decoration:                         none;
 $link-hover-color:                        $dark-blue;
 $link-hover-decoration:                   none;
 
@@ -164,7 +174,6 @@ $paragraph-margin-bottom:   0;
 $alert-padding-y:                   1.6rem;
 $alert-padding-x:                   1.6rem;
 $alert-border-width:                0;
-
 
 // Dropdowns
 //
@@ -214,23 +223,23 @@ $input-height:                          3.6rem;
 // $form-check-inline-margin-x:            .75rem !default;
 // $form-check-inline-input-margin-x:      .3125rem !default;
 
-$custom-control-gutter:                 0.8rem;
+$form-control-gutter:                 0.8rem;
 $form-grid-gutter-width:                1.6rem;
 $form-group-margin-bottom:              2.4rem;
 
 $input-group-addon-color:               $text-muted;
 $input-group-addon-bg:                  $gray-50;
 
-$custom-control-indicator-size:         1.6rem;
+$form-control-indicator-size:         1.6rem;
 
-$custom-control-indicator-border-color: $gray-200;
+$form-control-indicator-border-color: $gray-200;
 
-$custom-control-indicator-disabled-bg:          $gray-100;
+$form-control-indicator-disabled-bg:          $gray-100;
 
-$custom-control-indicator-checked-color:        $white;
-$custom-control-indicator-checked-bg:           $primary;
-$custom-control-indicator-checked-disabled-bg:  $gray-100;
-$custom-control-indicator-checked-border-color: $primary;
+$form-control-indicator-checked-color:        $white;
+$form-control-indicator-checked-bg:           $primary;
+$form-control-indicator-checked-disabled-bg:  $gray-100;
+$form-control-indicator-checked-border-color: $primary;
 
 $custom-checkbox-indicator-indeterminate-bg:           $primary;
 $custom-checkbox-indicator-indeterminate-color:        $white;
@@ -320,7 +329,7 @@ $nav-tabs-link-active-border-color: $primary;
 
 // Cards
 
-$card-spacer-y:                     0;
+$card-spacer-y:                     2.4rem;
 $card-spacer-x:                     2.4rem;
 $card-border-color:                 $border;
 $card-cap-bg:                       $white;
@@ -371,3 +380,9 @@ $breadcrumb-padding-x:              0.8rem;
 $breadcrumb-padding-y:              0.4rem;
 $breadcrumb-item-padding:           0;
 $breadcrumb-divider:                none;
+
+// Close
+
+$btn-close-bg:               url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 10.586L16.95 5.636L18.364 7.05L13.414 12L18.364 16.95L16.95 18.364L12 13.414L7.05 18.364L5.636 16.95L10.586 12L5.636 7.05L7.05 5.636L12 10.586Z' fill='%23666666'/%3E%3C/svg%3E");
+$btn-close-width:            2rem;
+$btn-close-height:           2rem;

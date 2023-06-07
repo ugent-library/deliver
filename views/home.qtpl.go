@@ -76,8 +76,8 @@ func (v *Home) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 	qw422016.E().S(c.PathTo("login").String())
 //line views/home.qtpl:21
 	qw422016.N().S(`">
-                            <i class="if if-arrow-right mt-0 ml-2"></i>
-                            <span class="btn-text mr-2">Log in</span>
+                            <i class="if if-arrow-right mt-0 ms-2"></i>
+                            <span class="btn-text me-2">Log in</span>
                         </a>
                     </div>
                 </div>
