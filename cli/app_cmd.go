@@ -103,7 +103,6 @@ var appCmd = &cli.Command{
 		})
 
 		// controllers
-		errs := controllers.NewErrorsController()
 		auth := controllers.NewAuthController(repo, oidcAuth)
 		pages := controllers.NewPagesController()
 		spaces := controllers.NewSpacesController(repo)
@@ -140,9 +139,9 @@ var appCmd = &cli.Command{
 					GetUserByRememberToken: repo.Users.GetByRememberToken,
 					Router:                 router,
 					ErrorHandlers: map[int]http.HandlerFunc{
-						http.StatusNotFound:     errs.NotFound,
-						http.StatusUnauthorized: errs.Unauthorized,
-						http.StatusForbidden:    errs.Forbidden,
+						http.StatusNotFound:     controllers.NotFound,
+						http.StatusUnauthorized: controllers.Unauthorized,
+						http.StatusForbidden:    controllers.Forbidden,
 					},
 					Permissions: permissions,
 					Assets:      assets,
@@ -152,7 +151,7 @@ var appCmd = &cli.Command{
 			)
 
 			// viewable by everyone
-			r.NotFound(errs.NotFound)
+			r.NotFound(controllers.NotFound)
 			r.Get("/", pages.Home).Name("home")
 			r.Get("/auth/callback", auth.Callback)
 			r.Get("/login", auth.Login).Name("login")

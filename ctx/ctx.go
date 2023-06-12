@@ -147,7 +147,7 @@ func (c *Ctx) init(w http.ResponseWriter, r *http.Request, userSource func(conte
 			continue
 		}
 
-		// delete cookie
+		// delete after read
 		http.SetCookie(w, &http.Cookie{
 			Name:     cookie.Name,
 			Value:    "",
@@ -180,6 +180,7 @@ func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
 	u.Scheme = c.scheme
 	return u
 }
+
 func (c *Ctx) PersistFlash(w http.ResponseWriter, f Flash) {
 	j, err := json.Marshal(f)
 	if err != nil {
