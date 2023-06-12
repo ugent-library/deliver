@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/ugent-library/deliver/ent"
@@ -44,14 +43,10 @@ func (r *FoldersRepo) Create(ctx context.Context, f *models.Folder) error {
 		SetName(f.Name).
 		SetExpiresAt(f.ExpiresAt).
 		Save(ctx)
+	if ent.IsConstraintError(err) {
+		return validate.NewErrors(validate.ErrNotUnique("name"))
+	}
 	if err != nil {
-		// TODO does ent support unwrapping sql errors?
-		// https://stackoverflow.com/questions/70859712/how-do-you-handle-database-errors-in-go-without-getting-coupled-to-the-sql-drive
-		// https://github.com/ent/ent/issues/2328
-		// see also UpdateFolder and CreateUser
-		if strings.Contains(err.Error(), "SQLSTATE 23505") {
-			return validate.NewErrors(validate.ErrNotUnique("name"))
-		}
 		return err
 	}
 	*f = *rowToFolder(row)
@@ -65,10 +60,10 @@ func (r *FoldersRepo) Update(ctx context.Context, f *models.Folder) error {
 	row, err := r.db.Folder.UpdateOneID(f.ID).
 		SetName(f.Name).
 		Save(ctx)
+	if ent.IsConstraintError(err) {
+		return validate.NewErrors(validate.ErrNotUnique("name"))
+	}
 	if err != nil {
-		if strings.Contains(err.Error(), "SQLSTATE 23505") {
-			return validate.NewErrors(validate.ErrNotUnique("name"))
-		}
 		return err
 	}
 	*f = *rowToFolder(row)

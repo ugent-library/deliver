@@ -3,13 +3,11 @@ package repositories
 import (
 	"context"
 	"errors"
-	"strings"
 
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent"
 	"github.com/ugent-library/deliver/ent/user"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/validate"
 )
 
 type UsersRepo struct {
@@ -55,9 +53,6 @@ func (r *UsersRepo) CreateOrUpdate(ctx context.Context, u *models.User) error {
 			u.UpdateEmail()
 		}).ID(ctx)
 	if err != nil {
-		if strings.Contains(err.Error(), "SQLSTATE 23505") {
-			return validate.NewErrors(validate.ErrNotUnique("username"))
-		}
 		return err
 	}
 	row, err := r.db.User.Get(ctx, id)
