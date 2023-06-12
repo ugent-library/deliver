@@ -8,7 +8,7 @@ import (
 
 func RequireUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := Get(r.Context())
+		c := Get(r)
 
 		if c.User == nil {
 			c.HandleError(w, r, httperror.Unauthorized)
@@ -20,7 +20,7 @@ func RequireUser(next http.Handler) http.Handler {
 
 func RequireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := Get(r.Context())
+		c := Get(r)
 
 		if c.User == nil {
 			c.HandleError(w, r, httperror.Unauthorized)

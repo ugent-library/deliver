@@ -23,7 +23,7 @@ func NewAuthController(repo *repositories.Repo, oidcAuth *oidc.Auth) *AuthContro
 }
 
 func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	claims := oidc.Claims{}
 	if err := h.oidcAuth.CompleteAuth(w, r, &claims); err != nil {
@@ -54,7 +54,7 @@ func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthController) Login(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	if err := h.oidcAuth.BeginAuth(w, r); err != nil {
 		c.HandleError(w, r, err)
@@ -62,7 +62,7 @@ func (h *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	if err := h.repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
 		c.HandleError(w, r, err)

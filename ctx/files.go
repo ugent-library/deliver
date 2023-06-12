@@ -12,14 +12,14 @@ import (
 
 var fileKey = contextKey("file")
 
-func GetFile(ctx context.Context) *models.File {
-	return ctx.Value(fileKey).(*models.File)
+func GetFile(r *http.Request) *models.File {
+	return r.Context().Value(fileKey).(*models.File)
 }
 
 func SetFile(filesRepo repositories.FilesRepo) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c := Get(r.Context())
+			c := Get(r)
 
 			fileID := chi.URLParam(r, "fileID")
 
@@ -37,8 +37,8 @@ func SetFile(filesRepo repositories.FilesRepo) func(http.Handler) http.Handler {
 
 func CanEditFile(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := Get(r.Context())
-		file := GetFile(r.Context())
+		c := Get(r)
+		file := GetFile(r)
 
 		if !c.IsSpaceAdmin(c.User, file.Folder.Space) {
 			c.HandleError(w, r, httperror.Forbidden)

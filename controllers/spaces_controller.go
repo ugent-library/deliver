@@ -34,7 +34,7 @@ type SpaceForm struct {
 }
 
 func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	var userSpaces []*models.Space
 	var err error
@@ -83,7 +83,7 @@ func (h *SpacesController) Show(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) New(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
 		Space:            &models.Space{},
@@ -92,7 +92,7 @@ func (h *SpacesController) New(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	b := SpaceForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -130,8 +130,8 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	space := ctx.GetSpace(r.Context())
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -162,8 +162,8 @@ func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	space := ctx.GetSpace(r.Context())
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
 
 	render.HTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
 		Space:            space,
@@ -172,8 +172,8 @@ func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	space := ctx.GetSpace(r.Context())
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
 
 	b := SpaceForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -201,8 +201,8 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *models.Folder, err error) {
-	c := ctx.Get(r.Context())
-	space := ctx.GetSpace(r.Context())
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
 
 	validationErrors := validate.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {

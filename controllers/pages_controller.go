@@ -15,7 +15,7 @@ func NewPagesController() *PagesController {
 }
 
 func (h *PagesController) Home(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
+	c := ctx.Get(r)
 
 	if c.User != nil {
 		http.Redirect(w, r, c.PathTo("spaces").String(), http.StatusSeeOther)

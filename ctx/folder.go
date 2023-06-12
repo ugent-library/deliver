@@ -12,14 +12,14 @@ import (
 
 var folderKey = contextKey("folder")
 
-func GetFolder(ctx context.Context) *models.Folder {
-	return ctx.Value(folderKey).(*models.Folder)
+func GetFolder(r *http.Request) *models.Folder {
+	return r.Context().Value(folderKey).(*models.Folder)
 }
 
 func SetFolder(foldersRepo repositories.FoldersRepo) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c := Get(r.Context())
+			c := Get(r)
 
 			folderID := chi.URLParam(r, "folderID")
 
@@ -37,8 +37,8 @@ func SetFolder(foldersRepo repositories.FoldersRepo) func(http.Handler) http.Han
 
 func CanEditFolder(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := Get(r.Context())
-		folder := GetFolder(r.Context())
+		c := Get(r)
+		folder := GetFolder(r)
 
 		if !c.IsSpaceAdmin(c.User, folder.Space) {
 			c.HandleError(w, r, httperror.Forbidden)

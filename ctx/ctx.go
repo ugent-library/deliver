@@ -46,8 +46,8 @@ type Config struct {
 	Banner                 string
 }
 
-func Get(ctx context.Context) *Ctx {
-	return ctx.Value(ctxKey).(*Ctx)
+func Get(r *http.Request) *Ctx {
+	return r.Context().Value(ctxKey).(*Ctx)
 }
 
 func Set(config Config) func(http.Handler) http.Handler {

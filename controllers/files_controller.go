@@ -24,8 +24,8 @@ func NewFilesController(r *repositories.Repo, s objectstore.Store) *FilesControl
 }
 
 func (h *FilesController) Download(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	file := ctx.GetFile(r.Context())
+	c := ctx.Get(r)
+	file := ctx.GetFile(r)
 
 	if err := h.repo.Files.AddDownload(r.Context(), file.ID); err != nil {
 		c.HandleError(w, r, err)
@@ -54,8 +54,8 @@ func (h *FilesController) Download(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *FilesController) Delete(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	file := ctx.GetFile(r.Context())
+	c := ctx.Get(r)
+	file := ctx.GetFile(r)
 
 	if err := h.repo.Files.Delete(r.Context(), file.ID); err != nil {
 		c.HandleError(w, r, err)

@@ -40,8 +40,8 @@ func NewFoldersController(r *repositories.Repo, s objectstore.Store, maxFileSize
 }
 
 func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	folder := ctx.GetFolder(r.Context())
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
 
 	if htmx.Request(r) {
 		render.HTML(w, http.StatusOK, views.Files(c, folder.Files))
@@ -55,8 +55,8 @@ func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	folder := ctx.GetFolder(r.Context())
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
 
 	render.HTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
 		Folder:           folder,
@@ -65,8 +65,8 @@ func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	folder := ctx.GetFolder(r.Context())
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
 
 	b := FolderForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -95,8 +95,8 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	folder := ctx.GetFolder(r.Context())
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
 
 	if err := h.repo.Folders.Delete(r.Context(), folder.ID); err != nil {
 		c.HandleError(w, r, err)
@@ -122,8 +122,8 @@ func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	folder := ctx.GetFolder(r.Context())
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
 
 	// TODO: retrieve content type by content sniffing without interfering with streaming body
 	size, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
@@ -154,8 +154,8 @@ func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r.Context())
-	folder := ctx.GetFolder(r.Context())
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
 
 	render.HTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
 		Folder: folder,

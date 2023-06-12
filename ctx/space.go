@@ -12,14 +12,14 @@ import (
 
 var spaceKey = contextKey("space")
 
-func GetSpace(ctx context.Context) *models.Space {
-	return ctx.Value(spaceKey).(*models.Space)
+func GetSpace(r *http.Request) *models.Space {
+	return r.Context().Value(spaceKey).(*models.Space)
 }
 
 func SetSpace(spacesRepo repositories.SpacesRepo) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c := Get(r.Context())
+			c := Get(r)
 
 			spaceName := chi.URLParam(r, "spaceName")
 
@@ -37,8 +37,8 @@ func SetSpace(spacesRepo repositories.SpacesRepo) func(http.Handler) http.Handle
 
 func CanViewSpace(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c := Get(r.Context())
-		space := GetSpace(r.Context())
+		c := Get(r)
+		space := GetSpace(r)
 
 		if !c.IsSpaceAdmin(c.User, space) {
 			c.HandleError(w, r, httperror.Forbidden)
