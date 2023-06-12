@@ -151,10 +151,6 @@ github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lN
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/mozillazg/go-unidecode v0.2.0 h1:vFGEzAH9KSwyWmXCOblazEWDh7fOkpmy/Z4ArmamSUc=
 github.com/mozillazg/go-unidecode v0.2.0/go.mod h1:zB48+/Z5toiRolOZy9ksLryJ976VIwmDmpQ2quyt1aA=
-github.com/nics/ich v0.0.0-20230512143554-8316474b88df h1:8YKz20CdFCOzPYZw7qEH6Ehgc7/9bJBcf7shF3CwnzI=
-github.com/nics/ich v0.0.0-20230512143554-8316474b88df/go.mod h1:VOU/223ZShi9iLORheJXhd60DpLKnOtw/CsXTDPa0Qg=
-github.com/nics/ich v0.0.0-20230513183153-362f67165b31 h1:tWzkTmSLcxeq1qL2Znzr6apLga8/IX5020WyHO3zfaU=
-github.com/nics/ich v0.0.0-20230513183153-362f67165b31/go.mod h1:VOU/223ZShi9iLORheJXhd60DpLKnOtw/CsXTDPa0Qg=
 github.com/nics/ich v0.0.0-20230515073809-6deee7f5ae14 h1:ZHFmdAHkuEgfH1kYVuHTeXwLt0QSPDSRCZ7CcuIXHe4=
 github.com/nics/ich v0.0.0-20230515073809-6deee7f5ae14/go.mod h1:VOU/223ZShi9iLORheJXhd60DpLKnOtw/CsXTDPa0Qg=
 github.com/oklog/ulid/v2 v2.1.0 h1:+9lhoxAP56we25tyYETBBY1YLA2SaoLvUFgrP2miPJU=
@@ -173,6 +169,7 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/sergi/go-diff v1.0.0 h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
+github.com/stretchr/objx v0.5.0 h1:1zr/of2m5FGMsad5YfcqgdqdWrIhu+EBEJRhR1U7z/c=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
@@ -181,7 +178,7 @@ github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
-github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
+github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ8=
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f h1:KqaSxb7cYVFkQEC5fvVLRz+R4NHDDKOj8e5HLYq8Q+E=
 github.com/ugent-library/bind v0.0.0-20230123163703-bcb0ed303b6f/go.mod h1:QN9gGk5/ux2xoIia5EQbkw7XdO7yYQ5dG7/p6WSvp0o=
@@ -189,10 +186,6 @@ github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38 h1:guIHiXQJ
 github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38/go.mod h1:Al0v+CBt6ljkL5U+lyCLq3BQUZLxonIMrbdHbuX3lUI=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20 h1:djFbAZZWAHkbqTmDjOkd1LwnirpiVe4nyp0sp3lQ9Ds=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20/go.mod h1:QuEpmxsRkH6YuLjj1xAS2g1xywDUxxdfuN0bBfkB1oc=
-github.com/ugent-library/httpx v0.0.0-20230515135137-4055ec071df2 h1:SYD3Rx39QrXylPL9ax6NLJO2ZoMkbMZKu0X2Y/7iaBI=
-github.com/ugent-library/httpx v0.0.0-20230515135137-4055ec071df2/go.mod h1:+m4mWcYSpZknAPTanWib+3cehzEyTDxz9ipf3NG3ezM=
-github.com/ugent-library/httpx v0.0.0-20230516121022-7b8f3af3aea9 h1:V13PC1XTcJOpHZxWEOlYK7r3+EhJrJOG8hWsSJJd4vQ=
-github.com/ugent-library/httpx v0.0.0-20230516121022-7b8f3af3aea9/go.mod h1:+m4mWcYSpZknAPTanWib+3cehzEyTDxz9ipf3NG3ezM=
 github.com/ugent-library/httpx v0.0.0-20230522072608-fba7bb4a066d h1:j+m9h1q80/D8oikAxVYDfnCfjM0SOuSdoHBhylp4AJg=
 github.com/ugent-library/httpx v0.0.0-20230522072608-fba7bb4a066d/go.mod h1:+m4mWcYSpZknAPTanWib+3cehzEyTDxz9ipf3NG3ezM=
 github.com/ugent-library/middleware v0.0.0-20230227155910-03965f71a3db h1:QibiWLCpHrdq0w2nQW8cnhOjnrxDeasnoq7O/fMh3nU=
@@ -201,8 +194,6 @@ github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b h1:4Ine7pmtSh4f8
 github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b/go.mod h1:xrhsdKpNBuNqikF0f+QQ0s3e9Y1I64PNcGQFw0M+wTU=
 github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62 h1:TWb788Kaux7YYhiH7IjtrrO61822fpNAlJp7y1Po/bE=
 github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62/go.mod h1:2LCM3IglxvIwUSO610PQUJ9aA3kROToNfUGCip6/Ozs=
-github.com/ugent-library/zaphttp v0.0.0-20230512163753-7e68a0ac7bfc h1:AS13BtQ8XXkWi8AumApcW18z+mP9Ug5Gl+M+WfVTito=
-github.com/ugent-library/zaphttp v0.0.0-20230512163753-7e68a0ac7bfc/go.mod h1:NNb8N0IFmnHlnGV3C7GwQ1GUwNgw7DVLTlqovnNaC7M=
 github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce h1:+TNoKsfMTTveEe1RQRaJ7TZnHVh1k98Nk+4gTg2mENA=
 github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce/go.mod h1:CzM8mO+4QRZi4Sx0rPTt9csR6b2IgbIyoveLwFz+bQM=
 github.com/ugorji/go v1.1.7 h1:/68gy2h+1mWMrwZFeD1kQialdSzAb432dtpeJ42ovdo=
