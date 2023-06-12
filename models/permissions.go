@@ -1,6 +1,5 @@
 package models
 
-// TODO move space users to db
 type Permissions struct {
 	Admins []string
 }

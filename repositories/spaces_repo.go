@@ -47,38 +47,12 @@ func (r *SpacesRepo) GetAllByUsername(ctx context.Context, username string) ([]*
 	return spaces, nil
 }
 
-func (r *SpacesRepo) Get(ctx context.Context, id string) (*models.Space, error) {
-	row, err := r.db.Space.Query().
-		Where(space.IDEQ(id)).
-		WithFolders(func(q *ent.FolderQuery) {
-			q.Order(ent.Asc(folder.FieldExpiresAt))
-			q.WithFiles(func(q *ent.FileQuery) {
-				// TODO why does this give the error
-				// unexpected foreign-key "folder_id" returned  for node
-				// q.Select(file.FieldSize)
-			})
-		}).
-		First(ctx)
-	if err != nil {
-		var e *ent.NotFoundError
-		if errors.As(err, &e) {
-			return nil, models.ErrNotFound
-		}
-		return nil, err
-	}
-	return rowToSpace(row), nil
-}
-
 func (r *SpacesRepo) GetByName(ctx context.Context, name string) (*models.Space, error) {
 	row, err := r.db.Space.Query().
 		Where(space.NameEQ(name)).
 		WithFolders(func(q *ent.FolderQuery) {
 			q.Order(ent.Asc(folder.FieldExpiresAt))
-			q.WithFiles(func(q *ent.FileQuery) {
-				// TODO why does this give the error
-				// unexpected foreign-key "folder_id" returned  for node
-				// q.Select(file.FieldSize)
-			})
+			q.WithFiles()
 		}).
 		First(ctx)
 	if err != nil {

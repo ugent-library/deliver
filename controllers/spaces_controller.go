@@ -64,7 +64,7 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	space, err := h.repo.Spaces.Get(r.Context(), userSpaces[0].ID)
+	space, err := h.repo.Spaces.GetByName(r.Context(), userSpaces[0].Name)
 	if err != nil {
 		c.HandleError(w, r, err)
 		return
