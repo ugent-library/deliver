@@ -38,7 +38,6 @@ const (
 	FlashCookiePrefix = "deliver.flash."
 )
 
-// TODO reduce type requirements
 type Config struct {
 	Repo          *repositories.Repo
 	Storage       objectstore.Store
@@ -63,9 +62,40 @@ func Set(config Config) func(http.Handler) http.Handler {
 
 			r = r.WithContext(context.WithValue(r.Context(), ctxKey, c))
 
-			if err := c.init(w, r, config.Repo.Users); err != nil {
-				c.HandleError(w, r, err)
-				return
+			// load user from remember token cookie
+			if cookie, _ := r.Cookie(RememberCookie); cookie != nil {
+				user, err := config.Repo.Users.GetByRememberToken(r.Context(), cookie.Value)
+				if err != nil && err != models.ErrNotFound {
+					c.HandleError(w, r, err)
+					return
+				}
+				c.User = user
+			}
+
+			// load flash from cookies
+			for _, cookie := range r.Cookies() {
+				if !strings.HasPrefix(cookie.Name, FlashCookiePrefix) {
+					continue
+				}
+
+				// delete after read
+				http.SetCookie(w, &http.Cookie{
+					Name:     cookie.Name,
+					Value:    "",
+					Expires:  time.Now(),
+					Path:     "/",
+					HttpOnly: true,
+					SameSite: http.SameSiteStrictMode,
+				})
+
+				j, err := base64.URLEncoding.DecodeString(cookie.Value)
+				if err != nil {
+					continue
+				}
+				f := Flash{}
+				if err = json.Unmarshal(j, &f); err == nil {
+					c.Flash = append(c.Flash, f)
+				}
 			}
 
 			next.ServeHTTP(w, r)
@@ -90,7 +120,7 @@ type Ctx struct {
 	errorHandlers map[int]http.HandlerFunc
 	router        *ich.Mux
 	assets        mix.Manifest
-	Log           *zap.SugaredLogger // TODO use plain logger
+	Log           *zap.SugaredLogger // TODO use plain logger?
 	Hub           *htmx.Hub
 	CSRFToken     string
 	CSRFTag       string
@@ -145,45 +175,6 @@ func (c *Ctx) HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
 }
 
-func (c *Ctx) init(w http.ResponseWriter, r *http.Request, users *repositories.UsersRepo) error {
-	// remember token cookie
-	if cookie, _ := r.Cookie(RememberCookie); cookie != nil {
-		user, err := users.GetByRememberToken(r.Context(), cookie.Value)
-		if err != nil && err != models.ErrNotFound {
-			return err
-		}
-		c.User = user
-	}
-
-	// flash cookies
-	for _, cookie := range r.Cookies() {
-		if !strings.HasPrefix(cookie.Name, FlashCookiePrefix) {
-			continue
-		}
-
-		// delete after read
-		http.SetCookie(w, &http.Cookie{
-			Name:     cookie.Name,
-			Value:    "",
-			Expires:  time.Now(),
-			Path:     "/",
-			HttpOnly: true,
-			SameSite: http.SameSiteStrictMode,
-		})
-
-		j, err := base64.URLEncoding.DecodeString(cookie.Value)
-		if err != nil {
-			continue
-		}
-		f := Flash{}
-		if err = json.Unmarshal(j, &f); err == nil {
-			c.Flash = append(c.Flash, f)
-		}
-	}
-
-	return nil
-}
-
 func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
 	return c.router.PathTo(name, pairs...)
 }
@@ -221,8 +212,7 @@ func (c *Ctx) AssetPath(asset string) string {
 func (c *Ctx) WebSocketPath(channels ...string) string {
 	h, err := c.Hub.EncryptChannelNames(channels)
 	if err != nil {
-		c.Log.Error(err)
-		return ""
+		panic(err)
 	}
 	return "/ws?channels=" + url.QueryEscape(h)
 }
