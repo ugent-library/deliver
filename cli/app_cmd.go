@@ -158,6 +158,7 @@ var appCmd = &cli.Command{
 			r.Get("/logout", auth.Logout).Name("logout")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", folders.Share).Name("shareFolder")
 			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", files.Download).Name("downloadFile")
+			r.With(ctx.SetFolder(*repo.Folders)).Get("/folders/{folderID}.zip", folders.Download).Name("downloadFolder")
 			// viewable by space owners and admins
 			r.Group(func(r *ich.Mux) {
 				r.Use(ctx.RequireUser)

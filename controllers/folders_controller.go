@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"archive/zip"
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -160,4 +163,48 @@ func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
 	render.HTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
 		Folder: folder,
 	}))
+}
+
+func (h *FoldersController) Download(w http.ResponseWriter, r *http.Request) {
+
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
+
+	zipFileName := fmt.Sprintf("%s-%s.zip", folder.ID, folder.Slug())
+	w.Header().Add("Content-Type", "application/zip")
+	w.Header().Add(
+		"Content-Disposition",
+		fmt.Sprintf("attachment; filename*=UTF-8''%s", zipFileName),
+	)
+
+	zipFh := zip.NewWriter(bufio.NewWriter(w))
+	defer zipFh.Close()
+
+	for _, file := range folder.Files {
+
+		fileWriter, err := zipFh.CreateHeader(&zip.FileHeader{
+			Name:     file.Name,
+			Method:   zip.Store, //no compression for streaming
+			Modified: time.Now(),
+		})
+		if err != nil {
+			c.HandleError(w, r, err)
+			return
+		}
+
+		// increment file download count
+		// stop when counter fails?
+		if err := h.repo.Files.AddDownload(r.Context(), file.ID); err != nil {
+			c.HandleError(w, r, err)
+			return
+		}
+
+		// add file contents to zip
+		fileReader, err := h.storage.Get(r.Context(), file.ID)
+		if err != nil {
+			c.HandleError(w, r, err)
+			return
+		}
+		io.Copy(fileWriter, fileReader)
+	}
 }

@@ -49,7 +49,7 @@ type ShareFolder struct {
                             </div>
                             <div class="bc-toolbar-right">
                                 <div class="bc-toolbar-item">
-                                    <p>{%d len(v.Folder.Files) %} items</p>
+                                    <p>{%d len(v.Folder.Files) %} items ({%s friendly.Bytes(v.Folder.TotalSize()) %})</p>
                                 </div>
                             </div>
                         </div>
@@ -65,6 +65,10 @@ type ShareFolder struct {
                                     <th class="text-nowrap align-middle">Downloads</th>
                                     <th class="text-nowrap align-middle">Created at</th>
                                     <th class="table-col-sm-fixed table-col-sm-fixed-right text-end align-middle">
+                                        <a class="btn btn-primary" href="{%s c.PathTo("downloadFolder", "folderID", v.Folder.ID).String() %}">
+                                            <i class="if if-download"></i>
+                                            <span class="btn-text">Download all files</span>
+                                        </a>
                                     </th>
                                 </tr>
                             </thead>
