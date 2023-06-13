@@ -15,8 +15,11 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
+	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"go.uber.org/zap"
 )
@@ -37,13 +40,16 @@ const (
 
 // TODO reduce type requirements
 type Config struct {
-	GetUserByRememberToken func(context.Context, string) (*models.User, error)
-	Router                 *ich.Mux
-	ErrorHandlers          map[int]http.HandlerFunc
-	Permissions            *models.Permissions
-	Assets                 mix.Manifest
-	Hub                    *htmx.Hub
-	Banner                 string
+	Repo          *repositories.Repo
+	Storage       objectstore.Store
+	MaxFileSize   int64
+	Auth          *oidc.Auth
+	Router        *ich.Mux
+	ErrorHandlers map[int]http.HandlerFunc
+	Permissions   *models.Permissions
+	Assets        mix.Manifest
+	Hub           *htmx.Hub
+	Banner        string
 }
 
 func Get(r *http.Request) *Ctx {
@@ -57,7 +63,7 @@ func Set(config Config) func(http.Handler) http.Handler {
 
 			r = r.WithContext(context.WithValue(r.Context(), ctxKey, c))
 
-			if err := c.init(w, r, config.GetUserByRememberToken); err != nil {
+			if err := c.init(w, r, config.Repo.Users); err != nil {
 				c.HandleError(w, r, err)
 				return
 			}
@@ -75,6 +81,10 @@ type Flash struct {
 }
 
 type Ctx struct {
+	Repo          *repositories.Repo
+	Storage       objectstore.Store
+	MaxFileSize   int64
+	Auth          *oidc.Auth
 	host          string
 	scheme        string
 	errorHandlers map[int]http.HandlerFunc
@@ -92,6 +102,10 @@ type Ctx struct {
 
 func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
 	c := &Ctx{
+		Repo:          config.Repo,
+		Storage:       config.Storage,
+		MaxFileSize:   config.MaxFileSize,
+		Auth:          config.Auth,
 		host:          r.Host,
 		scheme:        r.URL.Scheme,
 		errorHandlers: config.ErrorHandlers,
@@ -131,10 +145,10 @@ func (c *Ctx) HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
 }
 
-func (c *Ctx) init(w http.ResponseWriter, r *http.Request, userSource func(context.Context, string) (*models.User, error)) error {
+func (c *Ctx) init(w http.ResponseWriter, r *http.Request, users *repositories.UsersRepo) error {
 	// remember token cookie
 	if cookie, _ := r.Cookie(RememberCookie); cookie != nil {
-		user, err := userSource(r.Context(), cookie.Value)
+		user, err := users.GetByRememberToken(r.Context(), cookie.Value)
 		if err != nil && err != models.ErrNotFound {
 			return err
 		}

@@ -12,8 +12,8 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
-	"github.com/ugent-library/deliver/controllers"
 	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/handlers"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
@@ -102,13 +102,6 @@ var appCmd = &cli.Command{
 			Secret: []byte(config.Cookie.Secret),
 		})
 
-		// controllers
-		auth := controllers.NewAuthController(repo, oidcAuth)
-		pages := controllers.NewPagesController()
-		spaces := controllers.NewSpacesController(repo)
-		folders := controllers.NewFoldersController(repo, storage, config.MaxFileSize)
-		files := controllers.NewFilesController(repo, storage)
-
 		// routes
 		router.Get("/health", health.NewHandler(healthChecker))
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
@@ -136,12 +129,15 @@ var appCmd = &cli.Command{
 				),
 				// request context wrapper
 				ctx.Set(ctx.Config{
-					GetUserByRememberToken: repo.Users.GetByRememberToken,
-					Router:                 router,
+					Repo:        repo,
+					Storage:     storage,
+					MaxFileSize: config.MaxFileSize,
+					Auth:        oidcAuth,
+					Router:      router,
 					ErrorHandlers: map[int]http.HandlerFunc{
-						http.StatusNotFound:     controllers.NotFound,
-						http.StatusUnauthorized: controllers.Unauthorized,
-						http.StatusForbidden:    controllers.Forbidden,
+						http.StatusNotFound:     handlers.NotFound,
+						http.StatusUnauthorized: handlers.Unauthorized,
+						http.StatusForbidden:    handlers.Forbidden,
 					},
 					Permissions: permissions,
 					Assets:      assets,
@@ -151,40 +147,40 @@ var appCmd = &cli.Command{
 			)
 
 			// viewable by everyone
-			r.NotFound(controllers.NotFound)
-			r.Get("/", pages.Home).Name("home")
-			r.Get("/auth/callback", auth.Callback)
-			r.Get("/login", auth.Login).Name("login")
-			r.Get("/logout", auth.Logout).Name("logout")
-			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", folders.Share).Name("shareFolder")
-			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", files.Download).Name("downloadFile")
+			r.NotFound(handlers.NotFound)
+			r.Get("/", handlers.Home).Name("home")
+			r.Get("/auth/callback", handlers.AuthCallback)
+			r.Get("/login", handlers.Login).Name("login")
+			r.Get("/logout", handlers.Logout).Name("logout")
+			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", handlers.ShareFolder).Name("shareFolder")
+			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", handlers.DownloadFile).Name("downloadFile")
 			// viewable by space owners and admins
 			r.Group(func(r *ich.Mux) {
 				r.Use(ctx.RequireUser)
-				r.Get("/spaces", spaces.List).Name("spaces")
-				r.With(ctx.RequireAdmin).Get("/new-space", spaces.New).Name("newSpace")
-				r.With(ctx.RequireAdmin).Post("/spaces", spaces.Create).Name("createSpace")
+				r.Get("/spaces", handlers.ListSpaces).Name("spaces")
+				r.With(ctx.RequireAdmin).Get("/new-space", handlers.NewSpace).Name("newSpace")
+				r.With(ctx.RequireAdmin).Post("/spaces", handlers.CreateSpace).Name("createSpace")
 				r.Route("/spaces/{spaceName}", func(r *ich.Mux) {
 					r.Use(ctx.SetSpace(*repo.Spaces))
 					r.Use(ctx.CanViewSpace)
-					r.Get("/", spaces.Show).Name("space")
-					r.Post("/folders", spaces.CreateFolder).Name("createFolder")
-					r.With(ctx.RequireAdmin).Get("/edit", spaces.Edit).Name("editSpace")
-					r.With(ctx.RequireAdmin).Put("/", spaces.Update).Name("updateSpace")
+					r.Get("/", handlers.ShowSpace).Name("space")
+					r.Post("/folders", handlers.CreateFolder).Name("createFolder")
+					r.With(ctx.RequireAdmin).Get("/edit", handlers.EditSpace).Name("editSpace")
+					r.With(ctx.RequireAdmin).Put("/", handlers.UpdateSpace).Name("updateSpace")
 				})
 				r.Route("/folders/{folderID}", func(r *ich.Mux) {
 					r.Use(ctx.SetFolder(*repo.Folders))
 					r.Use(ctx.CanEditFolder)
-					r.Get("/", folders.Show).Name("folder")
-					r.Get("/edit", folders.Edit).Name("editFolder")
-					r.Put("/", folders.Update).Name("updateFolder")
-					r.Post("/files", folders.UploadFile).Name("uploadFile")
-					r.Delete("/", folders.Delete).Name("deleteFolder")
+					r.Get("/", handlers.ShowFolder).Name("folder")
+					r.Get("/edit", handlers.EditFolder).Name("editFolder")
+					r.Put("/", handlers.UpdateFolder).Name("updateFolder")
+					r.Post("/files", handlers.UploadFile).Name("uploadFile")
+					r.Delete("/", handlers.DeleteFolder).Name("deleteFolder")
 				})
 				r.Route("/files/{fileID}", func(r *ich.Mux) {
 					r.Use(ctx.SetFile(*repo.Files))
 					r.Use(ctx.CanEditFile)
-					r.Delete("/", files.Delete).Name("deleteFile")
+					r.Delete("/", handlers.DeleteFile).Name("deleteFile")
 				})
 			})
 		})

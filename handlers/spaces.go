@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"errors"
@@ -9,22 +9,11 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/httpx/render"
 )
-
-type SpacesController struct {
-	repo *repositories.Repo
-}
-
-func NewSpacesController(r *repositories.Repo) *SpacesController {
-	return &SpacesController{
-		repo: r,
-	}
-}
 
 var reSplitAdmins = regexp.MustCompile(`\s*[,;]\s*`)
 
@@ -33,15 +22,15 @@ type SpaceForm struct {
 	Admins string `form:"admins"`
 }
 
-func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
+func ListSpaces(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	var userSpaces []*models.Space
 	var err error
 	if c.Permissions.IsAdmin(c.User) {
-		userSpaces, err = h.repo.Spaces.GetAll(r.Context())
+		userSpaces, err = c.Repo.Spaces.GetAll(r.Context())
 	} else {
-		userSpaces, err = h.repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
+		userSpaces, err = c.Repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
 	}
 	if err != nil {
 		c.HandleError(w, r, err)
@@ -64,7 +53,7 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	space, err := h.repo.Spaces.GetByName(r.Context(), userSpaces[0].Name)
+	space, err := c.Repo.Spaces.GetByName(r.Context(), userSpaces[0].Name)
 	if err != nil {
 		c.HandleError(w, r, err)
 		return
@@ -78,11 +67,11 @@ func (h *SpacesController) List(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (h *SpacesController) Show(w http.ResponseWriter, r *http.Request) {
-	h.show(w, r, &models.Folder{}, nil)
+func ShowSpace(w http.ResponseWriter, r *http.Request) {
+	showSpace(w, r, &models.Folder{}, nil)
 }
 
-func (h *SpacesController) New(w http.ResponseWriter, r *http.Request) {
+func NewSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
@@ -91,7 +80,7 @@ func (h *SpacesController) New(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
+func CreateSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	b := SpaceForm{}
@@ -106,7 +95,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 		Admins: reSplitAdmins.Split(b.Admins, -1),
 	}
 
-	if err := h.repo.Spaces.Create(r.Context(), space); err != nil {
+	if err := c.Repo.Spaces.Create(r.Context(), space); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
@@ -129,39 +118,7 @@ func (h *SpacesController) Create(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *SpacesController) CreateFolder(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r)
-	space := ctx.GetSpace(r)
-
-	b := FolderForm{}
-	if err := bind.Form(r, &b); err != nil {
-		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
-		return
-	}
-
-	// TODO constructor for new objects
-	folder := &models.Folder{
-		SpaceID:   space.ID,
-		Name:      b.Name,
-		ExpiresAt: time.Now().AddDate(0, 1, 0),
-	}
-
-	if err := h.repo.Folders.Create(r.Context(), folder); err != nil {
-		h.show(w, r, folder, err)
-		return
-	}
-
-	c.PersistFlash(w, ctx.Flash{
-		Type:         "info",
-		Body:         "Folder created succesfully",
-		DismissAfter: 3 * time.Second,
-	})
-
-	loc := c.PathTo("folder", "folderID", folder.ID).String()
-	http.Redirect(w, r, loc, http.StatusSeeOther)
-}
-
-func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
+func EditSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
 
@@ -171,7 +128,7 @@ func (h *SpacesController) Edit(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
+func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
 
@@ -183,7 +140,7 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 
 	space.Admins = reSplitAdmins.Split(b.Admins, -1)
 
-	if err := h.repo.Spaces.Update(r.Context(), space); err != nil {
+	if err := c.Repo.Spaces.Update(r.Context(), space); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
@@ -200,7 +157,7 @@ func (h *SpacesController) Update(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *models.Folder, err error) {
+func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, err error) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
 
@@ -212,9 +169,9 @@ func (h *SpacesController) show(w http.ResponseWriter, r *http.Request, folder *
 
 	var userSpaces []*models.Space
 	if c.Permissions.IsAdmin(c.User) {
-		userSpaces, err = h.repo.Spaces.GetAll(r.Context())
+		userSpaces, err = c.Repo.Spaces.GetAll(r.Context())
 	} else {
-		userSpaces, err = h.repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
+		userSpaces, err = c.Repo.Spaces.GetAllByUsername(r.Context(), c.User.Username)
 	}
 	if err != nil {
 		c.HandleError(w, r, err)

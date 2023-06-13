@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"net/http"
@@ -6,27 +6,14 @@ import (
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/oidc"
 )
 
-type AuthController struct {
-	repo     *repositories.Repo
-	oidcAuth *oidc.Auth
-}
-
-func NewAuthController(repo *repositories.Repo, oidcAuth *oidc.Auth) *AuthController {
-	return &AuthController{
-		repo:     repo,
-		oidcAuth: oidcAuth,
-	}
-}
-
-func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
+func AuthCallback(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	claims := oidc.Claims{}
-	if err := h.oidcAuth.CompleteAuth(w, r, &claims); err != nil {
+	if err := c.Auth.CompleteAuth(w, r, &claims); err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
@@ -36,7 +23,7 @@ func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 		Name:     claims.Name,
 		Email:    claims.Email,
 	}
-	if err := h.repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
+	if err := c.Repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
@@ -53,18 +40,18 @@ func (h *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
 }
 
-func (h *AuthController) Login(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
-	if err := h.oidcAuth.BeginAuth(w, r); err != nil {
+	if err := c.Auth.BeginAuth(w, r); err != nil {
 		c.HandleError(w, r, err)
 	}
 }
 
-func (h *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
-	if err := h.repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
+	if err := c.Repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
