@@ -111,42 +111,26 @@ type Flash struct {
 }
 
 type Ctx struct {
-	Repo          *repositories.Repo
-	Storage       objectstore.Store
-	MaxFileSize   int64
-	Auth          *oidc.Auth
-	host          string
-	scheme        string
-	errorHandlers map[int]http.HandlerFunc
-	router        *ich.Mux
-	assets        mix.Manifest
-	Log           *zap.SugaredLogger // TODO use plain logger?
-	Hub           *htmx.Hub
-	CSRFToken     string
-	CSRFTag       string
-	User          *models.User
-	Flash         []Flash
-	Banner        string
-	*models.Permissions
+	Config
+	host      string
+	scheme    string
+	Log       *zap.SugaredLogger // TODO use plain logger?
+	CSRFToken string
+	CSRFTag   string
+	User      *models.User
+	Flash     []Flash
+	Banner    string
 }
 
 func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
 	c := &Ctx{
-		Repo:          config.Repo,
-		Storage:       config.Storage,
-		MaxFileSize:   config.MaxFileSize,
-		Auth:          config.Auth,
-		host:          r.Host,
-		scheme:        r.URL.Scheme,
-		errorHandlers: config.ErrorHandlers,
-		Log:           zaphttp.Logger(r.Context()).Sugar(),
-		CSRFToken:     csrf.Token(r),
-		CSRFTag:       string(csrf.TemplateField(r)),
-		router:        config.Router,
-		assets:        config.Assets,
-		Hub:           config.Hub,
-		Banner:        config.Banner,
-		Permissions:   config.Permissions,
+		Config:    config,
+		host:      r.Host,
+		scheme:    r.URL.Scheme,
+		Log:       zaphttp.Logger(r.Context()).Sugar(),
+		CSRFToken: csrf.Token(r),
+		CSRFTag:   string(csrf.TemplateField(r)),
+		Banner:    config.Banner,
 	}
 	if c.scheme == "" {
 		c.scheme = "http"
@@ -165,7 +149,7 @@ func (c *Ctx) HandleError(w http.ResponseWriter, r *http.Request, err error) {
 		httpErr = httperror.InternalServerError
 	}
 
-	if h, ok := c.errorHandlers[httpErr.StatusCode]; ok {
+	if h, ok := c.ErrorHandlers[httpErr.StatusCode]; ok {
 		h(w, r)
 		return
 	}
@@ -176,11 +160,11 @@ func (c *Ctx) HandleError(w http.ResponseWriter, r *http.Request, err error) {
 }
 
 func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
-	return c.router.PathTo(name, pairs...)
+	return c.Router.PathTo(name, pairs...)
 }
 
 func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
-	u := c.router.PathTo(name, pairs...)
+	u := c.Router.PathTo(name, pairs...)
 	u.Host = c.host
 	u.Scheme = c.scheme
 	return u
@@ -202,7 +186,7 @@ func (c *Ctx) PersistFlash(w http.ResponseWriter, f Flash) {
 }
 
 func (c *Ctx) AssetPath(asset string) string {
-	ap, err := c.assets.AssetPath(asset)
+	ap, err := c.Assets.AssetPath(asset)
 	if err != nil {
 		panic(err)
 	}
