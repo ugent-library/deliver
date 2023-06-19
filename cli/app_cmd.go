@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
+	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/handlers"
 	"github.com/ugent-library/deliver/htmx"
@@ -24,8 +25,11 @@ import (
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"github.com/ugent-library/zaphttp/zapchi"
-	"github.com/urfave/cli/v2"
 )
+
+func init() {
+	rootCmd.AddCommand(appCmd)
+}
 
 var appInfo = &struct {
 	Branch string `json:"branch,omitempty"`
@@ -35,10 +39,10 @@ var appInfo = &struct {
 	Commit: os.Getenv("SOURCE_COMMIT"),
 }
 
-var appCmd = &cli.Command{
-	Name:  "app",
-	Usage: "Start the web app server",
-	Action: func(*cli.Context) error {
+var appCmd = &cobra.Command{
+	Use:   "app",
+	Short: "Start the web app server",
+	RunE: func(cmd *cobra.Command, args []string) error {
 		// setup services
 		repo, err := repositories.New(config.Repo.Conn)
 		if err != nil {

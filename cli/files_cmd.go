@@ -3,21 +3,23 @@ package cli
 import (
 	"context"
 
+	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/objectstore"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/urfave/cli/v2"
 )
 
-var filesCmd = &cli.Command{
-	Name: "files",
-	Subcommands: []*cli.Command{
-		gcFilesCmd,
-	},
+func init() {
+	rootCmd.AddCommand(filesCmd)
+	filesCmd.AddCommand(gcFilesCmd)
 }
 
-var gcFilesCmd = &cli.Command{
-	Name: "gc",
-	Action: func(*cli.Context) error {
+var filesCmd = &cobra.Command{
+	Use: "files",
+}
+
+var gcFilesCmd = &cobra.Command{
+	Use: "gc",
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
 		repo, err := repositories.New(config.Repo.Conn)

@@ -1,12 +1,8 @@
 package cli
 
 import (
-	// "github.com/caarlos0/env/v8"
-
-	"os"
-
 	"github.com/caarlos0/env/v8"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
 	// load .env file if present
@@ -19,58 +15,39 @@ import (
 var (
 	config Config
 	logger *zap.SugaredLogger
+
+	rootCmd = &cobra.Command{
+		Use:   "deliver",
+		Short: "Deliver CLI",
+	}
 )
 
-func initConfig() error {
-	err := env.ParseWithOptions(&config, env.Options{
-		Prefix: "DELIVER_",
+func init() {
+	cobra.OnInitialize(initConfig, initLogger)
+	cobra.OnFinalize(func() {
+		cobra.CheckErr(logger.Sync())
 	})
-	if err != nil {
-		return err
-	}
+}
+
+func initConfig() {
+	cobra.CheckErr(env.ParseWithOptions(&config, env.Options{
+		Prefix: "DELIVER_",
+	}))
 	config.AfterLoad()
-	return nil
 }
 
-func initLogger() error {
-	var l *zap.Logger
-	var err error
+func initLogger() {
 	if config.Production {
-		l, err = zap.NewProduction()
+		l, err := zap.NewProduction()
+		cobra.CheckErr(err)
+		logger = l.Sugar()
 	} else {
-		l, err = zap.NewDevelopment()
+		l, err := zap.NewDevelopment()
+		cobra.CheckErr(err)
+		logger = l.Sugar()
 	}
-
-	if err != nil {
-		return err
-	}
-
-	logger = l.Sugar()
-
-	return nil
 }
 
-func Run() {
-	app := &cli.App{
-		Name:  "deliver",
-		Usage: "Deliver CLI",
-		Before: func(*cli.Context) error {
-			if err := initConfig(); err != nil {
-				return cli.Exit(err, 1)
-			}
-			if err := initLogger(); err != nil {
-				return cli.Exit(err, 1)
-			}
-			return nil
-		},
-		Commands: []*cli.Command{
-			foldersCmd,
-			filesCmd,
-			appCmd,
-		},
-	}
-
-	if err := app.Run(os.Args); err != nil {
-		logger.Fatal(err)
-	}
+func Run() error {
+	return rootCmd.Execute()
 }
