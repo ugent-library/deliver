@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/objectstore"
-	"github.com/ugent-library/deliver/repositories"
+	repository "github.com/ugent-library/deliver/repository"
 )
 
 func init() {
@@ -22,7 +22,7 @@ var gcFilesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
-		repo, err := repositories.New(config.Repo.Conn)
+		repo, err := repository.New(config.Repo.Conn)
 		if err != nil {
 			return err
 		}
@@ -31,11 +31,7 @@ var gcFilesCmd = &cobra.Command{
 			return err
 		}
 
-		iter, err := storage.IterateID(ctx)
-		if err != nil {
-			return err
-		}
-		for id, ok := iter.Next(); ok; id, ok = iter.Next() {
+		return storage.IterateID(ctx, func(id string) error {
 			exists, err := repo.Files.Exists(ctx, id)
 			if err != nil {
 				return err
@@ -45,7 +41,7 @@ var gcFilesCmd = &cobra.Command{
 					return err
 				}
 			}
-		}
-		return iter.Err()
+			return nil
+		})
 	},
 }

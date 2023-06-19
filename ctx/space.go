@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/repositories"
+	"github.com/ugent-library/deliver/repository"
 	"github.com/ugent-library/httperror"
 )
 
@@ -16,7 +16,7 @@ func GetSpace(r *http.Request) *models.Space {
 	return r.Context().Value(spaceKey).(*models.Space)
 }
 
-func SetSpace(spacesRepo repositories.SpacesRepo) func(http.Handler) http.Handler {
+func SetSpace(spacesRepo repository.SpacesRepo) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := Get(r)

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	"github.com/ugent-library/deliver/repositories"
+	"github.com/ugent-library/deliver/repository"
 )
 
 func init() {
@@ -19,7 +19,7 @@ var foldersCmd = &cobra.Command{
 var expireFoldersCmd = &cobra.Command{
 	Use: "expire",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		repo, err := repositories.New(config.Repo.Conn)
+		repo, err := repository.New(config.Repo.Conn)
 		if err != nil {
 			return err
 		}

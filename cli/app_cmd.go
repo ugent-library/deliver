@@ -18,7 +18,7 @@ import (
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
-	"github.com/ugent-library/deliver/repositories"
+	"github.com/ugent-library/deliver/repository"
 	"github.com/ugent-library/httpx/render"
 	mw "github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
@@ -44,7 +44,7 @@ var appCmd = &cobra.Command{
 	Short: "Start the web app server",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// setup services
-		repo, err := repositories.New(config.Repo.Conn)
+		repo, err := repository.New(config.Repo.Conn)
 		if err != nil {
 			return err
 		}

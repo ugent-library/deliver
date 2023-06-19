@@ -2,21 +2,20 @@ package objectstore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"sync"
 )
 
+//lint:ignore ST1012 name doesn't start with Err
+var Stop = errors.New("stop iterating")
+
 type Store interface {
 	Add(context.Context, string, io.Reader) (string, error)
 	Get(context.Context, string) (io.ReadCloser, error)
 	Delete(context.Context, string) error
-	IterateID(context.Context) (Iter, error)
-}
-
-type Iter interface {
-	Next() (string, bool)
-	Err() error
+	IterateID(context.Context, func(string) error) error
 }
 
 type Factory func(string) (Store, error)

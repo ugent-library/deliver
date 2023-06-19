@@ -22,7 +22,7 @@ var (
 func init() {
 	cobra.OnInitialize(initConfig, initLogger)
 	cobra.OnFinalize(func() {
-		cobra.CheckErr(logger.Sync())
+		logger.Sync()
 	})
 }
 
