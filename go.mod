@@ -11,7 +11,6 @@ require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/gorilla/csrf v1.7.1
 	github.com/jackc/pgx/v5 v5.3.1
-	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/nics/ich v0.0.0-20230515073809-6deee7f5ae14
 	github.com/oklog/ulid/v2 v2.1.0

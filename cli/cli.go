@@ -5,9 +5,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
-	// load .env file if present
-	_ "github.com/joho/godotenv/autoload"
-
 	// register objectstore backends
 	_ "github.com/ugent-library/deliver/objectstore/s3"
 )
