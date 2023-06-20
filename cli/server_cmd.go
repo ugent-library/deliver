@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/alexliesenfeld/health"
@@ -29,14 +28,6 @@ import (
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
-}
-
-var appInfo = &struct {
-	Branch string `json:"branch,omitempty"`
-	Commit string `json:"commit,omitempty"`
-}{
-	Branch: os.Getenv("SOURCE_BRANCH"),
-	Commit: os.Getenv("SOURCE_COMMIT"),
 }
 
 var serverCmd = &cobra.Command{
@@ -109,7 +100,13 @@ var serverCmd = &cobra.Command{
 		// routes
 		router.Get("/health", health.NewHandler(healthChecker))
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
-			render.JSON(w, http.StatusOK, appInfo)
+			render.JSON(w, http.StatusOK, &struct {
+				Branch string `json:"branch,omitempty"`
+				Commit string `json:"commit,omitempty"`
+			}{
+				Branch: config.Source.Branch,
+				Commit: config.Source.Commit,
+			})
 		})
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {

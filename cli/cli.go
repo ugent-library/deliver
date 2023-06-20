@@ -27,9 +27,7 @@ func init() {
 }
 
 func initConfig() {
-	cobra.CheckErr(env.ParseWithOptions(&config, env.Options{
-		Prefix: "DELIVER_",
-	}))
+	cobra.CheckErr(env.Parse(&config))
 }
 
 func initLogger() {
