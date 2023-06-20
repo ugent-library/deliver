@@ -24,16 +24,7 @@ interface PageView {
 
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper" hx-swap="none">
         <header>
-            {% if c.Banner == "development" %}
-                <div class="alert alert-warning mb-0 py-1" role="alert">
-                    <p>
-                        <strong>Test environment</strong>: data entered will not
-                        be saved. Contact <a
-                        href="mailto:libservice@ugent.be.">libservice@ugent.be</a>
-                        for more information.
-                    </p>
-                </div>
-            {% endif %}
+            {%= EnvBanner(c) %}
 
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">
@@ -188,13 +179,7 @@ interface PageView {
 
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
         <header>
-            {% if c.Banner == "development" %}
-                <div class="alert alert-warning mb-0 py-1" role="alert">
-                    <p>
-                        <strong>Test environment</strong>: all files and information in this environment are for testing purposes only.
-                    </p>
-                </div>
-            {% endif %}
+            {%= EnvBanner(c) %}
 
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">

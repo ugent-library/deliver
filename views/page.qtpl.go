@@ -79,21 +79,8 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
         <header>
             `)
 //line views/page.qtpl:27
-	if c.Banner == "development" {
+	StreamEnvBanner(qw422016, c)
 //line views/page.qtpl:27
-		qw422016.N().S(`
-                <div class="alert alert-warning mb-0 py-1" role="alert">
-                    <p>
-                        <strong>Test environment</strong>: data entered will not
-                        be saved. Contact <a
-                        href="mailto:libservice@ugent.be.">libservice@ugent.be</a>
-                        for more information.
-                    </p>
-                </div>
-            `)
-//line views/page.qtpl:36
-	}
-//line views/page.qtpl:36
 	qw422016.N().S(`
 
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
@@ -104,27 +91,27 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
                                         <a href="`)
-//line views/page.qtpl:45
+//line views/page.qtpl:36
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:45
+//line views/page.qtpl:36
 	qw422016.N().S(`">
                                             <img class="d-none d-lg-inline-block" src="`)
-//line views/page.qtpl:46
+//line views/page.qtpl:37
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-logo.svg"))
-//line views/page.qtpl:46
+//line views/page.qtpl:37
 	qw422016.N().S(`" alt="Ghent University Library">
                                             <img class="d-inline-block d-lg-none" src="`)
-//line views/page.qtpl:47
+//line views/page.qtpl:38
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-mark.svg"))
-//line views/page.qtpl:47
+//line views/page.qtpl:38
 	qw422016.N().S(`" alt="Ghent University Library">
                                         </a>
                                     </li>
                                     <li class="breadcrumb-item" aria-current="page">
                                         <a href="`)
-//line views/page.qtpl:51
+//line views/page.qtpl:42
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:51
+//line views/page.qtpl:42
 	qw422016.N().S(`" class="text-muted">Home</a>
                                     </li>
                                 </ol>
@@ -137,9 +124,9 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                             <div id="side-panels">
                                 <ul class="nav nav-main">
                                     `)
-//line views/page.qtpl:62
+//line views/page.qtpl:53
 	if c.User != nil {
-//line views/page.qtpl:62
+//line views/page.qtpl:53
 		qw422016.N().S(`
                                     <li class="nav-item">
                                         <a class="nav-link" href="mailto:libservice@ugent.be" target="_blank">
@@ -148,9 +135,9 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                         </a>
                                     </li>
                                     `)
-//line views/page.qtpl:69
+//line views/page.qtpl:60
 	}
-//line views/page.qtpl:69
+//line views/page.qtpl:60
 	qw422016.N().S(`
                                     <li class="nav-item">
                                         <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
@@ -160,9 +147,9 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                     </li>
                                     <li class="nav-item">
                                         `)
-//line views/page.qtpl:77
+//line views/page.qtpl:68
 	if c.User != nil {
-//line views/page.qtpl:77
+//line views/page.qtpl:68
 		qw422016.N().S(`
                                         <div class="dropdown position-static">
                                             <button class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -171,9 +158,9 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                                         <i class="if if-user"></i>
                                                     </div>
                                                     <div class="bc-avatar-text">`)
-//line views/page.qtpl:84
+//line views/page.qtpl:75
 		qw422016.E().S(c.User.Name)
-//line views/page.qtpl:84
+//line views/page.qtpl:75
 		qw422016.N().S(`</div>
                                                 </div>
                                             </button>
@@ -184,22 +171,22 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                                     </div>
                                                     <div class="bc-avatar-text">
                                                         <h4>`)
-//line views/page.qtpl:93
+//line views/page.qtpl:84
 		qw422016.E().S(c.User.Name)
-//line views/page.qtpl:93
+//line views/page.qtpl:84
 		qw422016.N().S(`</h4>
                                                         <p class="text-muted c-body-small">`)
-//line views/page.qtpl:94
+//line views/page.qtpl:85
 		qw422016.E().S(c.User.Email)
-//line views/page.qtpl:94
+//line views/page.qtpl:85
 		qw422016.N().S(`</p>
                                                     </div>
                                                 </div>
                                                 <hr class="dropdown-divider">
                                                 <a class="dropdown-item" href="`)
-//line views/page.qtpl:98
+//line views/page.qtpl:89
 		qw422016.E().S(c.PathTo("logout").String())
-//line views/page.qtpl:98
+//line views/page.qtpl:89
 		qw422016.N().S(`">
                                                     <i class="if if-log-out"></i>
                                                     <span>Log out</span>
@@ -207,22 +194,22 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                             </div>
                                         </div>
                                         `)
-//line views/page.qtpl:104
+//line views/page.qtpl:95
 	} else {
-//line views/page.qtpl:104
+//line views/page.qtpl:95
 		qw422016.N().S(`
                                         <a class="btn btn-link btn-sm" href="`)
-//line views/page.qtpl:105
+//line views/page.qtpl:96
 		qw422016.E().S(c.PathTo("login").String())
-//line views/page.qtpl:105
+//line views/page.qtpl:96
 		qw422016.N().S(`">
                                             <i class="if if-arrow-right mt-0 ms-2"></i>
                                             <span class="btn-text me-2">Log in</span>
                                         </a>
                                         `)
-//line views/page.qtpl:109
+//line views/page.qtpl:100
 	}
-//line views/page.qtpl:109
+//line views/page.qtpl:100
 	qw422016.N().S(`
                                     </li>
                                 </ul>
@@ -235,22 +222,22 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
         <main>
             <div class="d-flex u-maximize-height">
                 <div class="c-sidebar`)
-//line views/page.qtpl:120
+//line views/page.qtpl:111
 	if c.User != nil {
-//line views/page.qtpl:120
+//line views/page.qtpl:111
 		qw422016.N().S(` c-sidebar--dark-gray`)
-//line views/page.qtpl:120
+//line views/page.qtpl:111
 	}
-//line views/page.qtpl:120
+//line views/page.qtpl:111
 	qw422016.N().S(` d-none d-lg-flex">
                     <div class="c-sidebar__menu">
                         <nav>
                             <ul class="c-sidebar-menu">
                                 <li class="c-sidebar__item c-sidebar__item--active">
                                     <a href="`)
-//line views/page.qtpl:125
+//line views/page.qtpl:116
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:125
+//line views/page.qtpl:116
 	qw422016.N().S(`">
                                         <span class="c-sidebar__icon">
                                             <i class="if if-file"></i>
@@ -263,36 +250,36 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                     </div>
                     <div class="c-sidebar__bottom">
                         <img src="`)
-//line views/page.qtpl:136
+//line views/page.qtpl:127
 	qw422016.E().S(c.AssetPath("/images/logo-ugent-white.svg"))
-//line views/page.qtpl:136
+//line views/page.qtpl:127
 	qw422016.N().S(`" alt="Logo UGent" height="48px" width="auto">
                     </div>
                 </div>
 
                 `)
-//line views/page.qtpl:140
+//line views/page.qtpl:131
 	v.StreamContent(qw422016, c)
-//line views/page.qtpl:140
+//line views/page.qtpl:131
 	qw422016.N().S(`
             </div>
         </main>
 
         <div id="flash-messages">
             `)
-//line views/page.qtpl:145
+//line views/page.qtpl:136
 	for _, f := range c.Flash {
-//line views/page.qtpl:145
+//line views/page.qtpl:136
 		qw422016.N().S(`
             `)
-//line views/page.qtpl:146
+//line views/page.qtpl:137
 		StreamFlash(qw422016, f)
-//line views/page.qtpl:146
+//line views/page.qtpl:137
 		qw422016.N().S(`
             `)
-//line views/page.qtpl:147
+//line views/page.qtpl:138
 	}
-//line views/page.qtpl:147
+//line views/page.qtpl:138
 	qw422016.N().S(`
         </div>
 
@@ -320,38 +307,38 @@ func StreamPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
     </body>
     </html>
 `)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 }
 
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 func WritePage(qq422016 qtio422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	StreamPage(qw422016, c, v)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	qt422016.ReleaseWriter(qw422016)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 }
 
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 func Page(c *ctx.Ctx, v PageView) string {
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	WritePage(qb422016, c, v)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	qs422016 := string(qb422016.B)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 	return qs422016
-//line views/page.qtpl:173
+//line views/page.qtpl:164
 }
 
-//line views/page.qtpl:175
+//line views/page.qtpl:166
 func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:175
+//line views/page.qtpl:166
 	qw422016.N().S(`
     <!DOCTYPE html>
     <html class="u-maximize-height" dir="ltr" lang="en">
@@ -361,43 +348,33 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex">
         <link rel="stylesheet" href="`)
-//line views/page.qtpl:183
+//line views/page.qtpl:174
 	qw422016.E().S(c.AssetPath("/css/app.css"))
-//line views/page.qtpl:183
+//line views/page.qtpl:174
 	qw422016.N().S(`">
         <link rel="icon" href="`)
-//line views/page.qtpl:184
+//line views/page.qtpl:175
 	qw422016.E().S(c.AssetPath("/favicon.ico"))
-//line views/page.qtpl:184
+//line views/page.qtpl:175
 	qw422016.N().S(`">
         <script type="application/javascript" src="`)
-//line views/page.qtpl:185
+//line views/page.qtpl:176
 	qw422016.E().S(c.AssetPath("/js/app.js"))
-//line views/page.qtpl:185
+//line views/page.qtpl:176
 	qw422016.N().S(`"></script>
         <title>`)
-//line views/page.qtpl:186
+//line views/page.qtpl:177
 	v.StreamTitle(qw422016, c)
-//line views/page.qtpl:186
+//line views/page.qtpl:177
 	qw422016.N().S(`</title>
     </head>
 
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
         <header>
             `)
-//line views/page.qtpl:191
-	if c.Banner == "development" {
-//line views/page.qtpl:191
-		qw422016.N().S(`
-                <div class="alert alert-warning mb-0 py-1" role="alert">
-                    <p>
-                        <strong>Test environment</strong>: all files and information in this environment are for testing purposes only.
-                    </p>
-                </div>
-            `)
-//line views/page.qtpl:197
-	}
-//line views/page.qtpl:197
+//line views/page.qtpl:182
+	StreamEnvBanner(qw422016, c)
+//line views/page.qtpl:182
 	qw422016.N().S(`
 
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
@@ -408,27 +385,27 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
                                         <a href="`)
-//line views/page.qtpl:206
+//line views/page.qtpl:191
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:206
+//line views/page.qtpl:191
 	qw422016.N().S(`">
                                             <img class="d-none d-lg-inline-block" src="`)
-//line views/page.qtpl:207
+//line views/page.qtpl:192
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-logo.svg"))
-//line views/page.qtpl:207
+//line views/page.qtpl:192
 	qw422016.N().S(`" alt="Ghent University Library">
                                             <img class="d-inline-block d-lg-none" src="`)
-//line views/page.qtpl:208
+//line views/page.qtpl:193
 	qw422016.E().S(c.AssetPath("/images/ghent-university-library-mark.svg"))
-//line views/page.qtpl:208
+//line views/page.qtpl:193
 	qw422016.N().S(`" alt="Ghent University Library">
                                         </a>
                                     </li>
                                     <li class="breadcrumb-item" aria-current="page">
                                         <a href="`)
-//line views/page.qtpl:212
+//line views/page.qtpl:197
 	qw422016.E().S(c.PathTo("home").String())
-//line views/page.qtpl:212
+//line views/page.qtpl:197
 	qw422016.N().S(`">Home</a>
                                     </li>
                                 </ol>
@@ -447,39 +424,39 @@ func StreamPublicPage(qw422016 *qt422016.Writer, c *ctx.Ctx, v PageView) {
         </header>
         <main>
             `)
-//line views/page.qtpl:229
+//line views/page.qtpl:214
 	v.StreamContent(qw422016, c)
-//line views/page.qtpl:229
+//line views/page.qtpl:214
 	qw422016.N().S(`
         </main>
     </body>
     </html>
 `)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 }
 
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 func WritePublicPage(qq422016 qtio422016.Writer, c *ctx.Ctx, v PageView) {
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	StreamPublicPage(qw422016, c, v)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	qt422016.ReleaseWriter(qw422016)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 }
 
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 func PublicPage(c *ctx.Ctx, v PageView) string {
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	WritePublicPage(qb422016, c, v)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	qs422016 := string(qb422016.B)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 	return qs422016
-//line views/page.qtpl:233
+//line views/page.qtpl:218
 }

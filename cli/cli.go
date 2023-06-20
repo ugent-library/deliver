@@ -30,16 +30,15 @@ func initConfig() {
 	cobra.CheckErr(env.ParseWithOptions(&config, env.Options{
 		Prefix: "DELIVER_",
 	}))
-	config.AfterLoad()
 }
 
 func initLogger() {
-	if config.Production {
-		l, err := zap.NewProduction()
+	if config.Env == "local" {
+		l, err := zap.NewDevelopment()
 		cobra.CheckErr(err)
 		logger = l.Sugar()
 	} else {
-		l, err := zap.NewDevelopment()
+		l, err := zap.NewProduction()
 		cobra.CheckErr(err)
 		logger = l.Sugar()
 	}

@@ -88,7 +88,7 @@ var appCmd = &cobra.Command{
 		// setup router
 		router := ich.New()
 		router.Use(chimw.RequestID)
-		if config.Production {
+		if config.Env != "local" {
 			router.Use(chimw.RealIP)
 		}
 		router.Use(mw.MethodOverride(
@@ -146,7 +146,7 @@ var appCmd = &cobra.Command{
 					Permissions: permissions,
 					Assets:      assets,
 					Hub:         hub,
-					Banner:      config.Banner,
+					Env:         config.Env,
 				}),
 			)
 
@@ -190,7 +190,6 @@ var appCmd = &cobra.Command{
 		})
 
 		// start server
-		// TODO make timeouts configurable
 		addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 		server := graceful.WithDefaults(&http.Server{
 			Addr:         addr,

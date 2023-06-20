@@ -48,7 +48,7 @@ type Config struct {
 	Permissions   *models.Permissions
 	Assets        mix.Manifest
 	Hub           *htmx.Hub
-	Banner        string
+	Env           string
 }
 
 func Get(r *http.Request) *Ctx {
@@ -119,7 +119,7 @@ type Ctx struct {
 	CSRFTag   string
 	User      *models.User
 	Flash     []Flash
-	Banner    string
+	Env       string
 }
 
 func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
@@ -130,7 +130,7 @@ func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
 		Log:       zaphttp.Logger(r.Context()).Sugar(),
 		CSRFToken: csrf.Token(r),
 		CSRFTag:   string(csrf.TemplateField(r)),
-		Banner:    config.Banner,
+		Env:       config.Env,
 	}
 	if c.scheme == "" {
 		c.scheme = "http"
