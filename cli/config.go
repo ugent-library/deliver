@@ -1,6 +1,7 @@
 package cli
 
 type Config struct {
+	// Env must be local, development, test or production
 	Env     string   `env:"ENV" envDefault:"production"`
 	Host    string   `env:"HOST"`
 	Port    int      `env:"PORT" envDefault:"3000"`
