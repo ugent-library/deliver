@@ -28,7 +28,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(appCmd)
+	rootCmd.AddCommand(serverCmd)
 }
 
 var appInfo = &struct {
@@ -39,9 +39,9 @@ var appInfo = &struct {
 	Commit: os.Getenv("SOURCE_COMMIT"),
 }
 
-var appCmd = &cobra.Command{
-	Use:   "app",
-	Short: "Start the web app server",
+var serverCmd = &cobra.Command{
+	Use:   "server",
+	Short: "Start the server",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// setup services
 		repo, err := repository.New(config.Repo.Conn)

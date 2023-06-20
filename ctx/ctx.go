@@ -114,7 +114,7 @@ type Ctx struct {
 	Config
 	host      string
 	scheme    string
-	Log       *zap.SugaredLogger // TODO use plain logger?
+	Log       *zap.SugaredLogger
 	CSRFToken string
 	CSRFTag   string
 	User      *models.User
