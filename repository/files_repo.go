@@ -10,14 +10,14 @@ import (
 )
 
 type FilesRepo struct {
-	db *ent.Client
+	client *ent.Client
 }
 
 func (r *FilesRepo) Create(ctx context.Context, f *models.File) error {
 	if err := f.Validate(); err != nil {
 		return err
 	}
-	row, err := r.db.File.Create().
+	row, err := r.client.File.Create().
 		SetID(f.ID).
 		SetFolderID(f.FolderID).
 		SetMd5(f.MD5).
@@ -33,13 +33,13 @@ func (r *FilesRepo) Create(ctx context.Context, f *models.File) error {
 }
 
 func (r *FilesRepo) Exists(ctx context.Context, id string) (bool, error) {
-	return r.db.File.Query().
+	return r.client.File.Query().
 		Where(file.IDEQ(id)).
 		Exist(ctx)
 }
 
 func (r *FilesRepo) Get(ctx context.Context, id string) (*models.File, error) {
-	row, err := r.db.File.Query().
+	row, err := r.client.File.Query().
 		Where(file.IDEQ(id)).
 		WithFolder(func(q *ent.FolderQuery) {
 			q.WithSpace()
@@ -56,14 +56,14 @@ func (r *FilesRepo) Get(ctx context.Context, id string) (*models.File, error) {
 }
 
 func (r *FilesRepo) Delete(ctx context.Context, id string) error {
-	err := r.db.File.
+	err := r.client.File.
 		DeleteOneID(id).
 		Exec(ctx)
 	return err
 }
 
 func (r *FilesRepo) AddDownload(ctx context.Context, id string) error {
-	err := r.db.File.
+	err := r.client.File.
 		UpdateOneID(id).
 		AddDownloads(1).
 		Exec(ctx)

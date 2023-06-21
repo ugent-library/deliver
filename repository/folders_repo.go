@@ -13,11 +13,11 @@ import (
 )
 
 type FoldersRepo struct {
-	db *ent.Client
+	client *ent.Client
 }
 
 func (r *FoldersRepo) Get(ctx context.Context, id string) (*models.Folder, error) {
-	row, err := r.db.Folder.Query().
+	row, err := r.client.Folder.Query().
 		Where(folder.IDEQ(id)).
 		WithSpace().
 		WithFiles(func(q *ent.FileQuery) {
@@ -38,7 +38,7 @@ func (r *FoldersRepo) Create(ctx context.Context, f *models.Folder) error {
 	if err := f.Validate(); err != nil {
 		return err
 	}
-	row, err := r.db.Folder.Create().
+	row, err := r.client.Folder.Create().
 		SetSpaceID(f.SpaceID).
 		SetName(f.Name).
 		SetExpiresAt(f.ExpiresAt).
@@ -57,7 +57,7 @@ func (r *FoldersRepo) Update(ctx context.Context, f *models.Folder) error {
 	if err := f.Validate(); err != nil {
 		return err
 	}
-	row, err := r.db.Folder.UpdateOneID(f.ID).
+	row, err := r.client.Folder.UpdateOneID(f.ID).
 		SetName(f.Name).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
@@ -71,14 +71,14 @@ func (r *FoldersRepo) Update(ctx context.Context, f *models.Folder) error {
 }
 
 func (r *FoldersRepo) Delete(ctx context.Context, folderID string) error {
-	err := r.db.Folder.
+	err := r.client.Folder.
 		DeleteOneID(folderID).
 		Exec(ctx)
 	return err
 }
 
 func (r *FoldersRepo) DeleteExpired(ctx context.Context) error {
-	_, err := r.db.Folder.
+	_, err := r.client.Folder.
 		Delete().
 		Where(folder.ExpiresAtLT(time.Now())).
 		Exec(ctx)
