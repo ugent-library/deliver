@@ -2,12 +2,11 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/alexliesenfeld/health"
-	chimw "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
@@ -78,18 +77,18 @@ var serverCmd = &cobra.Command{
 
 		// setup router
 		router := ich.New()
-		router.Use(chimw.RequestID)
+		router.Use(middleware.RequestID)
 		if config.Env != "local" {
-			router.Use(chimw.RealIP)
+			router.Use(middleware.RealIP)
 		}
-		router.Use(mw.MethodOverride(
+		router.Use(mw.MethodOverride( // TODO eliminate need for method override
 			mw.MethodFromHeader(mw.MethodHeader),
 			mw.MethodFromForm(mw.MethodParam),
 		))
 		router.Use(zaphttp.SetLogger(logger.Desugar(), zapchi.RequestID))
-		router.Use(chimw.RequestLogger(zapchi.LogFormatter()))
-		router.Use(chimw.Recoverer)
-		router.Use(chimw.StripSlashes)
+		router.Use(middleware.RequestLogger(zapchi.LogFormatter()))
+		router.Use(middleware.Recoverer)
+		router.Use(middleware.StripSlashes)
 
 		// htmx message hub
 		hub := htmx.NewHub(htmx.Config{
@@ -187,14 +186,13 @@ var serverCmd = &cobra.Command{
 		})
 
 		// start server
-		addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 		server := graceful.WithDefaults(&http.Server{
-			Addr:         addr,
+			Addr:         config.Addr(),
 			Handler:      router,
 			ReadTimeout:  10 * time.Minute,
 			WriteTimeout: 10 * time.Minute,
 		})
-		logger.Infof("starting server at %s", addr)
+		logger.Infof("starting server at %s", config.Addr())
 		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
 			return err
 		}

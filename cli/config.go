@@ -1,5 +1,7 @@
 package cli
 
+import "fmt"
+
 type Config struct {
 	// Version info
 	Source struct {
@@ -28,4 +30,8 @@ type Config struct {
 		Secret string `env:"SECRET,notEmpty"`
 	} `envPrefix:"DELIVER_COOKIE_"`
 	MaxFileSize int64 `env:"DELIVER_MAX_FILE_SIZE" envDefault:"2000000000"`
+}
+
+func (c Config) Addr() string {
+	return fmt.Sprintf("%s:%d", config.Host, config.Port)
 }
