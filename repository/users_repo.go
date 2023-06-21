@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent"
@@ -18,15 +17,13 @@ func (r *UsersRepo) GetByRememberToken(ctx context.Context, token string) (*mode
 	row, err := r.client.User.Query().
 		Where(user.RememberTokenEQ(token)).
 		First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, models.ErrNotFound
+	}
 	if err != nil {
-		var e *ent.NotFoundError
-		if errors.As(err, &e) {
-			return nil, models.ErrNotFound
-		}
 		return nil, err
 	}
 	return rowToUser(row), nil
-
 }
 
 // TODO rewrite this when ent supports the Save method on Update; until then

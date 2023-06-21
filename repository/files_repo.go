@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 
 	"github.com/ugent-library/deliver/ent"
 	"github.com/ugent-library/deliver/ent/file"
@@ -45,11 +44,10 @@ func (r *FilesRepo) Get(ctx context.Context, id string) (*models.File, error) {
 			q.WithSpace()
 		}).
 		First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, models.ErrNotFound
+	}
 	if err != nil {
-		var e *ent.NotFoundError
-		if errors.As(err, &e) {
-			return nil, models.ErrNotFound
-		}
 		return nil, err
 	}
 	return rowToFile(row), nil
