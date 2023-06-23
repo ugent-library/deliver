@@ -28,16 +28,21 @@ Deliver is configured with these environment variables:
 
 ## Development setup with live reload
 
-The easiest way to get started is to create an `.env` file and use
-[godotenv](https://github.com/joho/godotenv) to load the configureation and
-[reflex](https://github.com/cespare/reflex) to reload the app after changes.
+For development you will also need:
+
+* Go >= 1.20
+* Node.js
+
+Initial setup:
 
 ```sh
-npm install
-go install github.com/valyala/quicktemplate/qtc@latest
-go install github.com/joho/godotenv/cmd/godotenv@latest
-go install github.com/cespare/reflex@latest
 cp .env.example .env
-cp reflex.conf.example reflex.conf
-godotenv reflex -d none -c reflex.conf
+cp .reflex.conf.example .reflex.conf
+make install-dev
+```
+
+To run the development server:
+
+```sh
+make dev
 ```
