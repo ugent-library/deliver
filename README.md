@@ -37,7 +37,7 @@ Initial setup:
 
 ```sh
 cp .env.example .env
-cp .reflex.conf.example .reflex.conf
+cp reflex.conf.example reflex.conf
 make install-dev
 ```
 
