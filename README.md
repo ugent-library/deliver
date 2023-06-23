@@ -1,12 +1,10 @@
 # deliver
 
-## Development
-
-### Configuration
+## Configuration
 
 Deliver is configured with these environment variables:
 
-* `DELIVER_PRODUCTION`
+* `DELIVER_ENV`
 * `DELIVER_HOST`
 * `DELIVER_PORT`
 * `DELIVER_ADMINS`
@@ -19,23 +17,17 @@ Deliver is configured with these environment variables:
 * `DELIVER_OIDC_REDIRECT_URL`
 * `DELIVER_COOKIE_SECRET`
 * `DELIVER_MAX_FILE_SIZE`
-* `DELIVER_BANNER`
 
-If a `.env` file is present in the project root, it's environment variables will be loaded.
+## Development setup with live reload
 
-To get started: 
-
-```sh
-cp .env.example .env
-```
-
-### Live reload
-
-This project uses [reflex](https://github.com/cespare/reflex) to reload the app
-server and recompile assets after changes.
+The easiest way to get started is to create an `.env` file and use
+[godotenv](https://github.com/joho/godotenv) to load the configureation and
+[reflex](https://github.com/cespare/reflex) to reload the app after changes.
 
 ```sh
+go install github.com/joho/godotenv/cmd/godotenv@latest
 go install github.com/cespare/reflex@latest
+cp .env.example .env
 cp reflex.conf.example reflex.conf
-reflex -d none -c reflex.conf
+godotenv reflex -d none -c reflex.conf
 ```
