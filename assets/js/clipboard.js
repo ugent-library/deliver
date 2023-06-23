@@ -2,7 +2,6 @@ export default function(rootEl) {
     rootEl.querySelectorAll("[data-clipboard]").forEach((btn) => {
         btn.addEventListener("click", () => {
             navigator.clipboard.writeText(btn.dataset.clipboard).then(() => {
-                btn.disabled = true
 
                 let icon = btn.querySelector(".if")
                 let text = btn.querySelector(".btn-text")
@@ -20,15 +19,13 @@ export default function(rootEl) {
                 text.classList.remove("text-primary")
                 text.classList.add("text-success")
                 text.setAttribute("aria-live", "polite")
-                text.innerText = "Link copied"
+                text.innerText = "Copied"
 
                 setTimeout(function () {
                     btn.className  = origBtnClass
                     icon.className = origIconClass
                     text.className = origTextClass
                     text.innerText = origText
-
-                    btn.disabled = false
                 }, 1500) 
             })
         })
