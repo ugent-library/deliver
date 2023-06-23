@@ -1,5 +1,13 @@
 # deliver
 
+## Prerequisites
+
+To run the application you will need:
+
+* A PostgreSQL database
+* An OpenID Connect endpoint
+* An S3 compatible object store
+
 ## Configuration
 
 Deliver is configured with these environment variables:
@@ -25,6 +33,8 @@ The easiest way to get started is to create an `.env` file and use
 [reflex](https://github.com/cespare/reflex) to reload the app after changes.
 
 ```sh
+npm install
+go install github.com/valyala/quicktemplate/qtc@latest
 go install github.com/joho/godotenv/cmd/godotenv@latest
 go install github.com/cespare/reflex@latest
 cp .env.example .env
