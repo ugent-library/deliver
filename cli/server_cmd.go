@@ -177,11 +177,7 @@ var serverCmd = &cobra.Command{
 					r.Post("/files", handlers.UploadFile).Name("uploadFile")
 					r.Delete("/", handlers.DeleteFolder).Name("deleteFolder")
 				})
-				r.Route("/files/{fileID}", func(r *ich.Mux) {
-					r.Use(ctx.SetFile(*repo.Files))
-					r.Use(ctx.CanEditFile)
-					r.Delete("/", handlers.DeleteFile).Name("deleteFile")
-				})
+				r.With(ctx.SetFile(*repo.Files), ctx.CanEditFile).Delete("/files/{fileID}", handlers.DeleteFile).Name("deleteFile")
 			})
 		})
 
