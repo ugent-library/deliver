@@ -16,7 +16,7 @@ import (
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstore"
-	"github.com/ugent-library/deliver/repository"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -39,7 +39,7 @@ const (
 )
 
 type Config struct {
-	Repo          *repository.Repo
+	Repo          *repositories.Repo
 	Storage       objectstore.Store
 	MaxFileSize   int64
 	Auth          *oidc.Auth

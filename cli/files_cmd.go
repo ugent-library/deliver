@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/objectstore"
-	repository "github.com/ugent-library/deliver/repository"
+	repository "github.com/ugent-library/deliver/repositories"
 )
 
 func init() {

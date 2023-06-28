@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/repository"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 )
 
@@ -16,7 +16,7 @@ func GetFile(r *http.Request) *models.File {
 	return r.Context().Value(fileKey).(*models.File)
 }
 
-func SetFile(filesRepo repository.FilesRepo) func(http.Handler) http.Handler {
+func SetFile(filesRepo repositories.FilesRepo) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := Get(r)

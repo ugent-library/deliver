@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/repository"
+	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 )
 
@@ -16,7 +16,7 @@ func GetFolder(r *http.Request) *models.Folder {
 	return r.Context().Value(folderKey).(*models.Folder)
 }
 
-func SetFolder(foldersRepo repository.FoldersRepo) func(http.Handler) http.Handler {
+func SetFolder(foldersRepo repositories.FoldersRepo) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := Get(r)
