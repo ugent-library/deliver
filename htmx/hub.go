@@ -2,12 +2,14 @@ package htmx
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/ugent-library/crypt"
 	"nhooyr.io/websocket"
 )
 
@@ -17,10 +19,11 @@ const (
 )
 
 var (
+	ErrStreamingNotSupported = errors.New("streaming not supported")
+	ErrInvalidChannelNames   = errors.New("invalid channel names")
+
 	ConnectionTooSlowText   = "Connection too slow"
 	InternalServerErrorText = "Internal server error"
-
-	ErrStreamingNotSupported = errors.New("streaming not supported")
 )
 
 type client struct {
@@ -64,11 +67,23 @@ func NewHub(config Config) *Hub {
 }
 
 func (h *Hub) EncryptChannelNames(names []string) (string, error) {
-	return EncryptChannelNames(h.config.Secret, names)
+	ciphertext, err := crypt.Encrypt(h.config.Secret, []byte(strings.Join(names, ",")))
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
-func (h *Hub) DecryptChannelNames(names string) ([]string, error) {
-	return DecryptChannelNames(h.config.Secret, names)
+func (h *Hub) DecryptChannelNames(encryptedNames string) ([]string, error) {
+	ciphertext, err := base64.URLEncoding.DecodeString(encryptedNames)
+	if err != nil {
+		return nil, err
+	}
+	plaintext, err := crypt.Decrypt(h.config.Secret, ciphertext)
+	if err != nil {
+		return nil, errors.Join(err, ErrInvalidChannelNames)
+	}
+	return strings.Split(string(plaintext), ","), nil
 }
 
 func (h *Hub) Broadcast(msgs ...string) error {

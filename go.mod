@@ -64,6 +64,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.7.0
+	github.com/ugent-library/crypt v0.0.0-20230629141409-123bcb99fde2
 	github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38
 	github.com/ugent-library/httpx v0.0.0-20230522072608-fba7bb4a066d
 	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
