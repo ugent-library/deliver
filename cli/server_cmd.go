@@ -62,10 +62,6 @@ var serverCmd = &cobra.Command{
 			return err
 		}
 
-		// setup health checker
-		// TODO add checkers
-		healthChecker := health.NewChecker()
-
 		// setup assets
 		assets, err := mix.New(mix.Config{
 			ManifestFile: "static/mix-manifest.json",
@@ -74,6 +70,12 @@ var serverCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		// setup htmx message hub
+		hub := htmx.NewHub(htmx.Config{
+			// TODO htmx secret config
+			Secret: []byte(config.Cookie.Secret),
+		})
 
 		// setup router
 		router := ich.New()
@@ -90,14 +92,8 @@ var serverCmd = &cobra.Command{
 		router.Use(middleware.Recoverer)
 		router.Use(middleware.StripSlashes)
 
-		// htmx message hub
-		hub := htmx.NewHub(htmx.Config{
-			// TODO htmx secret config
-			Secret: []byte(config.Cookie.Secret),
-		})
-
-		// routes
-		router.Get("/health", health.NewHandler(healthChecker))
+		// mount health and info
+		router.Get("/health", health.NewHandler(health.NewChecker())) // TODO add checkers
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
 			render.JSON(w, http.StatusOK, &struct {
 				Branch string `json:"branch,omitempty"`
@@ -107,13 +103,19 @@ var serverCmd = &cobra.Command{
 				Commit: config.Source.Commit,
 			})
 		})
+
+		// mount assets
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
+		// mount htmx message hub
 		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
 			if err := hub.HandleWebSocket(w, r, r.URL.Query().Get("channels")); err != nil {
 				logger.Error(err)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		})
+
+		// mount ui routes
 		router.Group(func(r *ich.Mux) {
 			r.Use(
 				func(next http.Handler) http.Handler {
