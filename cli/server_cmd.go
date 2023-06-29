@@ -156,6 +156,7 @@ var serverCmd = &cobra.Command{
 			r.Get("/logout", handlers.Logout).Name("logout")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", handlers.ShareFolder).Name("shareFolder")
 			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", handlers.DownloadFile).Name("downloadFile")
+			r.With(ctx.SetFolder(*repo.Folders)).Get("/folders/{folderID}.zip", handlers.DownloadFolder).Name("downloadFolder")
 			// viewable by space owners and admins
 			r.Group(func(r *ich.Mux) {
 				r.Use(ctx.RequireUser)

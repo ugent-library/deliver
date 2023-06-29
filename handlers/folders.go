@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"archive/zip"
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -141,4 +144,41 @@ func ShareFolder(w http.ResponseWriter, r *http.Request) {
 	render.HTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
 		Folder: folder,
 	}))
+}
+
+func DownloadFolder(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
+
+	w.Header().Add("Content-Type", "application/zip")
+	w.Header().Add(
+		"Content-Disposition",
+		fmt.Sprintf("attachment; filename*=UTF-8''%s-%s.zip", folder.ID, folder.Slug()),
+	)
+
+	zipWriter := zip.NewWriter(bufio.NewWriter(w))
+	defer zipWriter.Close()
+
+	for _, file := range folder.Files {
+		fileWriter, err := zipWriter.CreateHeader(&zip.FileHeader{
+			Name:     file.Name,
+			Method:   zip.Store, // no compression for streaming
+			Modified: time.Now(),
+		})
+		if err != nil {
+			c.Log.Error(err)
+			return
+		}
+
+		if err := c.Repo.Files.AddDownload(r.Context(), file.ID); err != nil {
+			c.Log.Error(err)
+		}
+
+		fileReader, err := c.Storage.Get(r.Context(), file.ID)
+		if err != nil {
+			c.Log.Error(err)
+			return
+		}
+		io.Copy(fileWriter, fileReader)
+	}
 }

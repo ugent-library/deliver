@@ -130,7 +130,11 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
 //line views/share_folder.qtpl:52
 	qw422016.N().D(len(v.Folder.Files))
 //line views/share_folder.qtpl:52
-	qw422016.N().S(` items</p>
+	qw422016.N().S(` items (`)
+//line views/share_folder.qtpl:52
+	qw422016.E().S(friendly.Bytes(v.Folder.TotalSize()))
+//line views/share_folder.qtpl:52
+	qw422016.N().S(`)</p>
                                 </div>
                             </div>
                         </div>
@@ -150,68 +154,76 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     <th class="text-nowrap align-middle">Downloads</th>
                                     <th class="text-nowrap align-middle">Created at</th>
                                     <th class="table-col-sm-fixed table-col-sm-fixed-right text-end align-middle">
+                                        <a class="btn btn-primary" href="`)
+//line views/share_folder.qtpl:68
+		qw422016.E().S(c.PathTo("downloadFolder", "folderID", v.Folder.ID).String())
+//line views/share_folder.qtpl:68
+		qw422016.N().S(`">
+                                            <i class="if if-download"></i>
+                                            <span class="btn-text">Download all files</span>
+                                        </a>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 `)
-//line views/share_folder.qtpl:72
+//line views/share_folder.qtpl:76
 		for _, f := range v.Folder.Files {
-//line views/share_folder.qtpl:72
+//line views/share_folder.qtpl:76
 			qw422016.N().S(`
                                 <tr class="clickable-table-row">
                                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                                         <a href="`)
-//line views/share_folder.qtpl:75
+//line views/share_folder.qtpl:79
 			qw422016.E().S(c.PathTo("downloadFile", "fileID", f.ID).String())
-//line views/share_folder.qtpl:75
+//line views/share_folder.qtpl:79
 			qw422016.N().S(`">
                                             <span>`)
-//line views/share_folder.qtpl:76
+//line views/share_folder.qtpl:80
 			qw422016.E().S(f.Name)
-//line views/share_folder.qtpl:76
+//line views/share_folder.qtpl:80
 			qw422016.N().S(`</span>
                                         </a>
                                         <br><small class="text-muted">md5 checksum: `)
-//line views/share_folder.qtpl:78
+//line views/share_folder.qtpl:82
 			qw422016.E().S(f.MD5)
-//line views/share_folder.qtpl:78
+//line views/share_folder.qtpl:82
 			qw422016.N().S(`</small>
                                     </td>
                                     <td class="text-nowrap">
                                         <p>`)
-//line views/share_folder.qtpl:81
+//line views/share_folder.qtpl:85
 			qw422016.E().S(friendly.Bytes(f.Size))
-//line views/share_folder.qtpl:81
+//line views/share_folder.qtpl:85
 			qw422016.N().S(`</p>
                                     </td>
                                     <td class="text-nowrap">
                                         <p>`)
-//line views/share_folder.qtpl:84
+//line views/share_folder.qtpl:88
 			qw422016.E().S(f.ContentType)
-//line views/share_folder.qtpl:84
+//line views/share_folder.qtpl:88
 			qw422016.N().S(`</p>
                                     </td>
                                     <td class="text-nowrap">
                                         <p>`)
-//line views/share_folder.qtpl:87
+//line views/share_folder.qtpl:91
 			qw422016.N().DL(f.Downloads)
-//line views/share_folder.qtpl:87
+//line views/share_folder.qtpl:91
 			qw422016.N().S(`</p>
                                     </td>
                                     <td class="text-nowrap">
                                         <p>`)
-//line views/share_folder.qtpl:90
+//line views/share_folder.qtpl:94
 			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
-//line views/share_folder.qtpl:90
+//line views/share_folder.qtpl:94
 			qw422016.N().S(`</p>
                                     </td>
                                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                         <div class="c-button-toolbar">
                                             <a class="btn btn-link" href="`)
-//line views/share_folder.qtpl:94
+//line views/share_folder.qtpl:98
 			qw422016.E().S(c.PathTo("downloadFile", "fileID", f.ID).String())
-//line views/share_folder.qtpl:94
+//line views/share_folder.qtpl:98
 			qw422016.N().S(`">
                                                 <i class="if if-download"></i>
                                                 <span class="btn-txt">Download</span>
@@ -220,17 +232,17 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     </td>
                                 </tr>
                                 `)
-//line views/share_folder.qtpl:101
+//line views/share_folder.qtpl:105
 		}
-//line views/share_folder.qtpl:101
+//line views/share_folder.qtpl:105
 		qw422016.N().S(`
                             </tbody>
                         </table>
                     </div>
                     `)
-//line views/share_folder.qtpl:105
+//line views/share_folder.qtpl:109
 	} else {
-//line views/share_folder.qtpl:105
+//line views/share_folder.qtpl:109
 		qw422016.N().S(`
                     <div class="c-blank-slate c-blank-slate-muted">
                         <div class="bc-avatar">
@@ -243,40 +255,40 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                         </p>
                     </div>
                     `)
-//line views/share_folder.qtpl:116
+//line views/share_folder.qtpl:120
 	}
-//line views/share_folder.qtpl:116
+//line views/share_folder.qtpl:120
 	qw422016.N().S(`
                 </div>
             </div>
         </div>
     </div>
 `)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 }
 
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 func (v *ShareFolder) WriteContent(qq422016 qtio422016.Writer, c *ctx.Ctx) {
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	v.StreamContent(qw422016, c)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	qt422016.ReleaseWriter(qw422016)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 }
 
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 func (v *ShareFolder) Content(c *ctx.Ctx) string {
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	qb422016 := qt422016.AcquireByteBuffer()
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	v.WriteContent(qb422016, c)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	qs422016 := string(qb422016.B)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	qt422016.ReleaseByteBuffer(qb422016)
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 	return qs422016
-//line views/share_folder.qtpl:121
+//line views/share_folder.qtpl:125
 }
