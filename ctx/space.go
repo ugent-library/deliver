@@ -40,7 +40,7 @@ func CanViewSpace(next http.Handler) http.Handler {
 		c := Get(r)
 		space := GetSpace(r)
 
-		if !c.IsSpaceAdmin(c.User, space) {
+		if !c.Permissions.IsSpaceAdmin(c.User, space) {
 			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}

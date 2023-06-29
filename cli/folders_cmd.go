@@ -3,20 +3,22 @@ package cli
 import (
 	"context"
 
+	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/urfave/cli/v2"
 )
 
-var foldersCmd = &cli.Command{
-	Name: "folders",
-	Subcommands: []*cli.Command{
-		expireFoldersCmd,
-	},
+func init() {
+	rootCmd.AddCommand(foldersCmd)
+	foldersCmd.AddCommand(expireFoldersCmd)
 }
 
-var expireFoldersCmd = &cli.Command{
-	Name: "expire",
-	Action: func(*cli.Context) error {
+var foldersCmd = &cobra.Command{
+	Use: "folders",
+}
+
+var expireFoldersCmd = &cobra.Command{
+	Use: "expire",
+	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, err := repositories.New(config.Repo.Conn)
 		if err != nil {
 			return err

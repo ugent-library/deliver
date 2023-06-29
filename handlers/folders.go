@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"archive/zip"
@@ -7,42 +7,23 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
-	"strconv"
 	"time"
 
-	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/objectstore"
-	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/httpx/render"
 )
 
-type FoldersController struct {
-	repo        *repositories.Repo
-	storage     objectstore.Store
-	maxFileSize int64
-}
-
 type FolderForm struct {
 	Name string `form:"name"`
 }
 
-func NewFoldersController(r *repositories.Repo, s objectstore.Store, maxFileSize int64) *FoldersController {
-	return &FoldersController{
-		repo:        r,
-		storage:     s,
-		maxFileSize: maxFileSize,
-	}
-}
-
-func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
+func ShowFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
@@ -53,11 +34,43 @@ func (h *FoldersController) Show(w http.ResponseWriter, r *http.Request) {
 
 	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowFolder{
 		Folder:      folder,
-		MaxFileSize: h.maxFileSize,
+		MaxFileSize: c.MaxFileSize,
 	}))
 }
 
-func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
+func CreateFolder(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
+
+	b := FolderForm{}
+	if err := bind.Form(r, &b); err != nil {
+		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
+		return
+	}
+
+	// TODO constructor for new objects
+	folder := &models.Folder{
+		SpaceID:   space.ID,
+		Name:      b.Name,
+		ExpiresAt: time.Now().AddDate(0, 1, 0),
+	}
+
+	if err := c.Repo.Folders.Create(r.Context(), folder); err != nil {
+		showSpace(w, r, folder, err)
+		return
+	}
+
+	c.PersistFlash(w, ctx.Flash{
+		Type:         "info",
+		Body:         "Folder created succesfully",
+		DismissAfter: 3 * time.Second,
+	})
+
+	loc := c.PathTo("folder", "folderID", folder.ID).String()
+	http.Redirect(w, r, loc, http.StatusSeeOther)
+}
+
+func EditFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
@@ -67,7 +80,7 @@ func (h *FoldersController) Edit(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
+func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
@@ -79,7 +92,7 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 
 	folder.Name = b.Name
 
-	if err := h.repo.Folders.Update(r.Context(), folder); err != nil {
+	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
 		validationErrors := validate.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
@@ -97,11 +110,11 @@ func (h *FoldersController) Update(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
+func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
-	if err := h.repo.Folders.Delete(r.Context(), folder.ID); err != nil {
+	if err := c.Repo.Folders.Delete(r.Context(), folder.ID); err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
@@ -124,39 +137,7 @@ func (h *FoldersController) Delete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
-func (h *FoldersController) UploadFile(w http.ResponseWriter, r *http.Request) {
-	c := ctx.Get(r)
-	folder := ctx.GetFolder(r)
-
-	// TODO: retrieve content type by content sniffing without interfering with streaming body
-	size, _ := strconv.ParseInt(r.Header.Get("Content-Length"), 10, 64)
-
-	// request header only accepts ISO-8859-1 so we had to escape it
-	name, _ := url.QueryUnescape(r.Header.Get("X-Upload-Filename"))
-
-	file := &models.File{
-		FolderID:    folder.ID,
-		ID:          ulid.Make().String(),
-		Name:        name,
-		ContentType: r.Header.Get("Content-Type"),
-		Size:        size,
-	}
-
-	// TODO get size
-	md5, err := h.storage.Add(r.Context(), file.ID, r.Body)
-	if err != nil {
-		c.HandleError(w, r, err)
-		return
-	}
-
-	file.MD5 = md5
-
-	if err := h.repo.Files.Create(r.Context(), file); err != nil {
-		c.HandleError(w, r, err)
-	}
-}
-
-func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
+func ShareFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
@@ -165,44 +146,37 @@ func (h *FoldersController) Share(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (h *FoldersController) Download(w http.ResponseWriter, r *http.Request) {
-
+func DownloadFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
-	zipFileName := fmt.Sprintf("%s-%s.zip", folder.ID, folder.Slug())
 	w.Header().Add("Content-Type", "application/zip")
 	w.Header().Add(
 		"Content-Disposition",
-		fmt.Sprintf("attachment; filename*=UTF-8''%s", zipFileName),
+		fmt.Sprintf("attachment; filename*=UTF-8''%s-%s.zip", folder.ID, folder.Slug()),
 	)
 
-	zipFh := zip.NewWriter(bufio.NewWriter(w))
-	defer zipFh.Close()
+	zipWriter := zip.NewWriter(bufio.NewWriter(w))
+	defer zipWriter.Close()
 
 	for _, file := range folder.Files {
-
-		fileWriter, err := zipFh.CreateHeader(&zip.FileHeader{
+		fileWriter, err := zipWriter.CreateHeader(&zip.FileHeader{
 			Name:     file.Name,
-			Method:   zip.Store, //no compression for streaming
+			Method:   zip.Store, // no compression for streaming
 			Modified: time.Now(),
 		})
 		if err != nil {
-			c.HandleError(w, r, err)
+			c.Log.Error(err)
 			return
 		}
 
-		// increment file download count
-		// stop when counter fails?
-		if err := h.repo.Files.AddDownload(r.Context(), file.ID); err != nil {
-			c.HandleError(w, r, err)
-			return
+		if err := c.Repo.Files.AddDownload(r.Context(), file.ID); err != nil {
+			c.Log.Error(err)
 		}
 
-		// add file contents to zip
-		fileReader, err := h.storage.Get(r.Context(), file.ID)
+		fileReader, err := c.Storage.Get(r.Context(), file.ID)
 		if err != nil {
-			c.HandleError(w, r, err)
+			c.Log.Error(err)
 			return
 		}
 		io.Copy(fileWriter, fileReader)

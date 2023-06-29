@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"errors"
 
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent"
@@ -11,22 +10,20 @@ import (
 )
 
 type UsersRepo struct {
-	db *ent.Client
+	client *ent.Client
 }
 
 func (r *UsersRepo) GetByRememberToken(ctx context.Context, token string) (*models.User, error) {
-	row, err := r.db.User.Query().
+	row, err := r.client.User.Query().
 		Where(user.RememberTokenEQ(token)).
 		First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, models.ErrNotFound
+	}
 	if err != nil {
-		var e *ent.NotFoundError
-		if errors.As(err, &e) {
-			return nil, models.ErrNotFound
-		}
 		return nil, err
 	}
 	return rowToUser(row), nil
-
 }
 
 // TODO rewrite this when ent supports the Save method on Update; until then
@@ -40,7 +37,7 @@ func (r *UsersRepo) CreateOrUpdate(ctx context.Context, u *models.User) error {
 	if err != nil {
 		return err
 	}
-	id, err := r.db.User.Create().
+	id, err := r.client.User.Create().
 		SetUsername(u.Username).
 		SetName(u.Name).
 		SetEmail(u.Email).
@@ -55,7 +52,7 @@ func (r *UsersRepo) CreateOrUpdate(ctx context.Context, u *models.User) error {
 	if err != nil {
 		return err
 	}
-	row, err := r.db.User.Get(ctx, id)
+	row, err := r.client.User.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -68,7 +65,7 @@ func (r *UsersRepo) RenewRememberToken(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	err = r.db.User.
+	err = r.client.User.
 		UpdateOneID(id).
 		SetRememberToken(newToken).
 		Exec(ctx)

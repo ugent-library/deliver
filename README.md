@@ -1,12 +1,18 @@
 # deliver
 
-## Development
+## Prerequisites
 
-### Configuration
+To run the application you will need:
+
+* A PostgreSQL database
+* An OpenID Connect endpoint
+* An S3 compatible object store
+
+## Configuration
 
 Deliver is configured with these environment variables:
 
-* `DELIVER_PRODUCTION`
+* `DELIVER_ENV`
 * `DELIVER_HOST`
 * `DELIVER_PORT`
 * `DELIVER_ADMINS`
@@ -19,23 +25,24 @@ Deliver is configured with these environment variables:
 * `DELIVER_OIDC_REDIRECT_URL`
 * `DELIVER_COOKIE_SECRET`
 * `DELIVER_MAX_FILE_SIZE`
-* `DELIVER_BANNER`
 
-If a `.env` file is present in the project root, it's environment variables will be loaded.
+## Development setup with live reload
 
-To get started: 
+For development you will also need:
+
+* Go >= 1.20
+* Node.js
+
+Initial setup:
 
 ```sh
 cp .env.example .env
+cp reflex.conf.example reflex.conf
+make install-dev
 ```
 
-### Live reload
-
-This project uses [reflex](https://github.com/cespare/reflex) to reload the app
-server and recompile assets after changes.
+To run the development server:
 
 ```sh
-go install github.com/cespare/reflex@latest
-cp reflex.conf.example reflex.conf
-reflex -d none -c reflex.conf
+make dev
 ```

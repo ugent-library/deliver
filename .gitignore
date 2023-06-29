@@ -18,7 +18,8 @@ node_modules
 !.gitkeep
 
 # Live reloading
-.reflex.conf
+reflex.conf
 
 # Config
-.env
+.env*
+!.env.example

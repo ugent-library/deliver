@@ -3,24 +3,26 @@ package cli
 import (
 	"context"
 
+	"github.com/spf13/cobra"
 	"github.com/ugent-library/deliver/objectstore"
-	"github.com/ugent-library/deliver/repositories"
-	"github.com/urfave/cli/v2"
+	repository "github.com/ugent-library/deliver/repositories"
 )
 
-var filesCmd = &cli.Command{
-	Name: "files",
-	Subcommands: []*cli.Command{
-		gcFilesCmd,
-	},
+func init() {
+	rootCmd.AddCommand(filesCmd)
+	filesCmd.AddCommand(gcFilesCmd)
 }
 
-var gcFilesCmd = &cli.Command{
-	Name: "gc",
-	Action: func(*cli.Context) error {
+var filesCmd = &cobra.Command{
+	Use: "files",
+}
+
+var gcFilesCmd = &cobra.Command{
+	Use: "gc",
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
-		repo, err := repositories.New(config.Repo.Conn)
+		repo, err := repository.New(config.Repo.Conn)
 		if err != nil {
 			return err
 		}
@@ -29,11 +31,7 @@ var gcFilesCmd = &cli.Command{
 			return err
 		}
 
-		iter, err := storage.IterateID(ctx)
-		if err != nil {
-			return err
-		}
-		for id, ok := iter.Next(); ok; id, ok = iter.Next() {
+		return storage.IterateID(ctx, func(id string) error {
 			exists, err := repo.Files.Exists(ctx, id)
 			if err != nil {
 				return err
@@ -43,7 +41,7 @@ var gcFilesCmd = &cli.Command{
 					return err
 				}
 			}
-		}
-		return iter.Err()
+			return nil
+		})
 	},
 }

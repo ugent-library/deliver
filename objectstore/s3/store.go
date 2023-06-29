@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/ugent-library/deliver/objectstore"
 )
 
@@ -91,45 +90,26 @@ func (s *s3storage) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (s *s3storage) IterateID(ctx context.Context) (objectstore.Iter, error) {
-	return &iter{
-		ctx: ctx,
-		pager: s3.NewListObjectsV2Paginator(s.client, &s3.ListObjectsV2Input{
-			Bucket: aws.String(s.bucket),
-		}),
-	}, nil
-}
+func (s *s3storage) IterateID(ctx context.Context, fn func(string) error) error {
+	pager := s3.NewListObjectsV2Paginator(s.client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(s.bucket),
+	})
 
-type iter struct {
-	ctx     context.Context
-	pager   *s3.ListObjectsV2Paginator
-	objects []types.Object
-	i       int
-	err     error
-}
-
-func (it *iter) Next() (string, bool) {
-	if it.err != nil || (it.objects == nil && !it.pager.HasMorePages()) {
-		return "", false
-	}
-	if it.objects == nil {
-		page, err := it.pager.NextPage(it.ctx)
+	for pager.HasMorePages() {
+		page, err := pager.NextPage(ctx)
 		if err != nil {
-			it.err = err
-			return "", false
+			return err
 		}
-		it.objects = page.Contents
-		it.i = 0
+		for _, obj := range page.Contents {
+			err := fn(*obj.Key)
+			if err == objectstore.Stop {
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+		}
 	}
-	if it.i < len(it.objects) {
-		id := *it.objects[it.i].Key
-		it.i++
-		return id, true
-	}
-	it.objects = nil
-	return it.Next()
-}
 
-func (it *iter) Err() error {
-	return it.err
+	return nil
 }

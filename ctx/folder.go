@@ -40,7 +40,7 @@ func CanEditFolder(next http.Handler) http.Handler {
 		c := Get(r)
 		folder := GetFolder(r)
 
-		if !c.IsSpaceAdmin(c.User, folder.Space) {
+		if !c.Permissions.IsSpaceAdmin(c.User, folder.Space) {
 			c.HandleError(w, r, httperror.Forbidden)
 			return
 		}

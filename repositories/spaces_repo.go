@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"errors"
 
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
@@ -13,11 +12,11 @@ import (
 )
 
 type SpacesRepo struct {
-	db *ent.Client
+	client *ent.Client
 }
 
 func (r *SpacesRepo) GetAll(ctx context.Context) ([]*models.Space, error) {
-	rows, err := r.db.Space.Query().
+	rows, err := r.client.Space.Query().
 		Order(ent.Asc(space.FieldName)).
 		All(ctx)
 	if err != nil {
@@ -31,7 +30,7 @@ func (r *SpacesRepo) GetAll(ctx context.Context) ([]*models.Space, error) {
 }
 
 func (r *SpacesRepo) GetAllByUsername(ctx context.Context, username string) ([]*models.Space, error) {
-	rows, err := r.db.Space.Query().
+	rows, err := r.client.Space.Query().
 		Where(func(s *entsql.Selector) {
 			s.Where(sqljson.ValueContains(space.FieldAdmins, username))
 		}).
@@ -48,18 +47,17 @@ func (r *SpacesRepo) GetAllByUsername(ctx context.Context, username string) ([]*
 }
 
 func (r *SpacesRepo) GetByName(ctx context.Context, name string) (*models.Space, error) {
-	row, err := r.db.Space.Query().
+	row, err := r.client.Space.Query().
 		Where(space.NameEQ(name)).
 		WithFolders(func(q *ent.FolderQuery) {
 			q.Order(ent.Asc(folder.FieldExpiresAt))
 			q.WithFiles()
 		}).
 		First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, models.ErrNotFound
+	}
 	if err != nil {
-		var e *ent.NotFoundError
-		if errors.As(err, &e) {
-			return nil, models.ErrNotFound
-		}
 		return nil, err
 	}
 	return rowToSpace(row), nil
@@ -69,7 +67,7 @@ func (r *SpacesRepo) Create(ctx context.Context, s *models.Space) error {
 	if err := s.Validate(); err != nil {
 		return err
 	}
-	row, err := r.db.Space.Create().
+	row, err := r.client.Space.Create().
 		SetName(s.Name).
 		SetAdmins(s.Admins).
 		Save(ctx)
@@ -84,7 +82,7 @@ func (r *SpacesRepo) Update(ctx context.Context, s *models.Space) error {
 	if err := s.Validate(); err != nil {
 		return err
 	}
-	row, err := r.db.Space.UpdateOneID(s.ID).
+	row, err := r.client.Space.UpdateOneID(s.ID).
 		SetAdmins(s.Admins).
 		Save(ctx)
 	if err != nil {
