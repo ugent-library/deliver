@@ -98,9 +98,11 @@ var serverCmd = &cobra.Command{
 			render.JSON(w, http.StatusOK, &struct {
 				Branch string `json:"branch,omitempty"`
 				Commit string `json:"commit,omitempty"`
+				Image  string `json:"image,omitempty"`
 			}{
-				Branch: config.Source.Branch,
-				Commit: config.Source.Commit,
+				Branch: config.Version.Branch,
+				Commit: config.Version.Commit,
+				Image:  config.Version.Image,
 			})
 		})
 

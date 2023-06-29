@@ -4,10 +4,11 @@ import "fmt"
 
 type Config struct {
 	// Version info
-	Source struct {
-		Branch string `env:"BRANCH"`
-		Commit string `env:"COMMIT"`
-	} `envPrefix:"SOURCE_"`
+	Version struct {
+		Branch string `env:"SOURCE_BRANCH"`
+		Commit string `env:"SOURCE_COMMIT"`
+		Image  string `env:"IMAGE_NAME"`
+	}
 	// Env must be local, development, test or production
 	Env     string   `env:"DELIVER_ENV" envDefault:"production"`
 	Host    string   `env:"DELIVER_HOST"`
