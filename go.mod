@@ -33,7 +33,7 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	golang.org/x/oauth2 v0.8.0 // indirect
+	golang.org/x/oauth2 v0.11.0 // indirect
 )
 
 require (
@@ -67,16 +67,16 @@ require (
 	github.com/ugent-library/crypt v0.0.0-20230629141409-123bcb99fde2
 	github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38
 	github.com/ugent-library/httpx v0.0.0-20230522072608-fba7bb4a066d
-	github.com/ugent-library/oidc v0.0.0-20230125115048-da4a06842a62
+	github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.9.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	nhooyr.io/websocket v1.8.7
 )

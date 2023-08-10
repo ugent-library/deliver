@@ -57,6 +57,7 @@ var serverCmd = &cobra.Command{
 			RedirectURL:  config.OIDC.RedirectURL,
 			CookieName:   "deliver.state",
 			CookieSecret: []byte(config.Cookie.Secret),
+			Insecure:     config.Env == "local",
 		})
 		if err != nil {
 			return err
