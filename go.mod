@@ -11,6 +11,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/gorilla/csrf v1.7.1
 	github.com/jackc/pgx/v5 v5.3.1
+	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/nics/ich v0.0.0-20230515073809-6deee7f5ae14
 	github.com/oklog/ulid/v2 v2.1.0
@@ -65,7 +66,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.7.0
 	github.com/ugent-library/crypt v0.0.0-20230629141409-123bcb99fde2
-	github.com/ugent-library/friendly v0.0.0-20230424072840-866169fc1a38
+	github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072
 	github.com/ugent-library/httpx v0.0.0-20230522072608-fba7bb4a066d
 	github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
