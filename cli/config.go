@@ -10,11 +10,12 @@ type Config struct {
 		Image  string `env:"IMAGE_NAME"`
 	}
 	// Env must be local, development, test or production
-	Env     string   `env:"DELIVER_ENV" envDefault:"production"`
-	Host    string   `env:"DELIVER_HOST"`
-	Port    int      `env:"DELIVER_PORT" envDefault:"3000"`
-	Admins  []string `env:"DELIVER_ADMINS,notEmpty"`
-	Storage struct {
+	Env      string   `env:"DELIVER_ENV" envDefault:"production"`
+	Timezone string   `env:"DELIVER_TIMEZONE" envDefault:"Europe/Brussels"`
+	Host     string   `env:"DELIVER_HOST"`
+	Port     int      `env:"DELIVER_PORT" envDefault:"3000"`
+	Admins   []string `env:"DELIVER_ADMINS,notEmpty"`
+	Storage  struct {
 		Backend string `env:"BACKEND" envDefault:"s3"`
 		Conn    string `env:"CONN,notEmpty"`
 	} `envPrefix:"DELIVER_STORAGE_"`

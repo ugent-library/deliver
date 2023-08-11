@@ -25,6 +25,7 @@ Deliver is configured with these environment variables:
 * `DELIVER_OIDC_REDIRECT_URL`
 * `DELIVER_COOKIE_SECRET`
 * `DELIVER_MAX_FILE_SIZE`
+* `DELIVER_TIMEZONE`
 
 ## Development setup with live reload
 
