@@ -154,7 +154,7 @@ var serverCmd = &cobra.Command{
 					Assets:      assets,
 					Hub:         hub,
 					Env:         config.Env,
-					Timezone:        timezone,
+					Timezone:    timezone,
 				}),
 			)
 
@@ -190,7 +190,9 @@ var serverCmd = &cobra.Command{
 					r.Post("/files", handlers.UploadFile).Name("uploadFile")
 					r.Delete("/", handlers.DeleteFolder).Name("deleteFolder")
 				})
-				r.With(ctx.SetFile(*repo.Files), ctx.CanEditFile).Delete("/files/{fileID}", handlers.DeleteFile).Name("deleteFile")
+				r.With(ctx.SetFile(*repo.Files), ctx.CanEditFile).
+					Delete("/files/{fileID}", handlers.DeleteFile).
+					Name("deleteFile")
 			})
 		})
 
