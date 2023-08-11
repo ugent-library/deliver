@@ -22,7 +22,7 @@ type ShareFolder struct {
                                     <h4 class="bc-toolbar-title">Library delivery from {%s v.Folder.Space.Name %}: {%s v.Folder.Name %}</h4>
                                 </div>
                                 <div class="bc-toolbar-item">
-                                    <p>Expires on {%s v.Folder.ExpiresAt.Format("2006-01-02 15:04") %}</p>
+                                    <p>Expires on {%s v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +44,7 @@ type ShareFolder struct {
                         <div class="bc-toolbar">
                             <div class="bc-toolbar-left">
                                 <div class="bc-toolbar-item">
-                                    <h5>Download your files before {%s v.Folder.ExpiresAt.Format("2006-01-02 15:04") %}</h5>
+                                    <h5>Download your files before {%s v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") %}</h5>
                                 </div>
                             </div>
                             <div class="bc-toolbar-right">
@@ -91,7 +91,7 @@ type ShareFolder struct {
                                         <p>{%dl f.Downloads %}</p>
                                     </td>
                                     <td class="text-nowrap">
-                                        <p>{%s f.CreatedAt.Format("2006-01-02 15:04") %}</p>
+                                        <p>{%s f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                                     </td>
                                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                         <div class="c-button-toolbar">

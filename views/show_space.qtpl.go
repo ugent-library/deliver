@@ -358,7 +358,7 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <td class="text-nowrap">
                                     <p>`)
 //line views/show_space.qtpl:170
-			qw422016.E().S(f.ExpiresAt.Format("2006-01-02 15:04"))
+			qw422016.E().S(f.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/show_space.qtpl:170
 			qw422016.N().S(`</p>
                                     `)
@@ -406,14 +406,14 @@ func (v *ShowSpace) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <td class="text-nowrap">
                                     <p>`)
 //line views/show_space.qtpl:190
-			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
+			qw422016.E().S(f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/show_space.qtpl:190
 			qw422016.N().S(`</p>
                                 </td>
                                 <td class="text-nowrap">
                                     <p>`)
 //line views/show_space.qtpl:193
-			qw422016.E().S(f.UpdatedAt.Format("2006-01-02 15:04"))
+			qw422016.E().S(f.UpdatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/show_space.qtpl:193
 			qw422016.N().S(`</p>
                                 </td>

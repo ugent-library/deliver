@@ -89,7 +89,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <div class="bc-toolbar-item">
                                     <p>Expires on `)
 //line views/share_folder.qtpl:25
-	qw422016.E().S(v.Folder.ExpiresAt.Format("2006-01-02 15:04"))
+	qw422016.E().S(v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/share_folder.qtpl:25
 	qw422016.N().S(`</p>
                                 </div>
@@ -119,7 +119,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                 <div class="bc-toolbar-item">
                                     <h5>Download your files before `)
 //line views/share_folder.qtpl:47
-	qw422016.E().S(v.Folder.ExpiresAt.Format("2006-01-02 15:04"))
+	qw422016.E().S(v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/share_folder.qtpl:47
 	qw422016.N().S(`</h5>
                                 </div>
@@ -214,7 +214,7 @@ func (v *ShareFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                                     <td class="text-nowrap">
                                         <p>`)
 //line views/share_folder.qtpl:94
-			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
+			qw422016.E().S(f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/share_folder.qtpl:94
 			qw422016.N().S(`</p>
                                     </td>

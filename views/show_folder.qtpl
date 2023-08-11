@@ -30,7 +30,7 @@ type ShowFolder struct {
                             </h4>
                         </div>
                         <div class="bc-toolbar-item">
-                            <p>expires on {%s v.Folder.ExpiresAt.Format("2006-01-02 15:04") %}</p>
+                            <p>expires on {%s v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                         </div>
                     </div>
                     <div class="bc-toolbar-right">

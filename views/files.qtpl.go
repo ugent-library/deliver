@@ -121,7 +121,7 @@ func StreamFiles(qw422016 *qt422016.Writer, c *ctx.Ctx, files []*models.File) {
                     <td class="text-nowrap">
                         <p>`)
 //line views/files.qtpl:55
-			qw422016.E().S(f.CreatedAt.Format("2006-01-02 15:04"))
+			qw422016.E().S(f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/files.qtpl:55
 			qw422016.N().S(`</p>
                     </td>

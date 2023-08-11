@@ -167,7 +167,7 @@ type ShowSpace struct {
                                     </div>
                                 </td>
                                 <td class="text-nowrap">
-                                    <p>{%s f.ExpiresAt.Format("2006-01-02 15:04") %}</p>
+                                    <p>{%s f.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                                     {% if time.Until(f.ExpiresAt) < time.Hour * 24 * 7 %}
                                     <p class="badge rounded-pill badge-default mt-2">
                                         <i class="if if-info-circle"></I>
@@ -187,10 +187,10 @@ type ShowSpace struct {
                                     </ul>
                                 </td>
                                 <td class="text-nowrap">
-                                    <p>{%s f.CreatedAt.Format("2006-01-02 15:04") %}</p>
+                                    <p>{%s f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                                 </td>
                                 <td class="text-nowrap">
-                                    <p>{%s f.UpdatedAt.Format("2006-01-02 15:04") %}</p>
+                                    <p>{%s f.UpdatedAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                                 </td>
                                 <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                     <div class="c-button-toolbar">

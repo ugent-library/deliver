@@ -52,7 +52,7 @@
                         <p id="file-{%s f.ID %}-downloads">{%dl f.Downloads %}</p>
                     </td>
                     <td class="text-nowrap">
-                        <p>{%s f.CreatedAt.Format("2006-01-02 15:04") %}</p>
+                        <p>{%s f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
                     </td>
                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                         <div class="c-button-toolbar flex-nowrap">

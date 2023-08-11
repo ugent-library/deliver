@@ -105,7 +105,7 @@ func (v *ShowFolder) StreamContent(qw422016 *qt422016.Writer, c *ctx.Ctx) {
                         <div class="bc-toolbar-item">
                             <p>expires on `)
 //line views/show_folder.qtpl:33
-	qw422016.E().S(v.Folder.ExpiresAt.Format("2006-01-02 15:04"))
+	qw422016.E().S(v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04"))
 //line views/show_folder.qtpl:33
 	qw422016.N().S(`</p>
                         </div>

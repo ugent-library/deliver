@@ -78,6 +78,12 @@ var serverCmd = &cobra.Command{
 			Secret: []byte(config.Cookie.Secret),
 		})
 
+		// setup timezone
+		timezone, err := time.LoadLocation(config.Timezone)
+		if err != nil {
+			return err
+		}
+
 		// setup router
 		router := ich.New()
 		router.Use(middleware.RequestID)
@@ -148,6 +154,7 @@ var serverCmd = &cobra.Command{
 					Assets:      assets,
 					Hub:         hub,
 					Env:         config.Env,
+					Timezone:        timezone,
 				}),
 			)
 
