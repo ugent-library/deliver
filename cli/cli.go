@@ -1,7 +1,6 @@
 package cli
 
 import (
-	// embed timezone data
 	_ "time/tzdata"
 
 	"github.com/caarlos0/env/v8"
@@ -9,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
-	// register objectstore backends
 	_ "github.com/ugent-library/deliver/objectstore/s3"
 )
 
@@ -46,6 +44,6 @@ func initLogger() {
 	}
 }
 
-func Run() error {
-	return rootCmd.Execute()
+func Run() {
+	cobra.CheckErr(rootCmd.Execute())
 }
