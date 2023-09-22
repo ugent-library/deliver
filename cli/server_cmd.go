@@ -11,18 +11,19 @@ import (
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
-	"github.com/ugent-library/deliver/ctx"
-	"github.com/ugent-library/deliver/handlers"
-	"github.com/ugent-library/deliver/htmx"
-	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/objectstore"
-	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httpx/render"
 	mw "github.com/ugent-library/middleware"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"github.com/ugent-library/zaphttp/zapchi"
+
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/handlers"
+	"github.com/ugent-library/deliver/htmx"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/repositories"
 )
 
 func init() {
@@ -107,9 +108,9 @@ var serverCmd = &cobra.Command{
 				Commit string `json:"commit,omitempty"`
 				Image  string `json:"image,omitempty"`
 			}{
-				Branch: config.Version.Branch,
-				Commit: config.Version.Commit,
-				Image:  config.Version.Image,
+				Branch: version.Branch,
+				Commit: version.Commit,
+				Image:  version.Image,
 			})
 		})
 
