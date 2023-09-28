@@ -5,7 +5,6 @@ import "github.com/ugent-library/deliver/ctx"
 templ publicPageLayout(c *ctx.Ctx, title string, content templ.Component) {
     <!DOCTYPE html>
     <html class="u-maximize-height" dir="ltr" lang="en">
-
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -15,7 +14,6 @@ templ publicPageLayout(c *ctx.Ctx, title string, content templ.Component) {
         <script type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
         <title>{ title }</title>
     </head>
-
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
         <header>
             @pageBanner(c)

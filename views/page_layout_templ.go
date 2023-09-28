@@ -24,7 +24,7 @@ func pageLayout(c *ctx.Ctx, title string, content templ.Component) templ.Compone
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><meta name=\"csrf-token\" content=\"")
+		_, err = templBuffer.WriteString("<!doctype html><html class=\"u-maximize-height\" dir=\"ltr\" lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><meta name=\"csrf-token\" content=\"")
 		if err != nil {
 			return err
 		}
