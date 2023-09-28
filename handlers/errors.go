@@ -5,12 +5,12 @@ import (
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/views"
-	"github.com/ugent-library/httpx/render"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
-	render.HTML(w, http.StatusNotFound, views.PublicPage(c, &views.NotFound{}))
+	w.WriteHeader(http.StatusNotFound)
+	views.NotFound(c).Render(r.Context(), w)
 }
 
 func Unauthorized(w http.ResponseWriter, r *http.Request) {
@@ -20,5 +20,6 @@ func Unauthorized(w http.ResponseWriter, r *http.Request) {
 
 func Forbidden(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
-	render.HTML(w, http.StatusForbidden, views.PublicPage(c, &views.Forbidden{}))
+	w.WriteHeader(http.StatusForbidden)
+	views.Forbidden(c).Render(r.Context(), w)
 }

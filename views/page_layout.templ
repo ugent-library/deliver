@@ -1,30 +1,23 @@
-{% import "github.com/ugent-library/deliver/ctx" %}
+package views
 
-{%
-interface PageView {
-    Title(c *ctx.Ctx)
-    Content(c *ctx.Ctx)
-}
-%}
+import "github.com/ugent-library/deliver/ctx"
 
-{% func Page(c *ctx.Ctx, v PageView) %}
-    <!DOCTYPE html>
-    <html class="u-maximize-height" dir="ltr" lang="en">
-
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="noindex">
-        <meta name="csrf-token" content="{%s c.CSRFToken %}">
-        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}">
-        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}">
-        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}"></script>
-        <title>{%s v.Title(c) %}</title>
+templ pageLayout(c *ctx.Ctx, title string, content templ.Component) {
+   <!DOCTYPE html>
+   <html>
+   <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="robots" content="noindex"/>
+        <meta name="csrf-token" content={ c.CSRFToken }/>
+        <link rel="stylesheet" href={ c.AssetPath("/css/app.css") }/>
+        <link rel="icon" href={ c.AssetPath("/favicon.ico") }/>
+        <script type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
+        <title>{ title }</title>
     </head>
-
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper" hx-swap="none">
         <header>
-            {%= EnvBanner(c) %}
+            @pageBanner(c)
 
             <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
                 <div class="bc-toolbar bc-toolbar-sm">
@@ -33,13 +26,13 @@ interface PageView {
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="{%s c.PathTo("home").String() %}">
-                                            <img class="d-none d-lg-inline-block" src="{%s c.AssetPath("/images/ghent-university-library-logo.svg") %}" alt="Ghent University Library">
-                                            <img class="d-inline-block d-lg-none" src="{%s c.AssetPath("/images/ghent-university-library-mark.svg") %}" alt="Ghent University Library">
+                                        <a href={ templ.URL(c.PathTo("home").String()) }>
+                                            <img class="d-none d-lg-inline-block" src={ c.AssetPath("/images/ghent-university-library-logo.svg") } alt="Ghent University Library"/>
+                                            <img class="d-inline-block d-lg-none" src={ c.AssetPath("/images/ghent-university-library-mark.svg") } alt="Ghent University Library"/>
                                         </a>
                                     </li>
                                     <li class="breadcrumb-item" aria-current="page">
-                                        <a href="{%s c.PathTo("home").String() %}" class="text-muted">Home</a>
+                                        <a href={ templ.URL(c.PathTo("home").String()) } class="text-muted">Home</a>
                                     </li>
                                 </ol>
                             </nav>
@@ -50,14 +43,14 @@ interface PageView {
                         <div class="bc-toolbar-item">
                             <div id="side-panels">
                                 <ul class="nav nav-main">
-                                    {% if c.User != nil %}
+                                    if c.User != nil {
                                     <li class="nav-item">
                                         <a class="nav-link" href="mailto:libservice@ugent.be" target="_blank">
                                             <i class="if if-service"></i>
                                             <span class="btn-text">Ask help</span>
                                         </a>
                                     </li>
-                                    {% endif %}
+                                    }
                                     <li class="nav-item">
                                         <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
                                             <i class="if if-book"></i>
@@ -65,14 +58,14 @@ interface PageView {
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        {% if c.User != nil %}
+                                        if c.User != nil {
                                         <div class="dropdown position-static">
                                             <button class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <div class="bc-avatar-and-text">
                                                     <div class="bc-avatar bc-avatar--sm bc-avatar--small me-2">
                                                         <i class="if if-user"></i>
                                                     </div>
-                                                    <div class="bc-avatar-text">{%s c.User.Name %}</div>
+                                                    <div class="bc-avatar-text">{ c.User.Name }</div>
                                                 </div>
                                             </button>
                                             <div class="dropdown-menu">
@@ -81,23 +74,23 @@ interface PageView {
                                                         <i class="if if-user"></i>
                                                     </div>
                                                     <div class="bc-avatar-text">
-                                                        <h4>{%s c.User.Name %}</h4>
-                                                        <p class="text-muted c-body-small">{%s c.User.Email %}</p>
+                                                        <h4>{ c.User.Name }</h4>
+                                                        <p class="text-muted c-body-small">{ c.User.Email }</p>
                                                     </div>
                                                 </div>
-                                                <hr class="dropdown-divider">
-                                                <a class="dropdown-item" href="{%s c.PathTo("logout").String() %}">
+                                                <hr class="dropdown-divider"/>
+                                                <a class="dropdown-item" href={ templ.URL(c.PathTo("logout").String()) }>
                                                     <i class="if if-log-out"></i>
                                                     <span>Log out</span>
                                                 </a>
                                             </div>
                                         </div>
-                                        {% else %}
-                                        <a class="btn btn-link btn-sm" href="{%s c.PathTo("login").String() %}">
+                                        } else {
+                                        <a class="btn btn-link btn-sm" href={ templ.URL(c.PathTo("login").String()) }>
                                             <i class="if if-arrow-right mt-0 ms-2"></i>
                                             <span class="btn-text me-2">Log in</span>
                                         </a>
-                                        {% endif %}
+                                        }
                                     </li>
                                 </ul>
                             </div>
@@ -108,12 +101,12 @@ interface PageView {
         </header>
         <main>
             <div class="d-flex u-maximize-height">
-                <div class="c-sidebar{% if c.User != nil %} c-sidebar--dark-gray{% endif %} d-none d-lg-flex">
+                <div class={"c-sidebar", templ.KV("c-sidebar--dark-gray", c.User != nil), "d-none", "d-lg-flex"}>
                     <div class="c-sidebar__menu">
                         <nav>
                             <ul class="c-sidebar-menu">
                                 <li class="c-sidebar__item c-sidebar__item--active">
-                                    <a href="{%s c.PathTo("home").String() %}">
+                                    <a href={ templ.URL(c.PathTo("home").String()) }>
                                         <span class="c-sidebar__icon">
                                             <i class="if if-file"></i>
                                         </span>
@@ -124,18 +117,18 @@ interface PageView {
                         </nav>
                     </div>
                     <div class="c-sidebar__bottom">
-                        <img src="{%s c.AssetPath("/images/logo-ugent-white.svg") %}" alt="Logo UGent" height="48px" width="auto">
+                        <img src={ c.AssetPath("/images/logo-ugent-white.svg") } alt="Logo UGent" height="48px" width="auto"/>
                     </div>
                 </div>
 
-                {%= v.Content(c) %}
+                @content
             </div>
         </main>
 
         <div id="flash-messages">
-            {% for _, f := range c.Flash %}
-            {%= Flash(f) %}
-            {% endfor %}
+            for _, f := range c.Flash {
+                @flash(f)
+            }
         </div>
 
         <template id="modal-confirm">
@@ -161,58 +154,4 @@ interface PageView {
         </template>
     </body>
     </html>
-{% endfunc %}
-
-{% func PublicPage(c *ctx.Ctx, v PageView) %}
-    <!DOCTYPE html>
-    <html class="u-maximize-height" dir="ltr" lang="en">
-
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="noindex">
-        <link rel="stylesheet" href="{%s c.AssetPath("/css/app.css") %}">
-        <link rel="icon" href="{%s c.AssetPath("/favicon.ico") %}">
-        <script type="application/javascript" src="{%s c.AssetPath("/js/app.js") %}"></script>
-        <title>{%= v.Title(c) %}</title>
-    </head>
-
-    <body class="u-maximize-height overflow-hidden u-scroll-wrapper">
-        <header>
-            {%= EnvBanner(c) %}
-
-            <div class="bc-navbar bc-navbar--small bc-navbar--bordered-bottom bc-navbar--white bc-navbar--fixed bc-navbar--scrollable shadow-sm px-4">
-                <div class="bc-toolbar bc-toolbar-sm">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item">
-                                        <a href="{%s c.PathTo("home").String() %}">
-                                            <img class="d-none d-lg-inline-block" src="{%s c.AssetPath("/images/ghent-university-library-logo.svg") %}" alt="Ghent University Library">
-                                            <img class="d-inline-block d-lg-none" src="{%s c.AssetPath("/images/ghent-university-library-mark.svg") %}" alt="Ghent University Library">
-                                        </a>
-                                    </li>
-                                    <li class="breadcrumb-item" aria-current="page">
-                                        <a href="{%s c.PathTo("home").String() %}">Home</a>
-                                    </li>
-                                </ol>
-                            </nav>
-                        </div>
-                    </div>
-                    <div class="bc-toolbar-right">
-                        <div class="bc-toolbar-item">
-                            <div id="side-panels">
-                                <ul class="nav nav-main"></ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-        <main>
-            {%= v.Content(c) %}
-        </main>
-    </body>
-    </html>
-{% endfunc %}
+}

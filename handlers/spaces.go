@@ -12,7 +12,6 @@ import (
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/httpx/render"
 )
 
 var reSplitAdmins = regexp.MustCompile(`\s*[,;]\s*`)
@@ -59,12 +58,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowSpace{
-		Space:            space,
-		UserSpaces:       userSpaces,
-		Folder:           &models.Folder{},
-		ValidationErrors: validate.NewErrors(),
-	}))
+	views.ShowSpace(c, space, userSpaces, &models.Folder{}, validate.NewErrors()).Render(r.Context(), w)
 }
 
 func ShowSpace(w http.ResponseWriter, r *http.Request) {
@@ -73,11 +67,7 @@ func ShowSpace(w http.ResponseWriter, r *http.Request) {
 
 func NewSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
-
-	render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
-		Space:            &models.Space{},
-		ValidationErrors: validate.NewErrors(),
-	}))
+	views.NewSpace(c, &models.Space{}, validate.NewErrors()).Render(r.Context(), w)
 }
 
 func CreateSpace(w http.ResponseWriter, r *http.Request) {
@@ -101,10 +91,8 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 			c.HandleError(w, r, err)
 			return
 		}
-		render.HTML(w, http.StatusOK, views.Page(c, &views.NewSpace{
-			Space:            space,
-			ValidationErrors: validationErrors,
-		}))
+
+		views.NewSpace(c, space, validationErrors).Render(r.Context(), w)
 		return
 	}
 
@@ -121,11 +109,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 func EditSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
-
-	render.HTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
-		Space:            space,
-		ValidationErrors: validate.NewErrors(),
-	}))
+	views.EditSpace(c, space, validate.NewErrors()).Render(r.Context(), w)
 }
 
 func UpdateSpace(w http.ResponseWriter, r *http.Request) {
@@ -146,10 +130,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 			c.HandleError(w, r, err)
 			return
 		}
-		render.HTML(w, http.StatusOK, views.Page(c, &views.EditSpace{
-			Space:            space,
-			ValidationErrors: validationErrors,
-		}))
+		views.EditSpace(c, space, validationErrors).Render(r.Context(), w)
 		return
 	}
 
@@ -178,10 +159,5 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowSpace{
-		Space:            space,
-		UserSpaces:       userSpaces,
-		Folder:           folder,
-		ValidationErrors: validationErrors,
-	}))
+	views.ShowSpace(c, space, userSpaces, folder, validationErrors).Render(r.Context(), w)
 }

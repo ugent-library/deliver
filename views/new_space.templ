@@ -1,18 +1,17 @@
-{% import "strings" %}
-{% import "github.com/ugent-library/deliver/ctx" %}
-{% import "github.com/ugent-library/deliver/models" %}
-{% import "github.com/ugent-library/deliver/validate" %}
+package views
 
-{% code
-type NewSpace struct {
-    Space            *models.Space
-    ValidationErrors *validate.Errors
+import (
+    "strings"
+    "github.com/ugent-library/deliver/ctx"
+    "github.com/ugent-library/deliver/models"
+    "github.com/ugent-library/deliver/validate"
+)
+
+templ NewSpace(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
+    @pageLayout(c, "New space", newSpaceContent(c, space, errs))
 }
-%}
 
-{% func (v *NewSpace) Title(c *ctx.Ctx) %}New space{% endfunc %}
-
-{% func (v *NewSpace) Content(c *ctx.Ctx) %}
+templ newSpaceContent(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
             <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
@@ -34,7 +33,7 @@ type NewSpace struct {
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("spaces").String() %}">
+                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("spaces").String()) }>
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Cancel</span>
                                 </a>
@@ -49,23 +48,23 @@ type NewSpace struct {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{%s c.PathTo("createSpace").String() %}" method="POST" id="create-space">
-                        {%s= c.CSRFTag %}
+                    <form action={ c.PathTo("createSpace").String() } method="POST" id="create-space">
+                        @rawHTML(c.CSRFTag)
                         <div class="row mb-6">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>
                             <div class="col-lg-5 col-xl-4">
-                                {% if err := v.ValidationErrors.Get("name"); err != nil %}
-                                <input class="form-control is-invalid" type="text" value="{%s v.Space.Name  %}" id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid">
-                                <small class="invalid-feedback" id="space-name-invalid">{%s err.Error() %}</small>
-                                {% else %}
-                                <input class="form-control" type="text" value="{%s v.Space.Name %}" id="space-name" name="name">
-                                {% endif %}
+                                if e := errs.Get("name"); e != nil {
+                                <input class="form-control is-invalid" type="text" value={ space.Name  } id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid"/>
+                                <small class="invalid-feedback" id="space-name-invalid">{ e.Error() }</small>
+                                } else {
+                                <input class="form-control" type="text" value={ space.Name } id="space-name" name="name"/>
+                                }
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
                             <div class="col-lg-5 col-xl-4">
-                                <input class="form-control" type="text" value="{%s strings.Join(v.Space.Admins, ",") %}" id="space-admins" name="admins">
+                                <input class="form-control" type="text" value={ strings.Join(space.Admins, ",") } id="space-admins" name="admins"/>
                                 <p class="small form-text text-muted">Separate usernames with a comma.</p>
                             </div>
                         </div>
@@ -74,4 +73,4 @@ type NewSpace struct {
             </div>
         </div>
     </div>
-{% endfunc %}
+}

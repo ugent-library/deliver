@@ -1,16 +1,18 @@
-{% import "github.com/ugent-library/friendly" %}
-{% import "github.com/ugent-library/deliver/ctx" %}
-{% import "github.com/ugent-library/deliver/models" %}
+package views
 
-{% code
-type ShareFolder struct {
-    Folder *models.Folder
+import (
+    "fmt"
+    "github.com/ugent-library/friendly"
+    "github.com/ugent-library/deliver/ctx"
+    "github.com/ugent-library/deliver/models"
+)
+
+
+templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
+    @publicPageLayout(c, folder.Name, shareFolderContent(c, folder))
 }
-%}
 
-{% func (v *ShareFolder) Title(c *ctx.Ctx) %}{%s v.Folder.Name %}{% endfunc %}
-
-{% func (v *ShareFolder) Content(c *ctx.Ctx) %}
+templ shareFolderContent(c *ctx.Ctx, folder *models.Folder) {
     <div class="d-flex u-maximize-height">
         <div class="w-100 u-scroll-wrapper">
             <div class="bg-white">
@@ -19,10 +21,10 @@ type ShareFolder struct {
                         <div class="bc-toolbar bc-toolbar--auto">
                             <div class="bc-toolbar-left">
                                 <div class="bc-toolbar-item">
-                                    <h4 class="bc-toolbar-title">Library delivery from {%s v.Folder.Space.Name %}: {%s v.Folder.Name %}</h4>
+                                    <h4 class="bc-toolbar-title">Library delivery from { folder.Space.Name }: { folder.Name }</h4>
                                 </div>
                                 <div class="bc-toolbar-item">
-                                    <p>Expires on {%s v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
+                                    <p>Expires on { folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
                                 </div>
                             </div>
                         </div>
@@ -30,7 +32,7 @@ type ShareFolder struct {
                             <div class="bc-toolbar-left">
                                 <div class="bc-toolbar-item">
                                     <p class="text-muted">
-                                        Public shareable link: {%s c.URLTo("shareFolder", "folderID", v.Folder.ID, "folderSlug", v.Folder.Slug()).String() %}
+                                        Public shareable link: { c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
                                     </p>
                                 </div>
                             </div>
@@ -44,17 +46,17 @@ type ShareFolder struct {
                         <div class="bc-toolbar">
                             <div class="bc-toolbar-left">
                                 <div class="bc-toolbar-item">
-                                    <h5>Download your files before {%s v.Folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") %}</h5>
+                                    <h5>Download your files before { folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") }</h5>
                                 </div>
                             </div>
                             <div class="bc-toolbar-right">
                                 <div class="bc-toolbar-item">
-                                    <p>{%d len(v.Folder.Files) %} items ({%s friendly.Bytes(v.Folder.TotalSize()) %})</p>
+                                    <p>{ fmt.Sprint(len(folder.Files)) } items ({ friendly.Bytes(folder.TotalSize()) })</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% if len(v.Folder.Files) > 0 %}
+                    if len(folder.Files) > 0 {
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered">
                             <thead>
@@ -65,7 +67,7 @@ type ShareFolder struct {
                                     <th class="text-nowrap align-middle">Downloads</th>
                                     <th class="text-nowrap align-middle">Created at</th>
                                     <th class="table-col-sm-fixed table-col-sm-fixed-right text-end align-middle">
-                                        <a class="btn btn-primary" href="{%s c.PathTo("downloadFolder", "folderID", v.Folder.ID).String() %}">
+                                        <a class="btn btn-primary" href={ templ.URL(c.PathTo("downloadFolder", "folderID", folder.ID).String()) }>
                                             <i class="if if-download"></i>
                                             <span class="btn-text">Download all files</span>
                                         </a>
@@ -73,53 +75,53 @@ type ShareFolder struct {
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for _, f := range v.Folder.Files %}
+                                for _, f := range folder.Files {
                                 <tr class="clickable-table-row">
                                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                        <a href="{%s c.PathTo("downloadFile", "fileID", f.ID).String() %}">
-                                            <span>{%s f.Name %}</span>
+                                        <a href={ templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String()) }>
+                                            <span>{ f.Name }</span>
                                         </a>
-                                        <br><small class="text-muted">md5 checksum: {%s f.MD5 %}</small>
+                                        <br/><small class="text-muted">md5 checksum: { f.MD5 }</small>
                                     </td>
                                     <td class="text-nowrap">
-                                        <p>{%s friendly.Bytes(f.Size) %}</p>
+                                        <p>{ friendly.Bytes(f.Size) }</p>
                                     </td>
                                     <td class="text-nowrap">
-                                        <p>{%s f.ContentType %}</p>
+                                        <p>{ f.ContentType }</p>
                                     </td>
                                     <td class="text-nowrap">
-                                        <p>{%dl f.Downloads %}</p>
+                                        <p>{ fmt.Sprint(f.Downloads) }</p>
                                     </td>
                                     <td class="text-nowrap">
-                                        <p>{%s f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") %}</p>
+                                        <p>{ f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
                                     </td>
                                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                         <div class="c-button-toolbar">
-                                            <a class="btn btn-link" href="{%s c.PathTo("downloadFile", "fileID", f.ID).String() %}">
+                                            <a class="btn btn-link" href={ templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String()) }>
                                                 <i class="if if-download"></i>
                                                 <span class="btn-txt">Download</span>
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
-                                {% endfor %}
+                                }
                             </tbody>
                         </table>
                     </div>
-                    {% else %}
+                    } else {
                     <div class="c-blank-slate c-blank-slate-muted">
                         <div class="bc-avatar">
                             <i class="if if-info-circle"></i>
                         </div>
                         <p>
                             No files to display.
-                            <br>
+                            <br/>
                             Please get in touch with the person that sent you this link.
                         </p>
                     </div>
-                    {% endif %}
+                    }
                 </div>
             </div>
         </div>
     </div>
-{% endfunc %}
+}

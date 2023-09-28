@@ -16,7 +16,6 @@ import (
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/httpx/render"
 )
 
 type FolderForm struct {
@@ -28,14 +27,11 @@ func ShowFolder(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r)
 
 	if htmx.Request(r) {
-		render.HTML(w, http.StatusOK, views.Files(c, folder.Files))
+		views.Files(c, folder.Files).Render(r.Context(), w)
 		return
 	}
 
-	render.HTML(w, http.StatusOK, views.Page(c, &views.ShowFolder{
-		Folder:      folder,
-		MaxFileSize: c.MaxFileSize,
-	}))
+	views.ShowFolder(c, folder).Render(r.Context(), w)
 }
 
 func CreateFolder(w http.ResponseWriter, r *http.Request) {
@@ -73,11 +69,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 func EditFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
-
-	render.HTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
-		Folder:           folder,
-		ValidationErrors: validate.NewErrors(),
-	}))
+	views.EditFolder(c, folder, validate.NewErrors()).Render(r.Context(), w)
 }
 
 func UpdateFolder(w http.ResponseWriter, r *http.Request) {
@@ -99,10 +91,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render.HTML(w, http.StatusOK, views.Page(c, &views.EditFolder{
-			Folder:           folder,
-			ValidationErrors: validationErrors,
-		}))
+		views.EditFolder(c, folder, validationErrors).Render(r.Context(), w)
 		return
 	}
 
@@ -119,14 +108,14 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.Hub.Send("space."+folder.Space.ID, views.AddFlash(ctx.Flash{
+	c.Hub.Send("space."+folder.Space.ID, views.String(views.AddFlash(ctx.Flash{
 		Type: "info",
 		Body: fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
-	}))
-	c.Hub.Send("folder."+folder.ID, views.AddFlash(ctx.Flash{
+	})))
+	c.Hub.Send("folder."+folder.ID, views.String(views.AddFlash(ctx.Flash{
 		Type: "error",
 		Body: fmt.Sprintf("%s just deleted this folder.", c.User.Name),
-	}))
+	})))
 	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
 		Body:         "Folder deleted succesfully",
@@ -141,9 +130,7 @@ func ShareFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
 
-	render.HTML(w, http.StatusOK, views.PublicPage(c, &views.ShareFolder{
-		Folder: folder,
-	}))
+	views.ShareFolder(c, folder).Render(r.Context(), w)
 }
 
 func DownloadFolder(w http.ResponseWriter, r *http.Request) {

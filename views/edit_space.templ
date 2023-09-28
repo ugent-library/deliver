@@ -1,25 +1,25 @@
-{% import "strings" %}
-{% import "github.com/ugent-library/deliver/ctx" %}
-{% import "github.com/ugent-library/deliver/models" %}
-{% import "github.com/ugent-library/deliver/validate" %}
+package views
 
-{% code
-type EditSpace struct {
-    Space            *models.Space
-    ValidationErrors *validate.Errors
+import (
+    "fmt"
+    "strings"
+    "github.com/ugent-library/deliver/ctx"
+    "github.com/ugent-library/deliver/models"
+    "github.com/ugent-library/deliver/validate"
+)
+
+templ EditSpace(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
+    @pageLayout(c, fmt.Sprintf("Edit %s", space.Name), editSpaceContent(c, space, errs))
 }
-%}
 
-{% func (v *EditSpace) Title(c *ctx.Ctx) %}Edit {%s v.Space.Name %}{% endfunc %}
-
-{% func (v *EditSpace) Content(c *ctx.Ctx) %}
+templ editSpaceContent(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
             <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
                 <div class="bc-toolbar">
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item">
-                            <h4 class="bc-toolbar-title">Edit {%s v.Space.Name %}</h4>
+                            <h4 class="bc-toolbar-title">Edit { space.Name }</h4>
                         </div>
                     </div>
                 </div>
@@ -30,11 +30,11 @@ type EditSpace struct {
                 <div class="card-header">
                     <div class="bc-toolbar">
                         <div class="bc-toolbar-left">
-                            <div class="bc-toolbar-item">Edit {%s v.Space.Name %}</div>
+                            <div class="bc-toolbar-item">Edit { space.Name }</div>
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <a class="btn btn-link btn-link-muted" href="{%s c.PathTo("space", "spaceName", v.Space.Name).String() %}">
+                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("space", "spaceName", space.Name).String()) }>
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Discard changes</span>
                                 </a>
@@ -49,13 +49,13 @@ type EditSpace struct {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{%s c.PathTo("updateSpace", "spaceName", v.Space.Name).String() %}" method="POST" id="update-space">
-                        <input type="hidden" name="_method" value="PUT">
-                        {%s= c.CSRFTag %}
+                    <form action={ c.PathTo("updateSpace", "spaceName", space.Name).String() } method="POST" id="update-space">
+                        <input type="hidden" name="_method" value="PUT"/>
+                        @rawHTML(c.CSRFTag)
                         <div class="row">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
                             <div class="col-lg-5 col-xl-4">
-                                <input class="form-control" type="text" value="{%s strings.Join(v.Space.Admins, ",") %}" id="space-admins" name="admins">
+                                <input class="form-control" type="text" value={ strings.Join(space.Admins, ",") } id="space-admins" name="admins"/>
                                 <p class="small form-text text-muted">Separate usernames with a comma.</p>
                             </div>
                         </div>
@@ -64,4 +64,4 @@ type EditSpace struct {
             </div>
         </div>
     </div>
-{% endfunc %}
+}

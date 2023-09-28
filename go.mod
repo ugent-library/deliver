@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	entgo.io/ent v0.12.3
+	github.com/a-h/templ v0.2.334
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.67
@@ -20,7 +21,6 @@ require (
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
 	github.com/ugent-library/middleware v0.0.0-20230512145619-4be676c7c423
 	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
-	github.com/valyala/quicktemplate v1.7.0
 	go.uber.org/zap v1.24.0
 )
 
@@ -33,7 +33,6 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
 )
 

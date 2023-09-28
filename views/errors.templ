@@ -1,21 +1,21 @@
-{% import "github.com/ugent-library/deliver/ctx" %}
+package views
 
-{% code
-type Forbidden struct {}
-%}
+import "github.com/ugent-library/deliver/ctx"
 
-{% func (v *Forbidden) Title(c *ctx.Ctx) %}Forbidden{% endfunc %}
+templ Forbidden(c *ctx.Ctx) {
+    @publicPageLayout(c, "Forbidden", forbiddenContent(c))
+}
 
-{% func (v *Forbidden) Content(c *ctx.Ctx) %}
+templ forbiddenContent(c *ctx.Ctx) {
     <div class="d-flex u-maximize-height">
         <div class="w-100 u-scroll-wrapper">
             <div class="u-scroll-wrapper__body p-4">
                 <div class="c-blank-slate c-blank-slate-default">
                     <h1 class="my-6">403 - Forbidden</h1>
-                    <img src="{%s c.AssetPath("/images/torentje-forbidden.png") %}"
+                    <img src={ c.AssetPath("/images/torentje-forbidden.png") }
                         alt="Our Booktower Mascotte named Torentje is spotted trespassing."
                         style="min-height: 300px; max-height: 500px; display: block; width: auto;"
-                    >
+                    />
                     <p>
                         <strong>Oops, only librarians have access to the admin panel.</strong>
                     </p>
@@ -29,24 +29,23 @@ type Forbidden struct {}
             </div>
         </div>
     </div>
-{% endfunc %}
+}
 
-{% code
-type NotFound struct {}
-%}
 
-{% func (v *NotFound) Title(c *ctx.Ctx) %}Not found{% endfunc %}
+templ NotFound(c *ctx.Ctx) {
+    @publicPageLayout(c, "Not found", notFoundContent(c))
+}
 
-{% func (v *NotFound) Content(c *ctx.Ctx) %}
+templ notFoundContent(c *ctx.Ctx) {
     <div class="d-flex u-maximize-height">
         <div class="w-100 u-scroll-wrapper">
             <div class="u-scroll-wrapper__body p-4">
                 <div class="c-blank-slate c-blank-slate-default">
                     <h1 class="my-8">404 - Page Not Found</h1>
-                    <img src="{%s c.AssetPath("/images/torentje-wrong-delivery.png") %}"
+                    <img src={ c.AssetPath("/images/torentje-wrong-delivery.png") }
                         alt="Our Booktower Mascotte named Torentje receives a faulty delivery."
                         style="min-height: 300px; max-height: 400px; display: block; width: auto;"
-                    >
+                    />
                     <p>
                         <strong>It&rsquo;s possible you visited an expired link.</strong>
                     </p>
@@ -60,4 +59,4 @@ type NotFound struct {}
             </div>
         </div>
     </div>
-{% endfunc %}
+}
