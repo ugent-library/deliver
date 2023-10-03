@@ -53,9 +53,9 @@ templ newSpaceContent(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
                         <div class="row mb-6">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>
                             <div class="col-lg-5 col-xl-4">
-                                if e := errs.Get("name"); e != nil {
+                                if err := errs.Get("name"); err != nil {
                                 <input class="form-control is-invalid" type="text" value={ space.Name  } id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid"/>
-                                <small class="invalid-feedback" id="space-name-invalid">{ e.Error() }</small>
+                                <small class="invalid-feedback" id="space-name-invalid">{ err.Error() }</small>
                                 } else {
                                 <input class="form-control" type="text" value={ space.Name } id="space-name" name="name"/>
                                 }

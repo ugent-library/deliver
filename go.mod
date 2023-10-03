@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	entgo.io/ent v0.12.3
-	github.com/a-h/templ v0.2.334
+	github.com/a-h/templ v0.2.365-0.20231002173741-b66adbe34b06
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.67

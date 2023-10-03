@@ -92,9 +92,9 @@ templ showSpaceContent(c *ctx.Ctx, space *models.Space, userSpaces []*models.Spa
                             <label class="c-label" for="folder-name">Folder name</label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    if e := errs.Get("name"); e != nil {
+                                    if err := errs.Get("name"); err != nil {
                                     <input class="form-control is-invalid" type="text" value={ folder.Name } id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid"/>
-                                    <small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
+                                    <small class="invalid-feedback" id="folder-name-invalid">{ err.Error() }</small>
                                     } else {
                                     <input class="form-control" type="text" value={ folder.Name } id="folder-name" name="name"/>
                                     }

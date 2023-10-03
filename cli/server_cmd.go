@@ -127,6 +127,7 @@ var serverCmd = &cobra.Command{
 
 		// mount ui routes
 		router.Group(func(r *ich.Mux) {
+			// TODO use new RequestSize middleware
 			r.Use(
 				func(next http.Handler) http.Handler {
 					return http.MaxBytesHandler(next, config.MaxFileSize)
