@@ -45,7 +45,16 @@ func Get(r *http.Request) *Ctx {
 func Set(config Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c := New(config, w, r)
+			c := &Ctx{
+				Config:    config,
+				host:      r.Host,
+				scheme:    r.URL.Scheme,
+				Log:       zaphttp.Logger(r.Context()).Sugar(),
+				CSRFToken: csrf.Token(r),
+			}
+			if c.scheme == "" {
+				c.scheme = "http"
+			}
 
 			r = r.WithContext(context.WithValue(r.Context(), ctxKey, c))
 
@@ -100,21 +109,6 @@ type Ctx struct {
 	CSRFToken string
 	User      *models.User
 	Flash     []Flash
-}
-
-func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
-	c := &Ctx{
-		Config:    config,
-		host:      r.Host,
-		scheme:    r.URL.Scheme,
-		Log:       zaphttp.Logger(r.Context()).Sugar(),
-		CSRFToken: csrf.Token(r),
-	}
-	if c.scheme == "" {
-		c.scheme = "http"
-	}
-
-	return c
 }
 
 func (c *Ctx) HandleError(w http.ResponseWriter, r *http.Request, err error) {
