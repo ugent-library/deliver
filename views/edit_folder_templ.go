@@ -124,7 +124,7 @@ func editFolderContent(c *ctx.Ctx, folder *models.Folder, errs *validate.Errors)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = rawHTML(c.CSRFTag).Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = csrfField(c).Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -176,7 +176,7 @@ func editFolderContent(c *ctx.Ctx, folder *models.Folder, errs *validate.Errors)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = rawHTML(c.CSRFTag).Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = csrfField(c).Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

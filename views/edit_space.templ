@@ -51,7 +51,7 @@ templ editSpaceContent(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
                 <div class="card-body">
                     <form action={ c.PathTo("updateSpace", "spaceName", space.Name).String() } method="POST" id="update-space">
                         <input type="hidden" name="_method" value="PUT"/>
-                        @rawHTML(c.CSRFTag)
+                        @csrfField(c)
                         <div class="row">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
                             <div class="col-lg-5 col-xl-4">

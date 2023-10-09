@@ -24,6 +24,12 @@ import (
 	"go.uber.org/zap"
 )
 
+// TODO set __Host- cookie prefix in production
+const (
+	RememberCookie    = "deliver.remember"
+	FlashCookiePrefix = "deliver.flash."
+)
+
 type contextKey string
 
 func (c contextKey) String() string {
@@ -31,26 +37,6 @@ func (c contextKey) String() string {
 }
 
 var ctxKey = contextKey("ctx")
-
-// TODO set __Host- cookie prefix in production
-const (
-	RememberCookie    = "deliver.remember"
-	FlashCookiePrefix = "deliver.flash."
-)
-
-type Config struct {
-	Repo          *repositories.Repo
-	Storage       objectstore.Store
-	MaxFileSize   int64
-	Auth          *oidc.Auth
-	Router        *ich.Mux
-	ErrorHandlers map[int]http.HandlerFunc
-	Permissions   *models.Permissions
-	Assets        mix.Manifest
-	Hub           *htmx.Hub
-	Env           string
-	Timezone      *time.Location
-}
 
 func Get(r *http.Request) *Ctx {
 	return r.Context().Value(ctxKey).(*Ctx)
@@ -104,6 +90,21 @@ func Set(config Config) func(http.Handler) http.Handler {
 	}
 }
 
+type Config struct {
+	Repo          *repositories.Repo
+	Storage       objectstore.Store
+	MaxFileSize   int64
+	Auth          *oidc.Auth
+	Router        *ich.Mux
+	ErrorHandlers map[int]http.HandlerFunc
+	Permissions   *models.Permissions
+	Assets        mix.Manifest
+	Hub           *htmx.Hub
+	Env           string
+	Timezone      *time.Location
+	CSRFName      string
+}
+
 type Flash struct {
 	Type         string
 	Title        string
@@ -117,7 +118,6 @@ type Ctx struct {
 	scheme    string
 	Log       *zap.SugaredLogger
 	CSRFToken string
-	CSRFTag   string
 	User      *models.User
 	Flash     []Flash
 }
@@ -129,7 +129,6 @@ func New(config Config, w http.ResponseWriter, r *http.Request) *Ctx {
 		scheme:    r.URL.Scheme,
 		Log:       zaphttp.Logger(r.Context()).Sugar(),
 		CSRFToken: csrf.Token(r),
-		CSRFTag:   string(csrf.TemplateField(r)),
 	}
 	if c.scheme == "" {
 		c.scheme = "http"

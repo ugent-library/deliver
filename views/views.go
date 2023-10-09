@@ -4,19 +4,10 @@ package views
 
 import (
 	"context"
-	"io"
 	"strings"
 
 	"github.com/a-h/templ"
 )
-
-// TODO eliminate need for this
-func rawHTML(text string) templ.Component {
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
-		io.WriteString(w, text)
-		return nil
-	})
-}
 
 func String(c templ.Component) string {
 	b := strings.Builder{}

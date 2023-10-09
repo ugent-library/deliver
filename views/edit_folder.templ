@@ -44,7 +44,7 @@ templ editFolderContent(c *ctx.Ctx, folder *models.Folder, errs *validate.Errors
                             <div class="bc-toolbar-item">
                                 <form action={ c.PathTo("deleteFolder", "folderID", folder.ID).String() } method="POST" id="delete-folder">
                                     <input type="hidden" name="_method" value="DELETE"/>
-                                    @rawHTML(c.CSRFTag)
+                                    @csrfField(c)
                                     <button
                                         class="btn btn-link btn-link-muted"
                                         data-bs-toggle="modal"
@@ -73,7 +73,7 @@ templ editFolderContent(c *ctx.Ctx, folder *models.Folder, errs *validate.Errors
                 <div class="card-body">
                     <form action={ c.PathTo("updateFolder", "folderID", folder.ID).String() } method="POST" id="update-folder">
                         <input type="hidden" name="_method" value="PUT"/>
-                        @rawHTML(c.CSRFTag)
+                        @csrfField(c)
                         <div class="row mb-6">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="folder-name">Folder name</label>
                             <div class="col-lg-5 col-xl-4">

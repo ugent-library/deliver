@@ -157,6 +157,7 @@ var serverCmd = &cobra.Command{
 					Hub:         hub,
 					Env:         config.Env,
 					Timezone:    timezone,
+					CSRFName:    "_csrf_token",
 				}),
 			)
 

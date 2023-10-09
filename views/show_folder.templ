@@ -83,7 +83,7 @@ templ showFolderContent(c *ctx.Ctx, folder *models.Folder) {
                         enctype="multipart/form-data"
                         method="POST"
                     >
-                        @rawHTML(c.CSRFTag)
+                        @csrfField(c)
                         <div class="c-file-upload c-file-upload--small">
                             <input type="file" name="file" multiple
                                 data-upload-progress-target="file-upload-progress"
