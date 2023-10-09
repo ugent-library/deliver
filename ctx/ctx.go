@@ -50,40 +50,20 @@ func Set(config Config) func(http.Handler) http.Handler {
 			r = r.WithContext(context.WithValue(r.Context(), ctxKey, c))
 
 			// load user from remember token cookie
-			if cookie, _ := r.Cookie(RememberCookie); cookie != nil {
-				user, err := config.Repo.Users.GetByRememberToken(r.Context(), cookie.Value)
-				if err != nil && err != models.ErrNotFound {
-					c.HandleError(w, r, err)
-					return
-				}
-				c.User = user
+			u, err := getUser(r, config.Repo)
+			if err != nil {
+				c.HandleError(w, r, err)
+				return
 			}
+			c.User = u
 
 			// load flash from cookies
-			for _, cookie := range r.Cookies() {
-				if !strings.HasPrefix(cookie.Name, FlashCookiePrefix) {
-					continue
-				}
-
-				// delete after read
-				http.SetCookie(w, &http.Cookie{
-					Name:     cookie.Name,
-					Value:    "",
-					Expires:  time.Now(),
-					Path:     "/",
-					HttpOnly: true,
-					SameSite: http.SameSiteStrictMode,
-				})
-
-				j, err := base64.URLEncoding.DecodeString(cookie.Value)
-				if err != nil {
-					continue
-				}
-				f := Flash{}
-				if err = json.Unmarshal(j, &f); err == nil {
-					c.Flash = append(c.Flash, f)
-				}
+			f, err := getFlash(r, w)
+			if err != nil {
+				c.HandleError(w, r, err)
+				return
 			}
+			c.Flash = f
 
 			next.ServeHTTP(w, r)
 		})
@@ -181,6 +161,49 @@ func (c *Ctx) PersistFlash(w http.ResponseWriter, f Flash) {
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})
+}
+
+func getUser(r *http.Request, repo *repositories.Repo) (u *models.User, err error) {
+	if cookie, _ := r.Cookie(RememberCookie); cookie != nil {
+		u, err = repo.Users.GetByRememberToken(r.Context(), cookie.Value)
+		if err == models.ErrNotFound {
+			err = nil
+		}
+	}
+	return
+}
+
+func getFlash(r *http.Request, w http.ResponseWriter) ([]Flash, error) {
+	var flashes []Flash
+
+	for _, cookie := range r.Cookies() {
+		if !strings.HasPrefix(cookie.Name, FlashCookiePrefix) {
+			continue
+		}
+
+		// delete cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     cookie.Name,
+			Value:    "",
+			Expires:  time.Now(),
+			Path:     "/",
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+		})
+
+		j, err := base64.URLEncoding.DecodeString(cookie.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		f := Flash{}
+		if err = json.Unmarshal(j, &f); err != nil {
+			return nil, err
+		}
+		flashes = append(flashes, f)
+	}
+
+	return flashes, nil
 }
 
 func (c *Ctx) AssetPath(asset string) string {
