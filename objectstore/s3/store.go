@@ -7,6 +7,8 @@ import (
 	"strconv"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -47,7 +49,12 @@ func New(conn string) (objectstore.Store, error) {
 	}
 
 	return &s3storage{
-		client: s3.NewFromConfig(config),
+		client: s3.NewFromConfig(config, func(o *s3.Options) {
+			o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
+				// default rate limiter has 500 tokens
+				so.RateLimiter = ratelimit.NewTokenRateLimit(2000)
+			})
+		}),
 		bucket: bucket,
 	}, nil
 }
