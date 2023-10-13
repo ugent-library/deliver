@@ -8,10 +8,7 @@ import (
 )
 
 templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
-    @pageLayout(c, folder.Name, showFolderContent(c, folder))
-}
-
-templ showFolderContent(c *ctx.Ctx, folder *models.Folder) {
+    @pageLayout(c, folder.Name) {
     <div class="w-100 u-scroll-wrapper"
         hx-ext="ws"
         ws-connect={ c.WebSocketPath("folder."+folder.ID) }
@@ -156,4 +153,5 @@ templ showFolderContent(c *ctx.Ctx, folder *models.Folder) {
             </div>
         </li>
     </template>
+    }
 }

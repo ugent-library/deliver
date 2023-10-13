@@ -2,7 +2,7 @@ package views
 
 import "github.com/ugent-library/deliver/ctx"
 
-templ pageLayout(c *ctx.Ctx, title string, content templ.Component) {
+templ pageLayout(c *ctx.Ctx, title string) {
    <!DOCTYPE html>
    <html class="u-maximize-height" dir="ltr" lang="en">
    <head>
@@ -121,7 +121,7 @@ templ pageLayout(c *ctx.Ctx, title string, content templ.Component) {
                     </div>
                 </div>
 
-                @content
+                { children... }
             </div>
         </main>
 

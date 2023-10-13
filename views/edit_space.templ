@@ -9,10 +9,7 @@ import (
 )
 
 templ EditSpace(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
-    @pageLayout(c, fmt.Sprintf("Edit %s", space.Name), editSpaceContent(c, space, errs))
-}
-
-templ editSpaceContent(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
+    @pageLayout(c, fmt.Sprintf("Edit %s", space.Name)) {
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
             <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
@@ -64,4 +61,5 @@ templ editSpaceContent(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
             </div>
         </div>
     </div>
+    }
 }

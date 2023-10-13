@@ -9,10 +9,7 @@ import (
 
 
 templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
-    @publicPageLayout(c, folder.Name, shareFolderContent(c, folder))
-}
-
-templ shareFolderContent(c *ctx.Ctx, folder *models.Folder) {
+    @publicPageLayout(c, folder.Name) {
     <div class="d-flex u-maximize-height">
         <div class="w-100 u-scroll-wrapper">
             <div class="bg-white">
@@ -124,4 +121,5 @@ templ shareFolderContent(c *ctx.Ctx, folder *models.Folder) {
             </div>
         </div>
     </div>
+    }
 }

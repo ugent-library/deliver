@@ -15,5 +15,5 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.HomePage(c).Render(r.Context(), w)
+	views.Home(c).Render(r.Context(), w)
 }

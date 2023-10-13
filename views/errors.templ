@@ -3,10 +3,7 @@ package views
 import "github.com/ugent-library/deliver/ctx"
 
 templ Forbidden(c *ctx.Ctx) {
-    @publicPageLayout(c, "Forbidden", forbiddenContent(c))
-}
-
-templ forbiddenContent(c *ctx.Ctx) {
+    @publicPageLayout(c, "Forbidden") {
     <div class="d-flex u-maximize-height">
         <div class="w-100 u-scroll-wrapper">
             <div class="u-scroll-wrapper__body p-4">
@@ -29,14 +26,12 @@ templ forbiddenContent(c *ctx.Ctx) {
             </div>
         </div>
     </div>
+    }
 }
 
 
 templ NotFound(c *ctx.Ctx) {
-    @publicPageLayout(c, "Not found", notFoundContent(c))
-}
-
-templ notFoundContent(c *ctx.Ctx) {
+    @publicPageLayout(c, "Not found") {
     <div class="d-flex u-maximize-height">
         <div class="w-100 u-scroll-wrapper">
             <div class="u-scroll-wrapper__body p-4">
@@ -59,4 +54,5 @@ templ notFoundContent(c *ctx.Ctx) {
             </div>
         </div>
     </div>
+    }
 }

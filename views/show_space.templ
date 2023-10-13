@@ -10,10 +10,7 @@ import (
 )
 
 templ ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, folder *models.Folder, errs *validate.Errors) {
-    @pageLayout(c, space.Name, showSpaceContent(c, space, userSpaces, folder, errs))
-}
-
-templ showSpaceContent(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, folder *models.Folder, errs *validate.Errors) {
+    @pageLayout(c, space.Name) {
     <div class="c-sub-sidebar c-sidebar--bordered"
         hx-ext="ws"
         ws-connect={ c.WebSocketPath("space."+space.ID) }
@@ -92,9 +89,9 @@ templ showSpaceContent(c *ctx.Ctx, space *models.Space, userSpaces []*models.Spa
                             <label class="c-label" for="folder-name">Folder name</label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    if err := errs.Get("name"); err != nil {
+                                    if e := errs.Get("name"); e != nil {
                                     <input class="form-control is-invalid" type="text" value={ folder.Name } id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid"/>
-                                    <small class="invalid-feedback" id="folder-name-invalid">{ err.Error() }</small>
+                                    <small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
                                     } else {
                                     <input class="form-control" type="text" value={ folder.Name } id="folder-name" name="name"/>
                                     }
@@ -213,4 +210,5 @@ templ showSpaceContent(c *ctx.Ctx, space *models.Space, userSpaces []*models.Spa
             </div>
         </div>
     </div>
+    }
 }

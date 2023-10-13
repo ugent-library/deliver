@@ -2,11 +2,8 @@ package views
 
 import "github.com/ugent-library/deliver/ctx"
 
-templ HomePage(c *ctx.Ctx) {
-    @pageLayout(c, "Deliver", homePageContent(c))
-}
-
-templ homePageContent(c *ctx.Ctx) {
+templ Home(c *ctx.Ctx) {
+    @pageLayout(c, "Deliver") {
     <div class="w-100 u-scroll-wrapper">
         <div class="u-scroll-wrapper__body p-8">
             <div class="bc-toolbar bc-toolbar--auto align-items-start">
@@ -82,4 +79,5 @@ templ homePageContent(c *ctx.Ctx) {
             </div>
         </div>
     </div>
+    }
 }
