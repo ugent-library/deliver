@@ -1,10 +1,12 @@
 module github.com/ugent-library/deliver
 
-go 1.20
+go 1.21
+
+toolchain go1.21.3
 
 require (
 	entgo.io/ent v0.12.3
-	github.com/a-h/templ v0.2.365-0.20231002173741-b66adbe34b06
+	github.com/a-h/templ v0.2.408
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.67
@@ -21,19 +23,31 @@ require (
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
 	github.com/ugent-library/middleware v0.0.0-20230512145619-4be676c7c423
 	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
-	go.uber.org/zap v1.24.0
+	go.uber.org/zap v1.26.0
 )
 
 require (
+	github.com/a-h/lexical v0.0.53 // indirect
+	github.com/a-h/parse v0.0.0-20230731060248-8319ff0754b6 // indirect
+	github.com/a-h/protocol v0.0.0-20230224160810-b4eec67c1c22 // indirect
+	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
+	github.com/cli/browser v1.3.0 // indirect
 	github.com/coreos/go-oidc/v3 v3.6.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/natefinch/atomic v1.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
+	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/segmentio/encoding v0.3.6 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	go.lsp.dev/jsonrpc2 v0.10.0 // indirect
+	go.lsp.dev/pkg v0.0.0-20210717090340-384b27a52fb2 // indirect
+	go.lsp.dev/uri v0.3.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 )
 
 require (
