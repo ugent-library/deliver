@@ -101,7 +101,7 @@ var serverCmd = &cobra.Command{
 		router.Use(middleware.StripSlashes)
 
 		// mount health and info
-		router.Get("/health", health.NewHandler(health.NewChecker())) // TODO add checkers
+		router.Get("/status", health.NewHandler(health.NewChecker())) // TODO add checkers
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
 			render.JSON(w, http.StatusOK, &struct {
 				Branch string `json:"branch,omitempty"`
