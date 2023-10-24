@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
-	_ "github.com/ugent-library/deliver/objectstore/s3"
+	_ "github.com/ugent-library/deliver/objectstores/s3"
 )
 
 var (

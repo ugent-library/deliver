@@ -1,4 +1,4 @@
-package objectstore
+package objectstores
 
 import (
 	"context"
@@ -20,21 +20,21 @@ type Store interface {
 
 type Factory func(string) (Store, error)
 
-var backends = make(map[string]Factory)
-var backendsMu sync.RWMutex
+var factories = make(map[string]Factory)
+var mu sync.RWMutex
 
-func Register(backend string, factory Factory) {
-	backendsMu.Lock()
-	defer backendsMu.Unlock()
-	backends[backend] = factory
+func Register(name string, factory Factory) {
+	mu.Lock()
+	defer mu.Unlock()
+	factories[name] = factory
 }
 
-func New(backend, conn string) (Store, error) {
-	backendsMu.RLock()
-	factory, ok := backends[backend]
-	backendsMu.RUnlock()
+func New(name, conn string) (Store, error) {
+	mu.RLock()
+	factory, ok := factories[name]
+	mu.RUnlock()
 	if !ok {
-		return nil, fmt.Errorf("unknown storage backend '%s'", backend)
+		return nil, fmt.Errorf("unknown store '%s'", name)
 	}
 	return factory(conn)
 }

@@ -12,16 +12,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/objectstores"
 )
 
 func init() {
-	objectstore.Register("s3", New)
+	objectstores.Register("s3", New)
 }
 
 // connection string format: http(s)://id:secret@endpoint/bucket?region=region
 // see https://stackoverflow.com/questions/67575681/is-aws-go-sdk-v2-integrated-with-local-minio-server
-func New(conn string) (objectstore.Store, error) {
+func New(conn string) (objectstores.Store, error) {
 	u, err := url.Parse(conn)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func New(conn string) (objectstore.Store, error) {
 		})
 	}
 
-	return &s3storage{
+	return &s3store{
 		client: s3.NewFromConfig(config, func(o *s3.Options) {
 			o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
 				// default rate limiter has 500 tokens
@@ -59,12 +59,12 @@ func New(conn string) (objectstore.Store, error) {
 	}, nil
 }
 
-type s3storage struct {
+type s3store struct {
 	client *s3.Client
 	bucket string
 }
 
-func (s *s3storage) Add(ctx context.Context, id string, b io.Reader) (string, error) {
+func (s *s3store) Add(ctx context.Context, id string, b io.Reader) (string, error) {
 	uploader := manager.NewUploader(s.client)
 	res, err := uploader.Upload(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.bucket),
@@ -78,7 +78,7 @@ func (s *s3storage) Add(ctx context.Context, id string, b io.Reader) (string, er
 	return md5, nil
 }
 
-func (s *s3storage) Get(ctx context.Context, id string) (io.ReadCloser, error) {
+func (s *s3store) Get(ctx context.Context, id string) (io.ReadCloser, error) {
 	out, err := s.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(id),
@@ -89,7 +89,7 @@ func (s *s3storage) Get(ctx context.Context, id string) (io.ReadCloser, error) {
 	return out.Body, nil
 }
 
-func (s *s3storage) Delete(ctx context.Context, id string) error {
+func (s *s3store) Delete(ctx context.Context, id string) error {
 	_, err := s.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(id),
@@ -97,7 +97,7 @@ func (s *s3storage) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (s *s3storage) IterateID(ctx context.Context, fn func(string) error) error {
+func (s *s3store) IterateID(ctx context.Context, fn func(string) error) error {
 	pager := s3.NewListObjectsV2Paginator(s.client, &s3.ListObjectsV2Input{
 		Bucket: aws.String(s.bucket),
 	})
@@ -109,7 +109,7 @@ func (s *s3storage) IterateID(ctx context.Context, fn func(string) error) error 
 		}
 		for _, obj := range page.Contents {
 			err := fn(*obj.Key)
-			if err == objectstore.Stop {
+			if err == objectstores.Stop {
 				return nil
 			}
 			if err != nil {

@@ -22,7 +22,7 @@ import (
 	"github.com/ugent-library/deliver/handlers"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/objectstores"
 	"github.com/ugent-library/deliver/repositories"
 )
 
@@ -40,7 +40,7 @@ var serverCmd = &cobra.Command{
 			return err
 		}
 
-		storage, err := objectstore.New(config.Storage.Backend, config.Storage.Conn)
+		storage, err := objectstores.New(config.Storage.Backend, config.Storage.Conn)
 		if err != nil {
 			return err
 		}

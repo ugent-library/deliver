@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	"github.com/ugent-library/deliver/objectstore"
-	repository "github.com/ugent-library/deliver/repositories"
+	"github.com/ugent-library/deliver/objectstores"
+	"github.com/ugent-library/deliver/repositories"
 )
 
 func init() {
@@ -22,11 +22,11 @@ var gcFilesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
-		repo, err := repository.New(config.Repo.Conn)
+		repo, err := repositories.New(config.Repo.Conn)
 		if err != nil {
 			return err
 		}
-		storage, err := objectstore.New(config.Storage.Backend, config.Storage.Conn)
+		storage, err := objectstores.New(config.Storage.Backend, config.Storage.Conn)
 		if err != nil {
 			return err
 		}

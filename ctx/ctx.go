@@ -15,7 +15,7 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/objectstore"
+	"github.com/ugent-library/deliver/objectstores"
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
@@ -81,7 +81,7 @@ func Set(config Config) func(http.Handler) http.Handler {
 
 type Config struct {
 	Repo          *repositories.Repo
-	Storage       objectstore.Store
+	Storage       objectstores.Store
 	MaxFileSize   int64
 	Auth          *oidc.Auth
 	Router        *ich.Mux
