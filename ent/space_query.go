@@ -20,7 +20,7 @@ import (
 type SpaceQuery struct {
 	config
 	ctx         *QueryContext
-	order       []OrderFunc
+	order       []space.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.Space
 	withFolders *FolderQuery
@@ -55,7 +55,7 @@ func (sq *SpaceQuery) Unique(unique bool) *SpaceQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (sq *SpaceQuery) Order(o ...OrderFunc) *SpaceQuery {
+func (sq *SpaceQuery) Order(o ...space.OrderOption) *SpaceQuery {
 	sq.order = append(sq.order, o...)
 	return sq
 }
@@ -271,7 +271,7 @@ func (sq *SpaceQuery) Clone() *SpaceQuery {
 	return &SpaceQuery{
 		config:      sq.config,
 		ctx:         sq.ctx.Clone(),
-		order:       append([]OrderFunc{}, sq.order...),
+		order:       append([]space.OrderOption{}, sq.order...),
 		inters:      append([]Interceptor{}, sq.inters...),
 		predicates:  append([]predicate.Space{}, sq.predicates...),
 		withFolders: sq.withFolders.Clone(),
@@ -412,8 +412,11 @@ func (sq *SpaceQuery) loadFolders(ctx context.Context, query *FolderQuery, nodes
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(folder.FieldSpaceID)
+	}
 	query.Where(predicate.Folder(func(s *sql.Selector) {
-		s.Where(sql.InValues(space.FoldersColumn, fks...))
+		s.Where(sql.InValues(s.C(space.FoldersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -423,7 +426,7 @@ func (sq *SpaceQuery) loadFolders(ctx context.Context, query *FolderQuery, nodes
 		fk := n.SpaceID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "space_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "space_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

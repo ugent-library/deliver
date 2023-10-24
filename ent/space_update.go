@@ -104,7 +104,7 @@ func (su *SpaceUpdate) RemoveFolders(f ...*Folder) *SpaceUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (su *SpaceUpdate) Save(ctx context.Context) (int, error) {
 	su.defaults()
-	return withHooks[int, SpaceMutation](ctx, su.sqlSave, su.mutation, su.hooks)
+	return withHooks(ctx, su.sqlSave, su.mutation, su.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -171,10 +171,7 @@ func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -187,10 +184,7 @@ func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -206,10 +200,7 @@ func (su *SpaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -324,7 +315,7 @@ func (suo *SpaceUpdateOne) Select(field string, fields ...string) *SpaceUpdateOn
 // Save executes the query and returns the updated Space entity.
 func (suo *SpaceUpdateOne) Save(ctx context.Context) (*Space, error) {
 	suo.defaults()
-	return withHooks[*Space, SpaceMutation](ctx, suo.sqlSave, suo.mutation, suo.hooks)
+	return withHooks(ctx, suo.sqlSave, suo.mutation, suo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -408,10 +399,7 @@ func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -424,10 +412,7 @@ func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -443,10 +428,7 @@ func (suo *SpaceUpdateOne) sqlSave(ctx context.Context) (_node *Space, err error
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

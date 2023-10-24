@@ -101,7 +101,7 @@ func (sc *SpaceCreate) Mutation() *SpaceMutation {
 // Save creates the Space in the database.
 func (sc *SpaceCreate) Save(ctx context.Context) (*Space, error) {
 	sc.defaults()
-	return withHooks[*Space, SpaceMutation](ctx, sc.sqlSave, sc.mutation, sc.hooks)
+	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -152,6 +152,11 @@ func (sc *SpaceCreate) check() error {
 	}
 	if _, ok := sc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Space.updated_at"`)}
+	}
+	if v, ok := sc.mutation.ID(); ok {
+		if err := space.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Space.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -213,10 +218,7 @@ func (sc *SpaceCreate) createSpec() (*Space, *sqlgraph.CreateSpec) {
 			Columns: []string{space.FoldersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -481,8 +483,8 @@ func (scb *SpaceCreateBulk) Save(ctx context.Context) ([]*Space, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
 				} else {

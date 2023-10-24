@@ -36,6 +36,8 @@ func init() {
 	fileDescID := fileFields[0].Descriptor()
 	// file.DefaultID holds the default value on creation for the id field.
 	file.DefaultID = fileDescID.Default.(func() string)
+	// file.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	file.IDValidator = fileDescID.Validators[0].(func(string) error)
 	folderFields := schema.Folder{}.Fields()
 	_ = folderFields
 	// folderDescCreatedAt is the schema descriptor for created_at field.
@@ -52,6 +54,8 @@ func init() {
 	folderDescID := folderFields[0].Descriptor()
 	// folder.DefaultID holds the default value on creation for the id field.
 	folder.DefaultID = folderDescID.Default.(func() string)
+	// folder.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	folder.IDValidator = folderDescID.Validators[0].(func(string) error)
 	spaceFields := schema.Space{}.Fields()
 	_ = spaceFields
 	// spaceDescCreatedAt is the schema descriptor for created_at field.
@@ -68,6 +72,8 @@ func init() {
 	spaceDescID := spaceFields[0].Descriptor()
 	// space.DefaultID holds the default value on creation for the id field.
 	space.DefaultID = spaceDescID.Default.(func() string)
+	// space.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	space.IDValidator = spaceDescID.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescCreatedAt is the schema descriptor for created_at field.
@@ -84,4 +90,6 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() string)
+	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	user.IDValidator = userDescID.Validators[0].(func(string) error)
 }

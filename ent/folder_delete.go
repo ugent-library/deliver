@@ -27,7 +27,7 @@ func (fd *FolderDelete) Where(ps ...predicate.Folder) *FolderDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (fd *FolderDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, FolderMutation](ctx, fd.sqlExec, fd.mutation, fd.hooks)
+	return withHooks(ctx, fd.sqlExec, fd.mutation, fd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

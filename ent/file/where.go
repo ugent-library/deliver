@@ -55,6 +55,16 @@ func IDLTE(id string) predicate.File {
 	return predicate.File(sql.FieldLTE(FieldID, id))
 }
 
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.File {
+	return predicate.File(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.File {
+	return predicate.File(sql.FieldContainsFold(FieldID, id))
+}
+
 // FolderID applies equality check predicate on the "folder_id" field. It's identical to FolderIDEQ.
 func FolderID(v string) predicate.File {
 	return predicate.File(sql.FieldEQ(FieldFolderID, v))
@@ -529,11 +539,7 @@ func HasFolder() predicate.File {
 // HasFolderWith applies the HasEdge predicate on the "folder" edge with a given conditions (other predicates).
 func HasFolderWith(preds ...predicate.Folder) predicate.File {
 	return predicate.File(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(FolderInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, FolderTable, FolderColumn),
-		)
+		step := newFolderStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

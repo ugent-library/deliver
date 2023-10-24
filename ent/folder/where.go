@@ -55,6 +55,16 @@ func IDLTE(id string) predicate.Folder {
 	return predicate.Folder(sql.FieldLTE(FieldID, id))
 }
 
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Folder {
+	return predicate.Folder(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Folder {
+	return predicate.Folder(sql.FieldContainsFold(FieldID, id))
+}
+
 // SpaceID applies equality check predicate on the "space_id" field. It's identical to SpaceIDEQ.
 func SpaceID(v string) predicate.Folder {
 	return predicate.Folder(sql.FieldEQ(FieldSpaceID, v))
@@ -354,11 +364,7 @@ func HasSpace() predicate.Folder {
 // HasSpaceWith applies the HasEdge predicate on the "space" edge with a given conditions (other predicates).
 func HasSpaceWith(preds ...predicate.Space) predicate.Folder {
 	return predicate.Folder(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(SpaceInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, SpaceTable, SpaceColumn),
-		)
+		step := newSpaceStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -381,11 +387,7 @@ func HasFiles() predicate.Folder {
 // HasFilesWith applies the HasEdge predicate on the "files" edge with a given conditions (other predicates).
 func HasFilesWith(preds ...predicate.File) predicate.Folder {
 	return predicate.Folder(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(FilesInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, FilesTable, FilesColumn),
-		)
+		step := newFilesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

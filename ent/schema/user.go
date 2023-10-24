@@ -17,7 +17,9 @@ type User struct {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").
+			NotEmpty().
 			Unique().
+			Immutable().
 			DefaultFunc(func() string {
 				return ulid.Make().String()
 			}),

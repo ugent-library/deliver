@@ -121,7 +121,7 @@ func (fc *FolderCreate) Mutation() *FolderMutation {
 // Save creates the Folder in the database.
 func (fc *FolderCreate) Save(ctx context.Context) (*Folder, error) {
 	fc.defaults()
-	return withHooks[*Folder, FolderMutation](ctx, fc.sqlSave, fc.mutation, fc.hooks)
+	return withHooks(ctx, fc.sqlSave, fc.mutation, fc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -175,6 +175,11 @@ func (fc *FolderCreate) check() error {
 	}
 	if _, ok := fc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Folder.updated_at"`)}
+	}
+	if v, ok := fc.mutation.ID(); ok {
+		if err := folder.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Folder.id": %w`, err)}
+		}
 	}
 	if _, ok := fc.mutation.SpaceID(); !ok {
 		return &ValidationError{Name: "space", err: errors.New(`ent: missing required edge "Folder.space"`)}
@@ -239,10 +244,7 @@ func (fc *FolderCreate) createSpec() (*Folder, *sqlgraph.CreateSpec) {
 			Columns: []string{folder.SpaceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: space.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(space.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -259,10 +261,7 @@ func (fc *FolderCreate) createSpec() (*Folder, *sqlgraph.CreateSpec) {
 			Columns: []string{folder.FilesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: file.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(file.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -553,8 +552,8 @@ func (fcb *FolderCreateBulk) Save(ctx context.Context) ([]*Folder, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, fcb.builders[i+1].mutation)
 				} else {

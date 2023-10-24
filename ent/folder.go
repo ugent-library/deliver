@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent/folder"
 	"github.com/ugent-library/deliver/ent/space"
@@ -29,7 +30,8 @@ type Folder struct {
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FolderQuery when eager-loading is set.
-	Edges FolderEdges `json:"edges"`
+	Edges        FolderEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // FolderEdges holds the relations/edges for other nodes in the graph.
@@ -75,7 +77,7 @@ func (*Folder) scanValues(columns []string) ([]any, error) {
 		case folder.FieldCreatedAt, folder.FieldUpdatedAt, folder.FieldExpiresAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Folder", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -125,9 +127,17 @@ func (f *Folder) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				f.ExpiresAt = value.Time
 			}
+		default:
+			f.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Folder.
+// This includes values selected through modifiers, order, etc.
+func (f *Folder) Value(name string) (ent.Value, error) {
+	return f.selectValues.Get(name)
 }
 
 // QuerySpace queries the "space" edge of the Folder entity.

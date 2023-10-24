@@ -123,7 +123,7 @@ func (fc *FileCreate) Mutation() *FileMutation {
 // Save creates the File in the database.
 func (fc *FileCreate) Save(ctx context.Context) (*File, error) {
 	fc.defaults()
-	return withHooks[*File, FileMutation](ctx, fc.sqlSave, fc.mutation, fc.hooks)
+	return withHooks(ctx, fc.sqlSave, fc.mutation, fc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -193,6 +193,11 @@ func (fc *FileCreate) check() error {
 	}
 	if _, ok := fc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "File.updated_at"`)}
+	}
+	if v, ok := fc.mutation.ID(); ok {
+		if err := file.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "File.id": %w`, err)}
+		}
 	}
 	if _, ok := fc.mutation.FolderID(); !ok {
 		return &ValidationError{Name: "folder", err: errors.New(`ent: missing required edge "File.folder"`)}
@@ -269,10 +274,7 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 			Columns: []string{file.FolderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -655,8 +657,8 @@ func (fcb *FileCreateBulk) Save(ctx context.Context) ([]*File, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, fcb.builders[i+1].mutation)
 				} else {

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent/space"
 )
@@ -27,7 +28,8 @@ type Space struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SpaceQuery when eager-loading is set.
-	Edges SpaceEdges `json:"edges"`
+	Edges        SpaceEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // SpaceEdges holds the relations/edges for other nodes in the graph.
@@ -60,7 +62,7 @@ func (*Space) scanValues(columns []string) ([]any, error) {
 		case space.FieldCreatedAt, space.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Space", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -106,9 +108,17 @@ func (s *Space) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.UpdatedAt = value.Time
 			}
+		default:
+			s.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Space.
+// This includes values selected through modifiers, order, etc.
+func (s *Space) Value(name string) (ent.Value, error) {
+	return s.selectValues.Get(name)
 }
 
 // QueryFolders queries the "folders" edge of the Space entity.

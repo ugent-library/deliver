@@ -55,6 +55,16 @@ func IDLTE(id string) predicate.Space {
 	return predicate.Space(sql.FieldLTE(FieldID, id))
 }
 
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Space {
+	return predicate.Space(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Space {
+	return predicate.Space(sql.FieldContainsFold(FieldID, id))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Space {
 	return predicate.Space(sql.FieldEQ(FieldName, v))
@@ -239,11 +249,7 @@ func HasFolders() predicate.Space {
 // HasFoldersWith applies the HasEdge predicate on the "folders" edge with a given conditions (other predicates).
 func HasFoldersWith(preds ...predicate.Folder) predicate.Space {
 	return predicate.Space(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(FoldersInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, FoldersTable, FoldersColumn),
-		)
+		step := newFoldersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

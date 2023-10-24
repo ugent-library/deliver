@@ -4,6 +4,9 @@ package file
 
 import (
 	"time"
+
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -74,4 +77,68 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the File queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByFolderID orders the results by the folder_id field.
+func ByFolderID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFolderID, opts...).ToFunc()
+}
+
+// ByMd5 orders the results by the md5 field.
+func ByMd5(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMd5, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// BySize orders the results by the size field.
+func BySize(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSize, opts...).ToFunc()
+}
+
+// ByContentType orders the results by the content_type field.
+func ByContentType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContentType, opts...).ToFunc()
+}
+
+// ByDownloads orders the results by the downloads field.
+func ByDownloads(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDownloads, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByFolderField orders the results by folder field.
+func ByFolderField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFolderStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newFolderStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FolderInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, FolderTable, FolderColumn),
+	)
+}

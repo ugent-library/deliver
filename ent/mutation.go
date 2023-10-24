@@ -9,14 +9,13 @@ import (
 	"sync"
 	"time"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
 	"github.com/ugent-library/deliver/ent/predicate"
 	"github.com/ugent-library/deliver/ent/space"
 	"github.com/ugent-library/deliver/ent/user"
-
-	"entgo.io/ent"
-	"entgo.io/ent/dialect/sql"
 )
 
 const (

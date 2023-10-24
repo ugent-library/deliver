@@ -112,7 +112,7 @@ func (fu *FileUpdate) ClearFolder() *FileUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (fu *FileUpdate) Save(ctx context.Context) (int, error) {
 	fu.defaults()
-	return withHooks[int, FileMutation](ctx, fu.sqlSave, fu.mutation, fu.hooks)
+	return withHooks(ctx, fu.sqlSave, fu.mutation, fu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -197,10 +197,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{file.FolderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -213,10 +210,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{file.FolderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -340,7 +334,7 @@ func (fuo *FileUpdateOne) Select(field string, fields ...string) *FileUpdateOne 
 // Save executes the query and returns the updated File entity.
 func (fuo *FileUpdateOne) Save(ctx context.Context) (*File, error) {
 	fuo.defaults()
-	return withHooks[*File, FileMutation](ctx, fuo.sqlSave, fuo.mutation, fuo.hooks)
+	return withHooks(ctx, fuo.sqlSave, fuo.mutation, fuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -442,10 +436,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 			Columns: []string{file.FolderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -458,10 +449,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 			Columns: []string{file.FolderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: folder.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(folder.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -21,7 +21,7 @@ import (
 type FolderQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []folder.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Folder
 	withSpace  *SpaceQuery
@@ -57,7 +57,7 @@ func (fq *FolderQuery) Unique(unique bool) *FolderQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (fq *FolderQuery) Order(o ...OrderFunc) *FolderQuery {
+func (fq *FolderQuery) Order(o ...folder.OrderOption) *FolderQuery {
 	fq.order = append(fq.order, o...)
 	return fq
 }
@@ -295,7 +295,7 @@ func (fq *FolderQuery) Clone() *FolderQuery {
 	return &FolderQuery{
 		config:     fq.config,
 		ctx:        fq.ctx.Clone(),
-		order:      append([]OrderFunc{}, fq.order...),
+		order:      append([]folder.OrderOption{}, fq.order...),
 		inters:     append([]Interceptor{}, fq.inters...),
 		predicates: append([]predicate.Folder{}, fq.predicates...),
 		withSpace:  fq.withSpace.Clone(),
@@ -484,8 +484,11 @@ func (fq *FolderQuery) loadFiles(ctx context.Context, query *FileQuery, nodes []
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(file.FieldFolderID)
+	}
 	query.Where(predicate.File(func(s *sql.Selector) {
-		s.Where(sql.InValues(folder.FilesColumn, fks...))
+		s.Where(sql.InValues(s.C(folder.FilesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -495,7 +498,7 @@ func (fq *FolderQuery) loadFiles(ctx context.Context, query *FileQuery, nodes []
 		fk := n.FolderID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "folder_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "folder_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -526,6 +529,9 @@ func (fq *FolderQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != folder.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if fq.withSpace != nil {
+			_spec.Node.AddColumnOnce(folder.FieldSpaceID)
 		}
 	}
 	if ps := fq.predicates; len(ps) > 0 {

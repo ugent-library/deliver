@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
@@ -35,7 +36,8 @@ type File struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FileQuery when eager-loading is set.
-	Edges FileEdges `json:"edges"`
+	Edges        FileEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // FileEdges holds the relations/edges for other nodes in the graph.
@@ -72,7 +74,7 @@ func (*File) scanValues(columns []string) ([]any, error) {
 		case file.FieldCreatedAt, file.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type File", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -140,9 +142,17 @@ func (f *File) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				f.UpdatedAt = value.Time
 			}
+		default:
+			f.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the File.
+// This includes values selected through modifiers, order, etc.
+func (f *File) Value(name string) (ent.Value, error) {
+	return f.selectValues.Get(name)
 }
 
 // QueryFolder queries the "folder" edge of the File entity.
