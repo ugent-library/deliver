@@ -48,7 +48,7 @@ func New(conn string) (objectstores.Store, error) {
 		})
 	}
 
-	return &s3store{
+	return &s3Store{
 		client: s3.NewFromConfig(config, func(o *s3.Options) {
 			o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
 				// default rate limiter has 500 tokens
@@ -59,12 +59,12 @@ func New(conn string) (objectstores.Store, error) {
 	}, nil
 }
 
-type s3store struct {
+type s3Store struct {
 	client *s3.Client
 	bucket string
 }
 
-func (s *s3store) Add(ctx context.Context, id string, b io.Reader) (string, error) {
+func (s *s3Store) Add(ctx context.Context, id string, b io.Reader) (string, error) {
 	uploader := manager.NewUploader(s.client)
 	res, err := uploader.Upload(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.bucket),
@@ -78,7 +78,7 @@ func (s *s3store) Add(ctx context.Context, id string, b io.Reader) (string, erro
 	return md5, nil
 }
 
-func (s *s3store) Get(ctx context.Context, id string) (io.ReadCloser, error) {
+func (s *s3Store) Get(ctx context.Context, id string) (io.ReadCloser, error) {
 	out, err := s.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(id),
@@ -89,7 +89,7 @@ func (s *s3store) Get(ctx context.Context, id string) (io.ReadCloser, error) {
 	return out.Body, nil
 }
 
-func (s *s3store) Delete(ctx context.Context, id string) error {
+func (s *s3Store) Delete(ctx context.Context, id string) error {
 	_, err := s.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(id),
@@ -97,7 +97,7 @@ func (s *s3store) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (s *s3store) IterateID(ctx context.Context, fn func(string) error) error {
+func (s *s3Store) IterateID(ctx context.Context, fn func(string) error) error {
 	pager := s3.NewListObjectsV2Paginator(s.client, &s3.ListObjectsV2Input{
 		Bucket: aws.String(s.bucket),
 	})
