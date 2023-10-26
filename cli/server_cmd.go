@@ -11,8 +11,7 @@ import (
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
-	"github.com/ugent-library/httpx/render"
-	mw "github.com/ugent-library/middleware"
+	"github.com/ugent-library/httpx"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
@@ -91,10 +90,7 @@ var serverCmd = &cobra.Command{
 		if config.Env != "local" {
 			router.Use(middleware.RealIP)
 		}
-		router.Use(mw.MethodOverride( // TODO eliminate need for method override
-			mw.MethodFromHeader(mw.MethodHeader),
-			mw.MethodFromForm(mw.MethodParam),
-		))
+		router.Use(httpx.MethodOverride)
 		router.Use(zaphttp.SetLogger(logger.Desugar(), zapchi.RequestID))
 		router.Use(middleware.RequestLogger(zapchi.LogFormatter()))
 		router.Use(middleware.Recoverer)
@@ -103,7 +99,7 @@ var serverCmd = &cobra.Command{
 		// mount health and info
 		router.Get("/status", health.NewHandler(health.NewChecker())) // TODO add checkers
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
-			render.JSON(w, http.StatusOK, &struct {
+			httpx.RenderJSON(w, http.StatusOK, &struct {
 				Branch string `json:"branch,omitempty"`
 				Commit string `json:"commit,omitempty"`
 				Image  string `json:"image,omitempty"`
