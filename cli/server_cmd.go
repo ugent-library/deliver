@@ -99,15 +99,7 @@ var serverCmd = &cobra.Command{
 		// mount health and info
 		router.Get("/status", health.NewHandler(health.NewChecker())) // TODO add checkers
 		router.Get("/info", func(w http.ResponseWriter, r *http.Request) {
-			httpx.RenderJSON(w, http.StatusOK, &struct {
-				Branch string `json:"branch,omitempty"`
-				Commit string `json:"commit,omitempty"`
-				Image  string `json:"image,omitempty"`
-			}{
-				Branch: version.Branch,
-				Commit: version.Commit,
-				Image:  version.Image,
-			})
+			httpx.RenderJSON(w, http.StatusOK, version)
 		})
 
 		// mount assets
