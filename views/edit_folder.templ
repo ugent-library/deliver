@@ -39,7 +39,7 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *validate.Errors) {
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <form action={ c.PathTo("deleteFolder", "folderID", folder.ID).String() } method="POST" id="delete-folder">
+                                <form action={ templ.URL(c.PathTo("deleteFolder", "folderID", folder.ID).String()) } method="POST" id="delete-folder">
                                     <input type="hidden" name="_method" value="DELETE"/>
                                     @csrfField(c)
                                     <button
@@ -68,7 +68,7 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *validate.Errors) {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ c.PathTo("updateFolder", "folderID", folder.ID).String() } method="POST" id="update-folder">
+                    <form action={ templ.URL(c.PathTo("updateFolder", "folderID", folder.ID).String()) } method="POST" id="update-folder">
                         <input type="hidden" name="_method" value="PUT"/>
                         @csrfField(c)
                         <div class="row mb-6">

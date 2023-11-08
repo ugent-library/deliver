@@ -83,7 +83,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, fol
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ c.PathTo("createFolder", "spaceName", space.Name).String() } method="POST">
+                    <form action={ templ.URL(c.PathTo("createFolder", "spaceName", space.Name).String()) } method="POST">
                         @csrfField(c)
                         <div class={"mb-6", templ.KV("is-invalid", errs.Get("name") != nil)}>
                             <label class="c-label" for="folder-name">Folder name</label>

@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	entgo.io/ent v0.12.3
-	github.com/a-h/templ v0.2.408
+	github.com/a-h/templ v0.2.432
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.67
@@ -35,7 +35,7 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 )
 
 require (

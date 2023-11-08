@@ -45,7 +45,7 @@ templ NewSpace(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ c.PathTo("createSpace").String() } method="POST" id="create-space">
+                    <form action={ templ.URL(c.PathTo("createSpace").String()) } method="POST" id="create-space">
                         @csrfField(c)
                         <div class="row mb-6">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>

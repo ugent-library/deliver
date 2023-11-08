@@ -76,7 +76,7 @@ templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
                 </div>
                 <div class="card-body">
                     <form
-                        action={ c.PathTo("uploadFile", "folderID", folder.ID).String() }
+                        action={ templ.URL(c.PathTo("uploadFile", "folderID", folder.ID).String()) }
                         enctype="multipart/form-data"
                         method="POST"
                     >

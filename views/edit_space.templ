@@ -46,7 +46,7 @@ templ EditSpace(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ c.PathTo("updateSpace", "spaceName", space.Name).String() } method="POST" id="update-space">
+                    <form action={ templ.URL(c.PathTo("updateSpace", "spaceName", space.Name).String()) } method="POST" id="update-space">
                         <input type="hidden" name="_method" value="PUT"/>
                         @csrfField(c)
                         <div class="row">
