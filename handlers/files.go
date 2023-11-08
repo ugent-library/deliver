@@ -9,8 +9,8 @@ import (
 
 	"github.com/oklog/ulid/v2"
 	"github.com/ugent-library/deliver/ctx"
-	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/htmx"
 )
 
 func DownloadFile(w http.ResponseWriter, r *http.Request) {

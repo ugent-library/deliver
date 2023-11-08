@@ -19,10 +19,10 @@ import (
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/handlers"
-	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstores"
 	"github.com/ugent-library/deliver/repositories"
+	"github.com/ugent-library/htmx"
 )
 
 func init() {

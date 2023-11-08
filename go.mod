@@ -1,8 +1,6 @@
 module github.com/ugent-library/deliver
 
-go 1.21
-
-toolchain go1.21.3
+go 1.21.3
 
 require (
 	entgo.io/ent v0.12.3
@@ -30,12 +28,9 @@ require (
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/klauspost/compress v1.16.5 // indirect
-	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
 )
 
 require (
@@ -66,8 +61,9 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.7.0
-	github.com/ugent-library/crypt v0.0.0-20230629141409-123bcb99fde2
+	github.com/ugent-library/crypt v0.0.0-20230630063634-8c02106fd40e // indirect
 	github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072
+	github.com/ugent-library/htmx v0.0.0-20231108084838-f694c7b88f0d
 	github.com/ugent-library/httpx v0.0.0-20231026122034-e9de0b29458b
 	github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
@@ -79,5 +75,5 @@ require (
 	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
-	nhooyr.io/websocket v1.8.7
+	nhooyr.io/websocket v1.8.10 // indirect
 )

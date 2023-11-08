@@ -11,10 +11,10 @@ import (
 
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
-	"github.com/ugent-library/deliver/htmx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
+	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
 )
 
