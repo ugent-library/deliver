@@ -5,6 +5,20 @@ import (
 	"strings"
 )
 
+func Add(err error, errs ...error) {
+	vErrs := err.(*Errors)
+	for _, e := range errs {
+		switch vErr := e.(type) {
+		case *Errors:
+			vErrs.errors = append(vErrs.errors, vErr.errors...)
+		case *Error:
+			vErrs.errors = append(vErrs.errors, vErr)
+		default:
+			// TODO panic?
+		}
+	}
+}
+
 type Errors struct {
 	errors []*Error
 }
@@ -93,6 +107,10 @@ func (e *Error) Key() string {
 
 func (e *Error) Rule() string {
 	return e.rule
+}
+
+func (e *Error) Params() []any {
+	return e.params
 }
 
 func (e *Error) Message() string {

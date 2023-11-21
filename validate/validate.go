@@ -35,90 +35,53 @@ func Validate(errs ...*Error) error {
 
 func NotEmpty[T ~string | ~[]any | ~map[any]any](key string, val T) *Error {
 	if len(val) == 0 {
-		return &Error{
-			key:  key,
-			rule: RuleNotEmpty,
-			msg:  MessageNotEmpty,
-		}
+		return NewError(key, RuleNotEmpty).WithMessage(MessageNotEmpty)
 	}
 	return nil
 }
 
 func Length[T ~string | ~[]any | ~map[any]any](key string, val T, n int) *Error {
 	if len(val) != n {
-		return &Error{
-			key:    key,
-			rule:   RuleLength,
-			params: []any{n},
-			msg:    fmt.Sprintf(MessageLength, n),
-		}
+		return NewError(key, RuleLength, n).WithMessage(fmt.Sprintf(MessageLength, n))
 	}
 	return nil
 }
 
 func LengthIn[T ~string | ~[]any | ~map[any]any](key string, val T, min, max int) *Error {
 	if len(val) < min || len(val) > max {
-		return &Error{
-			key:    key,
-			rule:   RuleLengthIn,
-			params: []any{min, max},
-			msg:    fmt.Sprintf(MessageLengthIn, min, max),
-		}
+		return NewError(key, RuleLengthIn, min, max).WithMessage(fmt.Sprintf(MessageLengthIn, min, max))
 	}
 	return nil
 }
 
 func Min[T int | int64 | float64](key string, val T, min T) *Error {
 	if val < min {
-		return &Error{
-			key:    key,
-			rule:   RuleMin,
-			params: []any{min},
-			msg:    fmt.Sprintf(MessageMin, min),
-		}
+		return NewError(key, RuleMin, min).WithMessage(fmt.Sprintf(MessageMin, min))
 	}
 	return nil
 }
 
 func Max[T int | int64 | float64](key string, val T, max T) *Error {
 	if val > max {
-		return &Error{
-			key:    key,
-			rule:   RuleMax,
-			params: []any{max},
-			msg:    fmt.Sprintf(MessageMax, max),
-		}
+		return NewError(key, RuleMax, max).WithMessage(fmt.Sprintf(MessageMax, max))
 	}
 	return nil
 }
 
 func Match(key, val string, r *regexp.Regexp) *Error {
 	if !r.MatchString(val) {
-		return &Error{
-			key:    key,
-			rule:   RuleNotEmpty,
-			params: []any{r},
-			msg:    fmt.Sprintf(MessageMatch, r),
-		}
+		return NewError(key, RuleMatch, r).WithMessage(fmt.Sprintf(MessageMatch, r))
 	}
 	return nil
 }
 
 func Alphanumeric(key, val string) *Error {
 	if !ReAlphanumeric.MatchString(val) {
-		return &Error{
-			key:  key,
-			rule: RuleAlphanumeric,
-			msg:  MessageAlphanumeric,
-		}
+		return NewError(key, RuleAlphanumeric).WithMessage(MessageAlphanumeric)
 	}
 	return nil
 }
 
 func ErrNotUnique(key string) *Error {
-	return &Error{
-		key:  key,
-		rule: RuleUnique,
-		msg:  MessageUnique,
-	}
+	return NewError(key, RuleUnique).WithMessage(MessageUnique)
 }
