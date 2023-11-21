@@ -163,6 +163,8 @@ github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b h1:4Ine7pmtSh4f8
 github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b/go.mod h1:xrhsdKpNBuNqikF0f+QQ0s3e9Y1I64PNcGQFw0M+wTU=
 github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb h1:/MM0LyIxH8y0OyHfQhCNUKMLeeraKBOkXstI1H5JEY4=
 github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb/go.mod h1:2LCM3IglxvIwUSO610PQUJ9aA3kROToNfUGCip6/Ozs=
+github.com/ugent-library/okay v0.0.0-20231121155656-7bb0f0b425fc h1:poyur4yKa23ZufqyGXsJ6SyUl/aEr3JLj/oJMZaqsV8=
+github.com/ugent-library/okay v0.0.0-20231121155656-7bb0f0b425fc/go.mod h1:zF9L8aA06ik8U87qGR1GEhuLbxSZh+HmSEOfF3Z0Mrw=
 github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce h1:+TNoKsfMTTveEe1RQRaJ7TZnHVh1k98Nk+4gTg2mENA=
 github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce/go.mod h1:CzM8mO+4QRZi4Sx0rPTt9csR6b2IgbIyoveLwFz+bQM=
 github.com/zclconf/go-cty v1.13.2 h1:4GvrUxe/QUDYuJKAav4EYqdM47/kZa672LwmXFmEKT0=

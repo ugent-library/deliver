@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/okay"
 )
 
 type Space struct {
@@ -17,9 +17,9 @@ type Space struct {
 }
 
 func (s *Space) Validate() error {
-	return validate.Validate(
-		validate.NotEmpty("name", s.Name),
-		validate.LengthIn("name", s.Name, 1, 50),
-		validate.Alphanumeric("name", s.Name),
+	return okay.Validate(
+		okay.NotEmpty("name", s.Name),
+		okay.LengthIn("name", s.Name, 1, 50),
+		okay.Alphanumeric("name", s.Name),
 	)
 }

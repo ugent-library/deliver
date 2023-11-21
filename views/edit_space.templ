@@ -5,10 +5,10 @@ import (
     "strings"
     "github.com/ugent-library/deliver/ctx"
     "github.com/ugent-library/deliver/models"
-    "github.com/ugent-library/deliver/validate"
+    "github.com/ugent-library/okay"
 )
 
-templ EditSpace(c *ctx.Ctx, space *models.Space, errs *validate.Errors) {
+templ EditSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) {
     @pageLayout(c, fmt.Sprintf("Edit %s", space.Name)) {
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">

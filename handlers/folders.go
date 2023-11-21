@@ -12,10 +12,10 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/validate"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
+	"github.com/ugent-library/okay"
 )
 
 type FolderForm struct {
@@ -69,7 +69,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 func EditFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
-	views.EditFolder(c, folder, validate.NewErrors()).Render(r.Context(), w)
+	views.EditFolder(c, folder, okay.NewErrors()).Render(r.Context(), w)
 }
 
 func UpdateFolder(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +85,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 	folder.Name = b.Name
 
 	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
-		validationErrors := validate.NewErrors()
+		validationErrors := okay.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return

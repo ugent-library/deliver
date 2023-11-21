@@ -8,7 +8,7 @@ import (
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/okay"
 )
 
 type FoldersRepo struct {
@@ -42,7 +42,7 @@ func (r *FoldersRepo) Create(ctx context.Context, f *models.Folder) error {
 		SetExpiresAt(f.ExpiresAt).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
-		return validate.NewErrors(validate.ErrNotUnique("name"))
+		return okay.NewErrors(okay.ErrNotUnique("name"))
 	}
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (r *FoldersRepo) Update(ctx context.Context, f *models.Folder) error {
 		SetName(f.Name).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
-		return validate.NewErrors(validate.ErrNotUnique("name"))
+		return okay.NewErrors(okay.ErrNotUnique("name"))
 	}
 	if err != nil {
 		return err

@@ -9,7 +9,7 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/okay"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
 )
@@ -58,7 +58,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.ShowSpace(c, space, userSpaces, &models.Folder{}, validate.NewErrors()).Render(r.Context(), w)
+	views.ShowSpace(c, space, userSpaces, &models.Folder{}, okay.NewErrors()).Render(r.Context(), w)
 }
 
 func ShowSpace(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +67,7 @@ func ShowSpace(w http.ResponseWriter, r *http.Request) {
 
 func NewSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
-	views.NewSpace(c, &models.Space{}, validate.NewErrors()).Render(r.Context(), w)
+	views.NewSpace(c, &models.Space{}, okay.NewErrors()).Render(r.Context(), w)
 }
 
 func CreateSpace(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := c.Repo.Spaces.Create(r.Context(), space); err != nil {
-		validationErrors := validate.NewErrors()
+		validationErrors := okay.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
@@ -109,7 +109,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 func EditSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
-	views.EditSpace(c, space, validate.NewErrors()).Render(r.Context(), w)
+	views.EditSpace(c, space, okay.NewErrors()).Render(r.Context(), w)
 }
 
 func UpdateSpace(w http.ResponseWriter, r *http.Request) {
@@ -125,7 +125,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 	space.Admins = reSplitAdmins.Split(b.Admins, -1)
 
 	if err := c.Repo.Spaces.Update(r.Context(), space); err != nil {
-		validationErrors := validate.NewErrors()
+		validationErrors := okay.NewErrors()
 		if err != nil && !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
@@ -142,7 +142,7 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
 
-	validationErrors := validate.NewErrors()
+	validationErrors := okay.NewErrors()
 	if err != nil && !errors.As(err, &validationErrors) {
 		c.HandleError(w, r, err)
 		return

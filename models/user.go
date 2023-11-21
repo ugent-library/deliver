@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"time"
 
-	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/okay"
 )
 
 type User struct {
@@ -19,11 +19,11 @@ type User struct {
 }
 
 func (u *User) Validate() error {
-	return validate.Validate(
-		validate.NotEmpty("username", u.Username),
-		validate.LengthIn("username", u.Username, 1, 50),
-		validate.NotEmpty("name", u.Name),
-		validate.NotEmpty("email", u.Email),
+	return okay.Validate(
+		okay.NotEmpty("username", u.Username),
+		okay.LengthIn("username", u.Username, 1, 50),
+		okay.NotEmpty("name", u.Name),
+		okay.NotEmpty("email", u.Email),
 	)
 }
 

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/mozillazg/go-unidecode"
-	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/okay"
 )
 
 var reSlug = regexp.MustCompile("[^a-zA-Z0-9-]+")
@@ -42,8 +42,8 @@ func (f *Folder) Slug() string {
 }
 
 func (f *Folder) Validate() error {
-	return validate.Validate(
-		validate.NotEmpty("name", f.Name),
-		validate.LengthIn("name", f.Name, 1, 100),
+	return okay.Validate(
+		okay.NotEmpty("name", f.Name),
+		okay.LengthIn("name", f.Name, 1, 100),
 	)
 }

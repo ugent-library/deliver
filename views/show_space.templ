@@ -6,10 +6,10 @@ import (
     "github.com/ugent-library/friendly"
     "github.com/ugent-library/deliver/ctx"
     "github.com/ugent-library/deliver/models"
-    "github.com/ugent-library/deliver/validate"
+    "github.com/ugent-library/okay"
 )
 
-templ ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, folder *models.Folder, errs *validate.Errors) {
+templ ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
     @pageLayout(c, space.Name) {
     <div class="c-sub-sidebar c-sidebar--bordered"
         hx-ext="ws"

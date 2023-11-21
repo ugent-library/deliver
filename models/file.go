@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/ugent-library/deliver/validate"
+	"github.com/ugent-library/okay"
 )
 
 type File struct {
@@ -21,8 +21,8 @@ type File struct {
 }
 
 func (f *File) Validate() error {
-	return validate.Validate(
-		validate.NotEmpty("name", f.Name),
-		validate.Min("size", f.Size, 1),
+	return okay.Validate(
+		okay.NotEmpty("name", f.Name),
+		okay.Min("size", f.Size, 1),
 	)
 }
