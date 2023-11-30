@@ -1,16 +1,21 @@
 {
-    "private": true,
-    "devDependencies": {
-        "laravel-mix": "^6.0.11",
-        "resolve-url-loader": "^4.0.0",
-        "sass": "^1.35.1",
-        "sass-loader": "^12.1.0",
-        "uglify-js": "^3.14.2"
-    },
-    "dependencies": {
-        "@popperjs/core": "^2.11.8",
-        "bootstrap": "^5.2.3",
-        "bootstrap.native": "5.0.6",
-        "htmx.org": "^1.9.0"
-    }
+  "private": true,
+  "scripts": {
+    "precommit": "node node_modules/js-precommit-hook"
+  },
+  "precommit": "precommit",
+  "devDependencies": {
+    "js-precommit-hook": "github:ugent-library/js-precommit-hook",
+    "laravel-mix": "^6.0.11",
+    "resolve-url-loader": "^4.0.0",
+    "sass": "^1.35.1",
+    "sass-loader": "^12.1.0",
+    "uglify-js": "^3.14.2"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.2.3",
+    "bootstrap.native": "5.0.6",
+    "htmx.org": "^1.9.0"
+  }
 }
