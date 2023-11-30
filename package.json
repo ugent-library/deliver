@@ -12,6 +12,7 @@
   "precommit": "precommit",
   "devDependencies": {
     "cypress": "^13.6.0",
+    "cypress-common": "github:ugent-library/cypress-common#3.16.1",
     "cypress-dotenv": "^2.0.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
     "laravel-mix": "^6.0.11",

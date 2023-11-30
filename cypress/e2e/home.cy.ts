@@ -18,8 +18,8 @@ describe('The home page', () => {
 
     const assertLoginRedirection = href => {
       cy.request(href).then(response => {
-        expect(response.isOkStatusCode).to.be.true
-        expect(response.redirects).is.an('array').that.has.length(1)
+        expect(response).to.have.property('isOkStatusCode', true)
+        expect(response).to.have.property('redirects').that.is.an('array').that.has.length(1)
 
         const redirects = response.redirects
           .map(url => url.replace(/^3\d\d\: /, '')) // Redirect entries are in form '3XX: {url}'
@@ -29,9 +29,11 @@ describe('The home page', () => {
       })
     }
 
-    cy.contains('header .btn', 'Log in').invoke('attr', 'href').then(assertLoginRedirection)
-
-    cy.contains('main .btn', 'Log in').invoke('attr', 'href').then(assertLoginRedirection)
+    cy.get('header .btn:contains("Log in"), main .btn:contains("Log in")')
+      .should('have.length', 2)
+      .map('href')
+      .unique() // No need to check the same URL more than once
+      .each(assertLoginRedirection)
   })
 
   it('should be able to load the homepage as space admin', () => {
