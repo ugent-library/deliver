@@ -2,7 +2,7 @@ import { defineConfig } from 'cypress'
 import * as dotenvPlugin from 'cypress-dotenv'
 
 export default defineConfig({
-  // projectId: '...',
+  projectId: 'fm8w1c',
 
   e2e: {
     baseUrl: 'https://deliver.libtest.ugent.be/',

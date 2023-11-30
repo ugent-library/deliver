@@ -23,3 +23,9 @@ reflex.conf
 # Config
 .env*
 !.env.example
+
+# Cypress
+cypress.env.json
+cypress/videos
+cypress/screenshots
+cypress/cypress-record.sh
