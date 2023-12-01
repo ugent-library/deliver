@@ -79,7 +79,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO add ToSpace() method to SpaceForm or add a ultity BindSpace function?
+	// TODO add ToSpace() method to SpaceForm or add a utility BindSpace function?
 	space := &models.Space{
 		Name:   b.Name,
 		Admins: reSplitAdmins.Split(b.Admins, -1),
@@ -98,7 +98,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 
 	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
-		Body:         "Space created succesfully",
+		Body:         "Space created successfully",
 		DismissAfter: 3 * time.Second,
 	})
 
