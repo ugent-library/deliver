@@ -58,7 +58,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 
 	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
-		Body:         "Folder created succesfully",
+		Body:         "Folder created successfully",
 		DismissAfter: 3 * time.Second,
 	})
 
@@ -118,7 +118,7 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	})))
 	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",
-		Body:         "Folder deleted succesfully",
+		Body:         "Folder deleted successfully",
 		DismissAfter: 3 * time.Second,
 	})
 
