@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["htmx", "httperror", "liblogin"]
+  "cSpell.words": ["htmx", "httperror", "liblogin"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
