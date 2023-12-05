@@ -66,7 +66,7 @@ require (
 	github.com/ugent-library/htmx v0.0.0-20231108084838-f694c7b88f0d
 	github.com/ugent-library/httpx v0.0.0-20231026122034-e9de0b29458b
 	github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb
-	github.com/ugent-library/okay v0.0.0-20231122144918-c2ad1fa9fa73
+	github.com/ugent-library/okay v0.0.0-20231205122923-396c4d3a29f2
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

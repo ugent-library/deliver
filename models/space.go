@@ -19,7 +19,7 @@ type Space struct {
 func (s *Space) Validate() error {
 	return okay.Validate(
 		okay.NotEmpty("name", s.Name),
-		okay.LengthIn("name", s.Name, 1, 50),
+		okay.LengthBetween("name", s.Name, 1, 50),
 		okay.Alphanumeric("name", s.Name),
 	)
 }

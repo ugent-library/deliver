@@ -21,7 +21,7 @@ type User struct {
 func (u *User) Validate() error {
 	return okay.Validate(
 		okay.NotEmpty("username", u.Username),
-		okay.LengthIn("username", u.Username, 1, 50),
+		okay.LengthBetween("username", u.Username, 1, 50),
 		okay.NotEmpty("name", u.Name),
 		okay.NotEmpty("email", u.Email),
 	)
