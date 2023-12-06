@@ -1,6 +1,6 @@
 const DEFAULT_SPACE = 'test'
 
-describe('Clean up test folders and files', () => {
+describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
   it('should clean up all files and folders', () => {
     cy.loginAsSpaceAdmin()
 
