@@ -12,7 +12,7 @@ export function logCommand(name, consoleProps = {}, message: unknown = '', $el =
 }
 
 export function updateLogMessage(log: Cypress.Log, append: unknown) {
-  const message = log.get('message').split(', ')
+  const message = log.get('message').split(', ').filter(Boolean)
 
   message.push(append)
 
