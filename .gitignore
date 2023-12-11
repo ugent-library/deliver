@@ -28,4 +28,5 @@ reflex.conf
 cypress.env.json
 cypress/videos
 cypress/screenshots
+cypress/downloads
 cypress/cypress-record.sh
