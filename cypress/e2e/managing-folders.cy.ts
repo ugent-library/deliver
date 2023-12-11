@@ -129,5 +129,40 @@ describe('Managing folders', () => {
     cy.location('pathname').should('eq', '@previousPathname')
   })
 
-  it('should be possible to delete a folder')
+  it('should be possible to delete a folder', () => {
+    const FOLDER_NAME = `CYPRESS-${getRandomText()}`
+
+    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+
+    cy.contains('a', FOLDER_NAME).should('not.exist')
+
+    cy.setFieldByLabel('Folder name', FOLDER_NAME)
+    cy.contains('.btn', 'Make folder').click()
+
+    cy.ensureToast('Folder created successfully').closeToast()
+    cy.ensureNoToast()
+
+    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+
+    cy.contains('a', FOLDER_NAME).should('exist')
+
+    cy.contains('a', FOLDER_NAME).click()
+
+    cy.contains('.btn', 'Edit').click()
+
+    // TODO Remove when issue #99 is resolved
+    Cypress.on('uncaught:exception', () => {
+      // returning false here prevents Cypress from failing the test
+      return false
+    })
+
+    cy.contains('.btn', 'Delete folder').click()
+
+    cy.location('pathname').should('eq', `/spaces/${DEFAULT_SPACE}`)
+
+    cy.ensureToast('Folder deleted successfully').closeToast()
+    cy.ensureNoToast()
+
+    cy.contains('a', FOLDER_NAME).should('not.exist')
+  })
 })
