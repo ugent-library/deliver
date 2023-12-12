@@ -72,13 +72,10 @@ describe('Managing files', () => {
   it('should display a progress file during larger uploads', () => {
     cy.get('#file-upload-progress').as('uploadProgress').should('not.be.visible')
 
-    cy.intercept('POST', '/folders/*/files', req => {
-      req.on('response', res => {
-        res.setDelay(500)
-      })
-    }).as('uploadFile')
+    cy.intercept('POST', '/folders/*/files').as('uploadFile')
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/large.pdf')
+    const fileName = 'large-file.pdf'
+    cy.get('input[type=file]').selectFile(generateLargeFile(fileName, 1))
 
     cy.get('@uploadProgress').should('be.visible').contains('.btn', 'Cancel upload').should('be.visible')
     cy.get('@uploadProgress').contains('0%')
@@ -95,10 +92,36 @@ describe('Managing files', () => {
 
     cy.wait('@uploadFile')
 
-    assertFileUpload('large.pdf')
+    assertFileUpload(fileName)
   })
 
-  it('should be possible to cancel an upload')
+  it('should be possible to cancel an upload', () => {
+    const fileName = 'very-large-file.txt'
+    cy.get('input[type=file]').selectFile(generateLargeFile(fileName, 5))
+
+    cy.wait(50)
+
+    cy.get('#file-upload-progress').as('uploadProgress').should('be.visible').contains('.btn', 'Cancel upload').click()
+
+    cy.get('@uploadProgress').contains('.btn', 'Cancel upload').should('not.exist')
+
+    cy.get('@uploadProgress').contains('File upload aborted by you').should('be.visible')
+
+    cy.get('@uploadProgress').contains('.btn', 'Remove').click()
+
+    cy.get('@uploadProgress').should('not.be.visible')
+
+    cy.contains(fileName).should('not.exist')
+
+    // Wait some time to make sure the file is not still being processed on the server
+    cy.wait(2000)
+
+    cy.reload()
+
+    cy.contains(fileName).should('not.exist')
+    cy.contains('.card-header', 'Available files').should('contain', '0 items')
+    cy.get('#files table tbody tr').should('have.length', 0)
+  })
 
   it('should be possible to consult the public shareable link anonymously and download all files')
 
@@ -136,5 +159,18 @@ describe('Managing files', () => {
     if (mimeType) {
       cy.get('@testFile').should('contain', mimeType)
     }
+  }
+
+  function generateLargeFile(fileName: string, fileSizeInMegaByte: number, mimeType?: string) {
+    const largeString = 'a'.repeat(fileSizeInMegaByte * 1024 * 1024) // 5MB
+    const buffer = Buffer.from(largeString)
+
+    const file: Cypress.FileReferenceObject = {
+      fileName,
+      contents: buffer,
+      mimeType,
+    }
+
+    return file
   }
 })
