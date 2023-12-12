@@ -30,9 +30,7 @@ describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
   }
 
   function deleteTestFolder(_index: number, link: HTMLAnchorElement) {
-    cy.visit(link.href)
-
-    cy.contains('.btn', 'Edit').click()
+    cy.visit(`${link.href}/edit`)
 
     cy.contains('.btn', 'Delete folder').click()
   }
