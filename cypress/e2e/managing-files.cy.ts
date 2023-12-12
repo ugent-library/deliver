@@ -16,48 +16,50 @@ describe('Managing files', () => {
 
     cy.setFieldByLabel('Folder name', FOLDER_NAME)
     cy.contains('.btn', 'Make folder').click()
+
+    cy.ensureToast().closeToast()
   })
 
   it('should be possible to upload multiple file types ', () => {
     cy.contains('.card-header', 'Available files').should('contain', '0 items')
     cy.get('#files table').should('not.exist')
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/test.pdf')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.pdf', { action: 'select' })
     assertFileUpload('test.pdf', {
       sortOrder: 0,
       md5Checksum: 'f4e486fddb1f3d9d438926f053d53c6a',
       mimeType: 'application/pdf',
     })
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/test.json')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.json', { action: 'drag-drop' })
     assertFileUpload('test.json', {
       sortOrder: 0,
       md5Checksum: '58e0494c51d30eb3494f7c9198986bb9',
       mimeType: 'application/json',
     })
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/test.txt')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.txt', { action: 'select' })
     assertFileUpload('test.txt', {
       sortOrder: 2,
       md5Checksum: '7215ee9c7d9dc229d2921a40e899ec5f',
       mimeType: 'text/plain',
     })
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/test.docx')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.docx', { action: 'drag-drop' })
     assertFileUpload('test.docx', {
       sortOrder: 0,
       md5Checksum: 'f694ce9bacf8d1d83e4978e43908f4e8',
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     })
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/test.xlsx')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.xlsx', { action: 'select' })
     assertFileUpload('test.xlsx', {
       sortOrder: 4,
       md5Checksum: '351aaa090424e8614e5d80efed489e33',
       mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     })
 
-    cy.get('input[type=file]').selectFile('cypress/fixtures/test.png')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.png', { action: 'drag-drop' })
     assertFileUpload('test.png', {
       sortOrder: 3,
       md5Checksum: '6e516cbb6a21ec3b78228829bdec6bd9',
