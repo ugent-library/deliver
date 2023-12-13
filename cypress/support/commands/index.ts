@@ -6,6 +6,7 @@ import ensureNoToast from './ensure-no-toast'
 import setFieldByLabel from './set-field-by-label'
 import getClipboardText from './get-clipboard-text'
 import extractFolderId from './extract-folder-id'
+import logout from './logout'
 
 // Child commands
 import finishLog from './finish-log'
@@ -30,6 +31,8 @@ Cypress.Commands.addAll({
   getClipboardText,
 
   extractFolderId,
+
+  logout,
 })
 
 // Child commands

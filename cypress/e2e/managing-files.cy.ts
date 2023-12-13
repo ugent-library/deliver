@@ -7,6 +7,8 @@ describe('Managing files', () => {
   let FILE_COUNT: number
 
   beforeEach(() => {
+    cy.task('clearDownloads')
+
     FILE_COUNT = 0
     FOLDER_NAME = `CYPRESS-${getRandomText()}`
 
@@ -162,9 +164,142 @@ describe('Managing files', () => {
     cy.get('#files table tbody tr').should('have.length', 0)
   })
 
-  it('should be possible to consult the public shareable link anonymously and download all files')
+  it('should be possible to consult the public shareable link anonymously, download all files and keep download counts', () => {
+    cy.url().as('adminUrl')
+    cy.extractFolderId().getFolderShareUrl(FOLDER_NAME).as('shareUrl')
 
-  it('should keep the download count for each file')
+    cy.intercept('POST', '/folders/*/files').as('uploadFile')
+
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.txt')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.pdf')
+    cy.get('input[type=file]').selectFile('cypress/fixtures/test.json')
+
+    cy.wait('@uploadFile')
+
+    assertNumberOfDownloads('test.txt', 0)
+    assertNumberOfDownloads('test.pdf', 0)
+    assertNumberOfDownloads('test.json', 0)
+
+    cy.logout()
+
+    cy.visit('@shareUrl')
+
+    cy.contains(`Library delivery from ${DEFAULT_SPACE}: ${FOLDER_NAME}`)
+      .should('be.visible')
+      .then(function () {
+        cy.contains(this.shareUrl).should('be.visible')
+        cy.contains(this.adminUrl).should('not.exist')
+
+        assertNumberOfDownloads('test.txt', 0)
+        assertNumberOfDownloads('test.pdf', 0)
+        assertNumberOfDownloads('test.json', 0)
+
+        const zipFileName = `cypress/downloads/${this.folderId}-${FOLDER_NAME}.zip`
+        cy.readFile(zipFileName).should('not.exist')
+        cy.contains('.btn', 'Download all files').click()
+        cy.readFile(zipFileName)
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 1)
+        assertNumberOfDownloads('test.pdf', 1)
+        assertNumberOfDownloads('test.json', 1)
+
+        // Now test each individual download using the file name link in the first column
+        cy.readFile('cypress/downloads/test.txt').should('not.exist')
+        cy.contains('test.txt').click()
+        cy.readFile('cypress/downloads/test.txt')
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 2)
+        assertNumberOfDownloads('test.pdf', 1)
+        assertNumberOfDownloads('test.json', 1)
+
+        cy.readFile('cypress/downloads/test.pdf').should('not.exist')
+        cy.contains('test.pdf').click()
+        cy.readFile('cypress/downloads/test.pdf')
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 2)
+        assertNumberOfDownloads('test.pdf', 2)
+        assertNumberOfDownloads('test.json', 1)
+
+        cy.readFile('cypress/downloads/test.json').should('not.exist')
+        cy.contains('test.json').click()
+        cy.readFile('cypress/downloads/test.json')
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 2)
+        assertNumberOfDownloads('test.pdf', 2)
+        assertNumberOfDownloads('test.json', 2)
+
+        cy.task('clearDownloads')
+
+        // Now test the same using the "Download" links in the last column
+        cy.readFile('cypress/downloads/test.txt').should('not.exist')
+        cy.contains('table tbody tr', 'test.tx').find('td').last().contains('a', 'Download').click()
+        cy.readFile('cypress/downloads/test.txt')
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 3)
+        assertNumberOfDownloads('test.pdf', 2)
+        assertNumberOfDownloads('test.json', 2)
+
+        cy.readFile('cypress/downloads/test.pdf').should('not.exist')
+        cy.contains('table tbody tr', 'test.pdf').find('td').last().contains('a', 'Download').click()
+        cy.readFile('cypress/downloads/test.pdf')
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 3)
+        assertNumberOfDownloads('test.pdf', 3)
+        assertNumberOfDownloads('test.json', 2)
+
+        cy.readFile('cypress/downloads/test.json').should('not.exist')
+        cy.contains('table tbody tr', 'test.json').find('td').last().contains('a', 'Download').click()
+        cy.readFile('cypress/downloads/test.json')
+
+        cy.reload()
+        assertNumberOfDownloads('test.txt', 3)
+        assertNumberOfDownloads('test.pdf', 3)
+        assertNumberOfDownloads('test.json', 3)
+      })
+
+    cy.task('clearDownloads')
+
+    cy.loginAsSpaceAdmin()
+
+    cy.visit('@adminUrl')
+
+    assertNumberOfDownloads('test.txt', 3)
+    assertNumberOfDownloads('test.pdf', 3)
+    assertNumberOfDownloads('test.json', 3)
+
+    cy.readFile('cypress/downloads/test.txt').should('not.exist')
+    cy.contains('test.txt').click()
+    cy.readFile('cypress/downloads/test.txt')
+
+    cy.reload()
+    assertNumberOfDownloads('test.txt', 4)
+    assertNumberOfDownloads('test.pdf', 3)
+    assertNumberOfDownloads('test.json', 3)
+
+    cy.readFile('cypress/downloads/test.pdf').should('not.exist')
+    cy.contains('test.pdf').click()
+    cy.readFile('cypress/downloads/test.pdf')
+
+    cy.reload()
+    assertNumberOfDownloads('test.txt', 4)
+    assertNumberOfDownloads('test.pdf', 4)
+    assertNumberOfDownloads('test.json', 3)
+
+    cy.readFile('cypress/downloads/test.json').should('not.exist')
+    cy.contains('test.json').click()
+    cy.readFile('cypress/downloads/test.json')
+
+    cy.reload()
+    assertNumberOfDownloads('test.txt', 4)
+    assertNumberOfDownloads('test.pdf', 4)
+    assertNumberOfDownloads('test.json', 4)
+  })
 
   it('should be possible to delete files')
 
@@ -211,5 +346,9 @@ describe('Managing files', () => {
     }
 
     return file
+  }
+
+  function assertNumberOfDownloads(fileName: string, expectedNumberOfDownloads: number) {
+    cy.contains('table tbody tr', fileName).find('td').eq(3).should('have.text', expectedNumberOfDownloads)
   }
 })
