@@ -67,9 +67,48 @@ describe('Managing files', () => {
     })
   })
 
-  it('should be possible to upload multiple files simultaneously')
+  it('should be possible to upload multiple files simultaneously', () => {
+    cy.contains('.card-header', 'Available files').should('contain', '0 items')
+    cy.get('#files table').should('not.exist')
+    cy.get('#file-upload-progress').as('uploadProgress').should('not.be.visible')
 
-  it('should display a progress file during larger uploads', () => {
+    cy.intercept('POST', '/folders/*/files', req => {
+      req.on('response', res => {
+        // Cause an artificial delay in the response so all assertions have time to succeed during uploading
+        res.setDelay(1000)
+      })
+    }).as('uploadFiles')
+
+    cy.get('input[type=file]').selectFile([
+      generateLargeFile('large.txt', 1),
+      'cypress/fixtures/test.pdf',
+      'cypress/fixtures/test.txt',
+      'cypress/fixtures/test.json',
+    ])
+
+    cy.get('@uploadProgress')
+      .should('be.visible')
+      .get('.btn:contains("Cancel upload")')
+      .should('have.length', 4)
+      .and('be.visible')
+    cy.get('@uploadProgress')
+      .should('contain', 'large.txt')
+      .and('contain', 'test.pdf')
+      .and('contain', 'test.txt')
+      .and('contain', 'test.json')
+
+    cy.wait('@uploadFiles')
+
+    cy.contains('.card-header', 'Available files').should('contain', '4 items')
+    cy.get('#files table')
+      .should('be.visible')
+      .and('contain', 'large.txt')
+      .and('contain', 'test.pdf')
+      .and('contain', 'test.txt')
+      .and('contain', 'test.json')
+  })
+
+  it('should display a progress file during uploads', () => {
     cy.get('#file-upload-progress').as('uploadProgress').should('not.be.visible')
 
     cy.intercept('POST', '/folders/*/files').as('uploadFile')
@@ -163,7 +202,7 @@ describe('Managing files', () => {
 
   function generateLargeFile(fileName: string, fileSizeInMegaByte: number, mimeType?: string) {
     const largeString = 'a'.repeat(fileSizeInMegaByte * 1024 * 1024) // 5MB
-    const buffer = Buffer.from(largeString)
+    const buffer = Cypress.Buffer.from(largeString)
 
     const file: Cypress.FileReferenceObject = {
       fileName,
