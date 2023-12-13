@@ -44,6 +44,6 @@ func (f *Folder) Slug() string {
 func (f *Folder) Validate() error {
 	return okay.Validate(
 		okay.NotEmpty("name", f.Name),
-		okay.LengthIn("name", f.Name, 1, 100),
+		okay.LengthBetween("name", f.Name, 1, 100),
 	)
 }

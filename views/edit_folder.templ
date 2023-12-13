@@ -44,8 +44,6 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                                     @csrfField(c)
                                     <button
                                         class="btn btn-link btn-link-muted"
-                                        data-bs-toggle="modal"
-                                        data-target="#confirm-delete-folder"
                                     >
                                         <i class="if if-delete"></i>
                                         <span class="btn-text">Delete folder</span>
@@ -94,31 +92,6 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirm-delete-folder" class="modal hide" aria-modal="true" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="c-blank-slate c-blank-slate-muted">
-                        <div class="bc-avatar">
-                            <i class="if if-alert"></i>
-                        </div>
-                        <h4>
-                            Are you sure you want to delete the folder
-                            <br/>
-                            <strong>{ folder.Name }</strong>
-                            and its files?
-                        </h4>
-                        <p>You cannot undo this action or recover the files.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-link" data-bs-dismiss="modal">No, cancel</button>
-                    <button class="btn btn-danger" data-submit-target="#delete-folder">Yes, delete this folder</button>
                 </div>
             </div>
         </div>

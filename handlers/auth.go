@@ -34,7 +34,7 @@ func AuthCallback(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(24 * time.Hour * 7),
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteDefaultMode,
 	})
 
 	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
@@ -62,7 +62,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now(),
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteDefaultMode,
 	})
 
 	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)

@@ -53,7 +53,11 @@ func Set(config Config) func(http.Handler) http.Handler {
 				CSRFToken: csrf.Token(r),
 			}
 			if c.scheme == "" {
-				c.scheme = "http"
+				if config.Env == "local" {
+					c.scheme = "http"
+				} else {
+					c.scheme = "https"
+				}
 			}
 
 			r = r.WithContext(context.WithValue(r.Context(), ctxKey, c))
