@@ -1,14 +1,12 @@
 package repositories
 
 import (
-	"context"
 	"database/sql"
 
 	"entgo.io/ent/dialect"
 	sqldialect "entgo.io/ent/dialect/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/ugent-library/deliver/ent"
-	"github.com/ugent-library/deliver/ent/migrate"
 )
 
 type Repo struct {
@@ -26,13 +24,6 @@ func New(conn string) (*Repo, error) {
 
 	driver := sqldialect.OpenDB(dialect.Postgres, db)
 	client := ent.NewClient(ent.Driver(driver))
-
-	err = client.Schema.Create(context.TODO(),
-		migrate.WithDropIndex(true),
-	)
-	if err != nil {
-		return nil, err
-	}
 
 	return &Repo{
 		Users:   &UsersRepo{client},
