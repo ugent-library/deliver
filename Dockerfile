@@ -1,8 +1,9 @@
-FROM golang:alpine AS base
-
 # dev target
-FROM base as dev
+FROM node:current-alpine as dev
 WORKDIR /src
+COPY --from=golang:alpine /usr/local/go/ /usr/local/go/
+ENV GOPATH=/usr/local/go
+ENV PATH="${GOPATH}/bin:${PATH}"
 RUN go install github.com/jackc/tern/v2@latest
 RUN go install github.com/cespare/reflex@latest
 ENV TERN_CONFIG /src/tern.docker.conf
@@ -10,7 +11,7 @@ ENV TERN_MIGRATIONS /src/db/migrations
 CMD ["reflex", "-d",  "none",  "-c", "reflex.docker.conf"]
 
 # build stage
-FROM base AS build
+FROM golang:alpine AS build
 WORKDIR /build
 COPY . .
 RUN go get -d -v ./...
