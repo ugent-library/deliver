@@ -5,6 +5,7 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+      target: dev
     environment:
       DELIVER_ENV: local
       DELIVER_HOST: ""
@@ -19,6 +20,8 @@ services:
       DELIVER_COOKIE_SECRET: "1234"
     ports:
       - "3000:3000"
+    volumes:
+      - .:/src
     depends_on:
       - postgres
       - minio
@@ -26,8 +29,9 @@ services:
       - sh
       - -c
       - |
-        /dist/tern migrate
-        /dist/app server
+        npm install
+        tern migrate
+        reflex -d none -c reflex.conf
 
   postgres:
     image: postgres:16-alpine
