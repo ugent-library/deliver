@@ -23,3 +23,5 @@ reflex.conf
 # Config
 .env*
 !.env.example
+
+docker-compose.yml

@@ -1,5 +1,14 @@
 FROM golang:alpine AS base
 
+# dev target
+FROM base as dev
+WORKDIR /src
+RUN go install github.com/jackc/tern/v2@latest
+RUN go install github.com/cespare/reflex@latest
+ENV TERN_CONFIG /src/tern.docker.conf
+ENV TERN_MIGRATIONS /src/db/migrations
+CMD ["reflex", "-d",  "none",  "-c", "reflex.docker.conf"]
+
 # build stage
 FROM base AS build
 WORKDIR /build
