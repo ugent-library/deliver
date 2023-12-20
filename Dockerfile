@@ -1,5 +1,7 @@
+FROM golang:alpine AS base
+
 # build stage
-FROM golang:alpine AS build
+FROM base AS build
 WORKDIR /build
 COPY . .
 RUN go get -d -v ./...
