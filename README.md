@@ -27,12 +27,22 @@ Deliver is configured with these environment variables:
 * `DELIVER_MAX_FILE_SIZE`
 * `DELIVER_TIMEZONE`
 
-## Development setup with live reload
+## Docker Setup
 
-For development you will also need:
+You will need Docker and git to get started
+
+* `cp docker-compose.example.yml docker-compose.yml`
+* configure the oidc provider
+* `docker compose up`
+
+## Local development setup with live reload
+
+For local development you will also need:
 
 * Go >= 1.20
-* Node.js
+* A recent version of node.js
+* A recent version of Postgres
+* An S3 compatible object store
 
 Initial setup:
 
