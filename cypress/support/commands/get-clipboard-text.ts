@@ -1,4 +1,4 @@
-import { logCommand, updateConsoleProps } from './helpers'
+import { logCommand } from './helpers'
 
 export default function getClipboardText(): Cypress.Chainable<string> {
   const log = logCommand('getClipboardText')

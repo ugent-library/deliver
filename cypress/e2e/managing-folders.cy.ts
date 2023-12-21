@@ -24,13 +24,37 @@ describe('Managing folders', () => {
 
     cy.get('.bc-toolbar-title').should('contain.text', DEFAULT_SPACE).should('contain.text', FOLDER_NAME)
 
+    cy.get('.btn:contains("Copy public shareable link")')
+      .as('copyButton')
+      .next('input')
+      .should('have.value', '@shareUrl')
     cy.getClipboardText().should('not.eq', '@shareUrl')
-    cy.contains('.btn', 'Copy public shareable link').click()
+    cy.get('@copyButton').click().should('contain.text', 'Copied')
     cy.getClipboardText().should('eq', '@shareUrl')
+
+    // Original text resets after 1.5s
+    cy.wait(1500)
+    cy.get('@copyButton').should('contain.text', 'Copy public shareable link')
 
     cy.visit(`/spaces/${DEFAULT_SPACE}`)
 
-    cy.contains('a', FOLDER_NAME).should('exist')
+    cy.contains('tr', FOLDER_NAME)
+      .should('exist')
+      .find('td')
+      .as('folderRow')
+      .eq(3)
+      .should('contain.text', '0 files')
+      .should('contain.text', '0 B')
+      .should('contain.text', '0 downloads')
+
+    cy.get('@folderRow').contains('.btn', 'Copy link').as('copyButton').next('input').should('have.value', '@shareUrl')
+    cy.setClipboardText('')
+    cy.get('@copyButton').click().should('contain.text', 'Copied')
+    cy.getClipboardText().should('eq', '@shareUrl')
+
+    // Original text resets after 1.5s
+    cy.wait(1500)
+    cy.get('@copyButton').should('contain.text', 'Copy link')
   })
 
   it('should return an error if a new folder name is already in use within the same space', () => {
