@@ -19,6 +19,11 @@ export default defineConfig({
       on('task', {
         clearDownloads() {
           const downloadsFolder = path.resolve(config.downloadsFolder)
+
+          if (!fs.existsSync(downloadsFolder)) {
+            fs.mkdirSync(downloadsFolder, { recursive: true })
+          }
+
           const downloads = fs.readdirSync(downloadsFolder)
 
           downloads.forEach(file => {
