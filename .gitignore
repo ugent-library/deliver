@@ -25,3 +25,10 @@ reflex.conf
 !.env.example
 
 docker-compose.yml
+
+# Cypress
+cypress.env.json
+cypress/videos
+cypress/screenshots
+cypress/downloads
+cypress/cypress-record.sh
