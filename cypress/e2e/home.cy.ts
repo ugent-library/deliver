@@ -48,7 +48,16 @@ describe('The home page', () => {
 
     cy.get('.c-sidebar').should('have.length', 1).should('have.class', 'c-sidebar--dark-gray')
 
+    cy.wrap(Cypress.env('DEFAULT_SPACE')).should('not.be.empty')
+
     cy.get('.c-sub-sidebar').should('be.visible')
-    cy.contains('Your deliver spaces').should('be.visible')
+    cy.contains('.bc-navbar', 'Your deliver spaces')
+      .should('be.visible')
+      .next('.c-sub-sidebar__menu')
+      .contains('a', Cypress.env('DEFAULT_SPACE'))
+      .should('be.visible')
+      .click()
+
+    cy.location('pathname').should('eq', `/spaces/${Cypress.env('DEFAULT_SPACE')}`)
   })
 })

@@ -1,5 +1,3 @@
-const DEFAULT_SPACE = 'test'
-
 describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
   const SELECTOR = 'table.table tr td:first-of-type a:contains("CYPRESS-")'
 
@@ -12,7 +10,7 @@ describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
       return false
     })
 
-    deleteAllCypressTestFolders(DEFAULT_SPACE)
+    deleteAllCypressTestFolders(Cypress.env('DEFAULT_SPACE'))
 
     cy.get(SELECTOR).should('not.exist')
   })

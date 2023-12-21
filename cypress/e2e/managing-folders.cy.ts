@@ -1,7 +1,5 @@
 import getRandomText from 'support/util'
 
-const DEFAULT_SPACE = 'test'
-
 describe('Managing folders', () => {
   beforeEach(() => {
     cy.loginAsSpaceAdmin()
@@ -10,7 +8,7 @@ describe('Managing folders', () => {
   it('should be possible to create a new folder', () => {
     const FOLDER_NAME = `CYPRESS-${getRandomText()}`
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.contains('a', FOLDER_NAME).should('not.exist')
 
@@ -22,7 +20,7 @@ describe('Managing folders', () => {
     cy.ensureToast('Folder created successfully').closeToast()
     cy.ensureNoToast()
 
-    cy.get('.bc-toolbar-title').should('contain.text', DEFAULT_SPACE).should('contain.text', FOLDER_NAME)
+    cy.get('.bc-toolbar-title').should('contain.text', Cypress.env('DEFAULT_SPACE')).should('contain.text', FOLDER_NAME)
 
     cy.get('.btn:contains("Copy public shareable link")')
       .as('copyButton')
@@ -36,7 +34,7 @@ describe('Managing folders', () => {
     cy.wait(1500)
     cy.get('@copyButton').should('contain.text', 'Copy public shareable link')
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.contains('tr', FOLDER_NAME)
       .should('exist')
@@ -60,14 +58,14 @@ describe('Managing folders', () => {
   it('should return an error if a new folder name is already in use within the same space', () => {
     const FOLDER_NAME = `CYPRESS-${getRandomText()}`
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.setFieldByLabel('Folder name', FOLDER_NAME)
     cy.contains('.btn', 'Make folder').click()
 
     cy.location('pathname').should('match', /\/folders\/\w{26}/)
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.get('#folder-name').should('not.have.class', 'is-invalid')
     cy.get('#folder-name-invalid').should('not.exist')
@@ -83,7 +81,7 @@ describe('Managing folders', () => {
     const FOLDER_NAME1 = `CYPRESS-FOLDER_NAME_1-${getRandomText()}`
     const FOLDER_NAME2 = `CYPRESS-FOLDER_NAME_2-${getRandomText()}`
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.setFieldByLabel('Folder name', FOLDER_NAME1)
     cy.contains('.btn', 'Make folder').click()
@@ -114,12 +112,12 @@ describe('Managing folders', () => {
     const FOLDER_NAME1 = `CYPRESS-FOLDER_NAME_1-${getRandomText()}`
     const FOLDER_NAME2 = `CYPRESS-FOLDER_NAME_2-${getRandomText()}`
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
     cy.setFieldByLabel('Folder name', FOLDER_NAME1)
     cy.contains('.btn', 'Make folder').click()
     cy.location('pathname').as('previousPathname')
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
     cy.setFieldByLabel('Folder name', FOLDER_NAME2)
     cy.contains('.btn', 'Make folder').click()
 
@@ -156,7 +154,7 @@ describe('Managing folders', () => {
   it('should be possible to delete a folder', () => {
     const FOLDER_NAME = `CYPRESS-${getRandomText()}`
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.contains('a', FOLDER_NAME).should('not.exist')
 
@@ -166,7 +164,7 @@ describe('Managing folders', () => {
     cy.ensureToast('Folder created successfully').closeToast()
     cy.ensureNoToast()
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.contains('a', FOLDER_NAME).should('exist')
 
@@ -182,7 +180,7 @@ describe('Managing folders', () => {
 
     cy.contains('.btn', 'Delete folder').click()
 
-    cy.location('pathname').should('eq', `/spaces/${DEFAULT_SPACE}`)
+    cy.location('pathname').should('eq', `/spaces/${Cypress.env('DEFAULT_SPACE')}`)
 
     cy.ensureToast('Folder deleted successfully').closeToast()
     cy.ensureNoToast()

@@ -1,7 +1,5 @@
 import getRandomText from 'support/util'
 
-const DEFAULT_SPACE = 'test'
-
 describe('Managing files', () => {
   let FOLDER_NAME: string
   let FILE_COUNT: number
@@ -14,7 +12,7 @@ describe('Managing files', () => {
 
     cy.loginAsSpaceAdmin()
 
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.setFieldByLabel('Folder name', FOLDER_NAME)
     cy.contains('.btn', 'Make folder').click()
@@ -190,7 +188,7 @@ describe('Managing files', () => {
 
     cy.visit('@shareUrl')
 
-    cy.contains(`Library delivery from ${DEFAULT_SPACE}: ${FOLDER_NAME}`)
+    cy.contains(`Library delivery from ${Cypress.env('DEFAULT_SPACE')}: ${FOLDER_NAME}`)
       .should('be.visible')
       .then(function () {
         cy.contains(this.shareUrl).should('be.visible')
@@ -396,7 +394,7 @@ describe('Managing files', () => {
   }
 
   function assertTotalNumberOfDownloads(expectedNumberOfDownloads: number) {
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.contains('table tbody tr', FOLDER_NAME)
       .find('td')
@@ -424,7 +422,7 @@ describe('Managing files', () => {
   }
 
   function assertFolderFileCount(FILE_COUNT: number) {
-    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+    cy.visitSpace()
 
     cy.contains('table tr', FOLDER_NAME).find('td').eq(3).should('contain', `${FILE_COUNT} files`)
 

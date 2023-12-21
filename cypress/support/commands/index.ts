@@ -1,15 +1,16 @@
 // Parent commands
 import login from './login'
 import loginAsSpaceAdmin from './login-as-space-admin'
+import logout from './logout'
 import ensureToast from './ensure-toast'
 import ensureNoToast from './ensure-no-toast'
 import setFieldByLabel from './set-field-by-label'
 import getClipboardText from './get-clipboard-text'
 import setClipboardText from './set-clipboard-text'
 import extractFolderId from './extract-folder-id'
-import logout from './logout'
 import ensureModal from './ensure-modal'
 import ensureNoModal from './ensure-no-modal'
+import visitSpace from './visit-space'
 
 // Child commands
 import finishLog from './finish-log'
@@ -26,6 +27,8 @@ Cypress.Commands.addAll({
 
   loginAsSpaceAdmin,
 
+  logout,
+
   ensureToast,
 
   ensureNoToast,
@@ -38,11 +41,11 @@ Cypress.Commands.addAll({
 
   extractFolderId,
 
-  logout,
-
   ensureModal,
 
   ensureNoModal,
+
+  visitSpace,
 })
 
 // Child commands
