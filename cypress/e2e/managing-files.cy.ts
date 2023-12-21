@@ -20,6 +20,8 @@ describe('Managing files', () => {
     cy.contains('.btn', 'Make folder').click()
 
     cy.ensureToast().closeToast()
+
+    cy.url().as('adminUrl')
   })
 
   it('should be possible to upload multiple file types ', () => {
@@ -100,6 +102,9 @@ describe('Managing files', () => {
       .and('contain', 'test.json')
 
     cy.wait('@uploadFiles')
+    cy.wait('@uploadFiles')
+    cy.wait('@uploadFiles')
+    cy.wait('@uploadFiles')
 
     cy.contains('.card-header', 'Available files').should('contain', '4 items')
     cy.get('#files table')
@@ -138,7 +143,7 @@ describe('Managing files', () => {
 
   it('should be possible to cancel an upload', () => {
     const fileName = 'very-large-file.txt'
-    cy.get('input[type=file]').selectFile(generateLargeFile(fileName, 5))
+    cy.get('input[type=file]').selectFile(generateLargeFile(fileName, 10))
 
     cy.wait(50)
 
@@ -165,7 +170,6 @@ describe('Managing files', () => {
   })
 
   it('should be possible to consult the public shareable link anonymously, download all files and keep download counts', () => {
-    cy.url().as('adminUrl')
     cy.extractFolderId().getFolderShareUrl(FOLDER_NAME).as('shareUrl')
 
     cy.intercept('POST', '/folders/*/files').as('uploadFile')
@@ -179,6 +183,8 @@ describe('Managing files', () => {
     assertNumberOfDownloads('test.txt', 0)
     assertNumberOfDownloads('test.pdf', 0)
     assertNumberOfDownloads('test.json', 0)
+
+    assertTotalNumberOfDownloads(0)
 
     cy.logout()
 
@@ -267,7 +273,7 @@ describe('Managing files', () => {
 
     cy.loginAsSpaceAdmin()
 
-    cy.visit('@adminUrl')
+    assertTotalNumberOfDownloads(9)
 
     assertNumberOfDownloads('test.txt', 3)
     assertNumberOfDownloads('test.pdf', 3)
@@ -282,6 +288,8 @@ describe('Managing files', () => {
     assertNumberOfDownloads('test.pdf', 3)
     assertNumberOfDownloads('test.json', 3)
 
+    assertTotalNumberOfDownloads(10)
+
     cy.readFile('cypress/downloads/test.pdf').should('not.exist')
     cy.contains('test.pdf').click()
     cy.readFile('cypress/downloads/test.pdf')
@@ -291,6 +299,8 @@ describe('Managing files', () => {
     assertNumberOfDownloads('test.pdf', 4)
     assertNumberOfDownloads('test.json', 3)
 
+    assertTotalNumberOfDownloads(11)
+
     cy.readFile('cypress/downloads/test.json').should('not.exist')
     cy.contains('test.json').click()
     cy.readFile('cypress/downloads/test.json')
@@ -299,9 +309,39 @@ describe('Managing files', () => {
     assertNumberOfDownloads('test.txt', 4)
     assertNumberOfDownloads('test.pdf', 4)
     assertNumberOfDownloads('test.json', 4)
+
+    assertTotalNumberOfDownloads(12)
   })
 
-  it('should be possible to delete files')
+  it('should be possible to delete files', () => {
+    cy.contains('.card-header', 'Available files').should('contain', '0 items')
+
+    cy.intercept('POST', '/folders/*/files').as('uploadFile')
+
+    cy.get('input[type=file]').selectFile([
+      'cypress/fixtures/test.json',
+      'cypress/fixtures/test.pdf',
+      'cypress/fixtures/test.txt',
+    ])
+
+    cy.wait('@uploadFile')
+    cy.wait('@uploadFile')
+    cy.wait('@uploadFile')
+
+    assertFolderFileCount(3)
+
+    assertFileDelete(3, 'test.pdf')
+
+    assertFolderFileCount(2)
+
+    assertFileDelete(2, 'test.txt')
+
+    assertFolderFileCount(1)
+
+    assertFileDelete(1, 'test.json')
+
+    assertFolderFileCount(0)
+  })
 
   function assertFileUpload(
     fileName: string,
@@ -316,6 +356,7 @@ describe('Managing files', () => {
     } = {}
   ) {
     FILE_COUNT++
+
     cy.contains('.card-header', 'Available files').should('contain', `${FILE_COUNT} items`)
 
     cy.get('#files table tbody tr')
@@ -333,6 +374,8 @@ describe('Managing files', () => {
     if (mimeType) {
       cy.get('@testFile').should('contain', mimeType)
     }
+
+    assertFolderFileCount(FILE_COUNT)
   }
 
   function generateLargeFile(fileName: string, fileSizeInMegaByte: number, mimeType?: string) {
@@ -350,5 +393,41 @@ describe('Managing files', () => {
 
   function assertNumberOfDownloads(fileName: string, expectedNumberOfDownloads: number) {
     cy.contains('table tbody tr', fileName).find('td').eq(3).should('have.text', expectedNumberOfDownloads)
+  }
+
+  function assertTotalNumberOfDownloads(expectedNumberOfDownloads: number) {
+    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+
+    cy.contains('table tbody tr', FOLDER_NAME)
+      .find('td')
+      .eq(3)
+      .should('contain', `${expectedNumberOfDownloads} downloads`)
+
+    cy.visit('@adminUrl')
+  }
+
+  function assertFileDelete(numberOfAvailableFilesAtStart: number, fileToDelete: string) {
+    cy.contains('.card-header', 'Available files').should('contain', `${numberOfAvailableFilesAtStart} items`)
+
+    cy.ensureNoModal()
+
+    cy.contains('#files table tr', fileToDelete).contains('.btn', 'Delete').click()
+
+    cy.ensureModal(new RegExp(`Are you sure you want to delete the file.*${fileToDelete}\?`)).closeModal(
+      'Yes, delete this file'
+    )
+
+    cy.ensureNoModal()
+
+    cy.contains('.card-header', 'Available files').should('contain', `${numberOfAvailableFilesAtStart - 1} items`)
+    cy.contains('#files table tr', fileToDelete).should('not.exist')
+  }
+
+  function assertFolderFileCount(FILE_COUNT: number) {
+    cy.visit(`/spaces/${DEFAULT_SPACE}`)
+
+    cy.contains('table tr', FOLDER_NAME).find('td').eq(3).should('contain', `${FILE_COUNT} files`)
+
+    cy.visit('@adminUrl')
   }
 })

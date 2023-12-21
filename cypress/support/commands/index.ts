@@ -7,6 +7,8 @@ import setFieldByLabel from './set-field-by-label'
 import getClipboardText from './get-clipboard-text'
 import extractFolderId from './extract-folder-id'
 import logout from './logout'
+import ensureModal from './ensure-modal'
+import ensureNoModal from './ensure-no-modal'
 
 // Child commands
 import finishLog from './finish-log'
@@ -15,6 +17,7 @@ import setField from './set-field'
 
 // Dual commands
 import getFolderShareUrl from './get-folder-share-url'
+import closeModal from './close-modal'
 
 // Parent commands
 Cypress.Commands.addAll({
@@ -33,6 +36,10 @@ Cypress.Commands.addAll({
   extractFolderId,
 
   logout,
+
+  ensureModal,
+
+  ensureNoModal,
 })
 
 // Child commands
@@ -54,5 +61,7 @@ Cypress.Commands.addAll(
   },
   {
     getFolderShareUrl,
+
+    closeModal,
   }
 )
