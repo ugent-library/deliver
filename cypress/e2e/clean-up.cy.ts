@@ -10,6 +10,8 @@ describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
       return false
     })
 
+    cy.intercept('POST', '/folders/*').as('deleteFolder')
+
     deleteAllCypressTestFolders(Cypress.env('DEFAULT_SPACE'))
 
     cy.get(SELECTOR).should('not.exist')
@@ -20,16 +22,20 @@ describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
       // Using Cypress.$() direct jQuery selector tool here.
       // Using cy.get() the test would fail if none are left.
       const links = Cypress.$<HTMLAnchorElement>(SELECTOR)
+        .map((_, link) => Cypress.$(link).attr('href'))
+        .get()
 
       cy.log(`${links.length} test folder(s) found`)
 
-      links.each(deleteTestFolder)
+      links.forEach(deleteTestFolder)
     })
   }
 
-  function deleteTestFolder(_index: number, link: HTMLAnchorElement) {
-    cy.visit(`${link.href}/edit`)
+  function deleteTestFolder(href: string) {
+    cy.visit(`${href}/edit`)
 
     cy.contains('.btn', 'Delete folder').click()
+
+    cy.wait('@deleteFolder')
   }
 })
