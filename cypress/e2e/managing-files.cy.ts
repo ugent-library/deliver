@@ -141,8 +141,9 @@ describe('Managing files', () => {
 
   it('should be possible to cancel an upload', () => {
     const fileName = 'very-large-file.txt'
-    cy.get('input[type=file]').selectFile(generateLargeFile(fileName, 10))
+    cy.get('input[type=file]').selectFile(generateLargeFile(fileName, 25))
 
+    // Give Cypress a little bit of time to start uploading
     cy.wait(50)
 
     cy.get('#file-upload-progress').as('uploadProgress').should('be.visible').contains('.btn', 'Cancel upload').click()
@@ -377,8 +378,7 @@ describe('Managing files', () => {
   }
 
   function generateLargeFile(fileName: string, fileSizeInMegaByte: number, mimeType?: string) {
-    const largeString = 'a'.repeat(fileSizeInMegaByte * 1024 * 1024) // 5MB
-    const buffer = Cypress.Buffer.from(largeString)
+    const buffer = Cypress.Buffer.from(new ArrayBuffer(fileSizeInMegaByte * 1024 * 1024))
 
     const file: Cypress.FileReferenceObject = {
       fileName,
