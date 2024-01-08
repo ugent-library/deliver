@@ -18,6 +18,9 @@ services:
       DELIVER_OIDC_SECRET: "CHANGEME"
       DELIVER_OIDC_REDIRECT_URL: "http://localhost:3000/auth/callback"
       DELIVER_COOKIE_SECRET: "1234"
+      DELIVER_OIDC_URL: "http://localhost:4000"
+      DELIVER_OIDC_ID: "oidc-client"
+      DELIVER_OIDC_SECRET: "CHANGEME"
     ports:
       - "3000:3000"
     volumes:
@@ -29,6 +32,8 @@ services:
       - sh
       - -c
       - |
+        apk add caddy
+        caddy reverse-proxy --from :4000 --to oidc:4000 &
         npm install
         tern migrate
         reflex -d none -c reflex.conf
@@ -61,3 +66,59 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
       - ~/tmp/deliver_minio_data:/data
+
+  oidc:
+    image: ugentlib/mock-oidc-server:latest
+    container_name: mock-oidc-server
+    ports:
+      - 4000
+    command: "/bin/sh -c \"cd /dist && ./app server\""
+    environment:
+      MOCK_OIDC_EXPIRES_IN: "3600s"
+      MOCK_OIDC_HOST: "0.0.0.0"
+      MOCK_OIDC_PORT: "4000"
+      MOCK_OIDC_PRODUCTION: "true"
+      MOCK_OIDC_SESSION_COOKIE_NAME: "MOCK_OIDC_SESSION"
+      MOCK_OIDC_URI_BASE: "http://localhost:4000"
+      MOCK_OIDC_USERS: |
+        [
+          {
+            "id": "jdoe",
+            "claims": [
+              {
+                "name":  "name",
+                "value": "John Doe"
+              },
+              {
+                "name":  "given_name",
+                "value": "John"
+              },
+              {
+                "name":  "family_name",
+                "value": "Doe"
+              },
+              {
+                "name":  "preferred_username",
+                "value": "jdoe"
+              },
+              {
+                "name":  "email",
+                "value": "john.doe@ugent.be"
+              }
+            ]
+          }
+        ]
+      MOCK_OIDC_CLIENTS: |
+        [
+          {
+            "id": "oidc-client",
+            "secret": "CHANGEME"
+          }
+        ]
+      MOCK_OIDC_PUBLIC_KEY: "CHANGEME"
+      MOCK_OIDC_PRIVATE_KEY: "CHANGEME"
+    healthcheck:
+      test: ["CMD-SHELL", "nc", "-z", "localhost", "4000"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
