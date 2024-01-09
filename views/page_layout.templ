@@ -12,7 +12,7 @@ templ pageLayout(c *ctx.Ctx, title string) {
         <meta name="csrf-token" content={ c.CSRFToken }/>
         <link rel="stylesheet" href={ c.AssetPath("/css/app.css") }/>
         <link rel="icon" href={ c.AssetPath("/favicon.ico") }/>
-        <script type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
+        <script nonce={ c.CSPNonce } type="application/javascript" src={ c.AssetPath("/js/app.js") }></script>
         <title>{ title }</title>
     </head>
     <body class="u-maximize-height overflow-hidden u-scroll-wrapper" hx-swap="none">

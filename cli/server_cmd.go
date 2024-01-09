@@ -16,6 +16,8 @@ import (
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"github.com/ugent-library/zaphttp/zapchi"
+	"github.com/unrolled/secure"
+	"github.com/unrolled/secure/cspbuilder"
 
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/handlers"
@@ -95,6 +97,17 @@ var serverCmd = &cobra.Command{
 		router.Use(middleware.RequestLogger(zapchi.LogFormatter()))
 		router.Use(middleware.Recoverer)
 		router.Use(middleware.StripSlashes)
+		router.Use(secure.New(secure.Options{
+			IsDevelopment: config.Env == "local",
+			ContentSecurityPolicy: (&cspbuilder.Builder{
+				Directives: map[string][]string{
+					cspbuilder.DefaultSrc: {"'self'"},
+					cspbuilder.ScriptSrc:  {"'self'", "$NONCE"},
+					// TODO: htmx injects style
+					cspbuilder.StyleSrc: {"'self'", "'unsafe-inline'"},
+				},
+			}).MustBuild(),
+		}).Handler)
 
 		// mount health and info
 		router.Get("/status", health.NewHandler(health.NewChecker())) // TODO add checkers
