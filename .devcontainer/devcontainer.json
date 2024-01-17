@@ -1,0 +1,33 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/go-postgres
+{
+	"name": "Deliver",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+
+	// Override default workspace folder to be consistent and accessible in the
+	// Dockerfile
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/src,type=bind,consistency=cached"
+	],
+	"workspaceFolder": "/src",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Configure tool-specific properties.
+	// "customizations": {}
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [3000, 3999, 4000, "db-app:5432", "minio:9200", "minio:9100"],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// 
+	// "postCreateCommand": "/src/.devcontainer/commands/post-create-command.sh",
+	// "waitFor": "postCreateCommand",
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root",
+
+	"shutdownAction": "stopCompose"
+}
