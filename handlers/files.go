@@ -84,5 +84,5 @@ func DeleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	htmx.AddTrigger(w, "refresh-files")
+	htmx.Trigger(w, "refresh-files")
 }

@@ -161,6 +161,8 @@ github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072 h1:DkyZcjje
 github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072/go.mod h1:Al0v+CBt6ljkL5U+lyCLq3BQUZLxonIMrbdHbuX3lUI=
 github.com/ugent-library/htmx v0.0.0-20231108084838-f694c7b88f0d h1:JP0tYAxdiT73ZjjhIwVv935okkopiNIpq1hoQ0KNyAk=
 github.com/ugent-library/htmx v0.0.0-20231108084838-f694c7b88f0d/go.mod h1:0O9ScPduA+5OLO8bOLjUyZw+DBzjeiYAGDNqneC+fPc=
+github.com/ugent-library/htmx v0.0.0-20240118150818-64e3e65fb690 h1:Dsbqd3u/sjlKlwHK7ikROTZ0xatKkYGamuNkCqChcgU=
+github.com/ugent-library/htmx v0.0.0-20240118150818-64e3e65fb690/go.mod h1:kUwZPkdZkQ7AxWSVNuOOcu9bk2jcFyGJcn868cStEjI=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20 h1:djFbAZZWAHkbqTmDjOkd1LwnirpiVe4nyp0sp3lQ9Ds=
 github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20/go.mod h1:QuEpmxsRkH6YuLjj1xAS2g1xywDUxxdfuN0bBfkB1oc=
 github.com/ugent-library/httpx v0.0.0-20231026122034-e9de0b29458b h1:Y1gD0JpRWEBMPx2Nbc+hxTMjzVzegdWsEgI5q9N2meE=

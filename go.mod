@@ -66,7 +66,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/ugent-library/crypt v0.0.0-20240117154030-a71a6ff50afe
 	github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072
-	github.com/ugent-library/htmx v0.0.0-20231108084838-f694c7b88f0d
+	github.com/ugent-library/htmx v0.0.0-20240118150818-64e3e65fb690
 	github.com/ugent-library/httpx v0.0.0-20231026122034-e9de0b29458b
 	github.com/ugent-library/oidc v0.0.0-20230810150340-b66acc34dfeb
 	github.com/ugent-library/okay v0.0.0-20231205122923-396c4d3a29f2
