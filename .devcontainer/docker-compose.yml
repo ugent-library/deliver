@@ -22,6 +22,7 @@ services:
         sleep infinity
     depends_on:
       - db-app
+      - minio
 
   oidc:
     image: ugentlib/mock-oidc-server

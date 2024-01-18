@@ -24,7 +24,7 @@ reflex.conf
 .env*
 !.env.example
 
-docker-compose.yml
+/docker-compose.yml
 
 # Cypress
 cypress.env.json
