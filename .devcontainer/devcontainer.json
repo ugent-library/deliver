@@ -19,7 +19,7 @@
 	// "customizations": {}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [3000, 3999, 4000, "db-app:5432", "minio:9200", "minio:9100"],
+	"forwardPorts": ["db-app:5432", "minio:9000", "minio:9001"],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// 
