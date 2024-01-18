@@ -108,11 +108,11 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.Hub.Send("space."+folder.Space.ID, views.String(views.AddFlash(ctx.Flash{
+	c.Hub.SendString("space."+folder.Space.ID, views.String(views.AddFlash(ctx.Flash{
 		Type: "info",
 		Body: fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
 	})))
-	c.Hub.Send("folder."+folder.ID, views.String(views.AddFlash(ctx.Flash{
+	c.Hub.SendString("folder."+folder.ID, views.String(views.AddFlash(ctx.Flash{
 		Type: "error",
 		Body: fmt.Sprintf("%s just deleted this folder.", c.User.Name),
 	})))
