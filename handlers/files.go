@@ -34,7 +34,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c.Hub.Send("folder."+file.FolderID,
+	c.Hub.SendString("folder."+file.FolderID,
 		fmt.Sprintf(`"<span id="file-%s-downloads">%d</span>`, file.ID, file.Downloads),
 	)
 
