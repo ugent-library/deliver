@@ -11,6 +11,8 @@ import (
 	"github.com/nics/ich"
 	"github.com/ory/graceful"
 	"github.com/spf13/cobra"
+	"github.com/ugent-library/catbird"
+	"github.com/ugent-library/crypt"
 	"github.com/ugent-library/httpx"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -24,7 +26,6 @@ import (
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstores"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/ugent-library/htmx"
 )
 
 func init() {
@@ -75,10 +76,11 @@ var serverCmd = &cobra.Command{
 		}
 
 		// setup htmx message hub
-		hub := htmx.NewHub(htmx.Config{
-			// TODO htmx secret config
-			Secret: []byte(config.Cookie.Secret),
-		})
+		hub, err := catbird.New(catbird.Config{})
+		if err != nil {
+			return err
+		}
+		defer hub.Stop()
 
 		// setup timezone
 		timezone, err := time.LoadLocation(config.Timezone)
@@ -118,14 +120,6 @@ var serverCmd = &cobra.Command{
 		// mount assets
 		router.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-		// mount htmx message hub
-		router.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
-			if err := hub.HandleWebSocket(w, r, r.URL.Query().Get("channels")); err != nil {
-				logger.Error(err)
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			}
-		})
-
 		// mount ui routes
 		router.Group(func(r *ich.Mux) {
 			// TODO use new RequestSize middleware
@@ -143,6 +137,7 @@ var serverCmd = &cobra.Command{
 				),
 				// request context wrapper
 				ctx.Set(ctx.Config{
+					Crypt:       crypt.New([]byte(config.Cookie.Secret)),
 					Repo:        repo,
 					Storage:     storage,
 					MaxFileSize: config.MaxFileSize,
@@ -174,6 +169,21 @@ var serverCmd = &cobra.Command{
 			// viewable by space owners and admins
 			r.Group(func(r *ich.Mux) {
 				r.Use(ctx.RequireUser)
+
+				// mount htmx message hub
+				r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
+					c := ctx.Get(r)
+					var topics []string
+					if err := c.DecryptValue(r.URL.Query().Get("token"), &topics); err != nil {
+						c.HandleError(w, r, err)
+						return
+					}
+					if err := hub.HandleWebsocket(w, r, c.User.ID, topics); err != nil {
+						c.HandleError(w, r, err)
+						return
+					}
+				}).Name("ws")
+
 				r.Get("/spaces", handlers.ListSpaces).Name("spaces")
 				r.With(ctx.RequireAdmin).Get("/new-space", handlers.NewSpace).Name("newSpace")
 				r.With(ctx.RequireAdmin).Post("/spaces", handlers.CreateSpace).Name("createSpace")

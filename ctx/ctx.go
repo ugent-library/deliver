@@ -13,10 +13,11 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/nics/ich"
 	"github.com/oklog/ulid/v2"
+	"github.com/ugent-library/catbird"
+	"github.com/ugent-library/crypt"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/objectstores"
 	"github.com/ugent-library/deliver/repositories"
-	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
@@ -86,6 +87,8 @@ func Set(config Config) func(http.Handler) http.Handler {
 }
 
 type Config struct {
+	*crypt.Crypt
+	Env           string
 	Repo          *repositories.Repo
 	Storage       objectstores.Store
 	MaxFileSize   int64
@@ -94,8 +97,7 @@ type Config struct {
 	ErrorHandlers map[int]http.HandlerFunc
 	Permissions   *models.Permissions
 	Assets        mix.Manifest
-	Hub           *htmx.Hub
-	Env           string
+	Hub           *catbird.Hub
 	Timezone      *time.Location
 	CSRFName      string
 }
@@ -215,10 +217,10 @@ func (c *Ctx) AssetPath(asset string) string {
 	return ap
 }
 
-func (c *Ctx) WebSocketPath(channels ...string) string {
-	h, err := c.Hub.EncryptChannelNames(channels)
+func (c *Ctx) WebSocketPath(topics ...string) string {
+	token, err := c.EncryptValue(topics)
 	if err != nil {
 		panic(err)
 	}
-	return "/ws?channels=" + url.QueryEscape(h)
+	return c.PathTo("ws", "token", token).String()
 }
