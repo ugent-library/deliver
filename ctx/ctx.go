@@ -22,6 +22,7 @@ import (
 	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
+	"github.com/unrolled/secure"
 	"go.uber.org/zap"
 )
 
@@ -52,6 +53,7 @@ func Set(config Config) func(http.Handler) http.Handler {
 				scheme:    r.URL.Scheme,
 				Log:       zaphttp.Logger(r.Context()).Sugar(),
 				CSRFToken: csrf.Token(r),
+				CSPNonce:  secure.CSPNonce(r.Context()),
 			}
 			if c.scheme == "" {
 				if config.Env == "local" {
@@ -113,6 +115,7 @@ type Ctx struct {
 	scheme    string
 	Log       *zap.SugaredLogger
 	CSRFToken string
+	CSPNonce  string
 	User      *models.User
 	Flash     []Flash
 }
