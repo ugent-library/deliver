@@ -10,14 +10,15 @@ import (
 
 func init() {
 	rootCmd.AddCommand(resetCmd)
-	resetCmd.Flags().Bool("confirm", false, "destructive reset of all data")
+	resetCmd.Flags().Bool("force", false, "force destructive reset of all data")
 }
 
 var resetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Destructive reset",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if confirm, _ := cmd.Flags().GetBool("confirm"); !confirm {
+		if force, _ := cmd.Flags().GetBool("force"); !force {
+			cmd.Println("The --force flag is required to perform a destructive reset.")
 			return nil
 		}
 
@@ -38,32 +39,21 @@ var resetCmd = &cobra.Command{
 			return err
 		}
 
-		for _, sp := range spaces {
-			space, err := repo.Spaces.GetByName(ctx, sp.Name)
-			if err != nil {
-				return err
-			}
-
-			for _, folder := range space.Folders {
-				for _, file := range folder.Files {
-					if err = storage.Delete(ctx, file.ID); err != nil {
-						return err
-					}
-
-					if err = repo.Files.Delete(ctx, file.ID); err != nil {
-						return err
-					}
-				}
-
-				if err = repo.Folders.Delete(ctx, folder.ID); err != nil {
-					return err
-				}
-			}
-
+		for _, space := range spaces {
 			if err = repo.Spaces.Delete(ctx, space.ID); err != nil {
 				return err
 			}
 		}
+
+		err = storage.IterateID(ctx, func(id string) error {
+			return storage.Delete(ctx, id)
+		})
+
+		if err != nil {
+			return err
+		}
+
+		cmd.Println("Finished destructive reset.")
 
 		return nil
 	},

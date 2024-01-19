@@ -3,7 +3,6 @@ package cli
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -44,7 +43,7 @@ var seedCmd = &cobra.Command{
 			}
 
 			if len(spaces) > 0 {
-				fmt.Println("The database is not empty. Not seeding.")
+				cmd.Println("Not seeding dummy data because the database is not empty")
 				return nil
 			}
 		}
@@ -104,7 +103,7 @@ var seedCmd = &cobra.Command{
 			}
 		}
 
-		fmt.Println("Done.")
+		cmd.Println("Finished seeding dummy data.")
 
 		return nil
 	},
