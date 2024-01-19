@@ -1,8 +1,10 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/ugent-library/okay"
 )
 
@@ -25,4 +27,11 @@ func (f *File) Validate() error {
 		okay.NotEmpty("name", f.Name),
 		okay.Min("size", f.Size, 1),
 	)
+}
+
+func (f *File) Fake(faker *gofakeit.Faker) (any, error) {
+	return File{
+		Name:      fmt.Sprintf("%d.jpg", faker.Number(123456, 912345)),
+		Downloads: int64(faker.Number(0, 10)),
+	}, nil
 }
