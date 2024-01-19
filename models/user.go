@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/ugent-library/okay"
 )
 
@@ -25,6 +26,19 @@ func (u *User) Validate() error {
 		okay.NotEmpty("name", u.Name),
 		okay.NotEmpty("email", u.Email),
 	)
+}
+
+func (u *User) Fake(faker *gofakeit.Faker) (any, error) {
+	token, err := NewRememberToken()
+	if err != nil {
+		return nil, err
+	}
+	return User{
+		Username:      "deliver",
+		Name:          faker.Name(),
+		Email:         faker.Email(),
+		RememberToken: token,
+	}, nil
 }
 
 func NewRememberToken() (string, error) {

@@ -1,0 +1,27 @@
+[
+    {
+        "id": "deliver",
+        "claims": [
+            {
+                    "name":  "name",
+                    "value": "deliver"
+            },
+            {
+                    "name":  "given_name",
+                    "value": "deliver"
+            },
+            {
+                    "name":  "family_name",
+                    "value": "deliver"
+            },
+            {
+                    "name":  "preferred_username",
+                    "value": "deliver"
+            },
+            {
+                    "name":  "email",
+                    "value": "deliver@example.com"
+            }
+        ]
+    }
+  ]

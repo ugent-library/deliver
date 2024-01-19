@@ -92,6 +92,13 @@ func (r *SpacesRepo) Update(ctx context.Context, s *models.Space) error {
 	return nil
 }
 
+func (r *SpacesRepo) Delete(ctx context.Context, spaceID string) error {
+	err := r.client.Space.
+		DeleteOneID(spaceID).
+		Exec(ctx)
+	return err
+}
+
 func rowToSpace(row *ent.Space) *models.Space {
 	s := &models.Space{
 		ID:        row.ID,

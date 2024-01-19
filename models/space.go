@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/ugent-library/okay"
 )
 
@@ -22,4 +23,11 @@ func (s *Space) Validate() error {
 		okay.LengthBetween("name", s.Name, 1, 50),
 		okay.Alphanumeric("name", s.Name),
 	)
+}
+
+func (s *Space) Fake(faker *gofakeit.Faker) (any, error) {
+	return Space{
+		Name:   gofakeit.RandomString([]string{"BIBXYZ", "ABCLIB", "DEFCOL", "UNIZXY", "department", "BIBLIB", "FACLIB"}),
+		Admins: []string{"deliver"},
+	}, nil
 }

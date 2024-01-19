@@ -1,10 +1,12 @@
 package models
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/mozillazg/go-unidecode"
 	"github.com/ugent-library/okay"
 )
@@ -46,4 +48,14 @@ func (f *Folder) Validate() error {
 		okay.NotEmpty("name", f.Name),
 		okay.LengthBetween("name", f.Name, 1, 100),
 	)
+}
+
+func (f *Folder) Fake(faker *gofakeit.Faker) (any, error) {
+	created := gofakeit.PastDate()
+	return Folder{
+		Name:      fmt.Sprintf("%d", gofakeit.Number(1234567, 9123456)),
+		CreatedAt: created,
+		UpdatedAt: gofakeit.DateRange(created, time.Now()),
+		ExpiresAt: created.AddDate(0, 1, 0),
+	}, nil
 }
