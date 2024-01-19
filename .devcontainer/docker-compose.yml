@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
     user: postgres
     volumes:
-      - deliver-app-db-data:/var/lib/postgresql/data
+      - ../tmp/app-db/db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DATABASE: deliver
       POSTGRES_USER: deliver
@@ -56,7 +56,7 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - deliver-minio-data:/data
+      - ../tmp/minio:/data
 
   minio-mc:
     image: minio/mc
@@ -70,17 +70,3 @@ services:
       /usr/bin/mc mb myminio/deliver --ignore-existing;
       exit 0;
       "
-
-volumes:
-    deliver-app-db-data:
-      driver: local 
-      driver_opts:
-        type: none
-        device: ../tmp/deliver/db_data
-        o: bind
-    deliver-minio-data:
-      driver: local 
-      driver_opts:
-        type: none
-        device: ../tmp/minio
-        o: bind

@@ -24,8 +24,6 @@ reflex.conf
 /.env*
 !.env.example
 
-/docker-compose.yml
-
 # Cypress
 cypress.env.json
 cypress/videos
@@ -34,7 +32,5 @@ cypress/downloads
 cypress/cypress-record.sh
 
 # Docker
-tmp/minio/**
-tmp/deliver/db_data/**
-!tmp/deliver/db_data/.gitkeep
-!tmp/minio/.gitkeep
+/tmp
+/docker-compose.yml
