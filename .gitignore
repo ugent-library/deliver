@@ -21,7 +21,7 @@ node_modules
 reflex.conf
 
 # Config
-.env*
+/.env*
 !.env.example
 
 /docker-compose.yml
