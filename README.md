@@ -85,3 +85,15 @@ You are now logged into the dev container and ready to develop code, write code,
 1. Open a new terminal in VS Code from the `Terminal` menu link.
 2. Execute this command `reflex -d none -c reflex.docker.conf`.
 3. Once the application has started, VS Code will show a popup with a link that opens the project in your browser.
+
+**Networking**
+
+The application and its dependencies run on these ports:
+
+| Application    | Port |
+| -------------- | ---- |
+| Deliver        | 3101 |
+| Mock OIDC      | 3102 |
+| DB Application | 3151 |
+| Minio          | 3171 |
+| Minio Console  | 3172 |
