@@ -15,7 +15,7 @@ RUN go install github.com/cespare/reflex@latest
 RUN sudo apt-get update && sudo apt-get install telnet
 USER root
 
-RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && && cat /etc/motd' \
+RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/motd' \
     >> /etc/bash.bashrc \
     ; echo "\
 ===================================================================\n\
