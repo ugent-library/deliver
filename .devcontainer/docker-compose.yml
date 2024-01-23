@@ -67,7 +67,7 @@ services:
       /bin/sh -c "sleep infinity"
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc config host add myminio http://minio:3171 minioadmin minioadmin;
       /usr/bin/mc mb myminio/deliver --ignore-existing;
       exit 0;
       "
