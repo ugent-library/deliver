@@ -4,12 +4,6 @@ describe('Clean up test folders and files', { redirectionLimit: 1000 }, () => {
   it('should clean up all files and folders', () => {
     cy.loginAsSpaceAdmin()
 
-    // TODO Remove when issue #99 is resolved
-    Cypress.on('uncaught:exception', () => {
-      // returning false here prevents Cypress from failing the test
-      return false
-    })
-
     cy.intercept('POST', '/folders/*').as('deleteFolder')
 
     deleteAllCypressTestFolders(Cypress.env('DEFAULT_SPACE'))
