@@ -26,6 +26,7 @@ reflex.conf
 
 # Cypress
 cypress.env.json
+cypress/.env
 cypress/videos
 cypress/screenshots
 cypress/downloads
@@ -33,3 +34,4 @@ cypress/cypress-record.sh
 
 # Docker
 /tmp
+/docker-compose.yml
