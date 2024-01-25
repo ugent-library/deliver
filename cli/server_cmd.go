@@ -105,8 +105,8 @@ var serverCmd = &cobra.Command{
 				Directives: map[string][]string{
 					cspbuilder.DefaultSrc: {"'self'"},
 					cspbuilder.ScriptSrc:  {"'self'", "$NONCE"},
-					// TODO: htmx injects style
-					cspbuilder.StyleSrc: {"'self'", "'unsafe-inline'"},
+					cspbuilder.StyleSrc:   {"'self'", "'unsafe-inline'"}, // htmx injects style tags
+					cspbuilder.ImgSrc:     {"'self'", "data:"},           // bootstrap uses data: images
 				},
 			}).MustBuild(),
 		}).Handler)
