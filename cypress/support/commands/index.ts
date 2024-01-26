@@ -1,6 +1,7 @@
 // Parent commands
 import login from './login'
 import loginAsSpaceAdmin from './login-as-space-admin'
+import loginAsSuperAdmin from './login-as-super-admin'
 import logout from './logout'
 import ensureToast from './ensure-toast'
 import ensureNoToast from './ensure-no-toast'
@@ -26,6 +27,8 @@ Cypress.Commands.addAll({
   login,
 
   loginAsSpaceAdmin,
+
+  loginAsSuperAdmin,
 
   logout,
 

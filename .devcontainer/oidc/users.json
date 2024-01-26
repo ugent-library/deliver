@@ -1,27 +1,52 @@
 [
-    {
-        "id": "deliver",
-        "claims": [
-            {
-                    "name":  "name",
-                    "value": "deliver"
-            },
-            {
-                    "name":  "given_name",
-                    "value": "deliver"
-            },
-            {
-                    "name":  "family_name",
-                    "value": "deliver"
-            },
-            {
-                    "name":  "preferred_username",
-                    "value": "deliver"
-            },
-            {
-                    "name":  "email",
-                    "value": "deliver@example.com"
-            }
-        ]
-    }
-  ]
+  {
+    "id": "deliver",
+    "claims": [
+      {
+        "name": "name",
+        "value": "deliver"
+      },
+      {
+        "name": "given_name",
+        "value": "deliver"
+      },
+      {
+        "name": "family_name",
+        "value": "deliver"
+      },
+      {
+        "name": "preferred_username",
+        "value": "deliver"
+      },
+      {
+        "name": "email",
+        "value": "deliver@example.com"
+      }
+    ]
+  },
+  {
+    "id": "superdeliver",
+    "claims": [
+      {
+        "name": "name",
+        "value": "superdeliver"
+      },
+      {
+        "name": "given_name",
+        "value": "super"
+      },
+      {
+        "name": "family_name",
+        "value": "deliver"
+      },
+      {
+        "name": "preferred_username",
+        "value": "superdeliver"
+      },
+      {
+        "name": "email",
+        "value": "superdeliver@example.com"
+      }
+    ]
+  }
+]
