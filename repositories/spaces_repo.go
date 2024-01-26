@@ -9,6 +9,7 @@ import (
 	"github.com/ugent-library/deliver/ent/folder"
 	"github.com/ugent-library/deliver/ent/space"
 	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/okay"
 )
 
 type SpacesRepo struct {
@@ -71,6 +72,9 @@ func (r *SpacesRepo) Create(ctx context.Context, s *models.Space) error {
 		SetName(s.Name).
 		SetAdmins(s.Admins).
 		Save(ctx)
+	if ent.IsConstraintError(err) {
+		return okay.NewErrors(okay.ErrNotUnique("name"))
+	}
 	if err != nil {
 		return err
 	}
