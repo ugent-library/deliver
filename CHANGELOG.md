@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [v1.1.1] - 2024-01-29
+
+### Added
+
+- #107: Dev containers
+- Cypress tests
+- CSP policy
+- Better websocket hub (CatBird)  
+- /health endpoint
+- Major Go code refactor
+- #86: Make timezone configurable
+
+### Fixed
+
+- #109: Fix validation on unique folder and space names
+
 ## [v1.1.0] - 2023-07-06
 
 ### Added
@@ -59,8 +75,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]:  https://github.com/ugent-library/deliver/compare/v1.0.4...HEAD
-[v1.0.4]:  https://github.com/ugent-library/deliver/compare/v1.0.3...v1.0.4
+[unreleased]:  https://github.com/ugent-library/deliver/compare/v1.1.1...HEAD
+[v1.1.1]:  https://github.com/ugent-library/deliver/compare/v1.1.1...v1.1.1
+[v1.1.0]:  https://github.com/ugent-library/deliver/compare/v1.0.3...v1.1.0
 [v1.0.3]:  https://github.com/ugent-library/deliver/compare/v1.0.2...v1.0.3
 [v1.0.2]:  https://github.com/ugent-library/deliver/compare/v1.0.1...v1.0.2
 [v1.0.1]:  https://github.com/ugent-library/deliver/compare/v1.0.0...v1.0.1

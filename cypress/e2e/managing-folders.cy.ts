@@ -172,12 +172,6 @@ describe('Managing folders', () => {
 
     cy.contains('.btn', 'Edit').click()
 
-    // TODO Remove when issue #99 is resolved
-    Cypress.on('uncaught:exception', () => {
-      // returning false here prevents Cypress from failing the test
-      return false
-    })
-
     cy.contains('.btn', 'Delete folder').click()
 
     cy.location('pathname').should('eq', `/spaces/${Cypress.env('DEFAULT_SPACE')}`)
