@@ -132,7 +132,7 @@ describe('Managing files', () => {
       .prop('style')
       .its('width')
       .should('eq', '100%')
-    cy.get('@uploadProgress').contains('Processing your file. Hold on, do not refresh the page.')
+    cy.get('@uploadProgress').should('contain.text', 'Processing your file. Hold on, do not refresh the page.')
 
     cy.wait('@uploadFile')
 

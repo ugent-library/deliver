@@ -1,4 +1,5 @@
 {
+  "name": "deliver",
   "private": true,
   "scripts": {
     "test": "cypress run --config-file cypress/cypress.config.ts",

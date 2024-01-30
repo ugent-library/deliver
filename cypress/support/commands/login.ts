@@ -20,19 +20,13 @@ export default function login(username, password): void {
 
       cy.contains('.btn', 'Log in', NO_LOG).click(NO_LOG)
 
-      cy.origin(
-        Cypress.env('OIDC_ORIGIN'),
-        { args: { username, password, NO_LOG } },
-        ({ username, password, NO_LOG }) => {
-          cy.get('input[name="username"]', NO_LOG).type(username, NO_LOG)
+      cy.get('input[name="username"]', NO_LOG).type(username, NO_LOG)
 
-          if (password) {
-            cy.get('input[name="password"]', NO_LOG).type(password, NO_LOG)
-          }
+      if (password) {
+        cy.get('input[name="password"]', NO_LOG).type(password, NO_LOG)
+      }
 
-          cy.get(':submit', NO_LOG).click(NO_LOG)
-        }
-      )
+      cy.get(':submit', NO_LOG).click(NO_LOG)
     },
     {
       cacheAcrossSpecs: true,
