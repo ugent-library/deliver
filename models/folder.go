@@ -56,6 +56,6 @@ func (f *Folder) Fake(faker *gofakeit.Faker) (any, error) {
 		Name:      fmt.Sprintf("%d", gofakeit.Number(1234567, 9123456)),
 		CreatedAt: created,
 		UpdatedAt: gofakeit.DateRange(created, time.Now()),
-		ExpiresAt: created.AddDate(0, 1, 0),
+		ExpiresAt: created.AddDate(0, 0, 31),
 	}, nil
 }
