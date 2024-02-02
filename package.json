@@ -3,8 +3,9 @@
   "private": true,
   "scripts": {
     "test": "cypress run --config-file cypress/cypress.config.ts",
+    "test:libtest": "env-cmd --file ./cypress/.env cypress run --config-file cypress/cypress.config.ts",
     "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e --browser electron",
-    "cypress:record": "cypress/cypress-record.sh",
+    "cypress:open:libtest": "env-cmd --file ./cypress/.env cypress open --e2e --browser electron --config-file cypress/cypress.config.ts",
     "precommit": "node node_modules/js-precommit-hook",
     "generate-issue-test": "node ./cypress/scripts/generate-issue-test.mjs"
   },
@@ -12,6 +13,7 @@
   "devDependencies": {
     "cypress": "^13.6.3",
     "cypress-common": "github:ugent-library/cypress-common#3.16.1",
+    "env-cmd": "^10.1.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
     "laravel-mix": "^6.0.11",
     "resolve-url-loader": "^4.0.0",
