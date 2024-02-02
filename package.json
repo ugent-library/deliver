@@ -3,9 +3,9 @@
   "private": true,
   "scripts": {
     "test": "cypress run --config-file cypress/cypress.config.ts",
-    "test:libtest": "env-cmd --file ./cypress/.env cypress run --config-file cypress/cypress.config.ts",
+    "test:libtest": "env-cmd --file ./cypress/.env npm test",
     "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e --browser electron",
-    "cypress:open:libtest": "env-cmd --file ./cypress/.env cypress open --e2e --browser electron --config-file cypress/cypress.config.ts",
+    "cypress:open:libtest": "env-cmd --file ./cypress/.env npm run cypress:open",
     "precommit": "node node_modules/js-precommit-hook",
     "generate-issue-test": "node ./cypress/scripts/generate-issue-test.mjs"
   },
