@@ -107,6 +107,7 @@ type Flash struct {
 	Title        string
 	Body         string
 	DismissAfter time.Duration
+	AlwaysShow   bool
 }
 
 type Ctx struct {
