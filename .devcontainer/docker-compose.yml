@@ -36,7 +36,6 @@ services:
   db-app:
     image: postgres:16-alpine
     restart: unless-stopped
-    user: postgres
     volumes:
       - ../tmp/app-db/db_data:/var/lib/postgresql/data
     environment:
