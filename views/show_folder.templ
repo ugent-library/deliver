@@ -38,6 +38,12 @@ templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
                             </a>
                         </div>
                         <div class="bc-toolbar-item">
+                            <button class="btn btn-link btn-link-muted">
+                                <i class="if if-arrow-go-back"></i>
+                                <span class="btn-text">Postpone expiration</span>
+                            </button>
+                        </div>
+                        <div class="bc-toolbar-item">
                             <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("editFolder", "folderID", folder.ID).String()) }>
                                 <i class="if if-edit"></i>
                                 <span class="btn-text">Edit</span>
