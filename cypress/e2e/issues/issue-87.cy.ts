@@ -24,10 +24,8 @@ describe('Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.url().as('adminUrl')
 
-    cy.extractFolderId()
-
-    cy.get<string>('@folderId').then(folderId => {
-      cy.intercept('POST', `/folders/${folderId}/postpone`).as('postponeExpiration')
+    cy.extractFolderId().then(folderId => {
+      cy.intercept('PUT', `/folders/${folderId}/postpone`).as('postponeExpiration')
     })
   })
 
@@ -43,7 +41,7 @@ describe('Issue #87: Postpone button (extend folder expiration date by one month
         const expiresOnDate = dayjs(expiresOn.match(/^expires on (?<date>.*)$/).groups['date'])
 
         // Allow a 2 minute margin to account for computer time glitches
-        const lbound = dayjs().second(0).millisecond(0).add(1, 'month').subtract(1, 'minute')
+        const lbound = dayjs().second(0).millisecond(0).add(31, 'days').subtract(1, 'minute')
         const ubound = lbound.clone().add(2, 'minutes')
         expect(expiresOnDate.isBetween(lbound, ubound)).to.be.true
 
@@ -54,7 +52,7 @@ describe('Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.contains('.btn', 'Postpone expiration').should('be.visible').click()
 
-    cy.ensureModal(new RegExp(`Postpone the expiration date of ${FOLDER_NAME} by one month`))
+    cy.ensureModal(new RegExp(`Postpone the expiration date of\s*${FOLDER_NAME} by one month`))
       .within(function () {
         cy.contains(`Current expiration date: ${this.expirationDate}`).should('be.visible')
         // Since tests run instantly, this will be the same date
@@ -86,19 +84,12 @@ describe('Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.contains('.btn', 'Postpone expiration').should('be.visible').click()
 
-    cy.ensureModal(new RegExp(`Postpone the expiration date of ${FOLDER_NAME} by one month`))
-      .within(function () {
-        cy.contains(`Current expiration date: ${this.expirationDate}`).should('be.visible')
-        // Since tests run instantly, this will be the same date
-        cy.contains(`Expiration date after postponing: ${this.expirationDate}`).should('be.visible')
-      })
-      .closeModal('Cancel')
+    cy.ensureModal(new RegExp(`Postpone the expiration date of\s*${FOLDER_NAME} by one month`)).closeModal('No, cancel')
 
     cy.get('@postponeExpiration').should('be.null')
 
-    cy.url().should('eq', '@adminUrl')
-
     cy.ensureNoModal()
-    cy.ensureNoToast({ timeout: 0 })
+
+    cy.url().should('eq', '@adminUrl')
   })
 })

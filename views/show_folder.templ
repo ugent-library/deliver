@@ -2,6 +2,7 @@ package views
 
 import (
     "fmt"
+    "time"
     "github.com/ugent-library/friendly"
     "github.com/ugent-library/deliver/ctx"
     "github.com/ugent-library/deliver/models"
@@ -38,7 +39,12 @@ templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
                             </a>
                         </div>
                         <div class="bc-toolbar-item">
-                            <button class="btn btn-link btn-link-muted">
+                            <button class="btn btn-link btn-link-muted"
+                                hx-put={ c.PathTo("postponeExpiration", "folderID", folder.ID).String() }
+                                data-confirm="true"
+                                data-confirm-header={ fmt.Sprintf("Postpone the expiration date of<br /><strong>%s</strong> by one month", folder.Name) }
+                                data-confirm-content={ fmt.Sprintf("Current expiration date: %s<br />Expiration date after postponing: %s", folder.ExpiresAt.In(c.Timezone).Format("2006-01-02"), time.Now().AddDate(0, 0, 31).In(c.Timezone).Format("2006-01-02"))}
+                                data-confirm-proceed="Postpone">
                                 <i class="if if-arrow-go-back"></i>
                                 <span class="btn-text">Postpone expiration</span>
                             </button>

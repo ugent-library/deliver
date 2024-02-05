@@ -31,9 +31,9 @@ export default function ensureModal(
     .should('be.visible')
     .within(NO_LOG, () => {
       if (expectedTitle instanceof RegExp) {
-        cy.get('.modal-content', NO_LOG).invoke(NO_LOG, 'text').should('match', expectedTitle)
+        cy.get('.modal-body', NO_LOG).invoke(NO_LOG, 'text').should('match', expectedTitle)
       } else {
-        cy.get('.modal-content', NO_LOG).should('have.text', expectedTitle)
+        cy.get('.modal-body', NO_LOG).should('have.text', expectedTitle)
       }
     })
     .finishLog(log)

@@ -48,7 +48,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	folder := &models.Folder{
 		SpaceID:   space.ID,
 		Name:      b.Name,
-		ExpiresAt: time.Now().AddDate(0, 1, 0),
+		ExpiresAt: time.Now().AddDate(0, 0, 31),
 	}
 
 	if err := c.Repo.Folders.Create(r.Context(), folder); err != nil {
@@ -97,6 +97,10 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 
 	loc := c.PathTo("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
+}
+
+func PostponeFolderExpiration(w http.ResponseWriter, r *http.Request) {
+	panic("PostponeFolderExpiration not implemented")
 }
 
 func DeleteFolder(w http.ResponseWriter, r *http.Request) {
