@@ -21,6 +21,9 @@ RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/motd' \
 ===================================================================\n\
 = Welcome to dev containers                                       =\n\
 ===================================================================\n\
+Before you start, run:\n\
+    npm install\n\
+    go mod download -x\n\
 \n\
 Here are some useful commands to get you started:\n\
 \n\

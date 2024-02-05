@@ -15,7 +15,6 @@ services:
       - |
         cd /src
         bash -i -c 'nvm install'
-        npm install
         tern status
         tern migrate
         sleep infinity
