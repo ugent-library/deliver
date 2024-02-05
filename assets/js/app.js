@@ -32,6 +32,7 @@ htmx.on('htmx:confirm', evt => {
     evt.preventDefault()
 
     let modalEl = document.getElementById('modal-confirm').content.firstElementChild.cloneNode(true)
+    const confirmProceed = modalEl.querySelector('.confirm-proceed')
 
     document.body.append(modalEl)
 
@@ -42,10 +43,14 @@ htmx.on('htmx:confirm', evt => {
       modalEl.querySelector('.confirm-content').innerHTML = el.dataset.confirmContent
     }
     if (el.dataset.confirmProceed) {
-      modalEl.querySelector('.confirm-proceed').innerHTML = el.dataset.confirmProceed
+      confirmProceed.innerHTML = el.dataset.confirmProceed
+    }
+    if (el.dataset.confirmProceedStyle) {
+      confirmProceed.classList.remove('btn-danger')
+      confirmProceed.classList.add('btn-' + el.dataset.confirmProceedStyle)
     }
 
-    modalEl.querySelector('.confirm-proceed').addEventListener(
+    confirmProceed.addEventListener(
       'click',
       () => {
         evt.detail.issueRequest()

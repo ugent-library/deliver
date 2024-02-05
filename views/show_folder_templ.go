@@ -133,7 +133,7 @@ func ShowFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" data-confirm-proceed=\"Postpone\"><i class=\"if if-arrow-go-back\"></i> <span class=\"btn-text\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" data-confirm-proceed=\"Postpone\" data-confirm-proceed-style=\"primary\"><i class=\"if if-arrow-go-back\"></i> <span class=\"btn-text\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

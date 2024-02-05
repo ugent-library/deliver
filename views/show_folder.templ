@@ -44,7 +44,8 @@ templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
                                 data-confirm="true"
                                 data-confirm-header={ fmt.Sprintf("Postpone the expiration date of<br /><strong>%s</strong> by one month", folder.Name) }
                                 data-confirm-content={ fmt.Sprintf("Current expiration date: %s<br />Expiration date after postponing: %s", folder.ExpiresAt.In(c.Timezone).Format("2006-01-02"), time.Now().AddDate(0, 0, 31).In(c.Timezone).Format("2006-01-02"))}
-                                data-confirm-proceed="Postpone">
+                                data-confirm-proceed="Postpone"
+                                data-confirm-proceed-style="primary">
                                 <i class="if if-arrow-go-back"></i>
                                 <span class="btn-text">Postpone expiration</span>
                             </button>
