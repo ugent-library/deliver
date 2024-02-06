@@ -12,6 +12,8 @@ describe('Managing folders', () => {
 
     cy.contains('a', FOLDER_NAME).should('not.exist')
 
+    cy.getTotalNumberOfFolders().as('totalNumberOfFolders', { type: 'static' })
+
     cy.setFieldByLabel('Folder name', FOLDER_NAME)
     cy.contains('.btn', 'Make folder').click()
 
@@ -36,6 +38,10 @@ describe('Managing folders', () => {
 
     cy.visitSpace()
 
+    cy.get<number>('@totalNumberOfFolders').then(totalNumberOfFolders => {
+      cy.getTotalNumberOfFolders().should('eq', totalNumberOfFolders + 1)
+    })
+
     cy.contains('tr', FOLDER_NAME)
       .should('exist')
       .find('td')
@@ -53,6 +59,26 @@ describe('Managing folders', () => {
     // Original text resets after 1.5s
     cy.wait(1500)
     cy.get('@copyButton').should('contain.text', 'Copy link')
+  })
+
+  it('should return an error if a new folder name is empty', () => {
+    cy.visitSpace()
+
+    cy.getTotalNumberOfFolders().as('totalNumberOfFolders')
+
+    cy.get('#folder-name').should('not.have.class', 'is-invalid')
+    cy.get('#folder-name-invalid').should('not.exist')
+
+    // TODO: uncomment next line when #114 is fixed
+    // cy.setFieldByLabel('Folder name', ' ')
+    cy.contains('.btn', 'Make folder').click()
+
+    cy.get('#folder-name').should('have.class', 'is-invalid')
+    cy.get('#folder-name-invalid').should('be.visible').and('have.text', 'name cannot be empty')
+
+    cy.location('pathname').should('eq', `/spaces/${Cypress.env('DEFAULT_SPACE')}/folders`)
+
+    cy.getTotalNumberOfFolders().should('eq', '@totalNumberOfFolders')
   })
 
   it('should return an error if a new folder name is already in use within the same space', () => {
@@ -166,6 +192,8 @@ describe('Managing folders', () => {
 
     cy.visitSpace()
 
+    cy.getTotalNumberOfFolders().as('totalNumberOfFolders', { type: 'static' })
+
     cy.contains('a', FOLDER_NAME).should('exist')
 
     cy.contains('a', FOLDER_NAME).click()
@@ -175,6 +203,10 @@ describe('Managing folders', () => {
     cy.contains('.btn', 'Delete folder').click()
 
     cy.location('pathname').should('eq', `/spaces/${Cypress.env('DEFAULT_SPACE')}`)
+
+    cy.get<number>('@totalNumberOfFolders').then(totalNumberOfFolders => {
+      cy.getTotalNumberOfFolders().should('eq', totalNumberOfFolders - 1)
+    })
 
     cy.ensureToast('Folder deleted successfully').closeToast()
     cy.ensureNoToast()
