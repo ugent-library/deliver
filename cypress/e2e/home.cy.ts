@@ -19,13 +19,11 @@ describe('The home page', () => {
     const assertLoginRedirection = href => {
       cy.request(href).then(response => {
         expect(response).to.have.property('isOkStatusCode', true)
-        expect(response).to.have.property('redirects').that.is.an('array').that.has.length(1)
+        expect(response).to.have.property('redirects').that.is.an('array')
 
-        const redirects = response.redirects
-          .map(url => url.replace(/^3\d\d\: /, '')) // Redirect entries are in form '3XX: {url}'
-          .map(url => new URL(url))
+        const redirect = new URL(response.redirects.at(-1).replace(/^3\d\d\: /, '')) // Redirect entries are in form '3XX: {url}'
 
-        expect(redirects[0]).to.have.property('hostname', 'test.liblogin.ugent.be')
+        expect(redirect).to.have.property('origin', Cypress.env('OIDC_ORIGIN'))
       })
     }
 

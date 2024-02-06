@@ -1,13 +1,20 @@
 import { defineConfig } from 'cypress'
-import * as dotenvPlugin from 'cypress-dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
 
 export default defineConfig({
   projectId: 'fm8w1c',
 
+  env: {
+    OIDC_ORIGIN: 'http://localhost:3102',
+    SUPER_ADMIN_USER_NAME: 'superdeliver',
+    SPACE_ADMIN_USER_NAME: 'deliver',
+    DEFAULT_SPACE: 'CYPRESS',
+  },
+
   e2e: {
-    baseUrl: 'https://deliver.libtest.ugent.be/',
+    baseUrl: 'http://localhost:3101/',
+
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
 
@@ -33,8 +40,6 @@ export default defineConfig({
           return downloads
         },
       })
-
-      config = dotenvPlugin(config)
 
       return config
     },

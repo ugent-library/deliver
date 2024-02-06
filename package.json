@@ -1,11 +1,11 @@
 {
+  "name": "deliver",
   "private": true,
   "scripts": {
     "test": "cypress run --config-file cypress/cypress.config.ts",
-    "test:local": "cypress run --config-file cypress/cypress.config.ts --config baseUrl=http://localhost:3001",
-    "cypress:open": "cypress open --config-file cypress/cypress.config.ts --browser chrome --e2e",
-    "cypress:open:local": "cypress open --config-file cypress/cypress.config.ts --browser chrome --e2e --config baseUrl=http://localhost:3001",
-    "cypress:record": "cypress/cypress-record.sh",
+    "test:libtest": "env-cmd --file ./cypress/.env npm test",
+    "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e --browser electron",
+    "cypress:open:libtest": "env-cmd --file ./cypress/.env npm run cypress:open",
     "precommit": "node node_modules/js-precommit-hook",
     "generate-issue-test": "node ./cypress/scripts/generate-issue-test.mjs"
   },
@@ -13,7 +13,7 @@
   "devDependencies": {
     "cypress": "^13.6.3",
     "cypress-common": "github:ugent-library/cypress-common#3.16.1",
-    "cypress-dotenv": "^2.0.0",
+    "env-cmd": "^10.1.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
     "laravel-mix": "^6.0.11",
     "resolve-url-loader": "^4.0.0",
