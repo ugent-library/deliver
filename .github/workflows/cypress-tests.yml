@@ -25,7 +25,7 @@ jobs:
           config: baseUrl=https://deliver.libtest.ugent.be,video=true,retries=2
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          CYPRESS_OIDC_ORIGIN: ${{ env.CYPRESS_OIDC_ORIGIN }}
+          CYPRESS_OIDC_ORIGIN: ${{ vars.CYPRESS_OIDC_ORIGIN }}
           CYPRESS_SPACE_ADMIN_USER_NAME: ${{ secrets.CYPRESS_SPACE_ADMIN_USER_NAME }}
           CYPRESS_SPACE_ADMIN_USER_PASSWORD: ${{ secrets.CYPRESS_SPACE_ADMIN_USER_PASSWORD }}
           CYPRESS_SUPER_ADMIN_USER_NAME: ${{ secrets.CYPRESS_SUPER_ADMIN_USER_NAME }}
