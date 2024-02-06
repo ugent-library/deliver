@@ -113,9 +113,8 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		Body: fmt.Sprintf("%s just deleted the folder %s.", c.User.Name, folder.Name),
 	})))
 	c.Hub.SendString("folder."+folder.ID, views.String(views.AddFlash(ctx.Flash{
-		Type:       "error",
-		Body:       fmt.Sprintf("%s just deleted this folder.", c.User.Name),
-		AlwaysShow: true,
+		Type: "error",
+		Body: fmt.Sprintf("%s just deleted this folder.", c.User.Name),
 	})))
 	c.PersistFlash(w, ctx.Flash{
 		Type:         "info",

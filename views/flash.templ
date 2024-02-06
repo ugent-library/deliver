@@ -13,11 +13,10 @@ templ AddFlash(f ctx.Flash) {
 
 templ flash(f ctx.Flash) {
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true"
-        if f.AlwaysShow {
-        data-bs-autohide="false"
-        }
         if f.DismissAfter != 0 {
         data-bs-delay={ fmt.Sprint(f.DismissAfter.Milliseconds()) }
+        } else {
+        data-bs-autohide="false"
         }
     >
         <div class="toast-body">
