@@ -100,7 +100,26 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostponeFolderExpiration(w http.ResponseWriter, r *http.Request) {
-	panic("PostponeFolderExpiration not implemented")
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
+
+	folder.PostponeExpiration()
+
+	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
+		c.PersistFlash(w, ctx.Flash{
+			Type:         "error",
+			Body:         fmt.Sprintf("Unexpected error: %s", err.Error()),
+			DismissAfter: 0,
+		})
+	} else {
+		c.PersistFlash(w, ctx.Flash{
+			Type:         "success",
+			Body:         fmt.Sprintf("New expiration date for %s: %s", folder.Name, folder.ExpiresAt.In(c.Timezone).Format("2006-01-02")),
+			DismissAfter: 3 * time.Second,
+		})
+	}
+
+	htmx.Refresh(w)
 }
 
 func DeleteFolder(w http.ResponseWriter, r *http.Request) {

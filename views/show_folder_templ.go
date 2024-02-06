@@ -15,7 +15,6 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/friendly"
-	"time"
 )
 
 func ShowFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
@@ -129,7 +128,7 @@ func ShowFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("Current expiration date: %s<br />Expiration date after postponing: %s", folder.ExpiresAt.In(c.Timezone).Format("2006-01-02"), time.Now().AddDate(0, 0, 31).In(c.Timezone).Format("2006-01-02"))))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("Current expiration date: %s<br />Expiration date after postponing: %s", folder.ExpiresAt.In(c.Timezone).Format("2006-01-02"), folder.PostponeExpiration().In(c.Timezone).Format("2006-01-02"))))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

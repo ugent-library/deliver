@@ -31,7 +31,7 @@ htmx.on('htmx:confirm', evt => {
   if (el.dataset.confirm) {
     evt.preventDefault()
 
-    let modalEl = document.getElementById('modal-confirm').content.firstElementChild.cloneNode(true)
+    const modalEl = document.getElementById('modal-confirm').content.firstElementChild.cloneNode(true)
     const confirmProceed = modalEl.querySelector('.confirm-proceed')
 
     document.body.append(modalEl)

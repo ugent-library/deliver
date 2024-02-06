@@ -57,6 +57,7 @@ func (r *FoldersRepo) Update(ctx context.Context, f *models.Folder) error {
 	}
 	row, err := r.client.Folder.UpdateOneID(f.ID).
 		SetName(f.Name).
+		SetExpiresAt(f.ExpiresAt).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
 		return okay.NewErrors(okay.ErrNotUnique("name"))

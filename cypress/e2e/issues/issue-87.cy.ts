@@ -70,7 +70,7 @@ describe('Issue #87: Postpone button (extend folder expiration date by one month
       cy.ensureToast(`New expiration date for ${FOLDER_NAME}: ${expirationDate}`)
     })
 
-    cy.wait(3100)
+    cy.wait(3500)
 
     cy.ensureNoToast({ timeout: 0 })
   })
