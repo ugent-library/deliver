@@ -8,6 +8,8 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-22.04
+    container: 
+      image: cypress/included:latest
     steps:
       - name: Setup Node.js 18
         uses: actions/setup-node@v3
@@ -20,7 +22,7 @@ jobs:
         with:
           config-file: cypress/cypress.config.ts
           record: true
-          config: baseUrl=${{ secrets.CYPRESS_BASE_URL }},video=true,retries=2
+          config: baseUrl=https://deliver.libtest.ugent.be,video=true,retries=2
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_OIDC_ORIGIN: ${{ secrets.CYPRESS_OIDC_ORIGIN }}
