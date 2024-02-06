@@ -48,7 +48,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	folder := &models.Folder{
 		SpaceID:   space.ID,
 		Name:      b.Name,
-		ExpiresAt: time.Now().AddDate(0, 1, 0),
+		ExpiresAt: time.Now().AddDate(0, 0, 31),
 	}
 
 	if err := c.Repo.Folders.Create(r.Context(), folder); err != nil {
