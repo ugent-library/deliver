@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ugent-library/bind"
@@ -47,7 +48,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	// TODO constructor for new objects
 	folder := &models.Folder{
 		SpaceID:   space.ID,
-		Name:      b.Name,
+		Name:      strings.TrimSpace(b.Name),
 		ExpiresAt: time.Now().AddDate(0, 0, 31),
 	}
 
@@ -82,7 +83,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	folder.Name = b.Name
+	folder.Name = strings.TrimSpace(b.Name)
 
 	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
 		validationErrors := okay.NewErrors()
