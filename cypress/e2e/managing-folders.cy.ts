@@ -1,6 +1,8 @@
 import getRandomText from "support/util";
 
 describe("Managing folders", () => {
+  const NBSP = String.fromCharCode(160);
+
   beforeEach(() => {
     cy.loginAsSpaceAdmin();
   });
@@ -74,7 +76,7 @@ describe("Managing folders", () => {
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
 
-    cy.setFieldByLabel("Folder name", "   " + FOLDER_NAME + "   ");
+    cy.setFieldByLabel("Folder name", ` \t  ${FOLDER_NAME}  ${NBSP} `);
     cy.contains(".btn", "Make folder").click();
 
     cy.get(".bc-toolbar-title")
@@ -195,7 +197,10 @@ describe("Managing folders", () => {
 
     cy.contains(".btn", "Edit").click();
 
-    cy.setFieldByLabel("Folder name", "    " + FOLDER_NAME + " (updated)   ");
+    cy.setFieldByLabel(
+      "Folder name",
+      ` \t   ${FOLDER_NAME} (updated)  ${NBSP} `
+    );
     cy.contains(".btn", "Save changes").click();
 
     cy.get("h4.bc-toolbar-title").should(
