@@ -201,6 +201,7 @@ var serverCmd = &cobra.Command{
 					r.Get("/", handlers.ShowFolder).Name("folder")
 					r.Get("/edit", handlers.EditFolder).Name("editFolder")
 					r.Put("/", handlers.UpdateFolder).Name("updateFolder")
+					r.Put("/postpone", handlers.PostponeFolderExpiration).Name("postponeExpiration")
 					r.Post("/files", handlers.UploadFile).Name("uploadFile")
 					r.Delete("/", handlers.DeleteFolder).Name("deleteFolder")
 				})

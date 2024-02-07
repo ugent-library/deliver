@@ -13,6 +13,8 @@ import (
 
 var reSlug = regexp.MustCompile("[^a-zA-Z0-9-]+")
 
+const PostponePeriod = 31 * 24 * time.Hour
+
 type Folder struct {
 	ID        string    `json:"id,omitempty"`
 	SpaceID   string    `json:"space_id,omitempty"`
@@ -50,12 +52,18 @@ func (f *Folder) Validate() error {
 	)
 }
 
+func (f *Folder) PostponeExpiration() time.Time {
+	f.ExpiresAt = time.Now().Add(PostponePeriod)
+
+	return f.ExpiresAt
+}
+
 func (f *Folder) Fake(faker *gofakeit.Faker) (any, error) {
 	created := gofakeit.PastDate()
 	return Folder{
 		Name:      fmt.Sprintf("%d", gofakeit.Number(1234567, 9123456)),
 		CreatedAt: created,
 		UpdatedAt: gofakeit.DateRange(created, time.Now()),
-		ExpiresAt: created.AddDate(0, 0, 31),
+		ExpiresAt: created.Add(PostponePeriod),
 	}, nil
 }
