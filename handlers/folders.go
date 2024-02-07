@@ -107,9 +107,8 @@ func PostponeFolderExpiration(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
 		c.PersistFlash(w, ctx.Flash{
-			Type:         "error",
-			Body:         fmt.Sprintf("Unexpected error: %s", err.Error()),
-			DismissAfter: 0,
+			Type: "error",
+			Body: fmt.Sprintf("Unexpected error: %s", err.Error()),
 		})
 	} else {
 		c.PersistFlash(w, ctx.Flash{
