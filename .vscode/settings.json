@@ -1,4 +1,9 @@
 {
+  "[go]": {
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": ["bootstrap", "htmx", "laravel", "OIDC", "popperjs", "precommit", "ugent"]
 }
