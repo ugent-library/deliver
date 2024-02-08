@@ -9,9 +9,9 @@ import (
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/okay"
 	"github.com/ugent-library/deliver/views"
 	"github.com/ugent-library/httperror"
+	"github.com/ugent-library/okay"
 )
 
 var reSplitAdmins = regexp.MustCompile(`\s*[,;]\s*`)
@@ -58,7 +58,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.ShowSpace(c, space, userSpaces, &models.Folder{}, okay.NewErrors()).Render(r.Context(), w)
+	views.ShowSpace(c, space, space.Folders, "TODO", userSpaces, &models.Folder{}, okay.NewErrors()).Render(r.Context(), w)
 }
 
 func ShowSpace(w http.ResponseWriter, r *http.Request) {
@@ -159,5 +159,12 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	views.ShowSpace(c, space, userSpaces, folder, validationErrors).Render(r.Context(), w)
+	q := r.URL.Query().Get("q")
+	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space, q)
+	if err != nil {
+		c.HandleError(w, r, err)
+		return
+	}
+
+	views.ShowSpace(c, space, folders, q, userSpaces, folder, validationErrors).Render(r.Context(), w)
 }

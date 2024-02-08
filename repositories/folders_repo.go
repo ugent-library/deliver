@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent"
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
@@ -30,6 +31,27 @@ func (r *FoldersRepo) Get(ctx context.Context, id string) (*models.Folder, error
 		return nil, err
 	}
 	return rowToFolder(row), nil
+}
+
+func (r *FoldersRepo) GetBySpace(ctx context.Context, space *models.Space, q string) ([]*models.Folder, error) {
+	query := r.client.Folder.Query().
+		Where(folder.SpaceIDEQ(space.ID))
+
+	if q != "" {
+		query = query.Where(func(s *sql.Selector) {
+			s.Where(sql.Like(folder.FieldName, "%"+q+"%"))
+		})
+	}
+	rows, err := query.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	folders := make([]*models.Folder, len(rows))
+	for i, row := range rows {
+		folders[i] = rowToFolder(row)
+	}
+	return folders, nil
 }
 
 func (r *FoldersRepo) Create(ctx context.Context, f *models.Folder) error {
