@@ -10,22 +10,7 @@ To run the application you will need:
 
 ## Configuration
 
-Deliver is configured with these environment variables:
-
-* `DELIVER_ENV`
-* `DELIVER_HOST`
-* `DELIVER_PORT`
-* `DELIVER_ADMINS`
-* `DELIVER_REPO_CONN`
-* `DELIVER_STORAGE_BACKEND`
-* `DELIVER_STORAGE_CONN`
-* `DELIVER_OIDC_URL`
-* `DELIVER_OIDC_ID`
-* `DELIVER_OIDC_SECRET`
-* `DELIVER_OIDC_REDIRECT_URL`
-* `DELIVER_COOKIE_SECRET`
-* `DELIVER_MAX_FILE_SIZE`
-* `DELIVER_TIMEZONE`
+See [here](CONFIG.md).
 
 ## Docker Setup
 

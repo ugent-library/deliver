@@ -2,6 +2,8 @@ package cli
 
 import "fmt"
 
+//go:generate go run github.com/g4s8/envdoc@v0.1.2 --output ../CONFIG.md --all
+
 // Version info
 type Version struct {
 	Branch string `env:"SOURCE_BRANCH"`

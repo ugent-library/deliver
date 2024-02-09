@@ -6,11 +6,12 @@ toolchain go1.21.6
 
 require (
 	entgo.io/ent v0.12.3
-	github.com/a-h/templ v0.2.513
+	github.com/a-h/templ v0.2.543
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.67
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.33.1
+	github.com/brianvoe/gofakeit/v6 v6.27.0
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/gorilla/csrf v1.7.1
@@ -29,8 +30,6 @@ require (
 )
 
 require (
-	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
-	github.com/brianvoe/gofakeit/v6 v6.27.0 // indirect
 	github.com/coreos/go-oidc/v3 v3.6.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
@@ -77,7 +76,7 @@ require (
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/mod v0.10.0 // indirect
+	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

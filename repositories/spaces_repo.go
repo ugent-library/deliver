@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	entsql "entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"github.com/ugent-library/deliver/ent"
 	"github.com/ugent-library/deliver/ent/folder"
@@ -18,7 +18,11 @@ type SpacesRepo struct {
 
 func (r *SpacesRepo) GetAll(ctx context.Context) ([]*models.Space, error) {
 	rows, err := r.client.Space.Query().
-		Order(ent.Asc(space.FieldName)).
+		Order(func(s *sql.Selector) {
+			s.OrderExpr(sql.ExprFunc(func(b *sql.Builder) {
+				b.WriteString("UPPER(").Ident(space.FieldName).WriteString(")")
+			}))
+		}).
 		All(ctx)
 	if err != nil {
 		return nil, err
@@ -32,7 +36,7 @@ func (r *SpacesRepo) GetAll(ctx context.Context) ([]*models.Space, error) {
 
 func (r *SpacesRepo) GetAllByUsername(ctx context.Context, username string) ([]*models.Space, error) {
 	rows, err := r.client.Space.Query().
-		Where(func(s *entsql.Selector) {
+		Where(func(s *sql.Selector) {
 			s.Where(sqljson.ValueContains(space.FieldAdmins, username))
 		}).
 		Order(ent.Asc(space.FieldName)).

@@ -24,6 +24,7 @@ jobs:
           record: true
           config: video=true,retries=2
         env:
+          TZ: Europe/Brussels
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_BASE_URL: ${{ vars.CYPRESS_BASE_URL }}
           CYPRESS_OIDC_ORIGIN: ${{ vars.CYPRESS_OIDC_ORIGIN }}

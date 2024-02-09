@@ -52,13 +52,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	space, err := c.Repo.Spaces.GetByName(r.Context(), userSpaces[0].Name)
-	if err != nil {
-		c.HandleError(w, r, err)
-		return
-	}
-
-	views.ShowSpace(c, space, space.Folders, "TODO", userSpaces, &models.Folder{}, okay.NewErrors()).Render(r.Context(), w)
+	http.Redirect(w, r, c.PathTo("space", "spaceName", userSpaces[0].Name).String(), http.StatusSeeOther)
 }
 
 func ShowSpace(w http.ResponseWriter, r *http.Request) {

@@ -39,7 +39,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	space := ctx.GetSpace(r)
 
 	b := FolderForm{}
-	if err := bind.Form(r, &b); err != nil {
+	if err := bind.Form(r, &b, bind.Vacuum); err != nil {
 		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
@@ -77,7 +77,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r)
 
 	b := FolderForm{}
-	if err := bind.Form(r, &b); err != nil {
+	if err := bind.Form(r, &b, bind.Vacuum); err != nil {
 		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
