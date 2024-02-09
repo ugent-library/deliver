@@ -5,7 +5,7 @@ go 1.21.5
 toolchain go1.21.6
 
 require (
-	entgo.io/ent v0.12.3
+	entgo.io/ent v0.12.5
 	github.com/a-h/templ v0.2.543
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
@@ -40,7 +40,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.12.0 // indirect
+	ariga.io/atlas v0.14.1-0.20230918065911-83ad451a4935 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/alexliesenfeld/health v0.7.0
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect

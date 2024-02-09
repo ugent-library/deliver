@@ -36,6 +36,14 @@ func (su *SpaceUpdate) SetName(s string) *SpaceUpdate {
 	return su
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (su *SpaceUpdate) SetNillableName(s *string) *SpaceUpdate {
+	if s != nil {
+		su.SetName(*s)
+	}
+	return su
+}
+
 // SetAdmins sets the "admins" field.
 func (su *SpaceUpdate) SetAdmins(s []string) *SpaceUpdate {
 	su.mutation.SetAdmins(s)
@@ -231,6 +239,14 @@ type SpaceUpdateOne struct {
 // SetName sets the "name" field.
 func (suo *SpaceUpdateOne) SetName(s string) *SpaceUpdateOne {
 	suo.mutation.SetName(s)
+	return suo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (suo *SpaceUpdateOne) SetNillableName(s *string) *SpaceUpdateOne {
+	if s != nil {
+		suo.SetName(*s)
+	}
 	return suo
 }
 

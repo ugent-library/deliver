@@ -461,12 +461,16 @@ func (u *SpaceUpsertOne) IDX(ctx context.Context) string {
 // SpaceCreateBulk is the builder for creating many Space entities in bulk.
 type SpaceCreateBulk struct {
 	config
+	err      error
 	builders []*SpaceCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Space entities in the database.
 func (scb *SpaceCreateBulk) Save(ctx context.Context) ([]*Space, error) {
+	if scb.err != nil {
+		return nil, scb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
 	nodes := make([]*Space, len(scb.builders))
 	mutators := make([]Mutator, len(scb.builders))
@@ -685,6 +689,9 @@ func (u *SpaceUpsertBulk) UpdateUpdatedAt() *SpaceUpsertBulk {
 
 // Exec executes the query.
 func (u *SpaceUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the SpaceCreateBulk instead", i)
