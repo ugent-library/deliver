@@ -34,9 +34,25 @@ func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillableUsername sets the "username" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableUsername(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetUsername(*s)
+	}
+	return uu
+}
+
 // SetName sets the "name" field.
 func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	uu.mutation.SetName(s)
+	return uu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetName(*s)
+	}
 	return uu
 }
 
@@ -46,9 +62,25 @@ func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetEmail(*s)
+	}
+	return uu
+}
+
 // SetRememberToken sets the "remember_token" field.
 func (uu *UserUpdate) SetRememberToken(s string) *UserUpdate {
 	uu.mutation.SetRememberToken(s)
+	return uu
+}
+
+// SetNillableRememberToken sets the "remember_token" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableRememberToken(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetRememberToken(*s)
+	}
 	return uu
 }
 
@@ -149,9 +181,25 @@ func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableUsername sets the "username" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableUsername(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetUsername(*s)
+	}
+	return uuo
+}
+
 // SetName sets the "name" field.
 func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	uuo.mutation.SetName(s)
+	return uuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetName(*s)
+	}
 	return uuo
 }
 
@@ -161,9 +209,25 @@ func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetEmail(*s)
+	}
+	return uuo
+}
+
 // SetRememberToken sets the "remember_token" field.
 func (uuo *UserUpdateOne) SetRememberToken(s string) *UserUpdateOne {
 	uuo.mutation.SetRememberToken(s)
+	return uuo
+}
+
+// SetNillableRememberToken sets the "remember_token" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableRememberToken(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetRememberToken(*s)
+	}
 	return uuo
 }
 

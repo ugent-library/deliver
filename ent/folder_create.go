@@ -530,12 +530,16 @@ func (u *FolderUpsertOne) IDX(ctx context.Context) string {
 // FolderCreateBulk is the builder for creating many Folder entities in bulk.
 type FolderCreateBulk struct {
 	config
+	err      error
 	builders []*FolderCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Folder entities in the database.
 func (fcb *FolderCreateBulk) Save(ctx context.Context) ([]*Folder, error) {
+	if fcb.err != nil {
+		return nil, fcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(fcb.builders))
 	nodes := make([]*Folder, len(fcb.builders))
 	mutators := make([]Mutator, len(fcb.builders))
@@ -768,6 +772,9 @@ func (u *FolderUpsertBulk) ClearExpiresAt() *FolderUpsertBulk {
 
 // Exec executes the query.
 func (u *FolderUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the FolderCreateBulk instead", i)
