@@ -209,7 +209,16 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<small class=\"form-text text-muted\">We will generate a shareable public link for you.<br>Each folder will expire one month after creation date.</small></div><div class=\"col-md-3\"><button class=\"btn btn-primary ms-4\" type=\"submit\"><i class=\"if if-check\"></i> <span class=\"btn-text\">Make folder</span></button></div></div></div></form></div></div><form><div class=\"form mb-6 mt-8\"><div class=\"row\"><div class=\"col\"><div class=\"input-group\"><input class=\"form-control\" type=\"text\" id=\"q\" name=\"q\" value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<small class=\"form-text text-muted\">We will generate a shareable public link for you.<br>Each folder will expire one month after creation date.</small></div><div class=\"col-md-3\"><button class=\"btn btn-primary ms-4\" type=\"submit\"><i class=\"if if-check\"></i> <span class=\"btn-text\">Make folder</span></button></div></div></div></form></div></div><form action=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var12 templ.SafeURL = templ.URL(c.PathTo("space", "spaceName", space.Name).String())
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var12)))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><div class=\"form mb-6 mt-8\"><div class=\"row\"><div class=\"col\"><div class=\"input-group\"><input class=\"form-control\" type=\"search\" id=\"q\" name=\"q\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -217,7 +226,15 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <label class=\"visually-hidden\" for=\"q\">Search</label> <button class=\"btn btn-outline-primary\" type=\"submit\"><i class=\"if if-search\"></i><div class=\"btn-text\">Search</div></button></div></div></div></div></form>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.PathTo("getFolders", "spaceName", space.Name).String()))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"input changed delay:500ms, search\" hx-target=\"#folders\" hx-swap=\"innerHTML\"> <label class=\"visually-hidden\" for=\"q\">Search</label> <button class=\"btn btn-outline-primary\" type=\"submit\"><i class=\"if if-search\"></i><div class=\"btn-text\">Search</div></button></div></div></div></div></form><div id=\"folders\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -225,7 +242,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

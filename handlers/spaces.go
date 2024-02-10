@@ -59,6 +59,20 @@ func ShowSpace(w http.ResponseWriter, r *http.Request) {
 	showSpace(w, r, &models.Folder{}, nil)
 }
 
+func GetFolders(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r)
+	q := r.URL.Query().Get("q")
+
+	folders, err := getFolders(r, q)
+	if err != nil {
+		c.HandleError(w, r, err)
+		return
+	}
+
+	space := ctx.GetSpace(r)
+	views.Folders(c, folders, len(space.Folders)).Render(r.Context(), w)
+}
+
 func NewSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	views.NewSpace(c, &models.Space{}, okay.NewErrors()).Render(r.Context(), w)
@@ -154,11 +168,20 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 	}
 
 	q := r.URL.Query().Get("q")
-	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space, q)
+	folders, err := getFolders(r, q)
 	if err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
 
 	views.ShowSpace(c, space, folders, q, userSpaces, folder, validationErrors).Render(r.Context(), w)
+}
+
+func getFolders(r *http.Request, q string) ([]*models.Folder, error) {
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
+
+	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space, q)
+
+	return folders, err
 }

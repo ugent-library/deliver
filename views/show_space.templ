@@ -109,12 +109,22 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 						</form>
 					</div>
 				</div>
-				<form>
+				<form action={ templ.URL(c.PathTo("space", "spaceName", space.Name).String()) }>
 					<div class="form mb-6 mt-8">
 						<div class="row">
 							<div class="col">
 								<div class="input-group">
-									<input class="form-control" type="text" id="q" name="q" value={ q }/>
+									<input
+										class="form-control"
+										type="search"
+										id="q"
+										name="q"
+										value={ q }
+										hx-get={ c.PathTo("getFolders", "spaceName", space.Name).String() }
+										hx-trigger="input changed delay:500ms, search"
+										hx-target="#folders"
+										hx-swap="innerHTML"
+									/>
 									<label class="visually-hidden" for="q">Search</label>
 									<button class="btn btn-outline-primary" type="submit">
 										<i class="if if-search"></i>
@@ -125,7 +135,9 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 						</div>
 					</div>
 				</form>
-				@Folders(c, folders, len(space.Folders))
+				<div id="folders">
+					@Folders(c, folders, len(space.Folders))
+				</div>
 			</div>
 		</div>
 	}
