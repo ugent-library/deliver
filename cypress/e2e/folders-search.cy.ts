@@ -124,17 +124,32 @@ describe("Folder searching", () => {
   });
 
   it("should retain the current AJAX search when reloading the page", () => {
-    cy.get("input[name=q]").type("School", { delay: 0 }).blur();
+    cy.getNumberOfDisplayedFolders().as("folderCountBeforeSearch");
+
+    cy.get("input[name=q]").as("q").type("School", { delay: 0 }).blur();
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
       .should("eql", { q: "School" });
+
+    cy.url().should("have.param", "q", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
 
     cy.reload();
 
     assertFilteredFolders(["School work", "School projects"]);
+
+    cy.get("@q").clear();
+
+    cy.wait("@filterFolders")
+      .should("have.nested.property", "request.query")
+      .should("eql", { q: "" });
+
+    cy.url().should("not.have.param", "q");
+    cy.location("search").should("be.empty");
+
+    cy.get("@folderCountBeforeSearch").should("eq", "@folderCountBeforeSearch");
   });
 
   it("should be protected against SQL injection", () => {
@@ -219,6 +234,7 @@ describe("Folder searching", () => {
 
     cy.getNumberOfDisplayedFolders().should("eq", filteredFolders.length);
     cy.getTotalNumberOfFolders().should("eq", "@totalBeforeFiltering");
+    cy.get("#folders tbody tr").should("have.length", filteredFolders.length);
 
     TEST_FOLDER_NAMES.forEach((folderName) => {
       const assertion = filteredFolders.includes(folderName)

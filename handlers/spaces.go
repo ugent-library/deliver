@@ -10,6 +10,7 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/views"
+	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/okay"
 )
@@ -70,6 +71,15 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 	}
 
 	space := ctx.GetSpace(r)
+
+	newUrl := c.PathTo("space", "spaceName", space.Name)
+	newQuery := newUrl.Query()
+	if q != "" {
+		newQuery.Set("q", q)
+	}
+	newUrl.RawQuery = newQuery.Encode()
+	htmx.PushURL(w, newUrl.String())
+
 	views.Folders(c, folders, len(space.Folders)).Render(r.Context(), w)
 }
 
