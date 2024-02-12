@@ -164,6 +164,8 @@ describe("Folder searching", () => {
     it("should load correctly during full page load", () => {
       cy.visitSpace({ qs: { q: "School work" } });
 
+      cy.get("@filterFolders").should("be.null");
+
       assertFileDetailsLoadedCorrectly();
     });
 
@@ -174,6 +176,8 @@ describe("Folder searching", () => {
 
       cy.wait(600);
 
+      cy.get("@filterFolders", { timeout: 0 }).should("not.be.null");
+
       assertFileDetailsLoadedCorrectly();
     });
 
@@ -183,7 +187,7 @@ describe("Folder searching", () => {
       cy.get("#folders table tbody tr td")
         .eq(3)
         .should("contain", "1 file")
-        .should("contain", "130 bytes");
+        .should("contain", "130 B");
     }
   });
 

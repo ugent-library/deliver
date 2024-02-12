@@ -35,7 +35,8 @@ func (r *FoldersRepo) Get(ctx context.Context, id string) (*models.Folder, error
 
 func (r *FoldersRepo) GetBySpace(ctx context.Context, space *models.Space, q string) ([]*models.Folder, error) {
 	query := r.client.Folder.Query().
-		Where(folder.SpaceIDEQ(space.ID))
+		Where(folder.SpaceIDEQ(space.ID)).
+		WithFiles()
 
 	if q != "" {
 		query = query.Where(func(s *sql.Selector) {
