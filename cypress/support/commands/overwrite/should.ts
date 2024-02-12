@@ -1,7 +1,7 @@
-import { mapAlias } from './util'
+import { mapAlias } from "./util";
 
-Cypress.Commands.overwrite<'should', 'optional'>(
-  'should',
+Cypress.Commands.overwrite<"should", "optional">(
+  "should",
   function (
     this: Record<string, unknown>,
     originalFn: CallableFunction,
@@ -9,8 +9,8 @@ Cypress.Commands.overwrite<'should', 'optional'>(
     chainer: unknown,
     ...args: unknown[]
   ) {
-    args = args.map(a => mapAlias(this, a))
+    args = args.map((a) => mapAlias(this, a));
 
-    return originalFn(subject, chainer, ...args)
+    return originalFn(subject, chainer, ...args);
   }
-)
+);

@@ -1,19 +1,19 @@
-import { defineConfig } from 'cypress'
-import * as path from 'path'
-import * as fs from 'fs'
+import { defineConfig } from "cypress";
+import * as path from "path";
+import * as fs from "fs";
 
 export default defineConfig({
-  projectId: 'fm8w1c',
+  projectId: "fm8w1c",
 
   env: {
-    OIDC_ORIGIN: 'http://localhost:3102',
-    SUPER_ADMIN_USER_NAME: 'superdeliver',
-    SPACE_ADMIN_USER_NAME: 'deliver',
-    DEFAULT_SPACE: 'CYPRESS',
+    OIDC_ORIGIN: "http://localhost:3102",
+    SUPER_ADMIN_USER_NAME: "superdeliver",
+    SPACE_ADMIN_USER_NAME: "deliver",
+    DEFAULT_SPACE: "CYPRESS",
   },
 
   e2e: {
-    baseUrl: 'http://localhost:3101/',
+    baseUrl: "http://localhost:3101/",
 
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
@@ -23,25 +23,25 @@ export default defineConfig({
     viewportWidth: 1200,
 
     setupNodeEvents(on, config) {
-      on('task', {
+      on("task", {
         clearDownloads() {
-          const downloadsFolder = path.resolve(config.downloadsFolder)
+          const downloadsFolder = path.resolve(config.downloadsFolder);
 
           if (!fs.existsSync(downloadsFolder)) {
-            fs.mkdirSync(downloadsFolder, { recursive: true })
+            fs.mkdirSync(downloadsFolder, { recursive: true });
           }
 
-          const downloads = fs.readdirSync(downloadsFolder)
+          const downloads = fs.readdirSync(downloadsFolder);
 
-          downloads.forEach(file => {
-            fs.unlinkSync(path.join(downloadsFolder, file))
-          })
+          downloads.forEach((file) => {
+            fs.unlinkSync(path.join(downloadsFolder, file));
+          });
 
-          return downloads
+          return downloads;
         },
-      })
+      });
 
-      return config
+      return config;
     },
   },
-})
+});
