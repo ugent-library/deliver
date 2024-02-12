@@ -135,8 +135,17 @@ describe("Folder searching", () => {
     assertFilteredFolders(["School work", "School projects"]);
   });
 
+  it("should be protected against SQL injection", () => {
+    cy.get("input[name=q]").type("' OR 1=1 --");
+    cy.contains(".btn", "Search").click();
+
+    cy.getNumberOfDisplayedFolders().should("eq", 0);
+  });
+
   describe("Folder results table", () => {
     before(() => {
+      cy.loginAsSpaceAdmin();
+
       // Add 1 uploaded file to validate folders table
       cy.visitSpace({
         qs: { q: "School work" },
