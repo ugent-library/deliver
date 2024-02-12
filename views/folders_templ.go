@@ -226,7 +226,7 @@ func Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) templ.Compo
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"c-blank-slate c-blank-slate-muted\"><div class=\"bc-avatar\"><i class=\"if if-info-circle\"></i></div><p>Make a folder to get started</p></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"c-blank-slate c-blank-slate-muted\"><div class=\"bc-avatar\"><i class=\"if if-info-circle\"></i></div><h3>No folders to display.</h3><p>Refine your search or add a new folder.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

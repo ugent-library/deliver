@@ -1,3 +1,5 @@
+import { getRandomText } from "support/util";
+
 describe("Folder searching", () => {
   const TEST_FOLDER_NAMES = [
     "Personal documents",
@@ -142,6 +144,16 @@ describe("Folder searching", () => {
     cy.getNumberOfDisplayedFolders().should("eq", 0);
   });
 
+  it("should display a default message if nothing was filtered", () => {
+    cy.get("input[name=q]").type(getRandomText());
+    cy.contains(".btn", "Search").click();
+
+    cy.get("#folders .c-blank-slate")
+      .should("be.visible")
+      .and("contain.text", "No folders to display.")
+      .and("contain.text", "Refine your search or add a new folder.");
+  });
+
   describe("Folder results table", () => {
     before(() => {
       cy.loginAsSpaceAdmin();
@@ -202,6 +214,8 @@ describe("Folder searching", () => {
 
   function assertFilteredFolders(filteredFolders: TestFolderNames[]) {
     cy.get("#folders").scrollIntoView();
+
+    cy.get("#folders .c-blank-slate").should("not.exist");
 
     cy.getNumberOfDisplayedFolders().should("eq", filteredFolders.length);
     cy.getTotalNumberOfFolders().should("eq", "@totalBeforeFiltering");
