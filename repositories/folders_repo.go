@@ -39,10 +39,9 @@ func (r *FoldersRepo) GetBySpace(ctx context.Context, space *models.Space, q str
 		WithFiles()
 
 	if q != "" {
-		query = query.Where(func(s *sql.Selector) {
-			s.Where(sql.Like(folder.FieldName, "%"+q+"%"))
-		})
+		query = query.Where(sql.FieldContainsFold(folder.FieldName, q))
 	}
+
 	rows, err := query.All(ctx)
 	if err != nil {
 		return nil, err
