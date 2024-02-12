@@ -2,7 +2,7 @@
 
 import * as dayjs from "dayjs";
 
-import getRandomText from "support/util";
+import { getRandomText } from "support/util";
 
 describe("Issue #87: Postpone button (extend folder expiration date by one month)", () => {
   let FOLDER_NAME: string;

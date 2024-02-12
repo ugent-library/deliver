@@ -8,8 +8,6 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-22.04
-    container: 
-      image: cypress/included:latest
     steps:
       - name: Setup Node.js 18
         uses: actions/setup-node@v3

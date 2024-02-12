@@ -1,4 +1,4 @@
-import getRandomText from "support/util";
+import { getRandomText } from "support/util";
 
 describe("Managing folders", () => {
   const NBSP = String.fromCharCode(160);
