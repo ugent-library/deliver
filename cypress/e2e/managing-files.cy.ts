@@ -1,4 +1,4 @@
-import getRandomText from "support/util";
+import { getRandomText } from "support/util";
 
 describe("Managing files", () => {
   let FOLDER_NAME: string;

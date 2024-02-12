@@ -1,4 +1,4 @@
-import { mapAlias } from "./util";
+import { mapAlias } from "../../util";
 
 Cypress.Commands.overwrite<"visit">(
   "visit",
