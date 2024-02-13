@@ -33,13 +33,13 @@ func (r *FoldersRepo) Get(ctx context.Context, id string) (*models.Folder, error
 	return rowToFolder(row), nil
 }
 
-func (r *FoldersRepo) GetBySpace(ctx context.Context, space *models.Space, q string) ([]*models.Folder, error) {
+func (r *FoldersRepo) GetBySpace(ctx context.Context, space *models.Space, pagination *models.Pagination) ([]*models.Folder, error) {
 	query := r.client.Folder.Query().
 		Where(folder.SpaceIDEQ(space.ID)).
 		WithFiles()
 
-	if q != "" {
-		query = query.Where(sql.FieldContainsFold(folder.FieldName, q))
+	if q, ok := pagination.Filter("q"); ok && q.Value != "" {
+		query = query.Where(sql.FieldContainsFold(folder.FieldName, q.Value))
 	}
 
 	rows, err := query.All(ctx)
