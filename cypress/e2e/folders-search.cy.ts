@@ -52,9 +52,8 @@ describe("Folder searching", () => {
     cy.get("@q").type("School", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
-    cy.get("@filterFolders").should("be.null");
-
     cy.url().should("have.param", "q", "School");
+    cy.get("@q").should("have.value", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
   });
@@ -66,6 +65,7 @@ describe("Folder searching", () => {
     cy.contains(".btn", "Search").click();
 
     cy.url().should("have.param", "q", "wORk");
+    cy.get("@q").should("have.value", "wORk");
 
     assertFilteredFolders(["School work", "Work documents"]);
   });
@@ -73,9 +73,8 @@ describe("Folder searching", () => {
   it("should filter when hitting the ENTER key in the search field", () => {
     cy.get("@q").type("documents{enter}", { delay: 0 });
 
-    cy.get("@filterFolders").should("be.null");
-
     cy.url().should("have.param", "q", "documents");
+    cy.get("@q").should("have.value", "documents");
 
     assertFilteredFolders(["Personal documents", "Work documents"]);
   });
@@ -88,6 +87,7 @@ describe("Folder searching", () => {
       .should("eql", { q: "School" });
 
     cy.url().should("have.param", "q", "School");
+    cy.get("@q").should("have.value", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
   });
@@ -130,6 +130,7 @@ describe("Folder searching", () => {
       .should("eql", { q: "Financial rec" });
 
     cy.url().should("have.param", "q", "Financial rec");
+    cy.get("@q").should("have.value", "Financial rec");
 
     assertFilteredFolders(["Financial records"]);
   });
@@ -159,6 +160,7 @@ describe("Folder searching", () => {
 
     cy.url().should("not.have.param", "q");
     cy.location("search").should("be.empty");
+    cy.get("@q").should("have.value", "");
 
     cy.get("@folderCountBeforeSearch").should("eq", "@folderCountBeforeSearch");
   });
@@ -179,11 +181,15 @@ describe("Folder searching", () => {
 
     cy.url().should("not.have.param", "q");
     cy.location("search").should("be.empty");
+    cy.get("@q").should("have.value", "");
   });
 
   it("should be protected against SQL injection", () => {
-    cy.get("@q").type("' OR 1=1 --");
-    cy.contains(".btn", "Search").click();
+    cy.get("@q").type("' OR 1=1 --").blur();
+
+    cy.wait("@filterFolders")
+      .should("have.nested.property", "request.query")
+      .should("eql", { q: "' OR 1=1 --" });
 
     cy.getNumberOfDisplayedFolders().should("eq", 0);
   });
