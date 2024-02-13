@@ -42,12 +42,14 @@ describe("Folder searching", () => {
     cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
       "filterFolders"
     );
+
+    cy.get("input[name=q]").as("q");
   });
 
   it("should filter when clicking the search button", () => {
     cy.visitSpace();
 
-    cy.get("input[name=q]").type("School", { delay: 0 });
+    cy.get("@q").type("School", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
     cy.get("@filterFolders").should("be.null");
@@ -60,7 +62,7 @@ describe("Folder searching", () => {
   it("should filter case insensitively", () => {
     cy.visitSpace();
 
-    cy.get("input[name=q]").type("wORk", { delay: 0 });
+    cy.get("@q").type("wORk", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
     cy.url().should("have.param", "q", "wORk");
@@ -69,7 +71,7 @@ describe("Folder searching", () => {
   });
 
   it("should filter when hitting the ENTER key in the search field", () => {
-    cy.get("input[name=q]").type("documents{enter}", { delay: 0 });
+    cy.get("@q").type("documents{enter}", { delay: 0 });
 
     cy.get("@filterFolders").should("be.null");
 
@@ -79,35 +81,44 @@ describe("Folder searching", () => {
   });
 
   it("should filter when you blur the search field", () => {
-    cy.get("input[name=q]").type("School", { delay: 0 }).blur();
+    cy.get("@q").type("School", { delay: 0 }).blur();
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
       .should("eql", { q: "School" });
 
-    // TODO cy.url().should("have.param", "q", "School");
+    cy.url().should("have.param", "q", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
   });
 
   it("should filter automatically upon typing", () => {
-    cy.get("input[name=q]").type("records", { delay: 0 });
+    cy.get("@q").type("records", { delay: 0 });
 
     cy.get("@filterFolders")
       .should("have.nested.property", "request.query")
       .should("eql", { q: "records" });
 
-    // TODO cy.url().should("have.param", "q", "records");
+    cy.url().should("have.param", "q", "records");
 
     assertFilteredFolders(["Financial records"]);
   });
 
   it("should debounce filtering when still typing", () => {
-    cy.get("input[name=q]").as("q").type("Fin", { delay: 100 });
+    cy.get("@q").type("Fin", { delay: 100 });
     cy.wait(300);
     cy.get("@filterFolders").should("be.null");
 
-    cy.get("@q").type("anci", { delay: 100 });
+    cy.get("@q").type("amci", { delay: 100 });
+    cy.wait(300);
+    cy.get("@filterFolders").should("be.null");
+
+    // Oops typo!
+    cy.get("@q").type("{backspace}{backspace}{backspace}", { delay: 100 });
+    cy.wait(300);
+    cy.get("@filterFolders").should("be.null");
+
+    cy.get("@q").type("nci", { delay: 100 });
     cy.wait(300);
     cy.get("@filterFolders").should("be.null");
 
@@ -118,7 +129,7 @@ describe("Folder searching", () => {
       .should("have.nested.property", "request.query")
       .should("eql", { q: "Financial rec" });
 
-    // TODO cy.url().should("have.param", "q", "Financial rec");
+    cy.url().should("have.param", "q", "Financial rec");
 
     assertFilteredFolders(["Financial records"]);
   });
@@ -126,7 +137,7 @@ describe("Folder searching", () => {
   it("should retain the current AJAX search when reloading the page", () => {
     cy.getNumberOfDisplayedFolders().as("folderCountBeforeSearch");
 
-    cy.get("input[name=q]").as("q").type("School", { delay: 0 }).blur();
+    cy.get("@q").type("School", { delay: 0 }).blur();
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
@@ -152,15 +163,33 @@ describe("Folder searching", () => {
     cy.get("@folderCountBeforeSearch").should("eq", "@folderCountBeforeSearch");
   });
 
+  it("should be possible to clear the search field", () => {
+    cy.visitSpace({ qs: { q: "School work" } });
+
+    cy.get("@q").should("have.value", "School work");
+
+    // Clear by setting the value property instead of fake typing with cy.clear()
+    cy.get<HTMLInputElement>("@q").then((q) => (q.get(0).value = ""));
+    // Trigger the search event, which is equivalent to clicking the clear "✖️" button in the search input
+    cy.get("@q").trigger("search");
+
+    cy.wait("@filterFolders")
+      .should("have.nested.property", "request.query")
+      .should("eql", { q: "" });
+
+    cy.url().should("not.have.param", "q");
+    cy.location("search").should("be.empty");
+  });
+
   it("should be protected against SQL injection", () => {
-    cy.get("input[name=q]").type("' OR 1=1 --");
+    cy.get("@q").type("' OR 1=1 --");
     cy.contains(".btn", "Search").click();
 
     cy.getNumberOfDisplayedFolders().should("eq", 0);
   });
 
   it("should display a default message if nothing was filtered", () => {
-    cy.get("input[name=q]").type(getRandomText());
+    cy.get("@q").type(getRandomText());
     cy.contains(".btn", "Search").click();
 
     cy.get("#folders .c-blank-slate")
@@ -208,7 +237,7 @@ describe("Folder searching", () => {
     it("should load correctly during AJAX filtering", () => {
       cy.visitSpace();
 
-      cy.get("input[name=q]").type("School work");
+      cy.get("@q").type("School work");
 
       cy.wait(600);
 
