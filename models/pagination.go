@@ -36,21 +36,21 @@ func (p *Pagination) Filter(name string) (Filter, bool) {
 }
 
 func (p *Pagination) ToPairs() []string {
-	var usedFilters []string
+	var pairs []string
 
 	if p.limit > 0 {
-		usedFilters = append(usedFilters, "limit", strconv.Itoa(p.limit))
+		pairs = append(pairs, "limit", strconv.Itoa(p.limit))
 	}
 
 	if p.offset > 0 {
-		usedFilters = append(usedFilters, "offset", strconv.Itoa(p.offset))
+		pairs = append(pairs, "offset", strconv.Itoa(p.offset))
 	}
 
 	for _, f := range p.filters {
 		if f.Value != "" {
-			usedFilters = append(usedFilters, f.Name, f.Value)
+			pairs = append(pairs, f.Name, f.Value)
 		}
 	}
 
-	return usedFilters
+	return pairs
 }
