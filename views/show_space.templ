@@ -120,6 +120,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										id="q"
 										name="q"
 										value={ q }
+										autocomplete="off"
 										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
 										hx-trigger="input changed delay:500ms, search"
 										hx-target="#folders"
