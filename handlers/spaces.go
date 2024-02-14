@@ -197,7 +197,7 @@ func getFolders(r *http.Request, pagination *models.Pagination) ([]*models.Folde
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
 
-	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space, pagination)
+	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space.ID, pagination)
 
 	return folders, err
 }
