@@ -84,7 +84,7 @@ describe("Folder searching", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "School" });
+      .should("contain", { q: "School" });
 
     cy.url().should("have.param", "q", "School");
     cy.get("@q").should("have.value", "School");
@@ -97,7 +97,7 @@ describe("Folder searching", () => {
 
     cy.get("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "records" });
+      .should("contain", { q: "records" });
 
     cy.url().should("have.param", "q", "records");
 
@@ -127,7 +127,7 @@ describe("Folder searching", () => {
     cy.get("@filterFolders", { timeout: 0 })
       .should("not.be.null")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "Financial rec" });
+      .should("contain", { q: "Financial rec" });
 
     cy.url().should("have.param", "q", "Financial rec");
     cy.get("@q").should("have.value", "Financial rec");
@@ -142,7 +142,7 @@ describe("Folder searching", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "School" });
+      .should("contain", { q: "School" });
 
     cy.url().should("have.param", "q", "School");
 
@@ -156,10 +156,10 @@ describe("Folder searching", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "" });
+      .should("contain", { q: "" });
 
     cy.url().should("not.have.param", "q");
-    cy.location("search").should("be.empty");
+    cy.location("search").should("not.contain", "q=");
     cy.get("@q").should("have.value", "");
 
     cy.get("@folderCountBeforeSearch").should("eq", "@folderCountBeforeSearch");
@@ -177,10 +177,10 @@ describe("Folder searching", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "" });
+      .should("contain", { q: "" });
 
     cy.url().should("not.have.param", "q");
-    cy.location("search").should("be.empty");
+    cy.location("search").should("not.contain", "q=");
     cy.get("@q").should("have.value", "");
   });
 
@@ -189,7 +189,7 @@ describe("Folder searching", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "' OR 1=1 --" });
+      .should("contain", { q: "' OR 1=1 --" });
 
     cy.getNumberOfDisplayedFolders().should("eq", 0);
   });

@@ -9,11 +9,13 @@ type Filter struct {
 type Pagination struct {
 	limit   int
 	offset  int
+	sort    string
 	filters []Filter
 }
 
-func NewPagination(filters ...Filter) *Pagination {
+func NewPagination(sort string, filters ...Filter) *Pagination {
 	return &Pagination{
+		sort:    sort,
 		filters: filters,
 	}
 }
@@ -24,6 +26,10 @@ func (p *Pagination) Limit() int {
 
 func (p *Pagination) Offset() int {
 	return p.offset
+}
+
+func (p *Pagination) Sort() string {
+	return p.sort
 }
 
 func (p *Pagination) Filter(name string) (Filter, bool) {
@@ -37,6 +43,10 @@ func (p *Pagination) Filter(name string) (Filter, bool) {
 
 func (p *Pagination) ToPairs() []string {
 	var pairs []string
+
+	if p.sort != "" {
+		pairs = append(pairs, "sort", p.sort)
+	}
 
 	if p.limit > 0 {
 		pairs = append(pairs, "limit", strconv.Itoa(p.limit))
