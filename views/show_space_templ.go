@@ -234,7 +234,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"input changed delay:500ms, search\" hx-target=\"#folders\" hx-swap=\"innerHTML\"> <label class=\"visually-hidden\" for=\"q\">Search</label> <button class=\"btn btn-outline-primary\" type=\"submit\"><i class=\"if if-search\"></i><div class=\"btn-text\">Search</div></button></div></div></div></div></form><div id=\"folders\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"input changed delay:500ms, search\" hx-target=\"#folders\" hx-swap=\"innerHTML\" autocomplete=\"off\"> <label class=\"visually-hidden\" for=\"q\">Search</label> <button class=\"btn btn-outline-primary\" type=\"submit\"><i class=\"if if-search\"></i><div class=\"btn-text\">Search</div></button></div></div></div></div></form><div id=\"folders\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

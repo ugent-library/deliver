@@ -124,6 +124,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										hx-trigger="input changed delay:500ms, search"
 										hx-target="#folders"
 										hx-swap="innerHTML"
+										autocomplete="off"
 									/>
 									<label class="visually-hidden" for="q">Search</label>
 									<button class="btn btn-outline-primary" type="submit">
