@@ -43,7 +43,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 			Type: "info",
 			Body: "Create an initial space to get started",
 		})
-		http.Redirect(w, r, c.PathTo("newSpace").String(), http.StatusSeeOther)
+		http.Redirect(w, r, c.Path("newSpace").String(), http.StatusSeeOther)
 		return
 	}
 
@@ -53,7 +53,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, c.PathTo("space", "spaceName", userSpaces[0].Name).String(), http.StatusSeeOther)
+	http.Redirect(w, r, c.Path("space", "spaceName", userSpaces[0].Name).String(), http.StatusSeeOther)
 }
 
 func ShowSpace(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +71,7 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	htmx.PushURL(w, getNewPageUrl(c, space, pagination))
+	htmx.PushURL(w, c.Path("space", "spaceName", space.Name, pagination.ToPairs()).String())
 
 	views.Folders(c, folders, len(space.Folders)).Render(r.Context(), w)
 }
@@ -113,7 +113,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 		DismissAfter: 3 * time.Second,
 	})
 
-	loc := c.PathTo("space", "spaceName", space.Name).String()
+	loc := c.Path("space", "spaceName", space.Name).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -145,7 +145,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loc := c.PathTo("space", "spaceName", space.Name).String()
+	loc := c.Path("space", "spaceName", space.Name).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -191,13 +191,4 @@ func getPagination(r *http.Request) *models.Pagination {
 	}
 
 	return models.NewPagination(filters...)
-}
-
-func getNewPageUrl(c *ctx.Ctx, space *models.Space, pagination *models.Pagination) string {
-	pairs := []string{"spaceName", space.Name}
-	pairs = append(pairs, pagination.ToPairs()...)
-
-	newUrl := c.PathTo("space", pairs...)
-
-	return newUrl.String()
 }

@@ -62,7 +62,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 		DismissAfter: 3 * time.Second,
 	})
 
-	loc := c.PathTo("folder", "folderID", folder.ID).String()
+	loc := c.Path("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -95,7 +95,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loc := c.PathTo("folder", "folderID", folder.ID).String()
+	loc := c.Path("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -144,7 +144,7 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		DismissAfter: 3 * time.Second,
 	})
 
-	loc := c.PathTo("space", "spaceName", folder.Space.Name).String()
+	loc := c.Path("space", "spaceName", folder.Space.Name).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 

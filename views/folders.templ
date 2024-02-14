@@ -43,14 +43,14 @@ templ Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) {
 						for _, f := range folders {
 							<tr>
 								<td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-									<a href={ templ.URL(c.PathTo("folder", "folderID", f.ID).String()) }>{ f.Name }</a>
+									<a href={ templ.URL(c.Path("folder", "folderID", f.ID).String()) }>{ f.Name }</a>
 								</td>
 								<td class="text-nowrap">
 									<div class="input-group" style="min-width: 375px;">
 										<button
 											type="button"
 											class="btn btn-outline-secondary"
-											data-clipboard={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
+											data-clipboard={ c.URL("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
 										>
 											<i class="if if-copy text-primary"></i>
 											<span class="btn-text">Copy link</span>
@@ -61,7 +61,7 @@ templ Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) {
 											style="min-width: 250px;"
 											readonly
 											data-select-value
-											value={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
+											value={ c.URL("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
 										/>
 									</div>
 								</td>
@@ -93,7 +93,7 @@ templ Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) {
 								</td>
 								<td class="table-col-sm-fixed table-col-sm-fixed-right">
 									<div class="c-button-toolbar">
-										<a class="btn btn-link" href={ templ.URL(c.PathTo("folder", "folderID", f.ID).String()) }>
+										<a class="btn btn-link" href={ templ.URL(c.Path("folder", "folderID", f.ID).String()) }>
 											<i class="if if-draft"></i>
 											<span class="btn-text">Open</span>
 										</a>

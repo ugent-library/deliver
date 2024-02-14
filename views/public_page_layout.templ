@@ -25,13 +25,13 @@ templ publicPageLayout(c *ctx.Ctx, title string) {
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href={ templ.URL(c.PathTo("home").String()) }>
+                                        <a href={ templ.URL(c.Path("home").String()) }>
                                             <img class="d-none d-lg-inline-block" src={ c.AssetPath("/images/ghent-university-library-logo.svg") } alt="Ghent University Library"/>
                                             <img class="d-inline-block d-lg-none" src={ c.AssetPath("/images/ghent-university-library-mark.svg") } alt="Ghent University Library"/>
                                         </a>
                                     </li>
                                     <li class="breadcrumb-item" aria-current="page">
-                                        <a href={ templ.URL(c.PathTo("home").String()) }>Home</a>
+                                        <a href={ templ.URL(c.Path("home").String()) }>Home</a>
                                     </li>
                                 </ol>
                             </nav>

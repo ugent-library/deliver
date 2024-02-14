@@ -11,7 +11,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	if c.User != nil {
-		http.Redirect(w, r, c.PathTo("spaces").String(), http.StatusSeeOther)
+		http.Redirect(w, r, c.Path("spaces").String(), http.StatusSeeOther)
 		return
 	}
 

@@ -40,7 +40,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(c.PathTo("space", "spaceName", folder.Space.Name).String())
+			var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(c.Path("space", "spaceName", folder.Space.Name).String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -62,7 +62,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 templ.SafeURL = templ.URL(c.PathTo("folder", "folderID", folder.ID).String())
+			var templ_7745c5c3_Var5 templ.SafeURL = templ.URL(c.Path("folder", "folderID", folder.ID).String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -97,7 +97,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var8 templ.SafeURL = templ.URL(c.PathTo("deleteFolder", "folderID", folder.ID).String())
+			var templ_7745c5c3_Var8 templ.SafeURL = templ.URL(c.Path("deleteFolder", "folderID", folder.ID).String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var8)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -114,7 +114,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var9 templ.SafeURL = templ.URL(c.PathTo("folder", "folderID", folder.ID).String())
+			var templ_7745c5c3_Var9 templ.SafeURL = templ.URL(c.Path("folder", "folderID", folder.ID).String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var9)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -123,7 +123,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(c.PathTo("updateFolder", "folderID", folder.ID).String())
+			var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(c.Path("updateFolder", "folderID", folder.ID).String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var10)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -185,9 +185,9 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String())
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 87, Col: 138}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 87, Col: 136}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {

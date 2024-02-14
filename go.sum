@@ -119,6 +119,8 @@ github.com/mozillazg/go-unidecode v0.2.0 h1:vFGEzAH9KSwyWmXCOblazEWDh7fOkpmy/Z4A
 github.com/mozillazg/go-unidecode v0.2.0/go.mod h1:zB48+/Z5toiRolOZy9ksLryJ976VIwmDmpQ2quyt1aA=
 github.com/nics/ich v0.0.0-20231128155525-f5704f956383 h1:af13T+6ta5pXDK/0JpkNPcvjPZ4hS7kATlr0unhBiGw=
 github.com/nics/ich v0.0.0-20231128155525-f5704f956383/go.mod h1:AsuZcCw75zKhstoYa507cGjVzV262w8KX6gaFqAEHmA=
+github.com/nics/ich v0.0.0-20240214113125-4ecddc685f7c h1:tPDKUpKqrSnPpMA8Wil8GJIEbm4OdUSuim7kTA9f+Ac=
+github.com/nics/ich v0.0.0-20240214113125-4ecddc685f7c/go.mod h1:aAe3Ll4Re6ftI3NYCgm4HaDvpEvZcxtu6QdZ/UTeHGk=
 github.com/oklog/ulid/v2 v2.1.0 h1:+9lhoxAP56we25tyYETBBY1YLA2SaoLvUFgrP2miPJU=
 github.com/oklog/ulid/v2 v2.1.0/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
 github.com/ory/graceful v0.1.3 h1:FaeXcHZh168WzS+bqruqWEw/HgXWLdNv2nJ+fbhxbhc=
