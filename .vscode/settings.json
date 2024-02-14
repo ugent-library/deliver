@@ -4,6 +4,17 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "golang.go"
   },
+  "[templ]": {
+    "editor.defaultFormatter": "a-h.templ"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["bootstrap", "htmx", "laravel", "OIDC", "popperjs", "precommit", "ugent"]
+  "cSpell.words": [
+    "bootstrap",
+    "htmx",
+    "laravel",
+    "OIDC",
+    "popperjs",
+    "precommit",
+    "ugent"
+  ]
 }

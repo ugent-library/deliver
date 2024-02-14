@@ -1,0 +1,117 @@
+package views
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/ugent-library/friendly"
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/models"
+)
+
+templ Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) {
+	<div class="card w-100 mb-6">
+		<div class="card-header">
+			<div class="bc-toolbar">
+				<div class="bc-toolbar-left">
+					<div class="bc-toolbar-item">
+						<h2>Folders</h2>
+					</div>
+				</div>
+				<div class="bc-toolbar-right">
+					<div class="bc-toolbar-item">
+						<p>Showing { fmt.Sprint(len(folders)) } of { fmt.Sprint(totalFolders) } folders</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		if len(folders) > 0 {
+			<div class="table-responsive">
+				<table class="table table-sm table-bordered">
+					<thead>
+						<tr>
+							<th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
+							<th class="text-nowrap">Public shareable link</th>
+							<th class="text-nowrap">Expires on</th>
+							<th class="text-nowrap">Documents</th>
+							<th class="text-nowrap">Created at</th>
+							<th class="text-nowrap">Updated at</th>
+							<th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, f := range folders {
+							<tr>
+								<td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
+									<a href={ templ.URL(c.PathTo("folder", "folderID", f.ID).String()) }>{ f.Name }</a>
+								</td>
+								<td class="text-nowrap">
+									<div class="input-group" style="min-width: 375px;">
+										<button
+											type="button"
+											class="btn btn-outline-secondary"
+											data-clipboard={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
+										>
+											<i class="if if-copy text-primary"></i>
+											<span class="btn-text">Copy link</span>
+										</button>
+										<input
+											type="text"
+											class="form-control input-select-text"
+											style="min-width: 250px;"
+											readonly
+											data-select-value
+											value={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
+										/>
+									</div>
+								</td>
+								<td class="text-nowrap">
+									<p>{ f.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
+									if time.Until(f.ExpiresAt) < time.Hour * 24 * 7 {
+										<p class="badge rounded-pill badge-default mt-2">
+											<i class="if if-info-circle"></i>
+											<span class="badge-text">Expires in { friendly.TimeRemaining(time.Until(f.ExpiresAt), friendly.EnglishTimeUnits) }.</span>
+										</p>
+									}
+								</td>
+								<td class="text-nowrap">
+									<p>{ fmt.Sprint(len(f.Files)) } files</p>
+									<ul class="c-meta-list c-meta-list-horizontal">
+										<li class="c-meta-item">
+											<span>{ friendly.Bytes(f.TotalSize()) }</span>
+										</li>
+										<li class="c-meta-item">
+											<span>{ fmt.Sprint(f.TotalDownloads()) } downloads</span>
+										</li>
+									</ul>
+								</td>
+								<td class="text-nowrap">
+									<p>{ f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
+								</td>
+								<td class="text-nowrap">
+									<p>{ f.UpdatedAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
+								</td>
+								<td class="table-col-sm-fixed table-col-sm-fixed-right">
+									<div class="c-button-toolbar">
+										<a class="btn btn-link" href={ templ.URL(c.PathTo("folder", "folderID", f.ID).String()) }>
+											<i class="if if-draft"></i>
+											<span class="btn-text">Open</span>
+										</a>
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		} else {
+			<div class="c-blank-slate c-blank-slate-muted">
+				<div class="bc-avatar">
+					<i class="if if-info-circle"></i>
+				</div>
+				<h3>No folders to display.</h3>
+				<p>Refine your search or add a new folder.</p>
+			</div>
+		}
+	</div>
+}

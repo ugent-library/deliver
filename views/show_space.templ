@@ -1,214 +1,144 @@
 package views
 
 import (
-    "fmt"
-    "time"
-    "github.com/ugent-library/friendly"
-    "github.com/ugent-library/deliver/ctx"
-    "github.com/ugent-library/deliver/models"
-    "github.com/ugent-library/okay"
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/okay"
 )
 
-templ ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
-    @pageLayout(c, space.Name) {
-    <div class="c-sub-sidebar c-sidebar--bordered"
-        hx-ext="ws"
-        ws-connect={ c.WebSocketPath("space."+space.ID) }
-    >
-        <div class="bc-navbar bc-navbar--xlarge bc-navbar--bordered-bottom">
-            <div class="bc-toolbar">
-                <div class="bc-toolbar-left">
-                    <div class="bc-toolbar-item">
-                        <h1 class="bc-toolbar-title">Your deliver spaces</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="c-sub-sidebar__menu my-6">
-            <nav>
-                <ul class="c-sub-sidebar-menu">
-                    for _, s := range userSpaces {
-                    <li class={"c-sub-sidebar__item", templ.KV("c-sub-sidebar__item--active", s.ID == space.ID)}>
-                        <a href={ templ.URL(c.PathTo("space", "spaceName", s.Name).String()) }>
-                            <span class="c-sidebar__label">{ s.Name }</span>
-                        </a>
-                    </li>
-                    }
-                    if c.Permissions.IsAdmin(c.User) {
-                    <li class="c-sub-sidebar__item">
-                        <a href={ templ.URL(c.PathTo("newSpace").String()) }>
-                            <span class="c-sidebar__label">
-                                <i class="if if-add"></i>
-                                Make a new space
-                            </span>
-                        </a>
-                    </li>
-                    }
-                </ul>
-            </nav>
-        </div>
-    </div>
-
-    <div class="w-100 u-scroll-wrapper">
-        <div class="bg-white">
-            <div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
-                <div class="bc-toolbar">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">
-                            <h1 class="bc-toolbar-title">{ space.Name } folders</h1>
-                        </div>
-                    </div>
-                    if c.Permissions.IsAdmin(c.User) {
-                    <div class="bc-toolbar-right">
-                        <div class="bc-toolbar-item">
-                            <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("editSpace", "spaceName", space.Name).String()) }>
-                                <i class="if if-edit"></i>
-                                <span class="btn-text">Edit space</span>
-                            </a>
-                        </div>
-                    </div>
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="u-scroll-wrapper__body p-6">
-            <div class="card w-100 mb-6">
-                <div class="card-header">
-                    <div class="bc-toolbar">
-                        <div class="bc-toolbar-left">
-                            <div class="bc-toolbar-item">
-                                <h2>Make a folder</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <form action={ templ.URL(c.PathTo("createFolder", "spaceName", space.Name).String()) } method="POST">
-                        @csrfField(c)
-                        <div class={"mb-6", templ.KV("is-invalid", errs.Get("name") != nil)}>
-                            <label class="c-label" for="folder-name">Folder name</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    if e := errs.Get("name"); e != nil {
-                                    <input class="form-control is-invalid" type="text" value={ folder.Name } id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid"/>
-                                    <small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
-                                    } else {
-                                    <input class="form-control" type="text" value={ folder.Name } id="folder-name" name="name"/>
-                                    }
-                                    <small class="form-text text-muted">
-                                        We will generate a shareable public link for you.
-                                        <br/>
-                                        Each folder will expire one month after creation date.
-                                    </small>
-                                </div>
-                                <div class="col-md-3">
-                                    <button class="btn btn-primary ms-4" type="submit">
-                                        <i class="if if-check"></i>
-                                        <span class="btn-text">Make folder</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="card w-100 mb-6">
-                <div class="card-header">
-                    <div class="bc-toolbar">
-                        <div class="bc-toolbar-left">
-                            <div class="bc-toolbar-item">
-                                <h2>Folders</h2>
-                            </div>
-                        </div>
-                        <div class="bc-toolbar-right">
-                            <div class="bc-toolbar-item">
-                                <p>Showing { fmt.Sprint(len(space.Folders)) } of { fmt.Sprint(len(space.Folders)) } folders</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                if len(space.Folders) > 0 {
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="table-col-lg-fixed table-col-sm-fixed-left text-nowrap">Folder</th>
-                                <th class="text-nowrap">Public shareable link</th>
-                                <th class="text-nowrap">Expires on</th>
-                                <th class="text-nowrap">Documents</th>
-                                <th class="text-nowrap">Created at</th>
-                                <th class="text-nowrap">Updated at</th>
-                                <th class="table-col-sm-fixed table-col-sm-fixed-right"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            for _, f := range space.Folders {
-                            <tr>
-                                <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                    <a href={ templ.URL(c.PathTo("folder", "folderID", f.ID).String()) }>{ f.Name }</a>
-                                </td>
-                                <td class="text-nowrap">
-                                    <div class="input-group" style="min-width: 375px;">
-                                        <button type="button" class="btn btn-outline-secondary"
-                                            data-clipboard={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
-                                        >
-                                            <i class="if if-copy text-primary"></i>
-                                            <span class="btn-text">Copy link</span>
-                                        </button>
-                                        <input type="text" class="form-control input-select-text" style="min-width: 250px;" readonly data-select-value 
-                                            value={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
-                                        />
-                                    </div>
-                                </td>
-                                <td class="text-nowrap">
-                                    <p>{ f.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
-                                    if time.Until(f.ExpiresAt) < time.Hour * 24 * 7 {
-                                    <p class="badge rounded-pill badge-default mt-2">
-                                        <i class="if if-info-circle"></i>
-                                        <span class="badge-text">Expires in { friendly.TimeRemaining(time.Until(f.ExpiresAt), friendly.EnglishTimeUnits) }.</span>
-                                    </p>
-                                    }
-                                </td>
-                                <td class="text-nowrap">
-                                    <p>{ fmt.Sprint(len(f.Files)) } files</p>
-                                    <ul class="c-meta-list c-meta-list-horizontal">
-                                        <li class="c-meta-item">
-                                            <span>{ friendly.Bytes(f.TotalSize()) }</span>
-                                        </li>
-                                        <li class="c-meta-item">
-                                            <span>{ fmt.Sprint(f.TotalDownloads()) } downloads</span>
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td class="text-nowrap">
-                                    <p>{ f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
-                                </td>
-                                <td class="text-nowrap">
-                                    <p>{ f.UpdatedAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
-                                </td>
-                                <td class="table-col-sm-fixed table-col-sm-fixed-right">
-                                    <div class="c-button-toolbar">
-                                        <a class="btn btn-link" href={ templ.URL(c.PathTo("folder", "folderID", f.ID).String()) }>
-                                            <i class="if if-draft"></i>
-                                            <span class="btn-text">Open</span>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                } else {
-                <div class="c-blank-slate c-blank-slate-muted">
-                    <div class="bc-avatar">
-                        <i class="if if-info-circle"></i>
-                    </div>
-                    <p>Make a folder to get started</p>
-                </div>
-                }
-            </div>
-        </div>
-    </div>
-    }
+templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
+	@pageLayout(c, space.Name) {
+		<div
+			class="c-sub-sidebar c-sidebar--bordered"
+			hx-ext="ws"
+			ws-connect={ c.WebSocketPath("space." + space.ID) }
+		>
+			<div class="bc-navbar bc-navbar--xlarge bc-navbar--bordered-bottom">
+				<div class="bc-toolbar">
+					<div class="bc-toolbar-left">
+						<div class="bc-toolbar-item">
+							<h1 class="bc-toolbar-title">Your deliver spaces</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="c-sub-sidebar__menu my-6">
+				<nav>
+					<ul class="c-sub-sidebar-menu">
+						for _, s := range userSpaces {
+							<li class={ "c-sub-sidebar__item", templ.KV("c-sub-sidebar__item--active", s.ID == space.ID) }>
+								<a href={ templ.URL(c.PathTo("space", "spaceName", s.Name).String()) }>
+									<span class="c-sidebar__label">{ s.Name }</span>
+								</a>
+							</li>
+						}
+						if c.Permissions.IsAdmin(c.User) {
+							<li class="c-sub-sidebar__item">
+								<a href={ templ.URL(c.PathTo("newSpace").String()) }>
+									<span class="c-sidebar__label">
+										<i class="if if-add"></i>
+										Make a new space
+									</span>
+								</a>
+							</li>
+						}
+					</ul>
+				</nav>
+			</div>
+		</div>
+		<div class="w-100 u-scroll-wrapper">
+			<div class="bg-white">
+				<div class="bc-navbar bc-navbar--xlarge bc-navbar--white bc-navbar--bordered-bottom">
+					<div class="bc-toolbar">
+						<div class="bc-toolbar-left">
+							<div class="bc-toolbar-item">
+								<h1 class="bc-toolbar-title">{ space.Name } folders</h1>
+							</div>
+						</div>
+						if c.Permissions.IsAdmin(c.User) {
+							<div class="bc-toolbar-right">
+								<div class="bc-toolbar-item">
+									<a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("editSpace", "spaceName", space.Name).String()) }>
+										<i class="if if-edit"></i>
+										<span class="btn-text">Edit space</span>
+									</a>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+			<div class="u-scroll-wrapper__body p-6">
+				<div class="card w-100 mb-6">
+					<div class="card-header">
+						<div class="bc-toolbar">
+							<div class="bc-toolbar-left">
+								<div class="bc-toolbar-item">
+									<h2>Make a folder</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<form action={ templ.URL(c.PathTo("createFolder", "spaceName", space.Name).String()) } method="POST">
+							@csrfField(c)
+							<div class={ "mb-6", templ.KV("is-invalid", errs.Get("name") != nil) }>
+								<label class="c-label" for="folder-name">Folder name</label>
+								<div class="row">
+									<div class="col-md-6">
+										if e := errs.Get("name"); e != nil {
+											<input class="form-control is-invalid" type="text" value={ folder.Name } id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid"/>
+											<small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
+										} else {
+											<input class="form-control" type="text" value={ folder.Name } id="folder-name" name="name"/>
+										}
+										<small class="form-text text-muted">
+											We will generate a shareable public link for you.
+											<br/>
+											Each folder will expire one month after creation date.
+										</small>
+									</div>
+									<div class="col-md-3">
+										<button class="btn btn-primary ms-4" type="submit">
+											<i class="if if-check"></i>
+											<span class="btn-text">Make folder</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<form action={ templ.URL(c.PathTo("space", "spaceName", space.Name).String()) }>
+					<div class="form mb-6 mt-8">
+						<div class="row">
+							<div class="col">
+								<div class="input-group">
+									<input
+										class="form-control"
+										type="search"
+										id="q"
+										name="q"
+										value={ q }
+										hx-get={ c.PathTo("getFolders", "spaceName", space.Name).String() }
+										hx-trigger="input changed delay:500ms, search"
+										hx-target="#folders"
+										hx-swap="innerHTML"
+									/>
+									<label class="visually-hidden" for="q">Search</label>
+									<button class="btn btn-outline-primary" type="submit">
+										<i class="if if-search"></i>
+										<div class="btn-text">Search</div>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div id="folders">
+					@Folders(c, folders, len(space.Folders))
+				</div>
+			</div>
+		</div>
+	}
 }

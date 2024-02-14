@@ -10,6 +10,7 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/views"
+	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/okay"
 )
@@ -57,6 +58,22 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 
 func ShowSpace(w http.ResponseWriter, r *http.Request) {
 	showSpace(w, r, &models.Folder{}, nil)
+}
+
+func GetFolders(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r)
+
+	pagination := getPagination(r)
+	folders, err := getFolders(r, pagination)
+	if err != nil {
+		c.HandleError(w, r, err)
+		return
+	}
+
+	space := ctx.GetSpace(r)
+	htmx.PushURL(w, getNewPageUrl(c, space, pagination))
+
+	views.Folders(c, folders, len(space.Folders)).Render(r.Context(), w)
 }
 
 func NewSpace(w http.ResponseWriter, r *http.Request) {
@@ -153,5 +170,43 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	views.ShowSpace(c, space, userSpaces, folder, validationErrors).Render(r.Context(), w)
+	pagination := getPagination(r)
+	folders, err := getFolders(r, pagination)
+	if err != nil {
+		c.HandleError(w, r, err)
+		return
+	}
+
+	q, _ := pagination.Filter("q")
+	views.ShowSpace(c, space, folders, q.Value, userSpaces, folder, validationErrors).Render(r.Context(), w)
+}
+
+func getPagination(r *http.Request) *models.Pagination {
+	query := r.URL.Query()
+	filters := make([]models.Filter, 0, len(query))
+
+	q := query.Get("q")
+	if q != "" {
+		filters = append(filters, models.Filter{Name: "q", Value: q})
+	}
+
+	return models.NewPagination(filters...)
+}
+
+func getFolders(r *http.Request, pagination *models.Pagination) ([]*models.Folder, error) {
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
+
+	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space, pagination)
+
+	return folders, err
+}
+
+func getNewPageUrl(c *ctx.Ctx, space *models.Space, pagination *models.Pagination) string {
+	pairs := []string{"spaceName", space.Name}
+	pairs = append(pairs, pagination.ToPairs()...)
+
+	newUrl := c.PathTo("space", pairs...)
+
+	return newUrl.String()
 }
