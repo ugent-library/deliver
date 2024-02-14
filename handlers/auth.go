@@ -37,7 +37,7 @@ func AuthCallback(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 	})
 
-	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
+	http.Redirect(w, r, c.Path("home").String(), http.StatusSeeOther)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -65,5 +65,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 	})
 
-	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
+	http.Redirect(w, r, c.Path("home").String(), http.StatusSeeOther)
 }

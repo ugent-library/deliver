@@ -18,7 +18,7 @@ require (
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
-	github.com/nics/ich v0.0.0-20231128155525-f5704f956383
+	github.com/nics/ich v0.0.0-20240214113125-4ecddc685f7c
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ory/graceful v0.1.3
 	github.com/ugent-library/bind v0.0.0-20230530100714-1c79a1aecab1

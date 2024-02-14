@@ -15,7 +15,7 @@ templ Home(c *ctx.Ctx) {
                 </div>
                 <div class="bc-toolbar-right">
                     <div class="bc-toolbar-item">
-                        <a class="btn btn-primary" href={ templ.URL(c.PathTo("login").String()) }>
+                        <a class="btn btn-primary" href={ templ.URL(c.Path("login").String()) }>
                             <i class="if if-arrow-right mt-0 ms-2"></i>
                             <span class="btn-text me-2">Log in</span>
                         </a>

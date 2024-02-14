@@ -40,7 +40,7 @@ func NewSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(c.PathTo("spaces").String())
+			var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(c.Path("spaces").String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -49,7 +49,7 @@ func NewSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var4 templ.SafeURL = templ.URL(c.PathTo("createSpace").String())
+			var templ_7745c5c3_Var4 templ.SafeURL = templ.URL(c.Path("createSpace").String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

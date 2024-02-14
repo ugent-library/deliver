@@ -57,7 +57,7 @@ func Files(c *ctx.Ctx, files []*models.File) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String())
+				var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(c.Path("downloadFile", "fileID", f.ID).String())
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -152,7 +152,7 @@ func Files(c *ctx.Ctx, files []*models.File) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.PathTo("deleteFile", "fileID", f.ID).String()))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.Path("deleteFile", "fileID", f.ID).String()))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -168,7 +168,7 @@ func Files(c *ctx.Ctx, files []*models.File) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String())
+				var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(c.Path("downloadFile", "fileID", f.ID).String())
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var10)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

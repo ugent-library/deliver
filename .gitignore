@@ -35,4 +35,6 @@ cypress/cypress-record.sh
 
 # Docker
 /tmp
-/docker-compose.yml
+
+# Local workspace
+go.work*

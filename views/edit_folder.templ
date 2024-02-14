@@ -16,12 +16,12 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                     <div class="bc-toolbar-left">
                         <div class="bc-toolbar-item">
                             <h4 class="bc-toolbar-title">
-                                <a href={ templ.URL(c.PathTo("space", "spaceName", folder.Space.Name).String()) }>
+                                <a href={ templ.URL(c.Path("space", "spaceName", folder.Space.Name).String()) }>
                                     <i class="if if-arrow-left"></i>
                                     <span>{ folder.Space.Name }</span>
                                 </a>
                                 <span>&mdash; Edit folder</span>
-                                <a href={ templ.URL(c.PathTo("folder", "folderID", folder.ID).String()) }>
+                                <a href={ templ.URL(c.Path("folder", "folderID", folder.ID).String()) }>
                                     { folder.Name }
                                 </a>
                             </h4>
@@ -39,7 +39,7 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <form action={ templ.URL(c.PathTo("deleteFolder", "folderID", folder.ID).String()) } method="POST" id="delete-folder">
+                                <form action={ templ.URL(c.Path("deleteFolder", "folderID", folder.ID).String()) } method="POST" id="delete-folder">
                                     <input type="hidden" name="_method" value="DELETE"/>
                                     @csrfField(c)
                                     <button
@@ -51,7 +51,7 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                                 </form>
                             </div>
                             <div class="bc-toolbar-item">
-                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("folder", "folderID", folder.ID).String()) }>
+                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("folder", "folderID", folder.ID).String()) }>
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Discard changes</span>
                                 </a>
@@ -66,7 +66,7 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ templ.URL(c.PathTo("updateFolder", "folderID", folder.ID).String()) } method="POST" id="update-folder">
+                    <form action={ templ.URL(c.Path("updateFolder", "folderID", folder.ID).String()) } method="POST" id="update-folder">
                         <input type="hidden" name="_method" value="PUT"/>
                         @csrfField(c)
                         <div class="row mb-6">
@@ -85,7 +85,7 @@ templ EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) {
                                 <p>Public shareable link</p>
                             </label>
                             <div class="col-lg-7 col-xl-9">
-                                <code class="c-code">{ c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }</code>
+                                <code class="c-code">{ c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }</code>
                                 <p class="small form-text text-muted">Anyone with
                                 this automatically generated link can view the files
                                 in this folder.</p>

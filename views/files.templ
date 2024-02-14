@@ -40,7 +40,7 @@ templ Files(c *ctx.Ctx, files []*models.File) {
                     for _, f := range files {
                     <tr class="clickable-table-row">
                         <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                            <a href={ templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String()) }>
+                            <a href={ templ.URL(c.Path("downloadFile", "fileID", f.ID).String()) }>
                                 <i class="if if-download"></i>
                                 <span>{ f.Name }</span>
                             </a>
@@ -62,7 +62,7 @@ templ Files(c *ctx.Ctx, files []*models.File) {
                         <td class="table-col-sm-fixed table-col-sm-fixed-right">
                             <div class="c-button-toolbar flex-nowrap">
                                 <button class="btn btn-link"
-                                    hx-delete={ c.PathTo("deleteFile", "fileID", f.ID).String() }
+                                    hx-delete={ c.Path("deleteFile", "fileID", f.ID).String() }
                                     data-confirm="true"
                                     data-confirm-header={ fmt.Sprintf("Are you sure you want to delete the file<br><strong>%s</strong>?", f.Name) }
                                     data-confirm-proceed="Yes, delete this file"
@@ -70,7 +70,7 @@ templ Files(c *ctx.Ctx, files []*models.File) {
                                     <i class="if if-delete"></i>
                                     <span class="btn-text">Delete</span>
                                 </button>
-                                <a class="btn btn-link" href={ templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String()) }>
+                                <a class="btn btn-link" href={ templ.URL(c.Path("downloadFile", "fileID", f.ID).String()) }>
                                     <i class="if if-download"></i>
                                     <span class="btn-text">Download</span>
                                 </a>

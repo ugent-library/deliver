@@ -27,14 +27,14 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 					<ul class="c-sub-sidebar-menu">
 						for _, s := range userSpaces {
 							<li class={ "c-sub-sidebar__item", templ.KV("c-sub-sidebar__item--active", s.ID == space.ID) }>
-								<a href={ templ.URL(c.PathTo("space", "spaceName", s.Name).String()) }>
+								<a href={ templ.URL(c.Path("space", "spaceName", s.Name).String()) }>
 									<span class="c-sidebar__label">{ s.Name }</span>
 								</a>
 							</li>
 						}
 						if c.Permissions.IsAdmin(c.User) {
 							<li class="c-sub-sidebar__item">
-								<a href={ templ.URL(c.PathTo("newSpace").String()) }>
+								<a href={ templ.URL(c.Path("newSpace").String()) }>
 									<span class="c-sidebar__label">
 										<i class="if if-add"></i>
 										Make a new space
@@ -58,7 +58,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 						if c.Permissions.IsAdmin(c.User) {
 							<div class="bc-toolbar-right">
 								<div class="bc-toolbar-item">
-									<a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("editSpace", "spaceName", space.Name).String()) }>
+									<a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("editSpace", "spaceName", space.Name).String()) }>
 										<i class="if if-edit"></i>
 										<span class="btn-text">Edit space</span>
 									</a>
@@ -80,7 +80,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 						</div>
 					</div>
 					<div class="card-body">
-						<form action={ templ.URL(c.PathTo("createFolder", "spaceName", space.Name).String()) } method="POST">
+						<form action={ templ.URL(c.Path("createFolder", "spaceName", space.Name).String()) } method="POST">
 							@csrfField(c)
 							<div class={ "mb-6", templ.KV("is-invalid", errs.Get("name") != nil) }>
 								<label class="c-label" for="folder-name">Folder name</label>
@@ -109,7 +109,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 						</form>
 					</div>
 				</div>
-				<form action={ templ.URL(c.PathTo("space", "spaceName", space.Name).String()) }>
+				<form action={ templ.URL(c.Path("space", "spaceName", space.Name).String()) }>
 					<div class="form mb-6 mt-8">
 						<div class="row">
 							<div class="col">
@@ -120,7 +120,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										id="q"
 										name="q"
 										value={ q }
-										hx-get={ c.PathTo("getFolders", "spaceName", space.Name).String() }
+										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
 										hx-trigger="input changed delay:500ms, search"
 										hx-target="#folders"
 										hx-swap="innerHTML"

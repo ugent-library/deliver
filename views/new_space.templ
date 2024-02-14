@@ -30,7 +30,7 @@ templ NewSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) {
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("spaces").String()) }>
+                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("spaces").String()) }>
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Cancel</span>
                                 </a>
@@ -45,7 +45,7 @@ templ NewSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ templ.URL(c.PathTo("createSpace").String()) } method="POST" id="create-space">
+                    <form action={ templ.URL(c.Path("createSpace").String()) } method="POST" id="create-space">
                         @csrfField(c)
                         <div class="row mb-6">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>

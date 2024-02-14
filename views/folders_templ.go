@@ -72,7 +72,7 @@ func Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) templ.Compo
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var4 templ.SafeURL = templ.URL(c.PathTo("folder", "folderID", f.ID).String())
+				var templ_7745c5c3_Var4 templ.SafeURL = templ.URL(c.Path("folder", "folderID", f.ID).String())
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -84,7 +84,7 @@ func Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) templ.Compo
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(f.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 45, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 45, Col: 84}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -94,7 +94,7 @@ func Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) templ.Compo
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String()))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.URL("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String()))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -102,7 +102,7 @@ func Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) templ.Compo
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String()))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.URL("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String()))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -211,7 +211,7 @@ func Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) templ.Compo
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var13 templ.SafeURL = templ.URL(c.PathTo("folder", "folderID", f.ID).String())
+				var templ_7745c5c3_Var13 templ.SafeURL = templ.URL(c.Path("folder", "folderID", f.ID).String())
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var13)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

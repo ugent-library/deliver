@@ -80,9 +80,9 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String())
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 31, Col: 148}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 31, Col: 146}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -136,7 +136,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(c.PathTo("downloadFolder", "folderID", folder.ID).String())
+				var templ_7745c5c3_Var10 templ.SafeURL = templ.URL(c.Path("downloadFolder", "folderID", folder.ID).String())
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var10)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -150,7 +150,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var11 templ.SafeURL = templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String())
+					var templ_7745c5c3_Var11 templ.SafeURL = templ.URL(c.Path("downloadFile", "fileID", f.ID).String())
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var11)))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -237,7 +237,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var18 templ.SafeURL = templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String())
+					var templ_7745c5c3_Var18 templ.SafeURL = templ.URL(c.Path("downloadFile", "fileID", f.ID).String())
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var18)))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
