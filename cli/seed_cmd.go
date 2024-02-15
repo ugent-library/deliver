@@ -48,9 +48,11 @@ var seedCmd = &cobra.Command{
 			}
 		}
 
+		faker := gofakeit.New(0)
+
 		// Create a 'deliver' user
 		var user models.User
-		gofakeit.Struct(&user)
+		faker.Struct(&user)
 
 		if err := repo.Users.CreateOrUpdate(ctx, &user); err != nil {
 			return err
@@ -59,7 +61,7 @@ var seedCmd = &cobra.Command{
 		// Create a space
 		for i := 0; i < 5; i++ {
 			var space models.Space
-			gofakeit.Struct(&space)
+			faker.Struct(&space)
 
 			if err := repo.Spaces.Create(ctx, &space); err != nil {
 				return err
@@ -68,7 +70,7 @@ var seedCmd = &cobra.Command{
 			for j := 0; j < 5; j++ {
 				// Create a folder
 				var folder models.Folder
-				gofakeit.Struct(&folder)
+				faker.Struct(&folder)
 				folder.SpaceID = space.ID
 
 				if err := repo.Folders.Create(ctx, &folder); err != nil {
@@ -78,12 +80,12 @@ var seedCmd = &cobra.Command{
 				for k := 0; k < 5; k++ {
 					// Create a file
 					var file models.File
-					gofakeit.Struct(&file)
+					faker.Struct(&file)
 
 					file.FolderID = folder.ID
 					file.ID = ulid.Make().String()
 
-					ba := gofakeit.ImageJpeg(1024, 1024)
+					ba := faker.ImageJpeg(1024, 1024)
 					br := bytes.NewReader(ba)
 					rc := io.NopCloser(br)
 

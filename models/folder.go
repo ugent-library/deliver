@@ -59,11 +59,11 @@ func (f *Folder) PostponeExpiration() time.Time {
 }
 
 func (f *Folder) Fake(faker *gofakeit.Faker) (any, error) {
-	created := gofakeit.PastDate()
+	created := faker.PastDate()
 	return Folder{
-		Name:      fmt.Sprintf("%d", gofakeit.Number(1234567, 9123456)),
+		Name:      fmt.Sprintf("%d", faker.Number(1234567, 9123456)),
 		CreatedAt: created,
-		UpdatedAt: gofakeit.DateRange(created, time.Now()),
+		UpdatedAt: faker.DateRange(created, time.Now()),
 		ExpiresAt: created.Add(PostponePeriod),
 	}, nil
 }
