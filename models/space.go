@@ -28,7 +28,10 @@ func (s *Space) Validate() error {
 
 func (s *Space) Fake(faker *gofakeit.Faker) (any, error) {
 	return Space{
-		Name:   fmt.Sprintf("SPACE%09d", faker.Number(1234567, 9123456)),
+		Name: fmt.Sprintf("%s%09d",
+			faker.RandomString([]string{"BIBXYZ", "ABCLIB", "DEFCOL", "UNIZXY", "department", "BIBLIB", "FACLIB"}),
+			faker.Number(1234567, 9123456),
+		),
 		Admins: []string{"deliver"},
 	}, nil
 }
