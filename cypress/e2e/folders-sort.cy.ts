@@ -1,16 +1,11 @@
-describe("Folders sorting", () => {
-  const randomSuffix = Math.floor(Math.random() * 1000000).toLocaleString(
-    undefined,
-    { minimumIntegerDigits: 6, useGrouping: false }
-  );
+import { getRandomText } from "support/util";
 
-  const TEST_FOLDER_NAMES = [
-    `CYPRESS-XYZ-${randomSuffix}`,
-    `CYPRESS-OPQ-${randomSuffix}`,
-    `CYPRESS-LMN-${randomSuffix}`,
-    `CYPRESS-FGH-${randomSuffix}`,
-    `CYPRESS-ABC-${randomSuffix}`,
-  ];
+describe("Folders sorting", () => {
+  const randomSuffix = getRandomText();
+
+  const TEST_FOLDER_NAMES = ["XYZ", "OPQ", "LMN", "FGH", "ABC"].map(
+    (f) => `${f}-${randomSuffix}`
+  );
 
   before(() => {
     cy.loginAsSpaceAdmin();
@@ -37,10 +32,18 @@ describe("Folders sorting", () => {
     );
   });
 
+  it("should have guaranteed order for sort field options", () => {
+    cy.visitSpace();
+
+    cy.get('select[name="sort"] option')
+      .map("value")
+      .should("eql", ["default", "expires-last"]);
+  });
+
   it("should sort folders by expiration date asc by default", () => {
     cy.visitSpace({ qs: { q: randomSuffix } });
 
-    cy.get("select[name=sort]").should("have.value", "expires-first");
+    cy.get("select[name=sort]").should("have.value", "default");
 
     cy.get("#folders table tbody tr td:first-of-type a")
       .map("textContent")
@@ -52,7 +55,7 @@ describe("Folders sorting", () => {
 
     cy.get("select[name=sort]").should("have.value", "expires-last");
 
-    cy.setFieldByLabel("Sort by", "expires-first");
+    cy.setFieldByLabel("Sort by", "default");
     cy.wait("@filterFolders");
 
     cy.get("#folders table tbody tr td:first-of-type a")
@@ -63,7 +66,7 @@ describe("Folders sorting", () => {
   it("should be possible to sort folders by expiration date desc", () => {
     cy.visitSpace({ qs: { q: randomSuffix } });
 
-    cy.get("select[name=sort]").should("have.value", "expires-first");
+    cy.get("select[name=sort]").should("have.value", "default");
 
     cy.setFieldByLabel("Sort by", "expires-last");
     cy.wait("@filterFolders");
@@ -76,7 +79,7 @@ describe("Folders sorting", () => {
   it("should keep the sort choice when searching", () => {
     cy.visitSpace();
 
-    cy.get("select[name=sort]").should("have.value", "expires-first");
+    cy.get("select[name=sort]").should("have.value", "default");
 
     cy.setFieldByLabel("Sort by", "expires-last");
 
@@ -97,7 +100,7 @@ describe("Folders sorting", () => {
   it("should keep the sort choice when searching using AJAX", () => {
     cy.visitSpace();
 
-    cy.get("select[name=sort]").should("have.value", "expires-first");
+    cy.get("select[name=sort]").should("have.value", "default");
 
     cy.setFieldByLabel("Sort by", "expires-last");
 
@@ -120,5 +123,20 @@ describe("Folders sorting", () => {
 
     cy.get("select[name=sort]").should("have.value", "expires-last");
     cy.get('option[value="expires-last"]').should("have.attr", "selected");
+  });
+
+  it("should clear the sort param from the URL when default is selected", () => {
+    cy.visitSpace({ qs: { q: "test", sort: "expires-last" } });
+
+    cy.get("select[name=sort]").should("have.value", "expires-last");
+
+    cy.setFieldByLabel("Sort by", "default");
+
+    cy.wait("@filterFolders")
+      .should("have.nested.property", "request.query")
+      .should("contain", { q: "test", sort: "default" });
+
+    cy.url().should("not.have.param", "sort");
+    cy.location("search").should("not.contain", "sort");
   });
 });

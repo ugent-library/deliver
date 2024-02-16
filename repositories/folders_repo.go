@@ -45,7 +45,7 @@ func (r *FoldersRepo) GetBySpace(ctx context.Context, spaceID string, pagination
 	switch sort := pagination.Sort(); sort {
 	case "expires-last":
 		query = query.Order(ent.Desc(folder.FieldExpiresAt))
-	default: // expires-first
+	default:
 		query = query.Order(ent.Asc(folder.FieldExpiresAt))
 	}
 

@@ -183,9 +183,7 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 
 func getPagination(r *http.Request) *models.Pagination {
 	query := r.URL.Query()
-
 	q := query.Get("q")
-	sort := query.Get("sort")
 
-	return models.NewPagination(sort, models.Filter{Name: "q", Value: q})
+	return models.NewPagination(query.Get("sort"), models.Filter{Name: "q", Value: q})
 }

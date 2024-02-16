@@ -15,3 +15,8 @@ func String(c templ.Component) string {
 	c.Render(context.TODO(), &b)
 	return b.String()
 }
+
+type SelectOption struct {
+	Value string
+	Label string
+}

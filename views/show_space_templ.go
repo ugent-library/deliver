@@ -16,9 +16,9 @@ import (
 	"github.com/ugent-library/okay"
 )
 
-var sortOptions = map[string]string{
-	"expires-first": "Expires first",
-	"expires-last":  "Expires last",
+var sortOptions = []SelectOption{
+	{"default", "Expires first"},
+	{"expires-last", "Expires last"},
 }
 
 func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, sort string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) templ.Component {
@@ -251,12 +251,12 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for value, name := range sortOptions {
+			for _, option := range sortOptions {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(value))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(option.Value))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -264,7 +264,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if sort == value {
+				if sort == option.Value {
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -275,9 +275,9 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(name)
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(option.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 153, Col: 69}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 153, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {

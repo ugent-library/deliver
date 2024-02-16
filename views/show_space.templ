@@ -6,9 +6,9 @@ import (
 	"github.com/ugent-library/okay"
 )
 
-var sortOptions = map[string]string{
-	"expires-first": "Expires first",
-	"expires-last":  "Expires last",
+var sortOptions = []SelectOption{
+	{"default", "Expires first"},
+	{"expires-last", "Expires last"},
 }
 
 templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, sort string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
@@ -150,8 +150,8 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										class="form-select"
 										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
 									>
-										for value, name := range sortOptions {
-											<option value={ value } selected?={ sort == value }>{ name }</option>
+										for _, option := range sortOptions {
+											<option value={ option.Value } selected?={ sort == option.Value }>{ option.Label }</option>
 										}
 									</select>
 								</div>

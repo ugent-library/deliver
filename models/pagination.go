@@ -14,6 +14,10 @@ type Pagination struct {
 }
 
 func NewPagination(sort string, filters ...Filter) *Pagination {
+	if sort == "default" {
+		sort = ""
+	}
+
 	return &Pagination{
 		sort:    sort,
 		filters: filters,
