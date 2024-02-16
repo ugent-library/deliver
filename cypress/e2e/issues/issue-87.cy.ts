@@ -40,7 +40,7 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
         const lbound = dayjs()
           .second(0)
           .millisecond(0)
-          .add(31, "days")
+          .add(30, "days")
           .subtract(1, "minute");
         const ubound = lbound.clone().add(2, "minutes");
         expect(expiresOnDate.unix()).is.within(
