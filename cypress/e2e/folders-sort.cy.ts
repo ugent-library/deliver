@@ -10,14 +10,9 @@ describe("Folders sorting", () => {
   before(() => {
     cy.loginAsSpaceAdmin();
 
-    cy.visitSpace();
-
     // Make sure test folders exist
     TEST_FOLDER_NAMES.forEach((folderName) => {
-      cy.setFieldByLabel("Folder name", folderName);
-      cy.contains(".btn", "Make folder").click();
-
-      cy.visitSpace();
+      cy.makeFolder(folderName);
 
       // Make sure the creation (and expiration dates) are different for each folder
       cy.wait(1000);
