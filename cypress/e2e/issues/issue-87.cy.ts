@@ -8,7 +8,7 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
   let FOLDER_NAME: string;
 
   beforeEach(() => {
-    FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    FOLDER_NAME = getRandomText();
 
     cy.loginAsSpaceAdmin();
 

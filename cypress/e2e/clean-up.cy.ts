@@ -1,5 +1,5 @@
 describe("Clean up test folders and files", { redirectionLimit: 1000 }, () => {
-  const SELECTOR = 'table.table tr td:first-of-type a:contains("CYPRESS-")';
+  const SELECTOR = "table.table tr td:first-of-type a";
 
   it("should clean up all files and folders", () => {
     cy.loginAsSpaceAdmin();
