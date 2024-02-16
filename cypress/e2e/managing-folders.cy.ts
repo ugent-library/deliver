@@ -8,7 +8,7 @@ describe("Managing folders", () => {
   });
 
   it("should be possible to create a new folder", () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
 
@@ -70,7 +70,7 @@ describe("Managing folders", () => {
   });
 
   it("should trim folder names", () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
 
@@ -113,7 +113,7 @@ describe("Managing folders", () => {
   });
 
   it("should return an error if a new folder name is already in use within the same space", () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
 
@@ -137,8 +137,8 @@ describe("Managing folders", () => {
   });
 
   it("should be possible to edit a folder name", () => {
-    const FOLDER_NAME1 = `CYPRESS-FOLDER_NAME_1-${getRandomText()}`;
-    const FOLDER_NAME2 = `CYPRESS-FOLDER_NAME_2-${getRandomText()}`;
+    const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
+    const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
     cy.visitSpace();
 
@@ -186,7 +186,7 @@ describe("Managing folders", () => {
   });
 
   it("should trim folder names when editing", () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
 
@@ -217,7 +217,7 @@ describe("Managing folders", () => {
   });
 
   it("should return an error if an edited folder name is empty", () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
 
@@ -247,8 +247,8 @@ describe("Managing folders", () => {
   });
 
   it("should return an error if an updated folder name is already in use within the same space", () => {
-    const FOLDER_NAME1 = `CYPRESS-FOLDER_NAME_1-${getRandomText()}`;
-    const FOLDER_NAME2 = `CYPRESS-FOLDER_NAME_2-${getRandomText()}`;
+    const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
+    const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
     cy.visitSpace();
     cy.setFieldByLabel("Folder name", FOLDER_NAME1);
@@ -294,7 +294,7 @@ describe("Managing folders", () => {
   });
 
   it("should be possible to delete a folder", () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
 

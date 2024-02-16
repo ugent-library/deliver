@@ -8,7 +8,7 @@ describe("Managing files", () => {
     cy.task("clearDownloads");
 
     FILE_COUNT = 0;
-    FOLDER_NAME = `CYPRESS-${getRandomText()}`;
+    FOLDER_NAME = getRandomText();
 
     cy.loginAsSpaceAdmin();
 
