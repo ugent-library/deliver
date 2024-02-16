@@ -17,6 +17,8 @@ export function logCommand(
 }
 
 export function updateLogMessage(log: Cypress.Log, append: unknown) {
+  if (!log) return;
+
   const message = log.get("message").split(", ").filter(Boolean);
 
   message.push(append);
@@ -28,6 +30,8 @@ export function updateConsoleProps(
   log: Cypress.Log,
   callback: (ObjectLike) => void
 ) {
+  if (!log) return;
+
   const consoleProps = log.get("consoleProps")();
 
   callback(consoleProps);

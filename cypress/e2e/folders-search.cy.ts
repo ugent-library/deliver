@@ -22,8 +22,7 @@ describe("Folder searching", () => {
 
       cy.getNumberOfDisplayedFolders().then((count) => {
         if (count === 0) {
-          cy.setFieldByLabel("Folder name", folderName);
-          cy.contains(".btn", "Make folder").click();
+          cy.makeFolder(folderName);
         }
       });
     });

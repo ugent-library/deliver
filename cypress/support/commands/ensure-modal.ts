@@ -8,10 +8,10 @@ type EnsureModalOptions = {
 
 export default function ensureModal(
   expectedTitle: string | RegExp,
-  options: EnsureModalOptions = {}
+  options?: EnsureModalOptions
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   let log: Cypress.Log | null = null;
-  if (options.log === true) {
+  if (options?.log !== false) {
     log = logCommand(
       "ensureModal",
       { "Expected title": expectedTitle },

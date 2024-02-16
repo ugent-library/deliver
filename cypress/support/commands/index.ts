@@ -12,6 +12,7 @@ import extractFolderId from "./extract-folder-id";
 import ensureModal from "./ensure-modal";
 import ensureNoModal from "./ensure-no-modal";
 import visitSpace from "./visit-space";
+import makeFolder from "./make-folder";
 
 // Child commands
 import finishLog from "./finish-log";
@@ -49,6 +50,8 @@ Cypress.Commands.addAll({
   ensureNoModal,
 
   visitSpace,
+
+  makeFolder,
 });
 
 // Child commands

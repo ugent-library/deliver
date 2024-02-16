@@ -12,12 +12,7 @@ describe("Managing files", () => {
 
     cy.loginAsSpaceAdmin();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
-
-    cy.ensureToast().closeToast();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.url().as("adminUrl");
   });
