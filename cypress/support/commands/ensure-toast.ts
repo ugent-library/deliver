@@ -1,13 +1,31 @@
 import { logCommand } from "./helpers";
 
+type EnsureToastOptions = {
+  log?: boolean;
+};
+
 export default function ensureToast(
-  expectedTitle?: string | RegExp
+  expectedTitle?: string | RegExp,
+  options?: EnsureToastOptions
 ): Cypress.Chainable<JQuery<HTMLElement>> {
-  const log = logCommand(
-    "ensureToast",
-    { "Expected title": expectedTitle },
-    expectedTitle
-  );
+  if (typeof expectedTitle === "object" && !(expectedTitle instanceof RegExp)) {
+    if (options) {
+      throw new Error("Invalid arguments provided for command useToast.");
+    }
+
+    // Only options were provided
+    options = expectedTitle;
+    expectedTitle = undefined;
+  }
+
+  const log =
+    options?.log !== false
+      ? logCommand(
+          "ensureToast",
+          { "Expected title": expectedTitle, options },
+          expectedTitle
+        )
+      : null;
 
   return cy
     .get(".toast", { log: false })
@@ -27,8 +45,6 @@ export default function ensureToast(
       return toast;
     })
     .should("be.visible")
-
-    .within({ log: false }, () => {})
     .finishLog(log);
 }
 
@@ -36,7 +52,8 @@ declare global {
   namespace Cypress {
     interface Chainable {
       ensureToast(
-        expectedTitle?: string | RegExp
+        expectedTitle?: string | RegExp,
+        options?: EnsureToastOptions
       ): Chainable<JQuery<HTMLElement>>;
     }
   }

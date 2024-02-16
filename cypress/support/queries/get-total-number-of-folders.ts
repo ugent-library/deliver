@@ -16,7 +16,7 @@ export default function getTotalNumberOfFolders(): () => number {
   return () => {
     const total = parseInt(containsFn().text().match(regex).groups["total"]);
 
-    if (log.get("message") != total) {
+    if (log.get("message") !== total.toString()) {
       updateLogMessage(log, total);
     }
 
