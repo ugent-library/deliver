@@ -178,17 +178,12 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 	}
 
 	q, _ := pagination.Filter("q")
-	views.ShowSpace(c, space, folders, q.Value, userSpaces, folder, validationErrors).Render(r.Context(), w)
+	views.ShowSpace(c, space, folders, q.Value, pagination.Sort(), userSpaces, folder, validationErrors).Render(r.Context(), w)
 }
 
 func getPagination(r *http.Request) *models.Pagination {
 	query := r.URL.Query()
-	filters := make([]models.Filter, 0, len(query))
-
 	q := query.Get("q")
-	if q != "" {
-		filters = append(filters, models.Filter{Name: "q", Value: q})
-	}
 
-	return models.NewPagination(filters...)
+	return models.NewPagination(query.Get("sort"), models.Filter{Name: "q", Value: q})
 }

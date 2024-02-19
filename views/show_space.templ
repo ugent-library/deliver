@@ -6,7 +6,12 @@ import (
 	"github.com/ugent-library/okay"
 )
 
-templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
+var sortOptions = []SelectOption{
+	{"default", "Expires first"},
+	{"expires-last", "Expires last"},
+}
+
+templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, sort string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
 	@pageLayout(c, space.Name) {
 		<div
 			class="c-sub-sidebar c-sidebar--bordered"
@@ -110,7 +115,12 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 					</div>
 				</div>
 				<form action={ templ.URL(c.Path("space", "spaceName", space.Name).String()) }>
-					<div class="form mb-6 mt-8">
+					<div
+						class="form mb-6 mt-8"
+						hx-target="#folders"
+						hx-swap="innerHTML"
+						hx-include="closest form"
+					>
 						<div class="row">
 							<div class="col">
 								<div class="input-group">
@@ -123,14 +133,27 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										autocomplete="off"
 										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
 										hx-trigger="input changed delay:500ms, search"
-										hx-target="#folders"
-										hx-swap="innerHTML"
 									/>
 									<label class="visually-hidden" for="q">Search</label>
 									<button class="btn btn-outline-primary" type="submit">
 										<i class="if if-search"></i>
 										<div class="btn-text">Search</div>
 									</button>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="d-flex align-items-center">
+									<label class="pe-3 text-nowrap" for="sort">Sort by</label>
+									<select
+										id="sort"
+										name="sort"
+										class="form-select"
+										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
+									>
+										for _, option := range sortOptions {
+											<option value={ option.Value } selected?={ sort == option.Value }>{ option.Label }</option>
+										}
+									</select>
 								</div>
 							</div>
 						</div>

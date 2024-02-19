@@ -42,6 +42,13 @@ func (r *FoldersRepo) GetBySpace(ctx context.Context, spaceID string, pagination
 		query = query.Where(sql.FieldContainsFold(folder.FieldName, q.Value))
 	}
 
+	switch sort := pagination.Sort(); sort {
+	case "expires-last":
+		query = query.Order(ent.Desc(folder.FieldExpiresAt))
+	default:
+		query = query.Order(ent.Asc(folder.FieldExpiresAt))
+	}
+
 	rows, err := query.All(ctx)
 	if err != nil {
 		return nil, err
