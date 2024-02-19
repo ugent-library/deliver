@@ -28,69 +28,19 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.visit("@adminUrl");
 
-    cy.contains("expires on")
-      .should("be.visible")
-      .invoke("text")
-      .then((expiresOn: string) => {
-        const expiresOnDate = dayjs(
-          expiresOn.match(/^expires on (?<date>.*)$/).groups["date"]
-        );
+    testPostpone(dayjs().add(30, "days"));
 
-        // Allow a 2 minute margin to account for computer time glitches
-        const lbound = dayjs()
-          .second(0)
-          .millisecond(0)
-          .add(30, "days")
-          .subtract(1, "minute");
-        const ubound = lbound.clone().add(2, "minutes");
-        expect(expiresOnDate.unix()).is.within(
-          lbound.unix(),
-          ubound.unix(),
-          `Expiration date "${expiresOnDate.toDate()}" is not within "${lbound.toDate()}" and "${ubound.toDate()}"`
-        );
+    // You can postpone multiple times
+    testPostpone(dayjs().add(60, "days"));
 
-        cy.wrap(expiresOnDate.format("YYYY-MM-DD")).as("expirationDate");
-      });
+    testPostpone(dayjs().add(90, "days"));
 
-    cy.ensureNoModal();
+    // Check expiration date in folder list
+    cy.visitSpace({ qs: { q: FOLDER_NAME } });
 
-    cy.contains(".btn", "Postpone expiration").should("be.visible").click();
-
-    cy.ensureModal(
-      new RegExp(
-        `Postpone the expiration date of\s*${FOLDER_NAME} by one month`
-      )
-    )
-      .within(function () {
-        cy.contains(`Current expiration date: ${this.expirationDate}`).should(
-          "be.visible"
-        );
-        // Since tests run instantly, this will be the same date
-        cy.contains(
-          `Expiration date after postponing: ${this.expirationDate}`
-        ).should("be.visible");
-      })
-      .closeModal("Postpone");
-
-    cy.wait("@postponeExpiration").should(
-      "have.nested.property",
-      "response.statusCode",
-      200
-    );
-
-    cy.url().should("eq", "@adminUrl");
-
-    cy.ensureNoModal();
-
-    cy.get<string>("@expirationDate").then((expirationDate) => {
-      cy.ensureToast(
-        `New expiration date for ${FOLDER_NAME}: ${expirationDate}`
-      );
-    });
-
-    cy.wait(3500);
-
-    cy.ensureNoToast({ timeout: 0 });
+    cy.get("#folders tbody tr:first-of-type td")
+      .eq(2)
+      .should("contain.text", dayjs().add(120, "days").format("YYYY-MM-DD"));
   });
 
   it("should not trigger the expiration logic when the modal is cancelled", () => {
@@ -114,4 +64,76 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.url().should("eq", "@adminUrl");
   });
+
+  function testPostpone(initDate: dayjs.Dayjs) {
+    cy.contains("expires on")
+      .should("be.visible")
+      .invoke("text")
+      .then((expiresOn: string) => {
+        const expiresOnDate = dayjs(getExpiresOnDate(expiresOn)).startOf("day"); // Ignore time portion
+
+        const calculatedExpirationDate = initDate.startOf("day");
+
+        expect(expiresOnDate.valueOf()).eq(
+          calculatedExpirationDate.valueOf(),
+          `Expected ${calculatedExpirationDate.toISOString()} to be equal to ${expiresOnDate.toISOString()}.`
+        );
+
+        cy.wrap(expiresOnDate.format("YYYY-MM-DD")).as("expirationDate");
+        cy.wrap(expiresOnDate.add(30, "days").format("YYYY-MM-DD")).as(
+          "nextExpirationDate"
+        );
+      });
+
+    cy.ensureNoModal();
+
+    cy.contains(".btn", "Postpone expiration").should("be.visible").click();
+
+    cy.ensureModal(
+      new RegExp(
+        `Postpone the expiration date of\s*${FOLDER_NAME} by one month`
+      )
+    )
+      .within(function () {
+        cy.contains(`Current expiration date: ${this.expirationDate}`).should(
+          "be.visible"
+        );
+        // Since tests run instantly, this will be the same date
+        cy.contains(
+          `Expiration date after postponing: ${this.nextExpirationDate}`
+        ).should("be.visible");
+      })
+      .closeModal("Postpone");
+
+    cy.wait("@postponeExpiration").should(
+      "have.nested.property",
+      "response.statusCode",
+      200
+    );
+
+    cy.url().should("eq", "@adminUrl");
+
+    cy.ensureNoModal();
+
+    cy.get<string>("@nextExpirationDate").then((nextExpirationDate) => {
+      cy.ensureToast(
+        `New expiration date for ${FOLDER_NAME}: ${nextExpirationDate}`
+      );
+    });
+
+    cy.wait(3500);
+
+    cy.ensureNoToast({ timeout: 0 });
+
+    cy.reload();
+
+    cy.contains("expires on")
+      .should("be.visible")
+      .invoke("text")
+      .should("contain", "@nextExpirationDate");
+  }
+
+  function getExpiresOnDate(expiresOn: string) {
+    return expiresOn.match(/^expires on (?<date>.*)$/).groups["date"];
+  }
 });

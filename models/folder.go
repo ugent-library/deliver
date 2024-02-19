@@ -61,7 +61,7 @@ func (f *Folder) Validate() error {
 }
 
 func (f *Folder) PostponeExpiration() time.Time {
-	f.ExpiresAt = time.Now().Add(PostponePeriod)
+	f.ExpiresAt = f.ExpiresAt.Add(PostponePeriod)
 
 	return f.ExpiresAt
 }
