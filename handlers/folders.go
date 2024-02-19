@@ -44,12 +44,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO constructor for new objects
-	folder := &models.Folder{
-		SpaceID:   space.ID,
-		Name:      b.Name,
-		ExpiresAt: time.Now().AddDate(0, 0, 31),
-	}
+	folder := models.NewFolder(space.ID, b.Name)
 
 	if err := c.Repo.Folders.Create(r.Context(), folder); err != nil {
 		showSpace(w, r, folder, err)
