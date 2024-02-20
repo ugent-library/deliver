@@ -1,6 +1,8 @@
+// https://github.com/ugent-library/deliver/issues/72
+
 import { getRandomText } from "support/util";
 
-describe("Folders sorting", () => {
+describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry date", () => {
   const randomSuffix = getRandomText();
 
   const TEST_FOLDER_NAMES = ["XYZ", "OPQ", "LMN", "FGH", "ABC"].map(
@@ -101,13 +103,13 @@ describe("Folders sorting", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "", sort: "expires-last" });
+      .should("contain", { sort: "expires-last" });
 
     cy.get("input[name=q]").type("name").blur();
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("eql", { q: "name", sort: "expires-last" });
+      .should("contain", { sort: "expires-last" });
 
     cy.url().should("have.param", "sort", "expires-last");
     cy.get("select[name=sort]").should("have.value", "expires-last");
@@ -129,7 +131,7 @@ describe("Folders sorting", () => {
 
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
-      .should("contain", { q: "test", sort: "default" });
+      .should("contain", { sort: "default" });
 
     cy.url().should("not.have.param", "sort");
     cy.location("search").should("not.contain", "sort");

@@ -450,7 +450,7 @@ describe("Managing files", () => {
   }
 
   function assertTotalNumberOfDownloads(expectedNumberOfDownloads: number) {
-    cy.visitSpace();
+    cy.visitSpace({ qs: { q: FOLDER_NAME } });
 
     cy.contains("table tbody tr", FOLDER_NAME)
       .find("td")
@@ -489,7 +489,7 @@ describe("Managing files", () => {
   }
 
   function assertFolderFileCount(FILE_COUNT: number) {
-    cy.visitSpace();
+    cy.visitSpace({ qs: { q: FOLDER_NAME } });
 
     cy.contains("table tr", FOLDER_NAME)
       .find("td")

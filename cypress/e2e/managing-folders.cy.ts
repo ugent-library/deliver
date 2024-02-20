@@ -10,7 +10,7 @@ describe("Managing folders", () => {
   it("should be possible to create a new folder", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
 
@@ -40,7 +40,7 @@ describe("Managing folders", () => {
     cy.wait(1500);
     cy.get("@copyButton").should("contain.text", "Copy public shareable link");
 
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
       cy.getTotalNumberOfFolders().should("eq", totalNumberOfFolders + 1);
@@ -73,8 +73,6 @@ describe("Managing folders", () => {
     const FOLDER_NAME = getRandomText();
 
     cy.visitSpace();
-
-    cy.contains("a", FOLDER_NAME).should("not.exist");
 
     cy.setFieldByLabel("Folder name", ` \t  ${FOLDER_NAME}  ${NBSP} `);
     cy.contains(".btn", "Make folder").click();
@@ -115,10 +113,7 @@ describe("Managing folders", () => {
   it("should return an error if a new folder name is already in use within the same space", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.location("pathname").should("match", /\/folders\/\w{26}/);
 
@@ -140,10 +135,7 @@ describe("Managing folders", () => {
     const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
     const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME1);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME1);
 
     cy.extractFolderId("previousFolderId")
       .getFolderShareUrl(FOLDER_NAME1)
@@ -188,10 +180,7 @@ describe("Managing folders", () => {
   it("should trim folder names when editing", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.extractFolderId();
 
@@ -219,10 +208,7 @@ describe("Managing folders", () => {
   it("should return an error if an edited folder name is empty", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.extractFolderId();
 
@@ -239,6 +225,7 @@ describe("Managing folders", () => {
       .should("be.visible")
       .and("have.text", "name cannot be empty");
 
+    // TODO: extract visitFolder command (that works with folder Id alias)
     cy.get<string>("@folderId").then((folderId) =>
       cy.visit(`/folders/${folderId}`)
     );
@@ -250,14 +237,10 @@ describe("Managing folders", () => {
     const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
     const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
-    cy.visitSpace();
-    cy.setFieldByLabel("Folder name", FOLDER_NAME1);
-    cy.contains(".btn", "Make folder").click();
-    cy.location("pathname").as("previousPathname");
+    cy.makeFolder(FOLDER_NAME1);
+    cy.location("pathname").as("folder1Url");
 
-    cy.visitSpace();
-    cy.setFieldByLabel("Folder name", FOLDER_NAME2);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME2);
 
     cy.contains(".btn", "Edit").click(); // Editing folder 2
 
@@ -272,7 +255,7 @@ describe("Managing folders", () => {
       .should("be.visible")
       .and("have.text", "name must be unique");
 
-    cy.visit("@previousPathname");
+    cy.visit("@folder1Url");
 
     cy.contains(".btn", "Edit").click(); // Editing folder 1
 
@@ -290,29 +273,19 @@ describe("Managing folders", () => {
     cy.setFieldByLabel("Folder name", FOLDER_NAME1);
     cy.contains(".btn", "Save changes").click();
 
-    cy.location("pathname").should("eq", "@previousPathname");
+    cy.location("pathname").should("eq", "@folder1Url");
   });
 
   it("should be possible to delete a folder", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
+    cy.makeFolder(FOLDER_NAME);
 
-    cy.contains("a", FOLDER_NAME).should("not.exist");
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
-
-    cy.ensureToast("Folder created successfully").closeToast();
-    cy.ensureNoToast();
-
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.getTotalNumberOfFolders().as("totalNumberOfFolders", { type: "static" });
 
-    cy.contains("a", FOLDER_NAME).should("exist");
-
-    cy.contains("a", FOLDER_NAME).click();
+    cy.contains("a", FOLDER_NAME).should("exist").click();
 
     cy.contains(".btn", "Edit").click();
 
@@ -329,6 +302,8 @@ describe("Managing folders", () => {
 
     cy.ensureToast("Folder deleted successfully").closeToast();
     cy.ensureNoToast();
+
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
   });

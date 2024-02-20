@@ -1,6 +1,8 @@
+// https://github.com/ugent-library/deliver/issues/92
+
 import { getRandomText } from "support/util";
 
-describe("Folder searching", () => {
+describe("Issue #92: [Speed and usability] Add search to folder overview", () => {
   const TEST_FOLDER_NAMES = [
     "Personal documents",
     "School work",

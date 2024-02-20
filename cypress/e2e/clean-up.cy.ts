@@ -12,7 +12,7 @@ describe("Clean up test folders and files", { redirectionLimit: 1000 }, () => {
   });
 
   function deleteAllCypressTestFolders(space: string) {
-    cy.visitSpace(space).then(() => {
+    cy.visitSpace(space, { qs: { limit: 1000 } }).then(() => {
       // Using Cypress.$() direct jQuery selector tool here.
       // Using cy.get() the test would fail if none are left.
       const links = Cypress.$<HTMLAnchorElement>(SELECTOR)
