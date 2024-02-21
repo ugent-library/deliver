@@ -1,7 +1,12 @@
+//
+// Additions to Bootstrap toast
+//
+
 .toast {
   position: relative;
   flex-basis: 0;
   width: 400px;
+  z-index: 9999;
 
   .btn-close {
     position: absolute;
