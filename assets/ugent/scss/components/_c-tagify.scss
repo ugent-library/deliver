@@ -1,3 +1,7 @@
+/* ==========================================================================
+    Component: Tagify input
+   ========================================================================== */
+
 @use "sass:math";
 
 // The suggestions list (dropdown) is appended to the document's body so the CSS variables should be defined at root-level
@@ -102,12 +106,12 @@
         @keyframes readonlyStyles {
             0% {
                 background: linear-gradient(45deg, var(--tag-bg)  25%,
-                                           transparent    25%,
-                                           transparent    50%,
-                                           var(--tag-bg)  50%,
-                                           var(--tag-bg)  75%,
-                                           transparent    75%,
-                                           transparent)   0/#{$size} #{$size};
+                                            transparent    25%,
+                                            transparent    50%,
+                                            var(--tag-bg)  50%,
+                                            var(--tag-bg)  75%,
+                                            transparent    75%,
+                                            transparent)   0/#{$size} #{$size};
                 box-shadow: none;
                 filter: brightness(.95);
             }
@@ -214,7 +218,7 @@
             color          : var(--tag-text-color);
             line-height    : inherit;
             border-radius  : var(--tag-border-radius);
-         // user-select    : none;  // should allow selecting text if the user wishes to copy something
+        // user-select    : none;  // should allow selecting text if the user wishes to copy something
             white-space    : nowrap;
             transition     : .13s ease-out;
 
@@ -299,9 +303,9 @@
 
         &#{ $self }{
             &--noAnim{
-              > div::before{
+                > div::before{
                 animation:none;
-              }
+                }
             }
 
             &--notAllowed:not(.tagify__tag--editable){
@@ -416,9 +420,9 @@
 
         &:empty{
             @include firefox {
-              // clicking twice on the input (not fast) disallows typing (bug) only when the input has "display:flex".
-              // disabled the below rule for the above reason:
-              //  display: flex; // https://bugzilla.mozilla.org/show_bug.cgi?id=904846#c45
+                // clicking twice on the input (not fast) disallows typing (bug) only when the input has "display:flex".
+                // disabled the below rule for the above reason:
+                //  display: flex; // https://bugzilla.mozilla.org/show_bug.cgi?id=904846#c45
             }
 
             &::before{
@@ -454,7 +458,7 @@
                     color: var(--placeholder-color-focus);
                 }
 
-                 &::after{
+                &::after{
                     @include firefox {
                         display: none;
                     }

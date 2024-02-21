@@ -20,13 +20,17 @@ export default function login(username, password): void {
 
       cy.contains(".btn", "Log in", NO_LOG).click(NO_LOG);
 
-      cy.get('input[name="username"]', NO_LOG).type(username, NO_LOG);
+      cy.get('input[name="username"]', NO_LOG).invoke(NO_LOG, "val", username);
 
       if (password) {
-        cy.get('input[name="password"]', NO_LOG).type(password, NO_LOG);
+        cy.get('input[name="password"]', NO_LOG).invoke(
+          NO_LOG,
+          "val",
+          password
+        );
       }
 
-      cy.get(":submit", NO_LOG).click(NO_LOG);
+      cy.get("form", NO_LOG).submit(NO_LOG);
     },
     {
       cacheAcrossSpecs: true,

@@ -1,6 +1,6 @@
-/* ==========================================================================
-  Additions to bootstrap/cards
-   ========================================================================== */
+//
+// Additions to Bootstrap alerts
+//
 
 /* Always clear alerts
    ========================================================================== */
@@ -24,10 +24,18 @@
 }
 
 .alert-title {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.alert-small {
+  font-size: $font-size-sm;
+  .alert-title {
+    font-size: $h4-font-size;
+  }
 }
 
 .alert-content {
+  overflow: hidden;
   flex: 1;
 }
 
@@ -46,15 +54,14 @@
 }
 
 /* Success alert
-   ========================================================================== */
+    ========================================================================== */
 
 .alert-success {
-  background: rgba($light-green, 0.6);
-  border: 1px solid rgba($success, 0.4);
-  color: mix($success, $text, 25%);
+  background: $green-50;
+  color: mix($success, $text, 30%);
 
   .alert-title {
-    color: mix($success, $header, 32%);
+    color: $green-900;
   }
 
 
@@ -64,15 +71,14 @@
 }
 
 /* Danger alert
-   ========================================================================== */
+    ========================================================================== */
 
 .alert-danger {
-  background: rgba($light-warm-red, 0.6);
-  border: 1px solid rgba($danger, 0.4);
+  background: $red-50;
   color: mix($danger, $text, 30%);
 
   .alert-title {
-    color: mix($danger, $header, 32%);
+    color: $red-900;
   }
 
   > .if:first-child {
@@ -81,15 +87,23 @@
 }
 
 /* Info alert
-   ========================================================================== */
+    ========================================================================== */
 
 .alert-info {
-  background: rgba($light-blue, 0.6);
-  border: 1px solid rgba($blue, 0.4);
-  color: mix($blue, $text, 30%);
+  background: $blue-50;
+  color: mix($primary, $text, 30%);
+  position: relative;
 
   .alert-title {
-    color: mix($blue, $header, 32%);
+    color: $blue-900;
+  }
+
+  .btn-outline-secondary {
+    border-color: $blue-200;
+  }
+
+  .btn-tertiary {
+    color: mix($primary, $text, 30%);
   }
 
   > .if:first-child {
@@ -98,18 +112,41 @@
 }
 
 /* Warning alert
-   ========================================================================== */
+    ========================================================================== */
 
 .alert-warning {
-  background: rgba($light-orange, 0.6);
-  border: 1px solid rgba($orange, 0.4);
-  color: mix($orange, $text, 25%);
+  background: $orange-50;
+  color: mix($warning, $text, 30%);
 
   .alert-title {
-    color: mix($orange, $header, 32%);
+    color: $orange-900;
+  }
+
+  .text-muted {
+    color: mix($warning, $text-muted, 20%) !important;
+  }
+
+  .btn-tertiary {
+    color: mix($warning, $text, 30%);
   }
 
   > .if:first-child {
     color: $orange;
+  }
+}
+
+/* Default alert
+    ========================================================================== */
+
+.alert-default {
+  background: rgba($gray-50, 0.8);
+  color: $gray-600;
+
+  .alert-title {
+    color: $gray-900
+  }
+
+  > .if:first-child {
+    color: $icon-muted;
   }
 }
