@@ -1,7 +1,6 @@
 @font-face {
     font-family: "icon-font";
-    src: url("../fonts/icon-font.woff2") format("woff2"),
-url("../fonts/icon-font.woff") format("woff");
+    src: url("../fonts/icon-font.woff2") format("woff2"), url("../fonts/icon-font.woff") format("woff");
 }
 
 i[class^="if-"]:before, i[class*=" if-"]:before {
@@ -24,288 +23,261 @@ i[class^="if-"]:before, i[class*=" if-"]:before {
 .if-alert:before {
     content: "\f103";
 }
-.if-arrow-double-down:before {
+.if-arrow-down:before {
     content: "\f104";
 }
-.if-arrow-double-up:before {
+.if-arrow-go-back:before {
     content: "\f105";
 }
-.if-arrow-down:before {
+.if-arrow-left:before {
     content: "\f106";
 }
-.if-arrow-go-back:before {
+.if-arrow-right:before {
     content: "\f107";
 }
-.if-arrow-left:before {
+.if-arrow-up:before {
     content: "\f108";
 }
-.if-arrow-right:before {
+.if-article:before {
     content: "\f109";
 }
-.if-arrow-up:before {
+.if-bar-chart:before {
     content: "\f10a";
 }
-.if-article:before {
+.if-book:before {
     content: "\f10b";
 }
-.if-asterisk:before {
+.if-calendar-1:before {
     content: "\f10c";
 }
-.if-bar-chart:before {
+.if-calendar:before {
     content: "\f10d";
 }
-.if-book:before {
+.if-caret-down:before {
     content: "\f10e";
 }
-.if-briefcase:before {
+.if-caret-left:before {
     content: "\f10f";
 }
-.if-building:before {
+.if-caret-right:before {
     content: "\f110";
 }
-.if-calendar-1:before {
+.if-caret-up:before {
     content: "\f111";
 }
-.if-calendar:before {
+.if-cc-by-line:before {
     content: "\f112";
 }
-.if-caret-down:before {
+.if-cc-line:before {
     content: "\f113";
 }
-.if-caret-left:before {
+.if-cc-nc-line:before {
     content: "\f114";
 }
-.if-caret-right:before {
+.if-cc-nd-line:before {
     content: "\f115";
 }
-.if-caret-up:before {
+.if-cc-sa-line:before {
     content: "\f116";
 }
-.if-cc-by-line:before {
+.if-cc-zero-line:before {
     content: "\f117";
 }
-.if-cc-line:before {
+.if-check-circle-fill:before {
     content: "\f118";
 }
-.if-cc-nc-line:before {
+.if-check-circle:before {
     content: "\f119";
 }
-.if-cc-nd-line:before {
+.if-check-double:before {
     content: "\f11a";
 }
-.if-cc-sa-line:before {
+.if-check:before {
     content: "\f11b";
 }
-.if-cc-zero-line:before {
+.if-chevron-down:before {
     content: "\f11c";
 }
-.if-check-circle-fill:before {
+.if-chevron-left:before {
     content: "\f11d";
 }
-.if-check-circle:before {
+.if-chevron-right:before {
     content: "\f11e";
 }
-.if-check-double:before {
+.if-chevron-up:before {
     content: "\f11f";
 }
-.if-check:before {
+.if-close-circle-fill:before {
     content: "\f120";
 }
-.if-chevron-down:before {
+.if-close:before {
     content: "\f121";
 }
-.if-chevron-left:before {
+.if-copy:before {
     content: "\f122";
 }
-.if-chevron-right:before {
+.if-database:before {
     content: "\f123";
 }
-.if-chevron-up:before {
+.if-delete:before {
     content: "\f124";
 }
-.if-close-circle-fill:before {
+.if-double-quotes:before {
     content: "\f125";
 }
-.if-close:before {
+.if-download:before {
     content: "\f126";
 }
-.if-copy:before {
+.if-draft-fill:before {
     content: "\f127";
 }
-.if-database:before {
+.if-draft:before {
     content: "\f128";
 }
-.if-delete:before {
+.if-drag:before {
     content: "\f129";
 }
-.if-double-quotes:before {
+.if-edit:before {
     content: "\f12a";
 }
-.if-download:before {
+.if-empty:before {
     content: "\f12b";
 }
-.if-draft-fill:before {
+.if-error-circle-fill:before {
     content: "\f12c";
 }
-.if-draft:before {
+.if-error-circle:before {
     content: "\f12d";
 }
-.if-drag:before {
+.if-external-link:before {
     content: "\f12e";
 }
-.if-edit:before {
+.if-eye-fill:before {
     content: "\f12f";
 }
-.if-empty:before {
+.if-eye-off:before {
     content: "\f130";
 }
-.if-error-circle-fill:before {
+.if-eye:before {
     content: "\f131";
 }
-.if-error-circle:before {
+.if-feedback-fill:before {
     content: "\f132";
 }
-.if-external-link:before {
+.if-file-pdf:before {
     content: "\f133";
 }
-.if-eye-fill:before {
+.if-file-text:before {
     content: "\f134";
 }
-.if-eye-off:before {
+.if-file-word:before {
     content: "\f135";
 }
-.if-eye:before {
+.if-file:before {
     content: "\f136";
 }
-.if-feedback-fill:before {
+.if-forbid:before {
     content: "\f137";
 }
-.if-file-pdf:before {
+.if-ghent-university:before {
     content: "\f138";
 }
-.if-file-text:before {
+.if-global:before {
     content: "\f139";
 }
-.if-file-word:before {
+.if-grid:before {
     content: "\f13a";
 }
-.if-file:before {
+.if-home:before {
     content: "\f13b";
 }
-.if-forbid:before {
+.if-info-circle-filled:before {
     content: "\f13c";
 }
-.if-ghent-university:before {
+.if-info-circle:before {
     content: "\f13d";
 }
-.if-global:before {
+.if-list-check:before {
     content: "\f13e";
 }
-.if-grid:before {
+.if-list-unordered:before {
     content: "\f13f";
 }
-.if-home:before {
+.if-lock-unlock:before {
     content: "\f140";
 }
-.if-info-circle-filled:before {
+.if-lock:before {
     content: "\f141";
 }
-.if-info-circle:before {
+.if-log-out:before {
     content: "\f142";
 }
-.if-list-check:before {
+.if-mail:before {
     content: "\f143";
 }
-.if-list-unordered:before {
+.if-menu:before {
     content: "\f144";
 }
-.if-lock-unlock:before {
+.if-message:before {
     content: "\f145";
 }
-.if-lock:before {
+.if-messages:before {
     content: "\f146";
 }
-.if-log-out:before {
+.if-more:before {
     content: "\f147";
 }
-.if-mail:before {
+.if-move-bottom:before {
     content: "\f148";
 }
-.if-menu:before {
+.if-move-top:before {
     content: "\f149";
 }
-.if-message:before {
+.if-no-edit:before {
     content: "\f14a";
 }
-.if-messages:before {
+.if-notification:before {
     content: "\f14b";
 }
-.if-more:before {
+.if-orcid:before {
     content: "\f14c";
 }
-.if-move-bottom:before {
+.if-pin:before {
     content: "\f14d";
 }
-.if-move-left:before {
+.if-request-change:before {
     content: "\f14e";
 }
-.if-move-right:before {
+.if-search:before {
     content: "\f14f";
 }
-.if-move-top:before {
+.if-service:before {
     content: "\f150";
 }
-.if-no-edit:before {
+.if-settings:before {
     content: "\f151";
 }
-.if-notification:before {
+.if-share:before {
     content: "\f152";
 }
-.if-orcid:before {
+.if-start:before {
     content: "\f153";
 }
-.if-pin:before {
+.if-subtract:before {
     content: "\f154";
 }
-.if-request-change:before {
+.if-table:before {
     content: "\f155";
 }
-.if-search:before {
+.if-time:before {
     content: "\f156";
 }
-.if-service:before {
+.if-user-add:before {
     content: "\f157";
 }
-.if-settings:before {
+.if-user:before {
     content: "\f158";
 }
-.if-share:before {
-    content: "\f159";
-}
-.if-start:before {
-    content: "\f15a";
-}
-.if-subtract:before {
-    content: "\f15b";
-}
-.if-table:before {
-    content: "\f15c";
-}
-.if-time:before {
-    content: "\f15d";
-}
-.if-tool:before {
-    content: "\f15e";
-}
-.if-upload:before {
-    content: "\f15f";
-}
-.if-user-add:before {
-    content: "\f160";
-}
-.if-user:before {
-    content: "\f161";
-}
 .if-zoom-in:before {
-    content: "\f162";
+    content: "\f159";
 }
