@@ -22,7 +22,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
         qs: { q: folderName },
       });
 
-      cy.getNumberOfDisplayedFolders().then((count) => {
+      cy.getFolderCount().then(({ count }) => {
         if (count === 0) {
           cy.makeFolder(folderName);
         }
@@ -33,12 +33,9 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
   beforeEach(() => {
     cy.loginAsSpaceAdmin();
 
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
-    cy.getNumberOfDisplayedFolders().should("be.at.least", 5);
-    cy.getTotalNumberOfFolders()
-      .should("be.at.least", 5)
-      .as("totalBeforeFiltering");
+    cy.getFolderCount().its("total").should("be.at.least", 5);
 
     cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
       "filterFolders"
@@ -137,7 +134,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
   });
 
   it("should retain the current AJAX search when reloading the page", () => {
-    cy.getNumberOfDisplayedFolders().as("folderCountBeforeSearch");
+    cy.getFolderCount().its("total").as("folderCountBeforeSearch");
 
     cy.get("@q").type("School", { delay: 0 }).blur();
 
@@ -163,7 +160,11 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
     cy.location("search").should("not.contain", "q=");
     cy.get("@q").should("have.value", "");
 
-    cy.get("@folderCountBeforeSearch").should("eq", "@folderCountBeforeSearch");
+    cy.getFolderCount().should(
+      "have.property",
+      "total",
+      "@folderCountBeforeSearch"
+    );
   });
 
   it("should be possible to clear the search field", () => {
@@ -192,7 +193,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
       .should("have.nested.property", "request.query")
       .should("contain", { q: "' OR 1=1 --" });
 
-    cy.getNumberOfDisplayedFolders().should("eq", 0);
+    cy.getFolderCount().should("have.property", "total", 0);
   });
 
   it("should display a default message if nothing was filtered", () => {
@@ -214,7 +215,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
         qs: { q: "School work" },
       });
 
-      cy.getNumberOfDisplayedFolders().should("eq", 1);
+      cy.getFolderCount().should("have.property", "total", 1);
 
       cy.contains("#folders a", "School work").click();
 
@@ -254,7 +255,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
     });
 
     function assertFileDetailsLoadedCorrectly() {
-      cy.getNumberOfDisplayedFolders().should("eq", 1);
+      cy.getFolderCount().should("have.property", "total", 1);
 
       cy.get("#folders table tbody tr td")
         .eq(3)
@@ -268,8 +269,12 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
 
     cy.get("#folders .c-blank-slate").should("not.exist");
 
-    cy.getNumberOfDisplayedFolders().should("eq", filteredFolders.length);
-    cy.getTotalNumberOfFolders().should("eq", "@totalBeforeFiltering");
+    cy.getFolderCount().should(
+      "have.property",
+      "total",
+      filteredFolders.length
+    );
+
     cy.get("#folders tbody tr").should("have.length", filteredFolders.length);
 
     TEST_FOLDER_NAMES.forEach((folderName) => {
