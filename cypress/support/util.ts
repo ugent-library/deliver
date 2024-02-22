@@ -4,7 +4,7 @@ export function getRandomText() {
 
 export function mapAlias(
   thisObject: Record<string, unknown>,
-  argument
+  argument: unknown
 ): unknown {
   if (typeof argument === "string" && argument.startsWith("@")) {
     const alias = argument.slice(1);

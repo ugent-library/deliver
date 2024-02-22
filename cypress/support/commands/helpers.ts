@@ -1,6 +1,6 @@
 export function logCommand(
-  name,
-  consoleProps = {},
+  name: string,
+  consoleProps: Cypress.ObjectLike = {},
   message: unknown = "",
   $el = undefined
 ) {
@@ -16,7 +16,10 @@ export function logCommand(
   });
 }
 
-export function updateLogMessage(log: Cypress.Log, append: unknown) {
+export function updateLogMessage(
+  log: Cypress.Log | undefined,
+  append: unknown
+) {
   if (!log) return;
 
   const message = log.get("message").split(", ").filter(Boolean);
@@ -27,8 +30,8 @@ export function updateLogMessage(log: Cypress.Log, append: unknown) {
 }
 
 export function updateConsoleProps(
-  log: Cypress.Log,
-  callback: (ObjectLike) => void
+  log: Cypress.Log | undefined,
+  callback: (consoleProps: Cypress.ObjectLike) => void
 ) {
   if (!log) return;
 

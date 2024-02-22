@@ -9,9 +9,10 @@ export default function setField(
   value: string,
   options: SetFieldOptions = { log: true }
 ): Cypress.Chainable<JQuery<HTMLInputElement | HTMLSelectElement>> {
-  const log =
-    options.log === true &&
-    logCommand("setField", { subject, value }, value).snapshot("before");
+  let log: Cypress.Log | undefined;
+  if (options.log === true) {
+    log = logCommand("setField", { subject, value }, value).snapshot("before");
+  }
 
   const field = cy.wrap(subject, { log: false });
 

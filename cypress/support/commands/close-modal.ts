@@ -7,18 +7,21 @@ type CloseModalOptions = {
 };
 
 export default function closeModal(
-  subject: undefined | JQuery<HTMLElement>,
+  subject: unknown,
   save: boolean | string | RegExp = false,
   options: CloseModalOptions = { log: true }
 ): void {
   const dismissButtonText =
     typeof save === "boolean" ? (save ? "Save" : "Cancel") : save;
 
-  let log: Cypress.Log | null = null;
+  let log: Cypress.Log | undefined;
   if (options.log === true) {
     log = logCommand(
       "closeModal",
-      { subject: subject.get(0), "Dismiss button text": dismissButtonText },
+      {
+        subject: subject ? (subject as JQuery<HTMLElement>).get(0) : null,
+        "Dismiss button text": dismissButtonText,
+      },
       dismissButtonText
     );
     log.set("type", !subject ? "parent" : "child");
@@ -27,7 +30,7 @@ export default function closeModal(
   const doCloseModal = () => {
     cy.contains(".modal-footer .btn", dismissButtonText, NO_LOG)
       .then(($el) => {
-        if (options.log === true) {
+        if (log) {
           log.set("$el", $el);
           updateConsoleProps(log, (cp) => {
             cp["Button element"] = $el.get(0);

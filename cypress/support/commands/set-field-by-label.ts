@@ -9,16 +9,16 @@ type SetFieldByLabelOptions = {
 export default function setFieldByLabel(
   labelCaption: string | RegExp,
   value: string,
-  options?: SetFieldByLabelOptions
+  options: SetFieldByLabelOptions = { log: true }
 ): Cypress.Chainable<JQuery<HTMLElement>> {
-  const log =
-    options?.log !== false
-      ? logCommand(
-          "setFieldByLabel",
-          { "Label caption": labelCaption, value },
-          `${labelCaption} = ${value}`
-        ).snapshot("before")
-      : null;
+  let log: Cypress.Log | undefined;
+  if (options?.log === true) {
+    logCommand(
+      "setFieldByLabel",
+      { "Label caption": labelCaption, value },
+      `${labelCaption} = ${value}`
+    ).snapshot("before");
+  }
 
   cy.getLabel(labelCaption, NO_LOG)
     .then((label) => {

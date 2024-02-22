@@ -18,13 +18,14 @@ describe("The home page", () => {
   it("should redirect to the login page when clicking the Login buttons", () => {
     cy.visit("/");
 
-    const assertLoginRedirection = (href) => {
+    const assertLoginRedirection = (href: string) => {
       cy.request(href).then((response) => {
         expect(response).to.have.property("isOkStatusCode", true);
-        expect(response).to.have.property("redirects").that.is.an("array");
+        expect(response).to.have.property("redirects").that.is.an("array").that
+          .is.not.empty;
 
         const redirect = new URL(
-          response.redirects.at(-1).replace(/^3\d\d\: /, "")
+          response.redirects!.at(-1)!.replace(/^3\d\d\: /, "")
         ); // Redirect entries are in form '3XX: {url}'
 
         expect(redirect).to.have.property("origin", Cypress.env("OIDC_ORIGIN"));
@@ -42,9 +43,9 @@ describe("The home page", () => {
     cy.loginAsSpaceAdmin();
 
     cy.request("/").then((response) => {
-      const spacesUrl = new URL("/spaces", Cypress.config("baseUrl"));
-      expect(response.redirects.at(-2)).to.eq(`303: ${spacesUrl}`);
-      expect(response.redirects.at(-1)).to.match(
+      const spacesUrl = new URL("/spaces", Cypress.config("baseUrl")!);
+      expect(response.redirects!.at(-2)).to.eq(`303: ${spacesUrl}`);
+      expect(response.redirects!.at(-1)).to.match(
         new RegExp(`^303: ${spacesUrl}/[\\w\\d]+$`)
       );
     });

@@ -2,7 +2,7 @@ import { logCommand } from "./helpers";
 
 const NO_LOG = { log: false };
 
-export default function login(username, password): void {
+export default function login(username: string, password: string): void {
   // WARNING: Whenever you change the code of the session setup, Cypress will throw an error:
   //   This session already exists. You may not create a new session with a previously used identifier.
   //   If you want to create a new session with a different setup function, please call cy.session() with

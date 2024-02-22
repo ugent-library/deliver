@@ -2,7 +2,7 @@ import { updateConsoleProps, updateLogMessage } from "./helpers";
 
 export default function finishLog(
   subject: unknown,
-  log: Cypress.Log,
+  log: Cypress.Log | undefined,
   appendToMessage = false
 ) {
   if (log) {
@@ -37,7 +37,10 @@ declare global {
        *   .validatedRequest(...)
        *   .finishLog(log)
        */
-      finishLog(log: Log, appendToMessage?: boolean): Chainable<Subject>;
+      finishLog(
+        log: Log | undefined,
+        appendToMessage?: boolean
+      ): Chainable<Subject>;
     }
   }
 }

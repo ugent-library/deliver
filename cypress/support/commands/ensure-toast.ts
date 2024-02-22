@@ -25,7 +25,7 @@ export default function ensureToast(
           { "Expected title": expectedTitle, options },
           expectedTitle
         )
-      : null;
+      : undefined;
 
   return cy
     .get(".toast", { log: false })
