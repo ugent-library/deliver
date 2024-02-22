@@ -1,13 +1,13 @@
-/* ==========================================================================
-  bc-toolbar
-  Toolbar
-   ========================================================================== */
+/**
+ * Component: Toolbar
+ * ===
+ */
 
 /* Variables
-   ========================================================================== */
+  ========================================================================== */
 
 $bc-toolbar-sm-height: 4.8rem !default;
-$bc-toolbar-height: 6.4rem !default;
+$bc-toolbar-height: 5.6rem !default;
 
 /* Reset padding in common Bootstrap elements
   ========================================================================== */
@@ -37,11 +37,11 @@ $bc-toolbar-height: 6.4rem !default;
 }
 
 .bc-toolbar--top {
-  align-items: start;
+  align-items: flex-start;
 }
 
 /* Bordered variants
-   ========================================================================== */
+  ========================================================================== */
 
 .bc-toolbar--bordered-top {
   border-top: 0.1rem solid $border;
@@ -56,7 +56,7 @@ $bc-toolbar-height: 6.4rem !default;
 
 .bc-toolbar-title {
   white-space: nowrap;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 500;
   margin: 0;
   color: $header;
@@ -154,6 +154,15 @@ $bc-toolbar-height: 6.4rem !default;
   }
 }
 
+.bc-toolbar--small-spacing {
+  .bc-toolbar-left .bc-toolbar-item:not(:last-child) {
+    padding-right: .8rem;
+  }
+  .bc-toolbar-right .bc-toolbar-item:not(:first-child) {
+    padding-left: .8rem;
+  }
+}
+
 .bc-toolbar-item--no-spacing {
   .bc-toolbar-left & {
     padding: 0;
@@ -166,31 +175,59 @@ $bc-toolbar-height: 6.4rem !default;
 
 
 .bc-toolbar-sm .bc-toolbar-left .bc-toolbar-item {
-  padding-right: $grid-gutter-width / 4;
+  padding-right: calc($grid-gutter-width / 4);
   &:last-child {
     padding-right: 0;
   }
 }
 
 .bc-toolbar-sm .bc-toolbar-right .bc-toolbar-item {
-  padding-left: $grid-gutter-width / 4;
+  padding-left: calc($grid-gutter-width / 4);
   &:first-child {
     padding-left: 0;
   }
 }
 
-.bc-toolbar-responsive {
+.bc-toolbar-lg-responsive {
   @include media-breakpoint-down(lg) {
-    flex-wrap: wrap;
+    height: auto;
+    flex-direction: column-reverse;
+    padding: 0.8rem 0;
+
+    .bc-toolbar-left,
+    .bc-toolbar-right {
+      width: 100%;
+    }
+  }
+
+}
+
+.bc-toolbar-md-responsive {
+  @include media-breakpoint-down(md) {
+    height: auto;
+    flex-direction: column-reverse;
+    padding: 0.8rem 0;
+
     .bc-toolbar-left,
     .bc-toolbar-right {
       width: 100%;
     }
 
-    .bc-toolbar-right {
-      justify-content: flex-start;
-    }
   }
 
-  height: auto;
+}
+
+.bc-toolbar-sm-responsive {
+  @include media-breakpoint-down(sm) {
+    height: auto;
+    flex-direction: column-reverse;
+    padding: 0.8rem 0;
+
+    .bc-toolbar-left,
+    .bc-toolbar-right {
+      width: 100%;
+    }
+
+  }
+
 }
