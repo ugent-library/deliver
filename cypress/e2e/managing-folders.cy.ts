@@ -14,9 +14,7 @@ describe("Managing folders", () => {
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
 
-    cy.getFolderCount()
-      .its("total")
-      .as("totalNumberOfFolders", { type: "static" });
+    cy.getFolderCount("total").as("totalNumberOfFolders", { type: "static" });
 
     cy.setFieldByLabel("Folder name", FOLDER_NAME);
     cy.contains(".btn", "Make folder").click();
@@ -45,11 +43,7 @@ describe("Managing folders", () => {
     cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
-      cy.getFolderCount().should(
-        "have.property",
-        "total",
-        totalNumberOfFolders + 1
-      );
+      cy.getFolderCount("total").should("eq", totalNumberOfFolders + 1);
     });
 
     cy.contains("tr", FOLDER_NAME)
@@ -95,7 +89,7 @@ describe("Managing folders", () => {
   it("should return an error if a new folder name is empty", () => {
     cy.visitSpace();
 
-    cy.getFolderCount().its("total").as("totalNumberOfFolders");
+    cy.getFolderCount("total").as("totalNumberOfFolders");
 
     cy.get("#folder-name").should("not.have.class", "is-invalid");
     cy.get("#folder-name-invalid").should("not.exist");
@@ -113,11 +107,7 @@ describe("Managing folders", () => {
       `/spaces/${Cypress.env("DEFAULT_SPACE")}/folders`
     );
 
-    cy.getFolderCount().should(
-      "have.property",
-      "total",
-      "@totalNumberOfFolders"
-    );
+    cy.getFolderCount("total").should("eq", "@totalNumberOfFolders");
   });
 
   it("should return an error if a new folder name is already in use within the same space", () => {
@@ -293,9 +283,7 @@ describe("Managing folders", () => {
 
     cy.visitSpace({ qs: { limit: 1000 } });
 
-    cy.getFolderCount()
-      .its("total")
-      .as("totalNumberOfFolders", { type: "static" });
+    cy.getFolderCount("total").as("totalNumberOfFolders", { type: "static" });
 
     cy.contains("a", FOLDER_NAME).should("exist").click();
 
@@ -309,11 +297,7 @@ describe("Managing folders", () => {
     );
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
-      cy.getFolderCount().should(
-        "have.property",
-        "total",
-        totalNumberOfFolders - 1
-      );
+      cy.getFolderCount("total").should("eq", totalNumberOfFolders - 1);
     });
 
     cy.ensureToast("Folder deleted successfully").closeToast();
