@@ -1,6 +1,8 @@
 package views
 
 import (
+	"fmt"
+
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/okay"
@@ -11,7 +13,7 @@ var sortOptions = []SelectOption{
 	{"expires-last", "Expires last"},
 }
 
-templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, sort string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
+templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, pagination *models.Pagination, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) {
 	@pageLayout(c, space.Name) {
 		<div
 			class="c-sub-sidebar c-sidebar--bordered"
@@ -115,6 +117,8 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 					</div>
 				</div>
 				<form action={ templ.URL(c.Path("space", "spaceName", space.Name).String()) }>
+					<input type="hidden" name="offset" value={ fmt.Sprint(pagination.Offset()) }/>
+					<input type="hidden" name="limit" value={ fmt.Sprint(pagination.Limit()) }/>
 					<div
 						class="form mb-6 mt-8"
 						hx-target="#folders"
@@ -129,7 +133,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										type="search"
 										id="q"
 										name="q"
-										value={ q }
+										value={ pagination.FilterValue("q") }
 										autocomplete="off"
 										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
 										hx-trigger="input changed delay:500ms, search"
@@ -151,7 +155,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 										hx-get={ c.Path("getFolders", "spaceName", space.Name).String() }
 									>
 										for _, option := range sortOptions {
-											<option value={ option.Value } selected?={ sort == option.Value }>{ option.Label }</option>
+											<option value={ option.Value } selected?={ pagination.Sort() == option.Value }>{ option.Label }</option>
 										}
 									</select>
 								</div>
@@ -160,7 +164,7 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q str
 					</div>
 				</form>
 				<div id="folders">
-					@Folders(c, folders, len(space.Folders))
+					@Folders(c, space, folders, pagination)
 				</div>
 			</div>
 		</div>

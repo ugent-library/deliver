@@ -1,8 +1,4 @@
-import {
-  logCommand,
-  updateConsoleProps,
-  updateLogMessage,
-} from "support/commands/helpers";
+import { logCommand, updateConsoleProps } from "support/commands/helpers";
 
 type GetFolderCountResult = {
   text: string;
@@ -12,23 +8,40 @@ type GetFolderCountResult = {
   total: number;
 };
 
-type X = GetFolderCountResult["end"];
-
 export default function getFolderCount<T extends keyof GetFolderCountResult>(
   key?: T
 ): () => GetFolderCountResult | GetFolderCountResult[T] {
   const log = logCommand("getFolderCount", { key });
 
-  const regex =
-    /Showing ((?<start>\d+)-(?<end>\d+) of )?(?<total>\d+) folder\(s\)/;
-
-  const containsFn = cy.now("contains", regex, {
-    log: false,
-  }) as () => JQuery<HTMLElement>;
+  const getFn = cy.now(
+    "get",
+    ".bc-toolbar:has(.pagination) .bc-toolbar-right .bc-toolbar-item span",
+    { log: false }
+  ) as () => JQuery<HTMLSpanElement>;
 
   return () => {
-    const text = containsFn().text();
-    const { start, end, total } = text.match(regex)!.groups!;
+    const texts = Cypress._.uniq(
+      getFn().map((_, e) => e.textContent?.trim() || "")
+    );
+    if (texts.length === 0 || texts?.at(0) === "") {
+      throw new Error("Found no folder count messages to parse.");
+    }
+
+    if (texts.length > 1) {
+      throw new Error(
+        "Found multiple non-matching folder counts: \n- " + texts.join("\n - ")
+      );
+    }
+
+    const text = texts.at(0)!;
+    const matches = text.match(
+      /Showing ((?<start>\d+)-(?<end>\d+) of )?(?<total>\d+) folder\(s\)/
+    );
+
+    if (!matches) {
+      throw new Error(`Could not parse folder count message: ${text}`);
+    }
+    const { start, end, total } = matches.groups!;
 
     const result: GetFolderCountResult = {
       text,

@@ -11,6 +11,8 @@ import "io"
 import "bytes"
 
 import (
+	"fmt"
+
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/okay"
@@ -21,7 +23,7 @@ var sortOptions = []SelectOption{
 	{"expires-last", "Expires last"},
 }
 
-func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q string, sort string, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) templ.Component {
+func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, pagination *models.Pagination, userSpaces []*models.Space, folder *models.Folder, errs *okay.Errors) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -82,7 +84,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(s.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 35, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 37, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -115,7 +117,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(space.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 59, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 61, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -190,7 +192,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(e.Error())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 95, Col: 79}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 97, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -223,11 +225,27 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><input type=\"hidden\" name=\"offset\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprint(pagination.Offset())))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input type=\"hidden\" name=\"limit\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprint(pagination.Limit())))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><div class=\"form mb-6 mt-8\" hx-target=\"#folders\" hx-swap=\"innerHTML\" hx-include=\"closest form\"><div class=\"row\"><div class=\"col\"><div class=\"input-group\"><input class=\"form-control\" type=\"search\" id=\"q\" name=\"q\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(q))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(pagination.FilterValue("q")))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -264,7 +282,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if sort == option.Value {
+				if pagination.Sort() == option.Value {
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -277,7 +295,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(option.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 153, Col: 91}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 157, Col: 104}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -292,7 +310,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = Folders(c, folders, len(space.Folders)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = Folders(c, space, folders, pagination).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -49,6 +49,15 @@ func (r *FoldersRepo) GetBySpace(ctx context.Context, spaceID string, pagination
 		query = query.Order(ent.Asc(folder.FieldExpiresAt))
 	}
 
+	count, err := query.Count(ctx)
+	if err != nil {
+		return nil, err
+	}
+	pagination.SetTotal(count)
+
+	query.Offset(int(pagination.Offset()))
+	query.Limit(int(pagination.Limit()))
+
 	rows, err := query.All(ctx)
 	if err != nil {
 		return nil, err
