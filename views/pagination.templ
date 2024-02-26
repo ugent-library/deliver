@@ -47,12 +47,19 @@ templ Pagination(args PaginationArgs) {
 								"aria-label": "Previous",
 							},
 						})
-						for i := 1; i <= args.pagination.NumberOfPages(); i++ {
-							@PaginationButton(PaginationButtonArgs{
-								active:   i == args.pagination.CurrentPage(),
-								contents: strconv.Itoa(i),
-								htmxGet:  generatePagedURL(args, i),
-							})
+						for _, page := range args.pagination.VisiblePages() {
+							if page >0 {
+								@PaginationButton(PaginationButtonArgs{
+									active:   page == args.pagination.CurrentPage(),
+									contents: strconv.Itoa(page),
+									htmxGet:  generatePagedURL(args, page),
+								})
+							} else {
+								@PaginationButton(PaginationButtonArgs{
+									disabled: true,
+									icon:     "if-more",
+								})
+							}
 						}
 						@PaginationButton(PaginationButtonArgs{
 							disabled: args.pagination.EndOfPage() == args.pagination.Total(),
@@ -69,7 +76,7 @@ templ Pagination(args PaginationArgs) {
 		<div class="bc-toolbar-right">
 			<div class="bc-toolbar-item">
 				<span class="text-muted c-body-small">
-					{ args.pagination.ToPaginationString() } folder(s)
+					Showing { args.pagination.PaginationString() } folder(s)
 				</span>
 			</div>
 		</div>

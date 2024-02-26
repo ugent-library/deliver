@@ -79,14 +79,24 @@ func Pagination(args PaginationArgs) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i := 1; i <= args.pagination.NumberOfPages(); i++ {
-			templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
-				active:   i == args.pagination.CurrentPage(),
-				contents: strconv.Itoa(i),
-				htmxGet:  generatePagedURL(args, i),
-			}).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+		for _, page := range args.pagination.VisiblePages() {
+			if page > 0 {
+				templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
+					active:   page == args.pagination.CurrentPage(),
+					contents: strconv.Itoa(page),
+					htmxGet:  generatePagedURL(args, page),
+				}).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
+					disabled: true,
+					icon:     "if-more",
+				}).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		}
 		templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
@@ -100,14 +110,14 @@ func Pagination(args PaginationArgs) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></nav></div></div><div class=\"bc-toolbar-right\"><div class=\"bc-toolbar-item\"><span class=\"text-muted c-body-small\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></nav></div></div><div class=\"bc-toolbar-right\"><div class=\"bc-toolbar-item\"><span class=\"text-muted c-body-small\">Showing ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(args.pagination.ToPaginationString())
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(args.pagination.PaginationString())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pagination.templ`, Line: 71, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pagination.templ`, Line: 78, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
