@@ -9,6 +9,7 @@
     "test:libtest": "env-cmd --file ./cypress/.env npm test --",
     "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e --browser electron",
     "cypress:open:libtest": "env-cmd --file ./cypress/.env npm run cypress:open --",
+    "cypress:lint": "tsc -p cypress/",
     "precommit": "node node_modules/js-precommit-hook",
     "generate-issue-test": "node ./cypress/scripts/generate-issue-test.mjs"
   },

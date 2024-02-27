@@ -25,7 +25,7 @@ describe("The home page", () => {
           .is.not.empty;
 
         const redirect = new URL(
-          response.redirects!.at(-1)!.replace(/^3\d\d\: /, "")
+          response.redirects!.at(-1)!.replace(/^3\d\d: /, "")
         ); // Redirect entries are in form '3XX: {url}'
 
         expect(redirect).to.have.property("origin", Cypress.env("OIDC_ORIGIN"));

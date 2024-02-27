@@ -16,7 +16,7 @@ export default function (
   }) as () => JQuery<HTMLElement>;
 
   return (): JQuery<HTMLElement> => {
-    let $el = getFn().filter((_, el) => {
+    const $el = getFn().filter((_, el) => {
       const $currentLabel = Cypress.$(el).clone();
 
       $currentLabel.find(".badge, .visually-hidden").remove();
