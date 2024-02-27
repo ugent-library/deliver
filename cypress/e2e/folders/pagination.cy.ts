@@ -3,32 +3,36 @@
 import { getRandomText } from "support/util";
 
 describe("Issue #91: [Speed and usability] Add pagination to folder overview", () => {
+  // All following tests assume there are exactly 21 folders in this space
+  const NUMBER_OF_TEST_FOLDERS = 21;
+
   before(() => {
     cy.loginAsSpaceAdmin();
 
+    cy.cleanUp();
+
     cy.visitSpace();
 
-    // All following tests assume there are exactly 21 folders in this space
-    cy.getFolderCount("total").then((total) => {
-      if (total < 21) {
-        for (let i = 0; i < 21 - total; i++) {
-          cy.makeFolder(getRandomText());
-        }
-      } else if (total > 21) {
-        for (let i = 0; i < total - 21; i++) {
-          cy.get("#folders tbody tr:first-of-type td:first-of-type a")
-            .prop("href")
-            .then((href) => {
-              cy.visit(`${href}/edit`);
+    cy.getFolderCount("total").should("eq", 0);
+    const folderNamesWithQuery = Array(7)
+      .fill(null)
+      .map(() => {
+        const name = getRandomText();
+        return name.slice(0, 5) + " CYPRESS " + name.slice(5);
+      });
+    const folderNamesWithoutQuery = Array(NUMBER_OF_TEST_FOLDERS - 7)
+      .fill(null)
+      .map(getRandomText);
 
-              cy.contains(".btn", "Delete folder").click();
-            });
-        }
-      }
+    Cypress._.shuffle([
+      ...folderNamesWithQuery,
+      ...folderNamesWithoutQuery,
+    ]).forEach((folderName) => {
+      cy.makeFolder(folderName, { noRedirect: true });
     });
 
     cy.visitSpace();
-    cy.getFolderCount("total").should("eq", 21);
+    cy.getFolderCount("total").should("eq", NUMBER_OF_TEST_FOLDERS);
   });
 
   beforeEach(() => {
@@ -292,26 +296,26 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
   it("should keep search query when switching pages", () => {
     cy.visitSpace({ qs: { limit: 3 } });
     cy.param("q").should("be.null");
+    cy.getFolderCount("text").should("eq", "Showing 1-3 of 21 folder(s)");
 
-    cy.get("@q").type("4");
+    cy.get("@q").type("CYPRESS");
     cy.wait("@getFolders");
-
-    cy.getFolderCount("total").as("previousTotal").should("be.lessThan", 21);
+    cy.getFolderCount("text").should("eq", "Showing 1-3 of 7 folder(s)");
 
     goToPage(3);
-    cy.param("q").should("eq", "4");
-    cy.get("@q").should("have.value", "4");
-    cy.getFolderCount("total").should("eq", "@previousTotal");
+    cy.param("q").should("eq", "CYPRESS");
+    cy.get("@q").should("have.value", "CYPRESS");
+    cy.getFolderCount("text").should("eq", "Showing 7-7 of 7 folder(s)");
 
     goToPage("previous");
-    cy.param("q").should("eq", "4");
-    cy.get("@q").should("have.value", "4");
-    cy.getFolderCount("total").should("eq", "@previousTotal");
+    cy.param("q").should("eq", "CYPRESS");
+    cy.get("@q").should("have.value", "CYPRESS");
+    cy.getFolderCount("text").should("eq", "Showing 4-6 of 7 folder(s)");
 
     goToPage("next");
-    cy.param("q").should("eq", "4");
-    cy.get("@q").should("have.value", "4");
-    cy.getFolderCount("total").should("eq", "@previousTotal");
+    cy.param("q").should("eq", "CYPRESS");
+    cy.get("@q").should("have.value", "CYPRESS");
+    cy.getFolderCount("text").should("eq", "Showing 7-7 of 7 folder(s)");
   });
 
   it("should keep sorting when switching pages", () => {

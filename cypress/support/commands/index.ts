@@ -13,11 +13,13 @@ import ensureModal from "./ensure-modal";
 import ensureNoModal from "./ensure-no-modal";
 import visitSpace from "./visit-space";
 import makeFolder from "./make-folder";
+import cleanUp from "./clean-up";
 
 // Child commands
 import finishLog from "./finish-log";
 import closeToast from "./close-toast";
 import setField from "./set-field";
+import submitForm from "./submit-form";
 
 // Dual commands
 import getFolderShareUrl from "./get-folder-share-url";
@@ -52,6 +54,8 @@ Cypress.Commands.addAll({
   visitSpace,
 
   makeFolder,
+
+  cleanUp,
 });
 
 // Child commands
@@ -63,6 +67,8 @@ Cypress.Commands.addAll(
     closeToast,
 
     setField,
+
+    submitForm,
   }
 );
 

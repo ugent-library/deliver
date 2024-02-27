@@ -18,15 +18,18 @@ export function logCommand(
 
 export function updateLogMessage(
   log: Cypress.Log | undefined,
-  append: unknown
+  append: unknown,
+  separator: string = ", "
 ) {
   if (!log) return;
 
-  const message = log.get("message").split(", ").filter(Boolean);
+  const message: unknown[] = (log.get("message") as string)
+    .split(separator)
+    .filter(Boolean);
 
   message.push(append);
 
-  log.set("message", message.join(", "));
+  log.set("message", message.join(separator));
 }
 
 export function updateConsoleProps(

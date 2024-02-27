@@ -24,7 +24,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
 
       cy.getFolderCount("count").then((count) => {
         if (count === 0) {
-          cy.makeFolder(folderName);
+          cy.makeFolder(folderName, { noRedirect: true });
         }
       });
     });

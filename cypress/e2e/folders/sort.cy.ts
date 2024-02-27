@@ -14,7 +14,7 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
     // Make sure test folders exist
     TEST_FOLDER_NAMES.forEach((folderName) => {
-      cy.makeFolder(folderName);
+      cy.makeFolder(folderName, { noRedirect: true });
 
       // Make sure the creation (and expiration dates) are different for each folder
       cy.wait(1000);
