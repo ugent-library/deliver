@@ -14,22 +14,11 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.visitSpace();
 
     cy.getFolderCount("total").should("eq", 0);
-    const folderNamesWithQuery = Array(7)
-      .fill(null)
-      .map(() => {
-        const name = getRandomText();
-        return name.slice(0, 5) + " CYPRESS " + name.slice(5);
-      });
-    const folderNamesWithoutQuery = Array(NUMBER_OF_TEST_FOLDERS - 7)
-      .fill(null)
-      .map(getRandomText);
 
     Cypress._.shuffle([
-      ...folderNamesWithQuery,
-      ...folderNamesWithoutQuery,
-    ]).forEach((folderName) => {
-      cy.makeFolder(folderName, { noRedirect: true });
-    });
+      ...Cypress._.times(7, () => getRandomText("CYPRESS")),
+      ...Cypress._.times(NUMBER_OF_TEST_FOLDERS - 7, () => getRandomText()),
+    ]).forEach((name) => cy.makeFolder(name, { noRedirect: true }));
 
     cy.visitSpace();
     cy.getFolderCount("total").should("eq", NUMBER_OF_TEST_FOLDERS);
