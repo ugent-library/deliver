@@ -48,7 +48,7 @@ templ Pagination(args PaginationArgs) {
 							},
 						})
 						for _, page := range args.pagination.VisiblePages() {
-							if page >0 {
+							if page > 0 {
 								@PaginationButton(PaginationButtonArgs{
 									active:   page == args.pagination.CurrentPage(),
 									contents: strconv.Itoa(page),

@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-const DefaultLimit = 20
-const DefaultSort = "default"
+const defaultLimit = 20
+const defaultSort = "default"
 
 type Filter struct {
 	Name, Value string
@@ -123,7 +123,7 @@ func (p *Pagination) ToPairs() []string {
 		}
 	}
 
-	if p.sort != "" && p.sort != DefaultSort {
+	if p.sort != "" && p.sort != defaultSort {
 		pairs = append(pairs, "sort", p.sort)
 	}
 
@@ -131,7 +131,7 @@ func (p *Pagination) ToPairs() []string {
 		pairs = append(pairs, "offset", strconv.Itoa(p.offset))
 	}
 
-	if p.limit != DefaultLimit {
+	if p.limit != defaultLimit {
 		pairs = append(pairs, "limit", strconv.Itoa(p.limit))
 	}
 

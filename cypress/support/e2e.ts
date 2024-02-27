@@ -45,7 +45,5 @@ before(() => {
     }
   });
 
-  cy.cleanUp();
-
   cy.logout();
 });

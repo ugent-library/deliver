@@ -1,4 +1,13 @@
 describe("The home page", () => {
+  before(() => {
+    cy.loginAsSpaceAdmin();
+
+    // Clean up test folders from previous run
+    cy.cleanUp();
+
+    cy.logout();
+  });
+
   it("should be able to load the home page anonymously", () => {
     cy.visit("/");
 
