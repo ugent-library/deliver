@@ -18,29 +18,31 @@ import (
 )
 
 type PaginationArgs struct {
-	pagination *models.Pagination
-	href       *url.URL
-	target     string
+	pagination     *models.Pagination
+	baseHref       *url.URL
+	baseHtmxGetUrl *url.URL
+	target         string
 }
 
-func generatePagedURL(args PaginationArgs, page int) string {
-	query := args.href.Query()
+func generatePagedURL(baseUrl *url.URL, page int, pagination *models.Pagination) url.URL {
+	newUrl := *baseUrl
+	query := newUrl.Query()
 
-	pairs := args.pagination.ToPairs()
+	pairs := pagination.ToPairs()
 	for i := 0; i < len(pairs); i += 2 {
 		query.Set(pairs[i], pairs[i+1])
 	}
 
-	newOffset := args.pagination.PageOffset(page)
+	newOffset := pagination.PageOffset(page)
 	if newOffset > 0 {
 		query.Set("offset", strconv.Itoa(newOffset))
 	} else {
 		query.Del("offset")
 	}
 
-	args.href.RawQuery = query.Encode()
+	newUrl.RawQuery = query.Encode()
 
-	return args.href.String()
+	return newUrl
 }
 
 func Pagination(args PaginationArgs) templ.Component {
@@ -71,7 +73,8 @@ func Pagination(args PaginationArgs) templ.Component {
 		templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
 			disabled: args.pagination.Offset() == 0,
 			icon:     "if-chevron-left",
-			htmxGet:  generatePagedURL(args, args.pagination.CurrentPage()-1),
+			href:     generatePagedURL(args.baseHref, args.pagination.CurrentPage()-1, args.pagination),
+			htmxGet:  generatePagedURL(args.baseHtmxGetUrl, args.pagination.CurrentPage()-1, args.pagination),
 			attrs: templ.Attributes{
 				"aria-label": "Previous",
 			},
@@ -84,7 +87,8 @@ func Pagination(args PaginationArgs) templ.Component {
 				templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
 					active:   page == args.pagination.CurrentPage(),
 					contents: strconv.Itoa(page),
-					htmxGet:  generatePagedURL(args, page),
+					href:     generatePagedURL(args.baseHref, page, args.pagination),
+					htmxGet:  generatePagedURL(args.baseHtmxGetUrl, page, args.pagination),
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -102,7 +106,8 @@ func Pagination(args PaginationArgs) templ.Component {
 		templ_7745c5c3_Err = PaginationButton(PaginationButtonArgs{
 			disabled: args.pagination.EndOfPage() == args.pagination.Total(),
 			icon:     "if-chevron-right",
-			htmxGet:  generatePagedURL(args, args.pagination.CurrentPage()+1),
+			href:     generatePagedURL(args.baseHref, args.pagination.CurrentPage()+1, args.pagination),
+			htmxGet:  generatePagedURL(args.baseHtmxGetUrl, args.pagination.CurrentPage()+1, args.pagination),
 			attrs: templ.Attributes{
 				"aria-label": "Next",
 			},
@@ -117,7 +122,7 @@ func Pagination(args PaginationArgs) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(args.pagination.PaginationString())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pagination.templ`, Line: 78, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pagination.templ`, Line: 83, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {

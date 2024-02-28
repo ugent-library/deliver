@@ -14,6 +14,7 @@ import ensureNoModal from "./ensure-no-modal";
 import visitSpace from "./visit-space";
 import makeFolder from "./make-folder";
 import cleanUp from "./clean-up";
+import disableHtmx from "./disable-htmx";
 
 // Child commands
 import finishLog from "./finish-log";
@@ -56,6 +57,8 @@ Cypress.Commands.addAll({
   makeFolder,
 
   cleanUp,
+
+  disableHtmx,
 });
 
 // Child commands

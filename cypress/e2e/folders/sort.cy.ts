@@ -39,7 +39,6 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
   it("should sort folders by expiration date asc by default", () => {
     cy.visitSpace({ qs: { q: randomSuffix } });
-
     cy.get("select[name=sort]").should("have.value", "default");
 
     cy.get("#folders table tbody tr td:first-of-type a")
@@ -49,7 +48,6 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
   it("should be possible to sort folders by expiration date asc", () => {
     cy.visitSpace({ qs: { q: randomSuffix, sort: "expires-last" } });
-
     cy.get("select[name=sort]").should("have.value", "expires-last");
 
     cy.setFieldByLabel("Sort by", "default");
@@ -62,7 +60,6 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
   it("should be possible to sort folders by expiration date desc", () => {
     cy.visitSpace({ qs: { q: randomSuffix } });
-
     cy.get("select[name=sort]").should("have.value", "default");
 
     cy.setFieldByLabel("Sort by", "expires-last");
@@ -75,13 +72,10 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
   it("should keep the sort choice when searching", () => {
     cy.visitSpace();
-
     cy.get("select[name=sort]").should("have.value", "default");
 
     cy.setFieldByLabel("Sort by", "expires-last");
-
     cy.wait("@filterFolders");
-
     cy.contains(".btn", "Search").click();
 
     cy.get("@filterFolders.all").should(
@@ -96,7 +90,6 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
   it("should keep the sort choice when searching using AJAX", () => {
     cy.visitSpace();
-
     cy.get("select[name=sort]").should("have.value", "default");
 
     cy.setFieldByLabel("Sort by", "expires-last");
@@ -124,11 +117,9 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
 
   it("should clear the sort param from the URL when default is selected", () => {
     cy.visitSpace({ qs: { q: "test", sort: "expires-last" } });
-
     cy.get("select[name=sort]").should("have.value", "expires-last");
 
     cy.setFieldByLabel("Sort by", "default");
-
     cy.wait("@filterFolders")
       .should("have.nested.property", "request.query")
       .should("contain", { sort: "default" });

@@ -130,6 +130,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.get(".card-footer .pagination .page-item").should("have.length", 4);
 
     cy.get("@q").type("grmbl", { delay: 0 });
+    awaitFoldersRefreshed();
     cy.getFolderCount("text").should("eq", "Showing 0 folder(s)");
 
     getNumberOfPages().should("eq", 1);
@@ -154,22 +155,22 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     goToPage("next");
     cy.getFolderCount("text").should("eq", "Showing 6-10 of 21 folder(s)");
     getActivePage().should("eq", 2);
-    cy.param("offset").should("eq", "5");
+    cy.params().should("eql", { limit: "5", offset: "5" });
 
     goToPage("next");
     cy.getFolderCount("text").should("eq", "Showing 11-15 of 21 folder(s)");
     getActivePage().should("eq", 3);
-    cy.param("offset").should("eq", "10");
+    cy.params().should("eql", { limit: "5", offset: "10" });
 
     goToPage("previous");
     cy.getFolderCount("text").should("eq", "Showing 6-10 of 21 folder(s)");
     getActivePage().should("eq", 2);
-    cy.param("offset").should("eq", "5");
+    cy.params().should("eql", { limit: "5", offset: "5" });
 
     goToPage("previous");
     cy.getFolderCount("text").should("eq", "Showing 1-5 of 21 folder(s)");
     getActivePage().should("eq", 1);
-    cy.param("offset").should("not.exist");
+    cy.params().should("eql", { limit: "5" });
   });
 
   it("should disable the previous page button when on the first page", () => {
@@ -225,17 +226,13 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.visitSpace();
     getActivePage().should("eq", 1);
     getNumberOfPages().should("eq", 2);
-
     cy.get("@previous").should("have.class", "disabled");
     cy.get("@next").should("not.have.class", "disabled");
 
     cy.get("@q").type("4");
-
-    cy.wait("@getFolders");
-
+    awaitFoldersRefreshed();
     getActivePage().should("eq", 1);
     getNumberOfPages().should("eq", 1);
-
     cy.get("@previous").should("have.class", "disabled");
     cy.get("@next").should("have.class", "disabled");
   });
@@ -305,7 +302,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.getFolderCount("text").should("eq", "Showing 1-3 of 21 folder(s)");
 
     cy.get("@q").type("CYPRESS");
-    cy.wait("@getFolders");
+    awaitFoldersRefreshed();
     cy.getFolderCount("text").should("eq", "Showing 1-3 of 7 folder(s)");
 
     goToPage(3);
@@ -329,7 +326,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.param("sort").should("be.null");
 
     cy.setFieldByLabel("Sort by", "expires-last");
-    cy.wait("@getFolders");
+    awaitFoldersRefreshed();
 
     cy.getFolderCount("total").should("eq", 21);
 
@@ -383,7 +380,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     getPagerButtons().should("eql", ["<", 1, 2, ">"]);
 
     cy.get("@q").type("cypress");
-    awaitHtmxPushedIntoHistoryEvent(() => cy.wait("@getFolders"));
+    awaitFoldersRefreshed();
     cy.param("offset").should("not.exist");
     cy.getFolderCount("text").should("eq", "Showing 1-7 of 7 folder(s)");
     getActivePage().should("eq", 1);
@@ -397,7 +394,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     getPagerButtons().should("eql", ["<", 1, 2, 3, ">"]);
 
     cy.get("@q").clear();
-    awaitHtmxPushedIntoHistoryEvent(() => cy.wait("@getFolders"));
+    awaitFoldersRefreshed();
     cy.param("offset").should("not.exist");
     cy.getFolderCount("text").should("eq", "Showing 1-3 of 21 folder(s)");
     getActivePage().should("eq", 1);
@@ -416,7 +413,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.getFolderCount("text").should("eq", "Showing 21-21 of 21 folder(s)");
 
     cy.setFieldByLabel("Sort by", "expires-last");
-    awaitHtmxPushedIntoHistoryEvent(() => cy.wait("@getFolders"));
+    awaitFoldersRefreshed();
     cy.param("offset").should("not.exist");
     getActivePage().should("eq", 1);
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
@@ -428,19 +425,78 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.getFolderCount("text").should("eq", "Showing 21-21 of 21 folder(s)");
 
     cy.setFieldByLabel("Sort by", "default");
-    awaitHtmxPushedIntoHistoryEvent(() => cy.wait("@getFolders"));
+    awaitFoldersRefreshed();
     cy.param("offset").should("not.exist");
     cy.param("sort").should("not.exist");
     getActivePage().should("eq", 1);
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
   });
 
+  it("should work with HTMX disabled", () => {
+    cy.disableHtmx();
+
+    cy.visitSpace({ qs: { limit: 2 } });
+    getNumberOfPages().should("eq", 11);
+    getActivePage().should("eq", 1);
+    getPagerButtons().should("eql", ["<", 1, 2, "...", 11, ">"]);
+
+    goToPage(2);
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "2" });
+    getActivePage().should("eq", 2);
+    getPagerButtons().should("eql", ["<", 1, 2, 3, "...", 11, ">"]);
+
+    goToPage("next");
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "4" });
+    getActivePage().should("eq", 3);
+    getPagerButtons().should("eql", ["<", 1, 2, 3, 4, "...", 11, ">"]);
+
+    goToPage(4);
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "6" });
+    getActivePage().should("eq", 4);
+    getPagerButtons().should("eql", ["<", 1, 2, 3, 4, 5, "...", 11, ">"]);
+
+    goToPage(5);
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "8" });
+    getActivePage().should("eq", 5);
+    getPagerButtons().should("eql", ["<", 1, "...", 4, 5, 6, "...", 11, ">"]);
+
+    goToPage("previous");
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "6" });
+    getActivePage().should("eq", 4);
+    getPagerButtons().should("eql", ["<", 1, 2, 3, 4, 5, "...", 11, ">"]);
+
+    goToPage(11);
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "20" });
+    getActivePage().should("eq", 11);
+    getPagerButtons().should("eql", ["<", 1, "...", 10, 11, ">"]);
+
+    goToPage("previous");
+    cy.get("@getFolders").should("be.null");
+    cy.params().should("eql", { limit: "2", offset: "18" });
+    getActivePage().should("eq", 10);
+    getPagerButtons().should("eql", ["<", 1, "...", 9, 10, 11, ">"]);
+  });
+
   function goToPage(page: number | "previous" | "next") {
-    awaitHtmxPushedIntoHistoryEvent(() => {
+    const goToPage = () => {
       if (typeof page === "string") {
         cy.get(`@${page}`).random().click();
       } else {
         cy.contains(".pagination .page-item", page).click();
+      }
+    };
+
+    cy.document().then((document) => {
+      if (document.documentElement.hasAttribute("hx-disable")) {
+        goToPage();
+      } else {
+        awaitHtmxPushedIntoHistoryEvent(goToPage);
       }
     });
   }
@@ -461,6 +517,10 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     // and Cypress would take over too soon.
     // This assertion makes sure this happened before proceeding.
     cy.get("@htmx:pushedIntoHistory").should("have.been.calledOnce");
+  }
+
+  function awaitFoldersRefreshed() {
+    awaitHtmxPushedIntoHistoryEvent(() => cy.wait("@getFolders"));
   }
 
   function getActivePage(): Cypress.Chainable<number> {

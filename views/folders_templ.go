@@ -37,9 +37,10 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = Pagination(PaginationArgs{
-			pagination: pagination,
-			href:       c.Path("getFolders", "spaceName", space.Name),
-			target:     "#folders",
+			pagination:     pagination,
+			baseHref:       c.Path("space", "spaceName", space.Name),
+			baseHtmxGetUrl: c.Path("getFolders", "spaceName", space.Name),
+			target:         "#folders",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -70,7 +71,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(f.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 38, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 39, Col: 84}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -99,7 +100,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(f.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 61, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 62, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -117,7 +118,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(friendly.TimeRemaining(time.Until(f.ExpiresAt), friendly.EnglishTimeUnits))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 65, Col: 123}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 66, Col: 123}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -135,7 +136,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(len(f.Files)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 70, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 71, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -148,7 +149,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(friendly.Bytes(f.TotalSize()))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 73, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 74, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -161,7 +162,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(f.TotalDownloads()))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 76, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 77, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -174,7 +175,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 81, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 82, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -187,7 +188,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(f.UpdatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 84, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `folders.templ`, Line: 85, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -212,9 +213,10 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = Pagination(PaginationArgs{
-				pagination: pagination,
-				href:       c.Path("getFolders", "spaceName", space.Name),
-				target:     "#folders",
+				pagination:     pagination,
+				baseHref:       c.Path("space", "spaceName", space.Name),
+				baseHtmxGetUrl: c.Path("getFolders", "spaceName", space.Name),
+				target:         "#folders",
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

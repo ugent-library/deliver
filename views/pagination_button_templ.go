@@ -10,11 +10,15 @@ import "context"
 import "io"
 import "bytes"
 
+import (
+	"net/url"
+)
+
 type PaginationButtonArgs struct {
 	active   bool
 	disabled bool
-	href     string
-	htmxGet  string
+	href     url.URL
+	htmxGet  url.URL
 	icon     string
 	contents string
 	attrs    templ.Attributes
@@ -55,7 +59,7 @@ func PaginationButton(args PaginationButtonArgs) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(args.href)
+			var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(args.href.String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -64,7 +68,7 @@ func PaginationButton(args PaginationButtonArgs) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(args.htmxGet))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(args.htmxGet.String()))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -157,7 +161,7 @@ func PaginationButtonContents(args PaginationButtonArgs) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(args.contents)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pagination_button.templ`, Line: 31, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pagination_button.templ`, Line: 35, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {

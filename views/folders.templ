@@ -13,9 +13,10 @@ templ Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginat
 	<div class="card w-100 mb-6">
 		<div class="card-header">
 			@Pagination(PaginationArgs{
-				pagination: pagination,
-				href:       c.Path("getFolders", "spaceName", space.Name),
-				target:     "#folders",
+				pagination:     pagination,
+				baseHref:       c.Path("space", "spaceName", space.Name),
+				baseHtmxGetUrl: c.Path("getFolders", "spaceName", space.Name),
+				target:         "#folders",
 			})
 		</div>
 		if len(folders) > 0 {
@@ -99,9 +100,10 @@ templ Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginat
 			</div>
 			<div class="card-footer">
 				@Pagination(PaginationArgs{
-					pagination: pagination,
-					href:       c.Path("getFolders", "spaceName", space.Name),
-					target:     "#folders",
+					pagination:     pagination,
+					baseHref:       c.Path("space", "spaceName", space.Name),
+					baseHtmxGetUrl: c.Path("getFolders", "spaceName", space.Name),
+					target:         "#folders",
 				})
 			</div>
 		} else {
