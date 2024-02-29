@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/ugent-library/bind"
@@ -183,7 +184,7 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 
 func getPagination(r *http.Request) *models.Pagination {
 	query := r.URL.Query()
-	q := query.Get("q")
+	q := strings.TrimSpace(query.Get("q"))
 
 	return models.NewPagination(query.Get("sort"), models.Filter{Name: "q", Value: q})
 }

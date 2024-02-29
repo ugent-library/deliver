@@ -46,8 +46,6 @@ describe("Folder searching", () => {
   });
 
   it("should filter when clicking the search button", () => {
-    cy.visitSpace();
-
     cy.get("@q").type("School", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
@@ -58,8 +56,6 @@ describe("Folder searching", () => {
   });
 
   it("should filter case insensitively", () => {
-    cy.visitSpace();
-
     cy.get("@q").type("wORk", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
@@ -105,20 +101,20 @@ describe("Folder searching", () => {
 
   it("should debounce filtering when still typing", () => {
     cy.get("@q").type("Fin", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     cy.get("@q").type("amci", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     // Oops typo!
     cy.get("@q").type("{backspace}{backspace}{backspace}", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     cy.get("@q").type("nci", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     cy.get("@q").type("al rec", { delay: 100 });
@@ -259,6 +255,46 @@ describe("Folder searching", () => {
         .should("contain", "1 file")
         .should("contain", "130 B");
     }
+  });
+
+  // https://github.com/ugent-library/deliver/issues/128
+  describe("Issue #128: Folder search query should be trimmed before filtering", () => {
+    const NBSP = String.fromCharCode(160);
+
+    it("should trim the search query when typed in the search field", () => {
+      cy.get("@q").type(` \t work ${NBSP}  `);
+
+      cy.wait("@filterFolders");
+      cy.getParams("q").should("eq", "work");
+      cy.get("#folders table tbody tr")
+        .should("have.length", 2)
+        .find("td:first-of-type a")
+        .each((a) => {
+          expect(a.text()).to.match(/work/i);
+        });
+
+      cy.reload();
+
+      cy.get("@q").should("have.value", "work");
+      cy.getParams("q").should("eq", "work");
+    });
+
+    it("should trim the search query when taken from url", () => {
+      cy.visitSpace({ qs: { q: ` \t work ${NBSP}  ` } });
+      cy.get("@q").should("have.value", "work");
+      cy.get("#folders table tbody tr")
+        .should("have.length", 2)
+        .find("td:first-of-type a")
+        .each((a) => {
+          expect(a.text()).to.match(/work/i);
+        });
+
+      cy.setFieldByLabel("Sort by", "expires-last");
+      cy.wait("@filterFolders");
+
+      cy.get("@q").should("have.value", "work");
+      cy.getParams("q").should("eq", "work");
+    });
   });
 
   function assertFilteredFolders(filteredFolders: TestFolderNames[]) {
