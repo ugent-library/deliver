@@ -12,7 +12,7 @@ export function logCommand(
       .trim()
       .toUpperCase(),
     message,
-    consoleProps: () => consoleProps,
+    consoleProps: () => ({ props: consoleProps }),
   });
 }
 
@@ -34,7 +34,7 @@ export function updateConsoleProps(
 
   const consoleProps = log.get("consoleProps")();
 
-  callback(consoleProps);
+  callback(consoleProps.props);
 
   log.set({ consoleProps: () => consoleProps });
 }
