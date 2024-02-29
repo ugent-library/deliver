@@ -105,20 +105,20 @@ describe("Folder searching", () => {
 
   it("should debounce filtering when still typing", () => {
     cy.get("@q").type("Fin", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     cy.get("@q").type("amci", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     // Oops typo!
     cy.get("@q").type("{backspace}{backspace}{backspace}", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     cy.get("@q").type("nci", { delay: 100 });
-    cy.wait(300);
+    cy.wait(100);
     cy.get("@filterFolders").should("be.null");
 
     cy.get("@q").type("al rec", { delay: 100 });
