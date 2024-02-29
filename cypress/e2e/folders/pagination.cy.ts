@@ -154,28 +154,28 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
     goToPage("next");
     cy.getFolderCount("text").should("eq", "Showing 6-10 of 21 folder(s)");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     cy.getParams().should("eql", { limit: "5", offset: "5" });
 
     goToPage("next");
     cy.getFolderCount("text").should("eq", "Showing 11-15 of 21 folder(s)");
-    getActivePage().should("eq", 3);
+    cy.getActivePage().should("eq", 3);
     cy.getParams().should("eql", { limit: "5", offset: "10" });
 
     goToPage("previous");
     cy.getFolderCount("text").should("eq", "Showing 6-10 of 21 folder(s)");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     cy.getParams().should("eql", { limit: "5", offset: "5" });
 
     goToPage("previous");
     cy.getFolderCount("text").should("eq", "Showing 1-5 of 21 folder(s)");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     cy.getParams().should("eql", { limit: "5" });
   });
 
   it("should disable the previous page button when on the first page", () => {
     cy.visitSpace({ qs: { limit: 5 } });
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     cy.get("@previous").should("have.class", "disabled");
 
     // Make sure nothing happens if we click it
@@ -185,17 +185,17 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
     // Test again after paging
     goToPage("next");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     cy.get("@previous").should("not.have.class", "disabled");
 
     goToPage("previous");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     cy.get("@previous").should("have.class", "disabled");
   });
 
   it("should disable the next page button when on the last page", () => {
     cy.visitSpace({ qs: { limit: 5, offset: 20 } });
-    getActivePage().should("eq", 5);
+    cy.getActivePage().should("eq", 5);
     cy.get("@next").should("have.class", "disabled");
 
     // Make sure nothing happens if we click it
@@ -205,33 +205,33 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
     // Test again after paging
     goToPage("previous");
-    getActivePage().should("eq", 4);
+    cy.getActivePage().should("eq", 4);
     cy.get("@next").should("not.have.class", "disabled");
 
     goToPage("next");
-    getActivePage().should("eq", 5);
+    cy.getActivePage().should("eq", 5);
     cy.get("@next").should("have.class", "disabled");
   });
 
   it("should disable previous and next page buttons when all results fit on one page (without search query)", () => {
     cy.visitSpace({ qs: { limit: 21 } });
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getNumberOfPages().should("eq", 1);
 
     cy.get("@previous").should("have.class", "disabled");
     cy.get("@next").should("have.class", "disabled");
   });
 
-  it("should disable previous and next page buttons when all results fit on one page (with query)", () => {
+  it("should disable previous and next page buttons when all results fit on one page (with search query)", () => {
     cy.visitSpace();
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getNumberOfPages().should("eq", 2);
     cy.get("@previous").should("have.class", "disabled");
     cy.get("@next").should("not.have.class", "disabled");
 
     cy.get("@q").type("4");
     cy.wait("@getFolders");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getNumberOfPages().should("eq", 1);
     cy.get("@previous").should("have.class", "disabled");
     cy.get("@next").should("have.class", "disabled");
@@ -240,54 +240,54 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
   it("should display an ellipsis section in the pager when there are a lot of pages", () => {
     cy.visitSpace({ qs: { limit: 2 } });
     getNumberOfPages().should("eq", 11);
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getPagerButtons().should("eql", ["<", 1, 2, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     getPagerButtons().should("eql", ["<", 1, 2, 3, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 3);
+    cy.getActivePage().should("eq", 3);
     getPagerButtons().should("eql", ["<", 1, 2, 3, 4, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 4);
+    cy.getActivePage().should("eq", 4);
     getPagerButtons().should("eql", ["<", 1, 2, 3, 4, 5, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 5);
+    cy.getActivePage().should("eq", 5);
     getPagerButtons().should("eql", ["<", 1, "...", 4, 5, 6, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 6);
+    cy.getActivePage().should("eq", 6);
     getPagerButtons().should("eql", ["<", 1, "...", 5, 6, 7, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 7);
+    cy.getActivePage().should("eq", 7);
     getPagerButtons().should("eql", ["<", 1, "...", 6, 7, 8, "...", 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 8);
+    cy.getActivePage().should("eq", 8);
     getPagerButtons().should("eql", ["<", 1, "...", 7, 8, 9, 10, 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 9);
+    cy.getActivePage().should("eq", 9);
     getPagerButtons().should("eql", ["<", 1, "...", 8, 9, 10, 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 10);
+    cy.getActivePage().should("eq", 10);
     getPagerButtons().should("eql", ["<", 1, "...", 9, 10, 11, ">"]);
 
     goToPage("next");
-    getActivePage().should("eq", 11);
+    cy.getActivePage().should("eq", 11);
     getPagerButtons().should("eql", ["<", 1, "...", 10, 11, ">"]);
   });
 
   it("should not be possible to click ellipsis buttons", () => {
     cy.visitSpace({ qs: { limit: 2, offset: 10 } });
     getNumberOfPages().should("eq", 11);
-    getActivePage().should("eq", 6);
+    cy.getActivePage().should("eq", 6);
 
     cy.get(".pagination .page-item:has(.if-more)")
       .should("have.length", 4) // 2 in top pager + 2 in bottom pager
@@ -376,59 +376,59 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
   it("should reset to first page when changing the search query", () => {
     cy.visitSpace({ qs: { offset: 20 } });
     cy.getFolderCount("text").should("eq", "Showing 21-21 of 21 folder(s)");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     getPagerButtons().should("eql", ["<", 1, 2, ">"]);
 
     cy.get("@q").type("cypress");
     cy.wait("@getFolders");
     cy.getParams("offset").should("not.exist");
     cy.getFolderCount("text").should("eq", "Showing 1-7 of 7 folder(s)");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getPagerButtons().should("eql", ["<", 1, ">"]);
   });
 
   it("should reset to first page when clearing the search query", () => {
     cy.visitSpace({ qs: { q: "cypress", limit: 3, offset: 3 } });
     cy.getFolderCount("text").should("eq", "Showing 4-6 of 7 folder(s)");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     getPagerButtons().should("eql", ["<", 1, 2, 3, ">"]);
 
     cy.get("@q").clear();
     cy.wait("@getFolders");
     cy.getParams("offset").should("not.exist");
     cy.getFolderCount("text").should("eq", "Showing 1-3 of 21 folder(s)");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getPagerButtons().should("eql", ["<", 1, 2, "...", 7, ">"]);
   });
 
   it("should reset to first page when sorting the results", () => {
     cy.visitSpace();
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
 
     goToPage(2);
     cy.getParams("offset").should("eq", "20");
     cy.getParams("sort").should("not.exist");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     cy.getFolderCount("text").should("eq", "Showing 21-21 of 21 folder(s)");
 
     cy.setFieldByLabel("Sort by", "expires-last");
     cy.wait("@getFolders");
     cy.getParams("offset").should("not.exist");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
 
     goToPage(2);
     cy.getParams("offset").should("eq", "20");
     cy.getParams("sort").should("eq", "expires-last");
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     cy.getFolderCount("text").should("eq", "Showing 21-21 of 21 folder(s)");
 
     cy.setFieldByLabel("Sort by", "default");
     cy.wait("@getFolders");
     cy.getParams("offset").should("not.exist");
     cy.getParams("sort").should("not.exist");
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
   });
 
@@ -437,49 +437,49 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
     cy.visitSpace({ qs: { limit: 2 } });
     getNumberOfPages().should("eq", 11);
-    getActivePage().should("eq", 1);
+    cy.getActivePage().should("eq", 1);
     getPagerButtons().should("eql", ["<", 1, 2, "...", 11, ">"]);
 
     goToPage(2);
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "2" });
-    getActivePage().should("eq", 2);
+    cy.getActivePage().should("eq", 2);
     getPagerButtons().should("eql", ["<", 1, 2, 3, "...", 11, ">"]);
 
     goToPage("next");
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "4" });
-    getActivePage().should("eq", 3);
+    cy.getActivePage().should("eq", 3);
     getPagerButtons().should("eql", ["<", 1, 2, 3, 4, "...", 11, ">"]);
 
     goToPage(4);
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "6" });
-    getActivePage().should("eq", 4);
+    cy.getActivePage().should("eq", 4);
     getPagerButtons().should("eql", ["<", 1, 2, 3, 4, 5, "...", 11, ">"]);
 
     goToPage(5);
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "8" });
-    getActivePage().should("eq", 5);
+    cy.getActivePage().should("eq", 5);
     getPagerButtons().should("eql", ["<", 1, "...", 4, 5, 6, "...", 11, ">"]);
 
     goToPage("previous");
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "6" });
-    getActivePage().should("eq", 4);
+    cy.getActivePage().should("eq", 4);
     getPagerButtons().should("eql", ["<", 1, 2, 3, 4, 5, "...", 11, ">"]);
 
     goToPage(11);
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "20" });
-    getActivePage().should("eq", 11);
+    cy.getActivePage().should("eq", 11);
     getPagerButtons().should("eql", ["<", 1, "...", 10, 11, ">"]);
 
     goToPage("previous");
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "18" });
-    getActivePage().should("eq", 10);
+    cy.getActivePage().should("eq", 10);
     getPagerButtons().should("eql", ["<", 1, "...", 9, 10, 11, ">"]);
   });
 
@@ -495,27 +495,6 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
         cy.wait("@getFolders");
       }
     });
-  }
-
-  function getActivePage(): Cypress.Chainable<number> {
-    return cy
-      .get(".pagination .page-item.active a.page-link")
-      .should(($a) => {
-        if ($a.length !== 2) {
-          expect($a).to.have.length(2);
-        }
-      })
-      .map<JQuery<HTMLAnchorElement>, string>("text")
-      .then(Cypress._.uniq)
-      .should((texts) => {
-        if (texts.length !== 1) {
-          expect(texts).to.have.length(
-            1,
-            "Active page is out of sync in header and footer"
-          );
-        }
-      })
-      .then((pageNumbers) => parseInt(pageNumbers[0]));
   }
 
   function getNumberOfPages() {
