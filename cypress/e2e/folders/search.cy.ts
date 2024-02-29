@@ -50,7 +50,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
     cy.get("@q").type("School", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
-    cy.url().should("have.param", "q", "School");
+    cy.getParams("q").should("eq", "School");
     cy.get("@q").should("have.value", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
@@ -62,7 +62,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
     cy.get("@q").type("wORk", { delay: 0 });
     cy.contains(".btn", "Search").click();
 
-    cy.url().should("have.param", "q", "wORk");
+    cy.getParams("q").should("eq", "wORk");
     cy.get("@q").should("have.value", "wORk");
 
     assertFilteredFolders(["School work", "Work documents"]);
@@ -71,7 +71,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
   it("should filter when hitting the ENTER key in the search field", () => {
     cy.get("@q").type("documents{enter}", { delay: 0 });
 
-    cy.url().should("have.param", "q", "documents");
+    cy.getParams("q").should("eq", "documents");
     cy.get("@q").should("have.value", "documents");
 
     assertFilteredFolders(["Personal documents", "Work documents"]);
@@ -84,7 +84,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
       .should("have.nested.property", "request.query")
       .should("contain", { q: "School" });
 
-    cy.url().should("have.param", "q", "School");
+    cy.getParams("q").should("eq", "School");
     cy.get("@q").should("have.value", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
@@ -97,7 +97,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
       .should("have.nested.property", "request.query")
       .should("contain", { q: "records" });
 
-    cy.url().should("have.param", "q", "records");
+    cy.getParams("q").should("eq", "records");
 
     assertFilteredFolders(["Financial records"]);
   });
@@ -127,7 +127,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
       .should("have.nested.property", "request.query")
       .should("contain", { q: "Financial rec" });
 
-    cy.url().should("have.param", "q", "Financial rec");
+    cy.getParams("q").should("eq", "Financial rec");
     cy.get("@q").should("have.value", "Financial rec");
 
     assertFilteredFolders(["Financial records"]);
@@ -142,7 +142,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
       .should("have.nested.property", "request.query")
       .should("contain", { q: "School" });
 
-    cy.url().should("have.param", "q", "School");
+    cy.getParams("q").should("eq", "School");
 
     assertFilteredFolders(["School work", "School projects"]);
 
