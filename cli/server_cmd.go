@@ -192,7 +192,7 @@ var serverCmd = &cobra.Command{
 					r.Use(ctx.CanViewSpace)
 					r.Get("/", handlers.ShowSpace).Name("space")
 					r.Get("/folders", handlers.GetFolders).Name("getFolders")
-					r.Post("/folders", handlers.CreateFolder).Name("createFolder")
+					r.Post("/", handlers.CreateFolder).Name("createFolder")
 					r.With(ctx.RequireAdmin).Get("/edit", handlers.EditSpace).Name("editSpace")
 					r.With(ctx.RequireAdmin).Put("/", handlers.UpdateSpace).Name("updateSpace")
 				})
