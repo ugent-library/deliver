@@ -191,18 +191,15 @@ func getPagination(r *http.Request) *models.Pagination {
 		filters = append(filters, models.Filter{Name: "q", Value: q})
 	}
 
-	return models.NewPagination(getQueryParamAsInt(query, "offset", 0), getQueryParamAsInt(query, "limit", 20), query.Get("sort"), filters...)
+	return models.NewPagination(getQueryParamAsInt(query, "offset"), getQueryParamAsInt(query, "limit"), query.Get("sort"), filters...)
 }
 
-func getQueryParamAsInt(query url.Values, paramName string, defaultValue int) int {
+func getQueryParamAsInt(query url.Values, paramName string) int {
 	param := query.Get(paramName)
-	if param == "" {
-		return defaultValue
-	}
 
 	intValue, err := strconv.Atoi(param)
 	if err != nil {
-		return defaultValue
+		return -1
 	}
 
 	return intValue

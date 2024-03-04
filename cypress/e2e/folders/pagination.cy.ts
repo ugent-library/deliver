@@ -93,6 +93,22 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.getFolderCount("text").should("eq", "Showing 21-21 of 21 folder(s)");
   });
 
+  it("should remove offset from the URL when default (0)", () => {
+    cy.visitSpace({ qs: { offset: 20 } });
+    cy.getParams("offset").should("eq", "20");
+
+    goToPage(1);
+    cy.getParams("offset").should("not.exist");
+  });
+
+  it("should remove limit from the URL when default (20)", () => {
+    cy.visitSpace({ qs: { limit: 20 } });
+    cy.getParams("limit").should("eq", "20");
+
+    goToPage(2);
+    cy.getParams("limit").should("not.exist");
+  });
+
   it("should display the filtered folder count when search query is used", () => {
     cy.visitSpace();
 
@@ -122,7 +138,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     });
   });
 
-  it("should always display page 1, even without results", () => {
+  it("should always display page 1 pagination button, even without results", () => {
     cy.visitSpace();
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
 
@@ -483,18 +499,28 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     getPagerButtons().should("eql", ["<", 1, "...", 9, 10, 11, ">"]);
   });
 
+  it("should not crash with zero or negative limit", () => {
+    cy.visitSpace({ qs: { limit: 0 } });
+    cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
+
+    cy.visitSpace({ qs: { limit: -1 } });
+    cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
+  });
+
+  it("should not crash with zero or negative offset", () => {
+    cy.visitSpace({ qs: { offset: 0 } });
+    cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
+
+    cy.visitSpace({ qs: { offset: -1 } });
+    cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
+  });
+
   function goToPage(page: number | "previous" | "next") {
     if (typeof page === "string") {
       cy.get(`@${page}`).random().click();
     } else {
       cy.contains(".pagination .page-item", page).click();
     }
-
-    cy.document().then((document) => {
-      if (!document.documentElement.hasAttribute("hx-disable")) {
-        cy.wait("@getFolders");
-      }
-    });
   }
 
   function getNumberOfPages() {

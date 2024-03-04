@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+const defaultOffset = 0
 const defaultLimit = 20
 const defaultSort = "default"
 
@@ -26,6 +27,14 @@ type Pagination struct {
 }
 
 func NewPagination(offset int, limit int, sort string, filters ...Filter) *Pagination {
+	if offset < 0 {
+		offset = defaultOffset
+	}
+
+	if limit <= 0 {
+		limit = defaultLimit
+	}
+
 	return &Pagination{
 		offset:           offset,
 		limit:            limit,
@@ -127,7 +136,7 @@ func (p *Pagination) ToPairs() []string {
 		pairs = append(pairs, "sort", p.sort)
 	}
 
-	if p.offset > 0 {
+	if p.offset != defaultOffset {
 		pairs = append(pairs, "offset", strconv.Itoa(p.offset))
 	}
 
