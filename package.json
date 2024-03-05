@@ -2,7 +2,7 @@
   "name": "deliver",
   "private": true,
   "scripts": {
-    "start": "reflex -d none -c reflex.docker.conf",
+    "dev": "reflex -d none -c reflex.docker.conf",
     "db:seed": "go run main.go seed",
     "db:reset": "go run main.go reset --force",
     "test": "cypress run --config-file cypress/cypress.config.ts",
