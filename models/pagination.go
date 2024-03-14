@@ -97,9 +97,6 @@ func (p *Pagination) VisiblePages() []int {
 
 	// Initialize map with each possible page number
 	pages := make(map[int]bool, p.NumberOfPages())
-	for i := 1; i <= p.NumberOfPages(); i++ {
-		pages[i] = false
-	}
 
 	// Activate pages 1, current - 1, current, current + 1 and end
 	pages[1] = true
