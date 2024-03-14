@@ -122,7 +122,7 @@ func (p *Pagination) VisiblePages() []int {
 		}
 	}
 
-	// Created sorted list of visible pages
+	// Create sorted list of visible pages
 	visiblePages := make([]int, 0, p.NumberOfPages())
 	for page, isVisible := range pages {
 		if isVisible {
