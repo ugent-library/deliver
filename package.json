@@ -2,7 +2,7 @@
   "name": "deliver",
   "private": true,
   "scripts": {
-    "start": "reflex -d none -c reflex.docker.conf",
+    "dev": "reflex -d none -c reflex.docker.conf",
     "db:seed": "go run main.go seed",
     "db:reset": "go run main.go reset --force",
     "test": "cypress run --config-file cypress/cypress.config.ts",
@@ -15,7 +15,7 @@
   },
   "precommit": "precommit",
   "devDependencies": {
-    "cypress": "^13.6.3",
+    "cypress": "^13.6.6",
     "cypress-common": "github:ugent-library/cypress-common#3.17.0",
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",

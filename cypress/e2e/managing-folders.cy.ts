@@ -104,7 +104,7 @@ describe("Managing folders", () => {
 
     cy.location("pathname").should(
       "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}/folders`
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
     );
 
     cy.getFolderCount("total").should("eq", "@totalNumberOfFolders");
@@ -159,18 +159,18 @@ describe("Managing folders", () => {
       .should(
         "not.eq",
         "@previousShareUrl",
-        "Share URL should change after edit"
+        "Share URL should change after edit",
       );
 
     cy.location("pathname").should(
       "eq",
       "@previousPathname",
-      "Pathname should not change after edit"
+      "Pathname should not change after edit",
     );
     cy.get(".bc-toolbar-title").should(
       "contain.text",
       FOLDER_NAME2,
-      "Folder title should change after edit"
+      "Folder title should change after edit",
     );
     cy.contains("Copy public shareable link")
       .next("input")
@@ -188,20 +188,20 @@ describe("Managing folders", () => {
 
     cy.setFieldByLabel(
       "Folder name",
-      ` \t   ${FOLDER_NAME} (updated)  ${NBSP} `
+      ` \t   ${FOLDER_NAME} (updated)  ${NBSP} `,
     );
     cy.contains(".btn", "Save changes").click();
 
     cy.get("h4.bc-toolbar-title").should(
       "contain.text",
-      FOLDER_NAME + " (updated)"
+      FOLDER_NAME + " (updated)",
     );
 
     cy.contains(".btn", "Edit").click();
 
     cy.get("input#folder-name").should(
       "have.value",
-      FOLDER_NAME + " (updated)"
+      FOLDER_NAME + " (updated)",
     );
   });
 
@@ -227,7 +227,7 @@ describe("Managing folders", () => {
 
     // TODO: extract visitFolder command (that works with folder Id alias)
     cy.get<string>("@folderId").then((folderId) =>
-      cy.visit(`/folders/${folderId}`)
+      cy.visit(`/folders/${folderId}`),
     );
 
     cy.get("h4.bc-toolbar-title").should("contain.text", FOLDER_NAME);
@@ -293,7 +293,7 @@ describe("Managing folders", () => {
 
     cy.location("pathname").should(
       "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}`
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
     );
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
@@ -306,5 +306,25 @@ describe("Managing folders", () => {
     cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
+  });
+
+  // https://github.com/ugent-library/deliver/issues/119
+  describe("Issue #119: Path changes when you try to create a folder with an invalid name", () => {
+    it("should not change path when folder name is incorrect", () => {
+      cy.visitSpace();
+
+      cy.contains(".btn", "Make folder").click();
+      cy.get("#folder-name").should("have.class", "is-invalid");
+
+      // Perform a refresh of whathever the path is at this point
+      cy.location("pathname").then(cy.visit);
+
+      cy.get("body > header").should("be.visible");
+      cy.get(".c-sidebar").should("be.visible");
+      cy.get(".c-sub-sidebar").should("be.visible");
+      cy.contains("h1", Cypress.env("DEFAULT_SPACE") + " folders").should(
+        "be.visible",
+      );
+    });
   });
 });
