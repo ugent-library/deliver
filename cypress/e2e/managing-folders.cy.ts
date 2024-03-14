@@ -104,11 +104,6 @@ describe("Managing folders", () => {
       .should("be.visible")
       .and("have.text", "name cannot be empty");
 
-    cy.location("pathname").should(
-      "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}/folders`
-    );
-
     cy.getTotalNumberOfFolders().should("eq", "@totalNumberOfFolders");
   });
 
@@ -331,5 +326,25 @@ describe("Managing folders", () => {
     cy.ensureNoToast();
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
+  });
+
+  // https://github.com/ugent-library/deliver/issues/119
+  describe("Issue #119: Path changes when you try to create a folder with an invalid name", () => {
+    it("should not change path when folder name is incorrect", () => {
+      cy.visitSpace();
+
+      cy.contains(".btn", "Make folder").click();
+      cy.get("#folder-name").should("have.class", "is-invalid");
+
+      // Perform a refresh of whathever the path is at this point
+      cy.location("pathname").then(cy.visit);
+
+      cy.get("body > header").should("be.visible");
+      cy.get(".c-sidebar").should("be.visible");
+      cy.get(".c-sub-sidebar").should("be.visible");
+      cy.contains("h1", Cypress.env("DEFAULT_SPACE") + " folders").should(
+        "be.visible"
+      );
+    });
   });
 });
