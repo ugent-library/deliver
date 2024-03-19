@@ -1,20 +1,21 @@
 import { logCommand, updateConsoleProps } from "./helpers";
 
 export default function getFolderShareUrl(
-  subject: string | null,
+  this: Record<string, unknown>,
+  subject: unknown,
   folderIdOrAlias: string,
   folderName?: string
 ): Cypress.Chainable<string> {
-  if (subject) {
+  if (typeof subject === "string") {
     // Handle child mode
     folderName = folderIdOrAlias;
     folderIdOrAlias = subject;
   }
 
-  const folderIdAlias: string | null = folderIdOrAlias.startsWith("@")
+  const folderIdAlias = folderIdOrAlias.startsWith("@")
     ? folderIdOrAlias
     : null;
-  const folderId: string = !!folderIdAlias
+  const folderId = !!folderIdAlias
     ? this[folderIdAlias.slice(1)]
     : folderIdOrAlias;
 
@@ -31,11 +32,11 @@ export default function getFolderShareUrl(
     });
   }
 
-  folderName = folderName.replace(/[^a-zA-Z0-9]+/g, "-"); // Normalize non-alphanumeric characters
+  folderName = folderName!.replace(/[^a-zA-Z0-9]+/g, "-"); // Normalize non-alphanumeric characters
 
   const url = new URL(
     `/share/${folderIdOrAlias}:${folderName}`,
-    Cypress.config().baseUrl
+    Cypress.config("baseUrl")!
   );
 
   return cy.wrap(url.toString(), { log: false }).finishLog(log);

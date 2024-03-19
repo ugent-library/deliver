@@ -10,14 +10,14 @@ export default function ensureModal(
   expectedTitle: string | RegExp,
   options?: EnsureModalOptions
 ): Cypress.Chainable<JQuery<HTMLElement>> {
-  let log: Cypress.Log | null = null;
-  if (options?.log !== false) {
-    log = logCommand(
-      "ensureModal",
-      { "Expected title": expectedTitle },
-      expectedTitle
-    );
-  }
+  const log =
+    options?.log !== false
+      ? logCommand(
+          "ensureModal",
+          { "Expected title": expectedTitle },
+          expectedTitle
+        )
+      : undefined;
 
   cy.get(".modal", NO_LOG).then((modalBackdrop) => {
     // Only assert with Chai if it is failing to not bloat the command log

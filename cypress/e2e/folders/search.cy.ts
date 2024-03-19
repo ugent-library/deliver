@@ -1,6 +1,8 @@
+// https://github.com/ugent-library/deliver/issues/92
+
 import { getRandomText } from "support/util";
 
-describe("Folder searching", () => {
+describe("Issue #92: [Speed and usability] Add search to folder overview", () => {
   const TEST_FOLDER_NAMES = [
     "Personal documents",
     "School work",
@@ -20,9 +22,9 @@ describe("Folder searching", () => {
         qs: { q: folderName },
       });
 
-      cy.getNumberOfDisplayedFolders().then((count) => {
+      cy.getFolderCount("count").then((count) => {
         if (count === 0) {
-          cy.makeFolder(folderName);
+          cy.makeFolder(folderName, { noRedirect: true });
         }
       });
     });
@@ -31,12 +33,9 @@ describe("Folder searching", () => {
   beforeEach(() => {
     cy.loginAsSpaceAdmin();
 
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
-    cy.getNumberOfDisplayedFolders().should("be.at.least", 5);
-    cy.getTotalNumberOfFolders()
-      .should("be.at.least", 5)
-      .as("totalBeforeFiltering");
+    cy.getFolderCount("total").should("be.at.least", 5);
 
     cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
       "filterFolders"
@@ -131,7 +130,7 @@ describe("Folder searching", () => {
   });
 
   it("should retain the current AJAX search when reloading the page", () => {
-    cy.getNumberOfDisplayedFolders().as("folderCountBeforeSearch");
+    cy.getFolderCount("total").as("folderCountBeforeSearch");
 
     cy.get("@q").type("School", { delay: 0 }).blur();
 
@@ -157,7 +156,7 @@ describe("Folder searching", () => {
     cy.location("search").should("not.contain", "q=");
     cy.get("@q").should("have.value", "");
 
-    cy.get("@folderCountBeforeSearch").should("eq", "@folderCountBeforeSearch");
+    cy.getFolderCount("total").should("eq", "@folderCountBeforeSearch");
   });
 
   it("should be possible to clear the search field", () => {
@@ -186,7 +185,7 @@ describe("Folder searching", () => {
       .should("have.nested.property", "request.query")
       .should("contain", { q: "' OR 1=1 --" });
 
-    cy.getNumberOfDisplayedFolders().should("eq", 0);
+    cy.getFolderCount("total").should("eq", 0);
   });
 
   it("should display a default message if nothing was filtered", () => {
@@ -208,7 +207,7 @@ describe("Folder searching", () => {
         qs: { q: "School work" },
       });
 
-      cy.getNumberOfDisplayedFolders().should("eq", 1);
+      cy.getFolderCount("total").should("eq", 1);
 
       cy.contains("#folders a", "School work").click();
 
@@ -248,7 +247,7 @@ describe("Folder searching", () => {
     });
 
     function assertFileDetailsLoadedCorrectly() {
-      cy.getNumberOfDisplayedFolders().should("eq", 1);
+      cy.getFolderCount("total").should("eq", 1);
 
       cy.get("#folders table tbody tr td")
         .eq(3)
@@ -302,8 +301,8 @@ describe("Folder searching", () => {
 
     cy.get("#folders .c-blank-slate").should("not.exist");
 
-    cy.getNumberOfDisplayedFolders().should("eq", filteredFolders.length);
-    cy.getTotalNumberOfFolders().should("eq", "@totalBeforeFiltering");
+    cy.getFolderCount("total").should("eq", filteredFolders.length);
+
     cy.get("#folders tbody tr").should("have.length", filteredFolders.length);
 
     TEST_FOLDER_NAMES.forEach((folderName) => {

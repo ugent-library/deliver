@@ -10,11 +10,11 @@ describe("Managing folders", () => {
   it("should be possible to create a new folder", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
 
-    cy.getTotalNumberOfFolders().as("totalNumberOfFolders", { type: "static" });
+    cy.getFolderCount("total").as("totalNumberOfFolders", { type: "static" });
 
     cy.setFieldByLabel("Folder name", FOLDER_NAME);
     cy.contains(".btn", "Make folder").click();
@@ -40,10 +40,10 @@ describe("Managing folders", () => {
     cy.wait(1500);
     cy.get("@copyButton").should("contain.text", "Copy public shareable link");
 
-    cy.visitSpace();
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
-      cy.getTotalNumberOfFolders().should("eq", totalNumberOfFolders + 1);
+      cy.getFolderCount("total").should("eq", totalNumberOfFolders + 1);
     });
 
     cy.contains("tr", FOLDER_NAME)
@@ -74,8 +74,6 @@ describe("Managing folders", () => {
 
     cy.visitSpace();
 
-    cy.contains("a", FOLDER_NAME).should("not.exist");
-
     cy.setFieldByLabel("Folder name", ` \t  ${FOLDER_NAME}  ${NBSP} `);
     cy.contains(".btn", "Make folder").click();
 
@@ -91,7 +89,7 @@ describe("Managing folders", () => {
   it("should return an error if a new folder name is empty", () => {
     cy.visitSpace();
 
-    cy.getTotalNumberOfFolders().as("totalNumberOfFolders");
+    cy.getFolderCount("total").as("totalNumberOfFolders");
 
     cy.get("#folder-name").should("not.have.class", "is-invalid");
     cy.get("#folder-name-invalid").should("not.exist");
@@ -104,16 +102,18 @@ describe("Managing folders", () => {
       .should("be.visible")
       .and("have.text", "name cannot be empty");
 
-    cy.getTotalNumberOfFolders().should("eq", "@totalNumberOfFolders");
+    cy.location("pathname").should(
+      "eq",
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+    );
+
+    cy.getFolderCount("total").should("eq", "@totalNumberOfFolders");
   });
 
   it("should return an error if a new folder name is already in use within the same space", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.location("pathname").should("match", /\/folders\/\w{26}/);
 
@@ -135,10 +135,7 @@ describe("Managing folders", () => {
     const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
     const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME1);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME1);
 
     cy.extractFolderId("previousFolderId")
       .getFolderShareUrl(FOLDER_NAME1)
@@ -162,18 +159,18 @@ describe("Managing folders", () => {
       .should(
         "not.eq",
         "@previousShareUrl",
-        "Share URL should change after edit"
+        "Share URL should change after edit",
       );
 
     cy.location("pathname").should(
       "eq",
       "@previousPathname",
-      "Pathname should not change after edit"
+      "Pathname should not change after edit",
     );
     cy.get(".bc-toolbar-title").should(
       "contain.text",
       FOLDER_NAME2,
-      "Folder title should change after edit"
+      "Folder title should change after edit",
     );
     cy.contains("Copy public shareable link")
       .next("input")
@@ -183,10 +180,7 @@ describe("Managing folders", () => {
   it("should trim folder names when editing", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.extractFolderId();
 
@@ -194,30 +188,27 @@ describe("Managing folders", () => {
 
     cy.setFieldByLabel(
       "Folder name",
-      ` \t   ${FOLDER_NAME} (updated)  ${NBSP} `
+      ` \t   ${FOLDER_NAME} (updated)  ${NBSP} `,
     );
     cy.contains(".btn", "Save changes").click();
 
     cy.get("h4.bc-toolbar-title").should(
       "contain.text",
-      FOLDER_NAME + " (updated)"
+      FOLDER_NAME + " (updated)",
     );
 
     cy.contains(".btn", "Edit").click();
 
     cy.get("input#folder-name").should(
       "have.value",
-      FOLDER_NAME + " (updated)"
+      FOLDER_NAME + " (updated)",
     );
   });
 
   it("should return an error if an edited folder name is empty", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
-
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME);
 
     cy.extractFolderId();
 
@@ -234,8 +225,9 @@ describe("Managing folders", () => {
       .should("be.visible")
       .and("have.text", "name cannot be empty");
 
+    // TODO: extract visitFolder command (that works with folder Id alias)
     cy.get<string>("@folderId").then((folderId) =>
-      cy.visit(`/folders/${folderId}`)
+      cy.visit(`/folders/${folderId}`),
     );
 
     cy.get("h4.bc-toolbar-title").should("contain.text", FOLDER_NAME);
@@ -245,14 +237,10 @@ describe("Managing folders", () => {
     const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
     const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
-    cy.visitSpace();
-    cy.setFieldByLabel("Folder name", FOLDER_NAME1);
-    cy.contains(".btn", "Make folder").click();
-    cy.location("pathname").as("previousPathname");
+    cy.makeFolder(FOLDER_NAME1);
+    cy.location("pathname").as("folder1Url");
 
-    cy.visitSpace();
-    cy.setFieldByLabel("Folder name", FOLDER_NAME2);
-    cy.contains(".btn", "Make folder").click();
+    cy.makeFolder(FOLDER_NAME2);
 
     cy.contains(".btn", "Edit").click(); // Editing folder 2
 
@@ -267,7 +255,7 @@ describe("Managing folders", () => {
       .should("be.visible")
       .and("have.text", "name must be unique");
 
-    cy.visit("@previousPathname");
+    cy.visit("@folder1Url");
 
     cy.contains(".btn", "Edit").click(); // Editing folder 1
 
@@ -285,29 +273,19 @@ describe("Managing folders", () => {
     cy.setFieldByLabel("Folder name", FOLDER_NAME1);
     cy.contains(".btn", "Save changes").click();
 
-    cy.location("pathname").should("eq", "@previousPathname");
+    cy.location("pathname").should("eq", "@folder1Url");
   });
 
   it("should be possible to delete a folder", () => {
     const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace();
+    cy.makeFolder(FOLDER_NAME);
 
-    cy.contains("a", FOLDER_NAME).should("not.exist");
+    cy.visitSpace({ qs: { limit: 1000 } });
 
-    cy.setFieldByLabel("Folder name", FOLDER_NAME);
-    cy.contains(".btn", "Make folder").click();
+    cy.getFolderCount("total").as("totalNumberOfFolders", { type: "static" });
 
-    cy.ensureToast("Folder created successfully").closeToast();
-    cy.ensureNoToast();
-
-    cy.visitSpace();
-
-    cy.getTotalNumberOfFolders().as("totalNumberOfFolders", { type: "static" });
-
-    cy.contains("a", FOLDER_NAME).should("exist");
-
-    cy.contains("a", FOLDER_NAME).click();
+    cy.contains("a", FOLDER_NAME).should("exist").click();
 
     cy.contains(".btn", "Edit").click();
 
@@ -315,15 +293,17 @@ describe("Managing folders", () => {
 
     cy.location("pathname").should(
       "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}`
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
     );
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
-      cy.getTotalNumberOfFolders().should("eq", totalNumberOfFolders - 1);
+      cy.getFolderCount("total").should("eq", totalNumberOfFolders - 1);
     });
 
     cy.ensureToast("Folder deleted successfully").closeToast();
     cy.ensureNoToast();
+
+    cy.visitSpace({ qs: { limit: 1000 } });
 
     cy.contains("a", FOLDER_NAME).should("not.exist");
   });
@@ -343,7 +323,7 @@ describe("Managing folders", () => {
       cy.get(".c-sidebar").should("be.visible");
       cy.get(".c-sub-sidebar").should("be.visible");
       cy.contains("h1", Cypress.env("DEFAULT_SPACE") + " folders").should(
-        "be.visible"
+        "be.visible",
       );
     });
   });

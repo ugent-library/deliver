@@ -2,11 +2,18 @@ import { logCommand } from "./helpers";
 
 const NO_LOG = { log: false };
 
+type MakeFolderOptions = {
+  space?: string;
+  noRedirect?: boolean;
+};
+
 export default function makeFolder(
   name: string,
-  space: string = Cypress.env("DEFAULT_SPACE")
+  { space, noRedirect }: MakeFolderOptions = {}
 ): void {
-  logCommand("makeFolder", { name, space }, name);
+  space ||= Cypress.env("DEFAULT_SPACE");
+
+  logCommand("makeFolder", { name, space, "No redirect": noRedirect }, name);
 
   cy.location("pathname", { log: false }).then((pathname) => {
     if (pathname !== `/spaces/${space}`) {
@@ -14,16 +21,19 @@ export default function makeFolder(
     }
   });
 
-  cy.setFieldByLabel("Folder name", name, NO_LOG);
-  cy.contains(".btn", "Make folder", NO_LOG).click(NO_LOG);
-
-  cy.ensureToast("Folder created successfully", NO_LOG).closeToast(NO_LOG);
+  cy.getLabel("Folder name", NO_LOG)
+    .submitForm({ name }, NO_LOG)
+    .then((response) => {
+      if (!noRedirect && response.redirectedToUrl) {
+        cy.visit(response.redirectedToUrl, NO_LOG);
+      }
+    });
 }
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      makeFolder(name: string, space?: string): Chainable<void>;
+      makeFolder(name: string, options?: MakeFolderOptions): Chainable<void>;
     }
   }
 }

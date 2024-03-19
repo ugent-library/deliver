@@ -9,21 +9,15 @@ import (
 	"github.com/ugent-library/deliver/models"
 )
 
-templ Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) {
+templ Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, pagination *models.Pagination) {
 	<div class="card w-100 mb-6">
 		<div class="card-header">
-			<div class="bc-toolbar">
-				<div class="bc-toolbar-left">
-					<div class="bc-toolbar-item">
-						<h2>Folders</h2>
-					</div>
-				</div>
-				<div class="bc-toolbar-right">
-					<div class="bc-toolbar-item">
-						<p>Showing { fmt.Sprint(len(folders)) } of { fmt.Sprint(totalFolders) } folders</p>
-					</div>
-				</div>
-			</div>
+			@Pagination(PaginationArgs{
+				pagination:     pagination,
+				baseHref:       c.Path("space", "spaceName", space.Name),
+				baseHtmxGetUrl: c.Path("getFolders", "spaceName", space.Name),
+				target:         "#folders",
+			})
 		</div>
 		if len(folders) > 0 {
 			<div class="table-responsive">
@@ -103,6 +97,14 @@ templ Folders(c *ctx.Ctx, folders []*models.Folder, totalFolders int) {
 						}
 					</tbody>
 				</table>
+			</div>
+			<div class="card-footer">
+				@Pagination(PaginationArgs{
+					pagination:     pagination,
+					baseHref:       c.Path("space", "spaceName", space.Name),
+					baseHtmxGetUrl: c.Path("getFolders", "spaceName", space.Name),
+					target:         "#folders",
+				})
 			</div>
 		} else {
 			<div class="c-blank-slate c-blank-slate-muted">

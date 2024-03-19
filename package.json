@@ -9,13 +9,14 @@
     "test:libtest": "env-cmd --file ./cypress/.env npm test --",
     "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e --browser electron",
     "cypress:open:libtest": "env-cmd --file ./cypress/.env npm run cypress:open --",
+    "cypress:lint": "tsc -p cypress/",
     "precommit": "node node_modules/js-precommit-hook",
     "generate-issue-test": "node ./cypress/scripts/generate-issue-test.mjs"
   },
   "precommit": "precommit",
   "devDependencies": {
     "cypress": "^13.6.6",
-    "cypress-common": "github:ugent-library/cypress-common#3.16.1",
+    "cypress-common": "github:ugent-library/cypress-common#3.17.0",
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",

@@ -1,10 +1,26 @@
-export function getRandomText() {
-  return crypto.randomUUID().replace(/-/g, "").toUpperCase().substring(0, 10);
+export function getRandomText(includeSubstring?: string): string {
+  const randomText = crypto
+    .randomUUID()
+    .replace(/-/g, "")
+    .toUpperCase()
+    .substring(0, 10);
+
+  if (includeSubstring) {
+    return (
+      randomText.slice(0, 5) +
+      " " +
+      includeSubstring +
+      " " +
+      randomText.slice(5)
+    );
+  }
+
+  return randomText;
 }
 
 export function mapAlias(
   thisObject: Record<string, unknown>,
-  argument
+  argument: unknown
 ): unknown {
   if (typeof argument === "string" && argument.startsWith("@")) {
     const alias = argument.slice(1);

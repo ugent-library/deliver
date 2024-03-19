@@ -8,14 +8,15 @@ export default function (
   caption: string | RegExp,
   options: GetLabelOptions = { log: true }
 ) {
-  const log = options.log !== false && logCommand("getLabel", null, caption);
+  const log =
+    options.log !== false && logCommand("getLabel", undefined, caption);
 
   const getFn = cy.now("get", "label", {
     log: false,
   }) as () => JQuery<HTMLElement>;
 
   return (): JQuery<HTMLElement> => {
-    let $el = getFn().filter((_, el) => {
+    const $el = getFn().filter((_, el) => {
       const $currentLabel = Cypress.$(el).clone();
 
       $currentLabel.find(".badge, .visually-hidden").remove();

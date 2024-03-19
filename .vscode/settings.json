@@ -8,13 +8,4 @@
     "editor.defaultFormatter": "a-h.templ"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": [
-    "bootstrap",
-    "htmx",
-    "laravel",
-    "OIDC",
-    "popperjs",
-    "precommit",
-    "ugent"
-  ]
 }

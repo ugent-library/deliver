@@ -3,7 +3,9 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -74,7 +76,7 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 
 	htmx.PushURL(w, c.Path("space", "spaceName", space.Name, pagination.ToPairs()).String())
 
-	views.Folders(c, folders, len(space.Folders)).Render(r.Context(), w)
+	views.Folders(c, space, folders, pagination).Render(r.Context(), w)
 }
 
 func NewSpace(w http.ResponseWriter, r *http.Request) {
@@ -178,13 +180,27 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	q, _ := pagination.Filter("q")
-	views.ShowSpace(c, space, folders, q.Value, pagination.Sort(), userSpaces, folder, validationErrors).Render(r.Context(), w)
+	views.ShowSpace(c, space, folders, pagination, userSpaces, folder, validationErrors).Render(r.Context(), w)
 }
 
 func getPagination(r *http.Request) *models.Pagination {
 	query := r.URL.Query()
+	filters := make([]models.Filter, 0, len(query))
 	q := strings.TrimSpace(query.Get("q"))
+	if q != "" {
+		filters = append(filters, models.Filter{Name: "q", Value: q})
+	}
 
-	return models.NewPagination(query.Get("sort"), models.Filter{Name: "q", Value: q})
+	return models.NewPagination(getQueryParamAsInt(query, "offset"), getQueryParamAsInt(query, "limit"), query.Get("sort"), filters...)
+}
+
+func getQueryParamAsInt(query url.Values, paramName string) int {
+	param := query.Get(paramName)
+
+	intValue, err := strconv.Atoi(param)
+	if err != nil {
+		return -1
+	}
+
+	return intValue
 }

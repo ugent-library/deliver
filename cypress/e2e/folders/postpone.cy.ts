@@ -54,7 +54,7 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.ensureModal(
       new RegExp(
-        `Postpone the expiration date of\s*${FOLDER_NAME} by one month`
+        `Postpone the expiration date of\\s*${FOLDER_NAME} by one month`
       )
     ).closeModal("No, cancel");
 
@@ -91,10 +91,10 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.ensureModal(
       new RegExp(
-        `Postpone the expiration date of\s*${FOLDER_NAME} by one month`
+        `Postpone the expiration date of\\s*${FOLDER_NAME} by one month`
       )
     )
-      .within(function () {
+      .within(function (this: Record<string, unknown>) {
         cy.contains(`Current expiration date: ${this.expirationDate}`).should(
           "be.visible"
         );
@@ -134,6 +134,12 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
   }
 
   function getExpiresOnDate(expiresOn: string) {
-    return expiresOn.match(/^expires on (?<date>.*)$/).groups["date"];
+    const matches = expiresOn.match(/^expires on (?<date>.*)$/);
+
+    if (!matches) {
+      throw new Error('Could not extract date from "expires on" text.');
+    }
+
+    return matches.groups!["date"];
   }
 });

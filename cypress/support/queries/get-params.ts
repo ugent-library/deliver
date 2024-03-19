@@ -1,6 +1,8 @@
 import { logCommand, updateConsoleProps } from "support/commands/helpers";
 
-export default function (...names: string[]) {
+type GetParamsResult = Record<string, string | string[]>;
+
+export default function (this: unknown, ...names: string[]) {
   const log = logCommand("getParams", getInitialConsoleProps(names), names);
 
   const urlFn = cy.now("url", { log: false }) as () => string;
@@ -40,37 +42,43 @@ function getParamsResult(url: string, names: string[]) {
       return params;
 
     case 1:
-      return params[names.at(0)];
+      return params[names.at(0)!];
 
     default:
       return Cypress._.pick(params, ...names);
   }
 }
 
-function getParamsObject(url: string): Record<string, string | string[]> {
+function getParamsObject(url: string): GetParamsResult {
   const { searchParams } = new URL(url);
 
-  return [...searchParams].reduce((previous, [name, value]) => {
-    if (name in previous) {
-      if (!Array.isArray(previous[name])) {
-        previous[name] = [previous[name]];
+  return [...searchParams].reduce(
+    (previous: GetParamsResult, [name, value]) => {
+      if (name in previous) {
+        const previousValue = previous[name];
+        if (Array.isArray(previousValue)) {
+          previousValue.push(value);
+        } else {
+          previous[name] = [value];
+        }
+      } else {
+        previous[name] = value;
       }
 
-      previous[name].push(value);
-    } else {
-      previous[name] = value;
-    }
-
-    return previous;
-  }, {});
+      return previous;
+    },
+    {}
+  );
 }
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      getParams(...names: string[]): Chainable<Record<string, string>>;
-      getParams(name: string): Chainable<string>;
-      getParams(): Chainable<Record<string, string>>;
+      getParams(...names: string[]): Chainable<GetParamsResult>;
+
+      getParams(name: string): Chainable<string | string[]>;
+
+      getParams(): Chainable<GetParamsResult>;
     }
   }
 }
