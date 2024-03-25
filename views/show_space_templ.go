@@ -140,7 +140,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></div><div class=\"u-scroll-wrapper__body p-6\"><div class=\"card w-100 mb-6\"><div class=\"card-header\"><div class=\"bc-toolbar\"><div class=\"bc-toolbar-left\"><div class=\"bc-toolbar-item\"><h2>Make a folder</h2></div></div></div></div><div class=\"card-body\"><form action=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></div><div class=\"u-scroll-wrapper__body p-6\"><div class=\"alert alert-info\"><i class=\"if if-info-circle-filled\"></i><div class=\"alert-content\"><h3 class=\"alert-title\">Scheduled maintenance: Deliver temporarily unavailable.</h3><p class=\"mt-2\">Due to maintenance Deliver will not be available on:</p><ul class=\"mb-2\"><li>Wednesday, March 27, 08:00 &mdash; 17:00</li><li>Thursday, March 28, 17:00 &mdash; 21:00</li></ul><p>For any questions, please contact <a href=\"mailto:libservice@ugent.be\">libservice@ugent.be</a>. We apologise for any inconveniences, thank you for your understanding.</p></div></div><div class=\"card w-100 mb-6\"><div class=\"card-header\"><div class=\"bc-toolbar\"><div class=\"bc-toolbar-left\"><div class=\"bc-toolbar-item\"><h2>Make a folder</h2></div></div></div></div><div class=\"card-body\"><form action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -190,7 +190,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(e.Error())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 95, Col: 79}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 107, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -277,7 +277,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, q stri
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(option.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 153, Col: 91}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_space.templ`, Line: 165, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {

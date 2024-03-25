@@ -88,14 +88,14 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div></div></div></div></div><div class=\"u-scroll-wrapper__body p-6\"><div class=\"card w-100 mb-6\"><div class=\"card-header\"><div class=\"bc-toolbar\"><div class=\"bc-toolbar-left\"><div class=\"bc-toolbar-item\"><h5>Download your files before ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div></div></div></div></div><div class=\"u-scroll-wrapper__body p-6\"><div class=\"alert alert-info\"><i class=\"if if-info-circle-filled\"></i><div class=\"alert-content\"><h3 class=\"alert-title\">Scheduled maintenance: Deliver temporarily unavailable.</h3><p class=\"mt-2\">Due to maintenance Deliver will not be available on:</p><ul class=\"mb-2\"><li>Wednesday, March 27, 08:00 &mdash; 17:00</li><li>Thursday, March 28, 17:00 &mdash; 21:00</li></ul><p>For any questions, please contact <a href=\"mailto:libservice@ugent.be\">libservice@ugent.be</a>. We apologise for any inconveniences, thank you for your understanding.</p></div></div><div class=\"card w-100 mb-6\"><div class=\"card-header\"><div class=\"bc-toolbar\"><div class=\"bc-toolbar-left\"><div class=\"bc-toolbar-item\"><h5>Download your files before ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 45, Col: 127}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 59, Col: 127}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(len(folder.Files)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 50, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 64, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -121,7 +121,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(friendly.Bytes(folder.TotalSize()))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 50, Col: 116}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 64, Col: 116}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -162,7 +162,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					var templ_7745c5c3_Var12 string
 					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(f.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 78, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 92, Col: 58}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 					if templ_7745c5c3_Err != nil {
@@ -175,7 +175,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					var templ_7745c5c3_Var13 string
 					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(f.MD5)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 80, Col: 92}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 94, Col: 92}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 					if templ_7745c5c3_Err != nil {
@@ -188,7 +188,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(friendly.Bytes(f.Size))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 83, Col: 67}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 97, Col: 67}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -201,7 +201,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					var templ_7745c5c3_Var15 string
 					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(f.ContentType)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 86, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 100, Col: 58}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
@@ -214,7 +214,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					var templ_7745c5c3_Var16 string
 					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(f.Downloads))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 89, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 103, Col: 68}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
@@ -227,7 +227,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					var templ_7745c5c3_Var17 string
 					templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(f.CreatedAt.In(c.Timezone).Format("2006-01-02 15:04"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 92, Col: 98}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `share_folder.templ`, Line: 106, Col: 98}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 					if templ_7745c5c3_Err != nil {
