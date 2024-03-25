@@ -489,15 +489,7 @@ func ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, fold
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></button> <input type=\"text\" class=\"form-control input-select-text\" style=\"min-width: 250px;\" readonly data-select-value value=\"")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String()))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div></td><td class=\"text-nowrap\"><p>")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></button></div></td><td class=\"text-nowrap\"><p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

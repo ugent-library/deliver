@@ -167,9 +167,6 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, userSpaces []*models.Space, fol
                                             <i class="if if-copy text-primary"></i>
                                             <span class="btn-text">Copy link</span>
                                         </button>
-                                        <input type="text" class="form-control input-select-text" style="min-width: 250px;" readonly data-select-value
-                                            value={ c.URLTo("shareFolder", "folderID", f.ID, "folderSlug", f.Slug()).String() }
-                                        />
                                     </div>
                                 </td>
                                 <td class="text-nowrap">
