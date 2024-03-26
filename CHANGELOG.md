@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [v1.1.2]
+
+### Added
+
+- Temporary status messages for migration
+
+### Fixed
+
+
 ## [v1.1.1] - 2024-01-29
 
 ### Added
