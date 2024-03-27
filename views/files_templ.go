@@ -48,7 +48,7 @@ func Files(c *ctx.Ctx, files []*models.File) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if len(files) > 0 {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap\">File name</th><th class=\"text-nowrap\">Size</th><th class=\"text-nowrap\">Type</th><th class=\"text-nowrap\">Downloads</th><th class=\"text-nowrap\">Created at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right\"></th></tr></thead> <tbody>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive overflow-y-hidden\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap\">File name</th><th class=\"text-nowrap\">Size</th><th class=\"text-nowrap\">Type</th><th class=\"text-nowrap\">Downloads</th><th class=\"text-nowrap\">Created at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
