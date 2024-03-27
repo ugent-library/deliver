@@ -130,7 +130,7 @@ func pageLayout(c *ctx.Ctx, title string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"nav-item\"><a class=\"nav-link\" href=\"https://ugentbe.sharepoint.com/:f:/r/teams/Group.CA2010_Universiteitsbibliotheek/Gedeelde%20documenten/Publieksdiensten?csf=1&amp;web=1&amp;e=MMSQmR\" target=\"_blank\"><i class=\"if if-book\"></i> <span class=\"btn-text\">Manual &ndash; NL</span></a></li><li class=\"nav-item\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"nav-item\"><a class=\"nav-link\" href=\"https://ugentbe.sharepoint.com/:b:/r/teams/Group.CA2010_Universiteitsbibliotheek/Gedeelde%20documenten/Publieksdiensten/Bruikleen_Deliver_handleiding_20240327.pdf?csf=1&amp;web=1&amp;e=3QQy71\" target=\"_blank\"><i class=\"if if-book\"></i> <span class=\"btn-text\">Manual &ndash; NL</span></a></li><li class=\"nav-item\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
