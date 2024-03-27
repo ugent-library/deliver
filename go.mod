@@ -54,7 +54,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.27 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.14.2 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
-	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-playground/form/v4 v4.2.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -71,14 +70,13 @@ require (
 	github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072
 	github.com/ugent-library/htmx v0.0.0-20240118150818-64e3e65fb690
 	github.com/ugent-library/httpx v0.0.0-20231026122034-e9de0b29458b
-	github.com/ugent-library/oidc v0.0.0-20240326204024-1d8ab1345acb
+	github.com/ugent-library/oidc v0.0.0-20240327104830-5735182db2e5
 	github.com/ugent-library/okay v0.0.0-20231205122923-396c4d3a29f2
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
