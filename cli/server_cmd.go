@@ -87,7 +87,12 @@ var serverCmd = &cobra.Command{
 		}
 
 		// setup handlers
-		authHandler := handlers.NewAuthHandler(oidcAuth, config.OIDC.MatchClaim)
+		authHandler := handlers.NewAuthHandler(
+			oidcAuth,
+			config.OIDC.UsernameClaim,
+			config.OIDC.NameClaim,
+			config.OIDC.EmailClaim,
+		)
 
 		// setup router
 		router := ich.New()

@@ -26,11 +26,13 @@ type Config struct {
 		Conn string `env:"CONN,notEmpty"`
 	} `envPrefix:"REPO_"`
 	OIDC struct {
-		URL         string `env:"URL,notEmpty"`
-		ID          string `env:"ID,notEmpty"`
-		Secret      string `env:"SECRET,notEmpty"`
-		RedirectURL string `env:"REDIRECT_URL,notEmpty"`
-		MatchClaim  string `env:"MATCH_CLAIM" envDefault:"preferred_username"`
+		URL           string `env:"URL,notEmpty"`
+		ID            string `env:"ID,notEmpty"`
+		Secret        string `env:"SECRET,notEmpty"`
+		RedirectURL   string `env:"REDIRECT_URL,notEmpty"`
+		UsernameClaim string `env:"USERNAME_CLAIM" envDefault:"preferred_username"`
+		NameClaim     string `env:"NAME_CLAIM" envDefault:"name"`
+		EmailClaim    string `env:"EMAIL_CLAIM" envDefault:"email"`
 	} `envPrefix:"OIDC_"`
 	Cookie struct {
 		Secret string `env:"SECRET,notEmpty"`

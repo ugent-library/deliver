@@ -10,14 +10,18 @@ import (
 )
 
 type AuthHandler struct {
-	auth       *oidc.Auth
-	matchClaim string
+	auth          *oidc.Auth
+	usernameClaim string
+	nameClaim     string
+	emailClaim    string
 }
 
-func NewAuthHandler(auth *oidc.Auth, matchClaim string) *AuthHandler {
+func NewAuthHandler(auth *oidc.Auth, usernameClaim, nameClaim, emailClaim string) *AuthHandler {
 	return &AuthHandler{
-		auth:       auth,
-		matchClaim: matchClaim,
+		auth:          auth,
+		usernameClaim: usernameClaim,
+		nameClaim:     nameClaim,
+		emailClaim:    emailClaim,
 	}
 }
 
@@ -31,12 +35,11 @@ func (h *AuthHandler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := &models.User{
-		Username: claims.GetString(h.matchClaim),
-		Name:     claims.Name,
-		Email:    claims.Email,
+		Username: claims.GetString(h.usernameClaim),
+		Name:     claims.GetString(h.nameClaim),
+		Email:    claims.GetString(h.emailClaim),
 	}
 	if err := c.Repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
-		c.Log.Errorf("cannot upsert user %+v (standard claims: %+v, all claims: %+v)", u, claims.StandardClaims, claims.All)
 		c.HandleError(w, r, err)
 		return
 	}
