@@ -36,6 +36,7 @@ func (h *AuthHandler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 		Email:    claims.Email,
 	}
 	if err := c.Repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
+		c.Log.Errorf("cannot upsert user %+v (standard claims: %+v, all claims: %+v)", u, claims.StandardClaims, claims.All)
 		c.HandleError(w, r, err)
 		return
 	}
