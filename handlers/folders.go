@@ -81,7 +81,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
 		validationErrors := okay.NewErrors()
-		if err != nil && !errors.As(err, &validationErrors) {
+		if !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
 		}

@@ -58,9 +58,7 @@ var serverCmd = &cobra.Command{
 			ClientID:     config.OIDC.ID,
 			ClientSecret: config.OIDC.Secret,
 			RedirectURL:  config.OIDC.RedirectURL,
-			CookieName:   "deliver.state",
-			CookieSecret: []byte(config.Cookie.Secret),
-			Insecure:     config.Env == "local",
+			CookiePrefix: "deliver.",
 		})
 		if err != nil {
 			return err
@@ -87,6 +85,9 @@ var serverCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		// setup handlers
+		authHandler := handlers.NewAuthHandler(oidcAuth, config.OIDC.MatchClaim)
 
 		// setup router
 		router := ich.New()
@@ -141,7 +142,6 @@ var serverCmd = &cobra.Command{
 					Repo:        repo,
 					Storage:     storage,
 					MaxFileSize: config.MaxFileSize,
-					Auth:        oidcAuth,
 					Router:      router,
 					ErrorHandlers: map[int]http.HandlerFunc{
 						http.StatusNotFound:     handlers.NotFound,
@@ -160,9 +160,9 @@ var serverCmd = &cobra.Command{
 			// viewable by everyone
 			r.NotFound(handlers.NotFound)
 			r.Get("/", handlers.Home).Name("home")
-			r.Get("/auth/callback", handlers.AuthCallback)
-			r.Get("/login", handlers.Login).Name("login")
-			r.Get("/logout", handlers.Logout).Name("logout")
+			r.Get("/auth/callback", authHandler.AuthCallback)
+			r.Get("/login", authHandler.Login).Name("login")
+			r.Get("/logout", authHandler.Logout).Name("logout")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", handlers.ShareFolder).Name("shareFolder")
 			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", handlers.DownloadFile).Name("downloadFile")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/folders/{folderID}.zip", handlers.DownloadFolder).Name("downloadFolder")

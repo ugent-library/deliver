@@ -101,7 +101,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Spaces.Create(r.Context(), space); err != nil {
 		validationErrors := okay.NewErrors()
-		if err != nil && !errors.As(err, &validationErrors) {
+		if !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
 		}
@@ -140,7 +140,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Spaces.Update(r.Context(), space); err != nil {
 		validationErrors := okay.NewErrors()
-		if err != nil && !errors.As(err, &validationErrors) {
+		if !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
 		}

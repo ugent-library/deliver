@@ -20,7 +20,6 @@ import (
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
-	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"github.com/unrolled/secure"
 	"go.uber.org/zap"
@@ -92,7 +91,6 @@ type Config struct {
 	Repo          *repositories.Repo
 	Storage       objectstores.Store
 	MaxFileSize   int64
-	Auth          *oidc.Auth
 	Router        *ich.Mux
 	ErrorHandlers map[int]http.HandlerFunc
 	Permissions   *models.Permissions

@@ -30,6 +30,7 @@ type Config struct {
 		ID          string `env:"ID,notEmpty"`
 		Secret      string `env:"SECRET,notEmpty"`
 		RedirectURL string `env:"REDIRECT_URL,notEmpty"`
+		MatchClaim  string `env:"MATCH_CLAIM" envDefault:"preferred_username"`
 	} `envPrefix:"OIDC_"`
 	Cookie struct {
 		Secret string `env:"SECRET,notEmpty"`

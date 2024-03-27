@@ -9,17 +9,29 @@ import (
 	"github.com/ugent-library/oidc"
 )
 
-func AuthCallback(w http.ResponseWriter, r *http.Request) {
+type AuthHandler struct {
+	auth       *oidc.Auth
+	matchClaim string
+}
+
+func NewAuthHandler(auth *oidc.Auth, matchClaim string) *AuthHandler {
+	return &AuthHandler{
+		auth:       auth,
+		matchClaim: matchClaim,
+	}
+}
+
+func (h *AuthHandler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	claims := oidc.Claims{}
-	if err := c.Auth.CompleteAuth(w, r, &claims); err != nil {
+	if err := h.auth.CompleteAuth(w, r, &claims); err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
 
 	u := &models.User{
-		Username: claims.PreferredUsername,
+		Username: claims.GetString(h.matchClaim),
 		Name:     claims.Name,
 		Email:    claims.Email,
 	}
@@ -40,15 +52,15 @@ func AuthCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, c.Path("home").String(), http.StatusSeeOther)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
-	if err := c.Auth.BeginAuth(w, r); err != nil {
+	if err := h.auth.BeginAuth(w, r); err != nil {
 		c.HandleError(w, r, err)
 	}
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	if err := c.Repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
