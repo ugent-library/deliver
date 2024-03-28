@@ -50,7 +50,7 @@ func Folders(c *ctx.Ctx, space *models.Space, folders []*models.Folder, paginati
 			return templ_7745c5c3_Err
 		}
 		if len(folders) > 0 {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap\">Folder</th><th class=\"text-nowrap\">Public shareable link</th><th class=\"text-nowrap\">Expires on</th><th class=\"text-nowrap\">Documents</th><th class=\"text-nowrap\">Created at</th><th class=\"text-nowrap\">Updated at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right\"></th></tr></thead> <tbody>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive overflow-y-hidden\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap\">Folder</th><th class=\"text-nowrap\">Public shareable link</th><th class=\"text-nowrap\">Expires on</th><th class=\"text-nowrap\">Documents</th><th class=\"text-nowrap\">Created at</th><th class=\"text-nowrap\">Updated at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
