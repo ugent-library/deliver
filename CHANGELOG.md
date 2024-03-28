@@ -8,17 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-* Added search box for folders
-* Added pagination for folders to reduce page loading time
-* Added sorting on folder expiration date
-* Updated manual link to new manual environment
-* Added tests for new features
+
+### Fixed
+
+## [v1.1.4] - 2024-03-28
+
+### Added
+
+- Added search box for folders
+- Added pagination for folders to reduce page loading time
+- Added sorting on folder expiration date
+- Updated manual link to new manual environment
+- Added tests for new features
+
+### Fixed
+
+## [v1.1.3]
+
+### Added
+
+- Remove temporary status messages for migration
+
+### Fixed
 
 ## [v1.1.2]
 
 ### Added
 
 - Temporary status messages for migration
+
+### Fixed
 
 ## [v1.1.1] - 2024-01-29
 
@@ -84,8 +103,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]:  https://github.com/ugent-library/deliver/compare/v1.1.1...HEAD
-[v1.1.1]:  https://github.com/ugent-library/deliver/compare/v1.1.1...v1.1.1
+[unreleased]:  https://github.com/ugent-library/deliver/compare/v1.1.4...HEAD
+[v1.1.4]:  https://github.com/ugent-library/deliver/compare/v1.1.3...v1.1.4
+[v1.1.3]:  https://github.com/ugent-library/deliver/compare/v1.1.2...v1.1.3
+[v1.1.2]:  https://github.com/ugent-library/deliver/compare/v1.1.1...v1.1.2
+[v1.1.1]:  https://github.com/ugent-library/deliver/compare/v1.1.0...v1.1.1
 [v1.1.0]:  https://github.com/ugent-library/deliver/compare/v1.0.3...v1.1.0
 [v1.0.3]:  https://github.com/ugent-library/deliver/compare/v1.0.2...v1.0.3
 [v1.0.2]:  https://github.com/ugent-library/deliver/compare/v1.0.1...v1.0.2
