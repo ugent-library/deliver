@@ -1,17 +1,31 @@
-import { logCommand } from './helpers'
+import { logCommand } from "./helpers";
 
-export default function visitSpace(space?: string): Cypress.Chainable<Cypress.AUTWindow> {
-  space ||= Cypress.env('DEFAULT_SPACE')
+export default function visitSpace(
+  space?: string,
+  options?: Partial<Cypress.VisitOptions>
+): Cypress.Chainable<Cypress.AUTWindow> {
+  if (typeof space !== "string") {
+    options = space;
+    space = Cypress.env("DEFAULT_SPACE");
+  }
 
-  logCommand('visitSpace', { space }, space)
+  if (options?.log !== false) {
+    logCommand("visitSpace", { space, options }, space);
+  }
 
-  return cy.visit(`/spaces/${space}`, { log: false })
+  return cy.visit(`/spaces/${space}`, { ...options, log: false });
 }
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      visitSpace(space?: string): Chainable<AUTWindow>
+      visitSpace(options?: string): Chainable<AUTWindow>;
+
+      visitSpace(
+        space?: string,
+        options?: Partial<VisitOptions>
+      ): Chainable<AUTWindow>;
+      visitSpace(options?: Partial<VisitOptions>): Chainable<AUTWindow>;
     }
   }
 }

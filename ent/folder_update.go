@@ -36,9 +36,25 @@ func (fu *FolderUpdate) SetSpaceID(s string) *FolderUpdate {
 	return fu
 }
 
+// SetNillableSpaceID sets the "space_id" field if the given value is not nil.
+func (fu *FolderUpdate) SetNillableSpaceID(s *string) *FolderUpdate {
+	if s != nil {
+		fu.SetSpaceID(*s)
+	}
+	return fu
+}
+
 // SetName sets the "name" field.
 func (fu *FolderUpdate) SetName(s string) *FolderUpdate {
 	fu.mutation.SetName(s)
+	return fu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (fu *FolderUpdate) SetNillableName(s *string) *FolderUpdate {
+	if s != nil {
+		fu.SetName(*s)
+	}
 	return fu
 }
 
@@ -288,9 +304,25 @@ func (fuo *FolderUpdateOne) SetSpaceID(s string) *FolderUpdateOne {
 	return fuo
 }
 
+// SetNillableSpaceID sets the "space_id" field if the given value is not nil.
+func (fuo *FolderUpdateOne) SetNillableSpaceID(s *string) *FolderUpdateOne {
+	if s != nil {
+		fuo.SetSpaceID(*s)
+	}
+	return fuo
+}
+
 // SetName sets the "name" field.
 func (fuo *FolderUpdateOne) SetName(s string) *FolderUpdateOne {
 	fuo.mutation.SetName(s)
+	return fuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (fuo *FolderUpdateOne) SetNillableName(s *string) *FolderUpdateOne {
+	if s != nil {
+		fuo.SetName(*s)
+	}
 	return fuo
 }
 

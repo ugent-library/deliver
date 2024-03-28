@@ -4,20 +4,23 @@
 
 .c-thumbnail {
   width: 9.6rem;
+  min-width: 9.6rem;
 }
 
 .c-thumbnail-small {
   width: 6.4rem;
+  min-width: 6.4rem;
 }
-
 
 .c-thumbnail-large {
   width: 11.2rem;
+  min-width: 11.2rem;
 }
 
 .c-thumbnail-lg-large {
   @include media-breakpoint-up(lg) {
     width: 11.2rem;
+    min-width: 11.2rem;
   }
 }
 

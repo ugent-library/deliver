@@ -1,0 +1,38 @@
+package views
+
+import (
+	"net/url"
+)
+
+type PaginationButtonArgs struct {
+	active   bool
+	disabled bool
+	href     url.URL
+	htmxGet  url.URL
+	icon     string
+	contents string
+	attrs    templ.Attributes
+}
+
+templ PaginationButton(args PaginationButtonArgs) {
+	<li class={ "page-item", templ.KV("disabled", args.disabled), templ.KV("active", args.active) }>
+		if !args.disabled {
+			<a class="page-link" href={ templ.URL(args.href.String()) } hx-get={ args.htmxGet.String() } { args.attrs... }>
+				@PaginationButtonContents(args)
+			</a>
+		} else {
+			<span class="page-link" { args.attrs... }>
+				@PaginationButtonContents(args)
+			</span>
+		}
+	</li>
+}
+
+templ PaginationButtonContents(args PaginationButtonArgs) {
+	if args.icon != "" {
+		<i class={ "if", args.icon } aria-hidden="true"></i>
+	}
+	if args.contents != "" {
+		{ args.contents }
+	}
+}

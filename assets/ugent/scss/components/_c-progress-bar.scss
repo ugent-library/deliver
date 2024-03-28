@@ -1,3 +1,7 @@
+/* ==========================================================================
+    Component: Progress bar
+   ========================================================================== */
+
 .c-progress-bar {
   display: flex;
   align-items: center;
@@ -27,7 +31,7 @@
   }
 
   .c-progress-bar__label {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: $text-muted;
     padding-left: .8rem;
   }

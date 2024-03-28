@@ -1,190 +1,330 @@
-import getRandomText from 'support/util'
+import { getRandomText } from "support/util";
 
-describe('Managing folders', () => {
+describe("Managing folders", () => {
+  const NBSP = String.fromCharCode(160);
+
   beforeEach(() => {
-    cy.loginAsSpaceAdmin()
-  })
+    cy.loginAsSpaceAdmin();
+  });
 
-  it('should be possible to create a new folder', () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`
+  it("should be possible to create a new folder", () => {
+    const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace()
+    cy.visitSpace({ qs: { limit: 1000 } });
 
-    cy.contains('a', FOLDER_NAME).should('not.exist')
+    cy.contains("a", FOLDER_NAME).should("not.exist");
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME)
-    cy.contains('.btn', 'Make folder').click()
+    cy.getFolderCount("total").as("totalNumberOfFolders", { type: "static" });
 
-    cy.extractFolderId().getFolderShareUrl(FOLDER_NAME).as('shareUrl')
+    cy.setFieldByLabel("Folder name", FOLDER_NAME);
+    cy.contains(".btn", "Make folder").click();
 
-    cy.ensureToast('Folder created successfully').closeToast()
-    cy.ensureNoToast()
+    cy.extractFolderId().getFolderShareUrl(FOLDER_NAME).as("shareUrl");
 
-    cy.get('.bc-toolbar-title').should('contain.text', Cypress.env('DEFAULT_SPACE')).should('contain.text', FOLDER_NAME)
+    cy.ensureToast("Folder created successfully").closeToast();
+    cy.ensureNoToast();
+
+    cy.get(".bc-toolbar-title")
+      .should("contain.text", Cypress.env("DEFAULT_SPACE"))
+      .should("contain.text", FOLDER_NAME);
 
     cy.get('.btn:contains("Copy public shareable link")')
-      .as('copyButton')
-      .next('input')
-      .should('have.value', '@shareUrl')
-    cy.getClipboardText().should('not.eq', '@shareUrl')
-    cy.get('@copyButton').click().should('contain.text', 'Copied')
-    cy.getClipboardText().should('eq', '@shareUrl')
+      .as("copyButton")
+      .next("input")
+      .should("have.value", "@shareUrl");
+    cy.getClipboardText().should("not.eq", "@shareUrl");
+    cy.get("@copyButton").click().should("contain.text", "Copied");
+    cy.getClipboardText().should("eq", "@shareUrl");
 
     // Original text resets after 1.5s
-    cy.wait(1500)
-    cy.get('@copyButton').should('contain.text', 'Copy public shareable link')
+    cy.wait(1500);
+    cy.get("@copyButton").should("contain.text", "Copy public shareable link");
 
-    cy.visitSpace()
+    cy.visitSpace({ qs: { limit: 1000 } });
 
-    cy.contains('tr', FOLDER_NAME)
-      .should('exist')
-      .find('td')
-      .as('folderRow')
+    cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
+      cy.getFolderCount("total").should("eq", totalNumberOfFolders + 1);
+    });
+
+    cy.contains("tr", FOLDER_NAME)
+      .should("exist")
+      .find("td")
+      .as("folderRow")
       .eq(3)
-      .should('contain.text', '0 files')
-      .should('contain.text', '0 B')
-      .should('contain.text', '0 downloads')
+      .should("contain.text", "0 files")
+      .should("contain.text", "0 B")
+      .should("contain.text", "0 downloads");
 
-    cy.get('@folderRow').contains('.btn', 'Copy link').as('copyButton').next('input').should('have.value', '@shareUrl')
-    cy.setClipboardText('')
-    cy.get('@copyButton').click().should('contain.text', 'Copied')
-    cy.getClipboardText().should('eq', '@shareUrl')
+    cy.get("@folderRow")
+      .contains(".btn", "Copy link")
+      .as("copyButton")
+      .next("input")
+      .should("have.value", "@shareUrl");
+    cy.setClipboardText("");
+    cy.get("@copyButton").click().should("contain.text", "Copied");
+    cy.getClipboardText().should("eq", "@shareUrl");
 
     // Original text resets after 1.5s
-    cy.wait(1500)
-    cy.get('@copyButton').should('contain.text', 'Copy link')
-  })
+    cy.wait(1500);
+    cy.get("@copyButton").should("contain.text", "Copy link");
+  });
 
-  it('should return an error if a new folder name is already in use within the same space', () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`
+  it("should trim folder names", () => {
+    const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace()
+    cy.visitSpace();
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME)
-    cy.contains('.btn', 'Make folder').click()
+    cy.setFieldByLabel("Folder name", ` \t  ${FOLDER_NAME}  ${NBSP} `);
+    cy.contains(".btn", "Make folder").click();
 
-    cy.location('pathname').should('match', /\/folders\/\w{26}/)
+    cy.get(".bc-toolbar-title")
+      .should("contain.text", Cypress.env("DEFAULT_SPACE"))
+      .should("contain.text", FOLDER_NAME);
 
-    cy.visitSpace()
+    cy.contains(".btn", "Edit").click();
 
-    cy.get('#folder-name').should('not.have.class', 'is-invalid')
-    cy.get('#folder-name-invalid').should('not.exist')
+    cy.get("input#folder-name").should("have.value", FOLDER_NAME);
+  });
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME)
-    cy.contains('.btn', 'Make folder').click()
+  it("should return an error if a new folder name is empty", () => {
+    cy.visitSpace();
 
-    cy.get('#folder-name').should('have.class', 'is-invalid')
-    cy.get('#folder-name-invalid').should('be.visible').and('have.text', 'name must be unique')
-  })
+    cy.getFolderCount("total").as("totalNumberOfFolders");
 
-  it('should be possible to edit a folder name', () => {
-    const FOLDER_NAME1 = `CYPRESS-FOLDER_NAME_1-${getRandomText()}`
-    const FOLDER_NAME2 = `CYPRESS-FOLDER_NAME_2-${getRandomText()}`
+    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name-invalid").should("not.exist");
 
-    cy.visitSpace()
+    cy.setFieldByLabel("Folder name", " ");
+    cy.contains(".btn", "Make folder").click();
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME1)
-    cy.contains('.btn', 'Make folder').click()
+    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name-invalid")
+      .should("be.visible")
+      .and("have.text", "name cannot be empty");
 
-    cy.extractFolderId('previousFolderId').getFolderShareUrl(FOLDER_NAME1).as('previousShareUrl')
-    cy.location('pathname').as('previousPathname')
+    cy.location("pathname").should(
+      "eq",
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+    );
 
-    cy.get('.bc-toolbar-title').should('contain.text', FOLDER_NAME1)
-    cy.contains('Copy public shareable link').next('input').should('have.value', '@previousShareUrl')
+    cy.getFolderCount("total").should("eq", "@totalNumberOfFolders");
+  });
 
-    cy.contains('.btn', 'Edit').click()
+  it("should return an error if a new folder name is already in use within the same space", () => {
+    const FOLDER_NAME = getRandomText();
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME2)
-    cy.contains('.btn', 'Save changes').click()
+    cy.makeFolder(FOLDER_NAME);
+
+    cy.location("pathname").should("match", /\/folders\/\w{26}/);
+
+    cy.visitSpace();
+
+    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name-invalid").should("not.exist");
+
+    cy.setFieldByLabel("Folder name", FOLDER_NAME);
+    cy.contains(".btn", "Make folder").click();
+
+    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name-invalid")
+      .should("be.visible")
+      .and("have.text", "name must be unique");
+  });
+
+  it("should be possible to edit a folder name", () => {
+    const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
+    const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
+
+    cy.makeFolder(FOLDER_NAME1);
+
+    cy.extractFolderId("previousFolderId")
+      .getFolderShareUrl(FOLDER_NAME1)
+      .as("previousShareUrl");
+    cy.location("pathname").as("previousPathname");
+
+    cy.get(".bc-toolbar-title").should("contain.text", FOLDER_NAME1);
+    cy.contains("Copy public shareable link")
+      .next("input")
+      .should("have.value", "@previousShareUrl");
+
+    cy.contains(".btn", "Edit").click();
+
+    cy.setFieldByLabel("Folder name", FOLDER_NAME2);
+    cy.contains(".btn", "Save changes").click();
 
     cy.extractFolderId(false)
-      .should('eq', '@previousFolderId', 'Folder ID must not change after edit')
+      .should("eq", "@previousFolderId", "Folder ID must not change after edit")
       .getFolderShareUrl(FOLDER_NAME2)
-      .as('newShareUrl')
-      .should('not.eq', '@previousShareUrl', 'Share URL should change after edit')
+      .as("newShareUrl")
+      .should(
+        "not.eq",
+        "@previousShareUrl",
+        "Share URL should change after edit",
+      );
 
-    cy.location('pathname').should('eq', '@previousPathname', 'Pathname should not change after edit')
-    cy.get('.bc-toolbar-title').should('contain.text', FOLDER_NAME2, 'Folder title should change after edit')
-    cy.contains('Copy public shareable link').next('input').should('have.value', '@newShareUrl')
-  })
+    cy.location("pathname").should(
+      "eq",
+      "@previousPathname",
+      "Pathname should not change after edit",
+    );
+    cy.get(".bc-toolbar-title").should(
+      "contain.text",
+      FOLDER_NAME2,
+      "Folder title should change after edit",
+    );
+    cy.contains("Copy public shareable link")
+      .next("input")
+      .should("have.value", "@newShareUrl");
+  });
 
-  it('should return an error if an updated folder name is already in use within the same space', () => {
-    const FOLDER_NAME1 = `CYPRESS-FOLDER_NAME_1-${getRandomText()}`
-    const FOLDER_NAME2 = `CYPRESS-FOLDER_NAME_2-${getRandomText()}`
+  it("should trim folder names when editing", () => {
+    const FOLDER_NAME = getRandomText();
 
-    cy.visitSpace()
-    cy.setFieldByLabel('Folder name', FOLDER_NAME1)
-    cy.contains('.btn', 'Make folder').click()
-    cy.location('pathname').as('previousPathname')
+    cy.makeFolder(FOLDER_NAME);
 
-    cy.visitSpace()
-    cy.setFieldByLabel('Folder name', FOLDER_NAME2)
-    cy.contains('.btn', 'Make folder').click()
+    cy.extractFolderId();
 
-    cy.contains('.btn', 'Edit').click() // Editing folder 2
+    cy.contains(".btn", "Edit").click();
 
-    cy.get('#folder-name').should('not.have.class', 'is-invalid')
-    cy.get('#folder-name-invalid').should('not.exist')
+    cy.setFieldByLabel(
+      "Folder name",
+      ` \t   ${FOLDER_NAME} (updated)  ${NBSP} `,
+    );
+    cy.contains(".btn", "Save changes").click();
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME1)
-    cy.contains('.btn', 'Save changes').click()
+    cy.get("h4.bc-toolbar-title").should(
+      "contain.text",
+      FOLDER_NAME + " (updated)",
+    );
 
-    cy.get('#folder-name').should('have.class', 'is-invalid')
-    cy.get('#folder-name-invalid').should('be.visible').and('have.text', 'name must be unique')
+    cy.contains(".btn", "Edit").click();
 
-    cy.visit('@previousPathname')
+    cy.get("input#folder-name").should(
+      "have.value",
+      FOLDER_NAME + " (updated)",
+    );
+  });
 
-    cy.contains('.btn', 'Edit').click() // Editing folder 1
+  it("should return an error if an edited folder name is empty", () => {
+    const FOLDER_NAME = getRandomText();
 
-    cy.get('#folder-name').should('not.have.class', 'is-invalid')
-    cy.get('#folder-name-invalid').should('not.exist')
+    cy.makeFolder(FOLDER_NAME);
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME2)
-    cy.contains('.btn', 'Save changes').click()
+    cy.extractFolderId();
 
-    cy.get('#folder-name').should('have.class', 'is-invalid')
-    cy.get('#folder-name-invalid').should('be.visible').and('have.text', 'name must be unique')
+    cy.contains(".btn", "Edit").click();
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME1)
-    cy.contains('.btn', 'Save changes').click()
+    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name-invalid").should("not.exist");
 
-    cy.location('pathname').should('eq', '@previousPathname')
-  })
+    cy.setFieldByLabel("Folder name", " ");
+    cy.contains(".btn", "Save changes").click();
 
-  it('should be possible to delete a folder', () => {
-    const FOLDER_NAME = `CYPRESS-${getRandomText()}`
+    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name-invalid")
+      .should("be.visible")
+      .and("have.text", "name cannot be empty");
 
-    cy.visitSpace()
+    // TODO: extract visitFolder command (that works with folder Id alias)
+    cy.get<string>("@folderId").then((folderId) =>
+      cy.visit(`/folders/${folderId}`),
+    );
 
-    cy.contains('a', FOLDER_NAME).should('not.exist')
+    cy.get("h4.bc-toolbar-title").should("contain.text", FOLDER_NAME);
+  });
 
-    cy.setFieldByLabel('Folder name', FOLDER_NAME)
-    cy.contains('.btn', 'Make folder').click()
+  it("should return an error if an updated folder name is already in use within the same space", () => {
+    const FOLDER_NAME1 = `FOLDER_NAME_1-${getRandomText()}`;
+    const FOLDER_NAME2 = `FOLDER_NAME_2-${getRandomText()}`;
 
-    cy.ensureToast('Folder created successfully').closeToast()
-    cy.ensureNoToast()
+    cy.makeFolder(FOLDER_NAME1);
+    cy.location("pathname").as("folder1Url");
 
-    cy.visitSpace()
+    cy.makeFolder(FOLDER_NAME2);
 
-    cy.contains('a', FOLDER_NAME).should('exist')
+    cy.contains(".btn", "Edit").click(); // Editing folder 2
 
-    cy.contains('a', FOLDER_NAME).click()
+    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name-invalid").should("not.exist");
 
-    cy.contains('.btn', 'Edit').click()
+    cy.setFieldByLabel("Folder name", FOLDER_NAME1);
+    cy.contains(".btn", "Save changes").click();
 
-    // TODO Remove when issue #99 is resolved
-    Cypress.on('uncaught:exception', () => {
-      // returning false here prevents Cypress from failing the test
-      return false
-    })
+    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name-invalid")
+      .should("be.visible")
+      .and("have.text", "name must be unique");
 
-    cy.contains('.btn', 'Delete folder').click()
+    cy.visit("@folder1Url");
 
-    cy.location('pathname').should('eq', `/spaces/${Cypress.env('DEFAULT_SPACE')}`)
+    cy.contains(".btn", "Edit").click(); // Editing folder 1
 
-    cy.ensureToast('Folder deleted successfully').closeToast()
-    cy.ensureNoToast()
+    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name-invalid").should("not.exist");
 
-    cy.contains('a', FOLDER_NAME).should('not.exist')
-  })
-})
+    cy.setFieldByLabel("Folder name", FOLDER_NAME2);
+    cy.contains(".btn", "Save changes").click();
+
+    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name-invalid")
+      .should("be.visible")
+      .and("have.text", "name must be unique");
+
+    cy.setFieldByLabel("Folder name", FOLDER_NAME1);
+    cy.contains(".btn", "Save changes").click();
+
+    cy.location("pathname").should("eq", "@folder1Url");
+  });
+
+  it("should be possible to delete a folder", () => {
+    const FOLDER_NAME = getRandomText();
+
+    cy.makeFolder(FOLDER_NAME);
+
+    cy.visitSpace({ qs: { limit: 1000 } });
+
+    cy.getFolderCount("total").as("totalNumberOfFolders", { type: "static" });
+
+    cy.contains("a", FOLDER_NAME).should("exist").click();
+
+    cy.contains(".btn", "Edit").click();
+
+    cy.contains(".btn", "Delete folder").click();
+
+    cy.location("pathname").should(
+      "eq",
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+    );
+
+    cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
+      cy.getFolderCount("total").should("eq", totalNumberOfFolders - 1);
+    });
+
+    cy.ensureToast("Folder deleted successfully").closeToast();
+    cy.ensureNoToast();
+
+    cy.visitSpace({ qs: { limit: 1000 } });
+
+    cy.contains("a", FOLDER_NAME).should("not.exist");
+  });
+
+  // https://github.com/ugent-library/deliver/issues/119
+  describe("Issue #119: Path changes when you try to create a folder with an invalid name", () => {
+    it("should not change path when folder name is incorrect", () => {
+      cy.visitSpace();
+
+      cy.contains(".btn", "Make folder").click();
+      cy.get("#folder-name").should("have.class", "is-invalid");
+
+      // Perform a refresh of whathever the path is at this point
+      cy.location("pathname").then(cy.visit);
+
+      cy.get("body > header").should("be.visible");
+      cy.get(".c-sidebar").should("be.visible");
+      cy.get(".c-sub-sidebar").should("be.visible");
+      cy.contains("h1", Cypress.env("DEFAULT_SPACE") + " folders").should(
+        "be.visible",
+      );
+    });
+  });
+});

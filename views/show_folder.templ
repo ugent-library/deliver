@@ -1,157 +1,178 @@
 package views
 
 import (
-    "fmt"
-    "github.com/ugent-library/friendly"
-    "github.com/ugent-library/deliver/ctx"
-    "github.com/ugent-library/deliver/models"
+	"fmt"
+	"github.com/ugent-library/friendly"
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/models"
 )
 
 templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
-    @pageLayout(c, folder.Name) {
-    <div class="w-100 u-scroll-wrapper"
-        hx-ext="ws"
-        ws-connect={ c.WebSocketPath("folder."+folder.ID) }
-    >
-        <div class="bg-white">
-            <div class="border-bottom py-5 px-6">
-                <div class="bc-toolbar bc-toolbar--auto">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item">
-                            <h4 class="bc-toolbar-title">
-                                <a href={ templ.URL(c.PathTo("space", "spaceName", folder.Space.Name).String()) }>
-                                    <i class="if if-arrow-left"></i>
-                                    <span>{ folder.Space.Name }</span>
-                                </a>
-                                &nbsp;&mdash; { folder.Name }
-                            </h4>
-                        </div>
-                        <div class="bc-toolbar-item">
-                            <p>expires on { folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
-                        </div>
-                    </div>
-                    <div class="bc-toolbar-right">
-                        <div class="bc-toolbar-item">
-                            <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("space", "spaceName", folder.Space.Name).String()) }>
-                                <i class="if if-add"></i>
-                                <span class="btn-text">Make new folder</span>
-                            </a>
-                        </div>
-                        <div class="bc-toolbar-item">
-                            <a class="btn btn-link btn-link-muted" href={ templ.URL(c.PathTo("editFolder", "folderID", folder.ID).String()) }>
-                                <i class="if if-edit"></i>
-                                <span class="btn-text">Edit</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
-                    <div class="bc-toolbar-left">
-                        <div class="bc-toolbar-item col-lg-8 col-sm-12 ps-0">
-                            <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    data-clipboard={ c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
-                                >
-                                    <i class="if if-copy text-primary"></i>
-                                    <span class="btn-text text-primary">Copy public shareable link</span>
-                                </button>
-                                <input type="text" class="form-control input-select-text" readonly data-select-value
-                                    value={ c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="u-scroll-wrapper__body p-6">
-            <div class="card w-100 mb-6">
-                <div class="card-header visually-hidden">
-                    <div class="bc-toolbar">
-                        <div class="bc-toolbar-left">
-                            <h2 class="bc-toolbar-item">Upload files</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <form
-                        action={ templ.URL(c.PathTo("uploadFile", "folderID", folder.ID).String()) }
-                        enctype="multipart/form-data"
-                        method="POST"
-                    >
-                        @csrfField(c)
-                        <div class="c-file-upload c-file-upload--small">
-                            <input type="file" name="file" multiple
-                                data-upload-progress-target="file-upload-progress"
-                                data-upload-max-file-size={ fmt.Sprint(c.MaxFileSize) }
-                                data-upload-msg-file-aborted="File upload aborted by you"
-                                data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
-                                data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
-                                data-upload-msg-file-too-large={ fmt.Sprintf("File is too large. Maximum file size is %s", friendly.Bytes(c.MaxFileSize)) }
-                                data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
-                                data-upload-msg-unexpected="File upload failed: unexpected server error"
-                            />
-                            <div class="c-file-upload__content">
-                                <p class="pt-2">Drag and drop or</p>
-                                <button class="btn btn-outline-primary" data-loading="Uploading...">
-                                    Upload files
-                                </button>
-                                <p class="small pt-2 mb-0">Maximum file size: { friendly.Bytes(c.MaxFileSize) }</p>
-                            </div>
-                        </div>
-                    </form>
-                    <ul class="list-group list-group-flush" id="file-upload-progress"></ul>
-                </div>
-            </div>
-
-            <div
-                hx-get={ c.PathTo("folder", "folderID", folder.ID).String() }
-                hx-swap="innerHTML"
-                hx-trigger="refresh-files from:body"
-            >
-                @Files(c, folder.Files)
-            </div>
-        </div>
-    </div>
-
-    <template id="tmpl-upload-progress">
-        <li class="list-group-item">
-            <div class="list-group-item-inner">
-                <div class="list-group-item-main u-min-w-0">
-                    <div class="bc-toolbar bc-toolbar--auto">
-                        <div class="bc-toolbar-left">
-                            <div class="bc-toolbar-item">
-                                <h4 class="list-group-item-title mb-0 upload-name"></h4>
-                            </div>
-                        </div>
-                        <div class="bc-toolbar-right">
-                            <div class="bc-toolbar-item ms-auto ms-lg-0">
-                                <button class="btn btn-sm btn-cancel-upload" type="button">
-                                    <i class="if if-close"></i>
-                                    <span class="btn-text">Cancel upload</span>
-                                </button>
-                                <button class="btn btn-sm btn-remove-upload d-none" type="button">
-                                    <i class="if if-close"></i>
-                                    <span class="btn-text">Remove</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress w-100 mt-4">
-                        <div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="bc-toolbar bc-toolbar--auto mt-2">
-                        <div class="bc-toolbar-left">
-                            <span class="small text-muted upload-msg"></span>
-                        </div>
-                        <div class="bc-toolbar-right">
-                            <span class="small text-muted"><span class="upload-size"></span> &mdash; <span class="upload-percent">0</span>%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </li>
-    </template>
-    }
+	@pageLayout(c, folder.Name) {
+		<div
+			class="w-100 u-scroll-wrapper"
+			hx-ext="ws"
+			ws-connect={ c.WebSocketPath("folder." + folder.ID) }
+		>
+			<div class="bg-white">
+				<div class="border-bottom py-5 px-6">
+					<div class="bc-toolbar bc-toolbar--auto">
+						<div class="bc-toolbar-left">
+							<div class="bc-toolbar-item">
+								<h4 class="bc-toolbar-title">
+									<a href={ templ.URL(c.Path("space", "spaceName", folder.Space.Name).String()) }>
+										<i class="if if-arrow-left"></i>
+										<span>{ folder.Space.Name }</span>
+									</a>
+									&nbsp;&mdash; { folder.Name }
+								</h4>
+							</div>
+							<div class="bc-toolbar-item">
+								<p>expires on { folder.ExpiresAt.In(c.Timezone).Format("2006-01-02 15:04") }</p>
+							</div>
+						</div>
+						<div class="bc-toolbar-right">
+							<div class="bc-toolbar-item">
+								<a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("space", "spaceName", folder.Space.Name).String()) }>
+									<i class="if if-add"></i>
+									<span class="btn-text">Make new folder</span>
+								</a>
+							</div>
+							<div class="bc-toolbar-item">
+								<button
+									class="btn btn-link btn-link-muted"
+									hx-put={ c.Path("postponeExpiration", "folderID", folder.ID).String() }
+									data-confirm="true"
+									data-confirm-header={ fmt.Sprintf("Postpone the expiration date of<br /><strong>%s</strong> by one month", folder.Name) }
+									data-confirm-content={ fmt.Sprintf("Current expiration date: %s<br />Expiration date after postponing: %s", folder.ExpiresAt.In(c.Timezone).Format("2006-01-02"), folder.PostponeExpiration().In(c.Timezone).Format("2006-01-02")) }
+									data-confirm-proceed="Postpone"
+									data-confirm-proceed-style="primary"
+								>
+									<i class="if if-arrow-go-back"></i>
+									<span class="btn-text">Postpone expiration</span>
+								</button>
+							</div>
+							<div class="bc-toolbar-item">
+								<a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("editFolder", "folderID", folder.ID).String()) }>
+									<i class="if if-edit"></i>
+									<span class="btn-text">Edit</span>
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="bc-toolbar bc-toolbar--auto mt-3 mb-2">
+						<div class="bc-toolbar-left">
+							<div class="bc-toolbar-item col-lg-8 col-sm-12 ps-0">
+								<div class="input-group">
+									<button
+										type="button"
+										class="btn btn-outline-secondary"
+										data-clipboard={ c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
+									>
+										<i class="if if-copy text-primary"></i>
+										<span class="btn-text text-primary">Copy public shareable link</span>
+									</button>
+									<input
+										type="text"
+										class="form-control input-select-text"
+										readonly
+										data-select-value
+										value={ c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="u-scroll-wrapper__body p-6">
+				<div class="card w-100 mb-6">
+					<div class="card-header visually-hidden">
+						<div class="bc-toolbar">
+							<div class="bc-toolbar-left">
+								<h2 class="bc-toolbar-item">Upload files</h2>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<form
+							action={ templ.URL(c.Path("uploadFile", "folderID", folder.ID).String()) }
+							enctype="multipart/form-data"
+							method="POST"
+						>
+							@csrfField(c)
+							<div class="c-file-upload c-file-upload--small">
+								<input
+									type="file"
+									name="file"
+									multiple
+									data-upload-progress-target="file-upload-progress"
+									data-upload-max-file-size={ fmt.Sprint(c.MaxFileSize) }
+									data-upload-msg-file-aborted="File upload aborted by you"
+									data-upload-msg-file-uploading="Uploading your file. Hold on, do not refresh the page."
+									data-upload-msg-file-processing="Processing your file. Hold on, do not refresh the page."
+									data-upload-msg-file-too-large={ fmt.Sprintf("File is too large. Maximum file size is %s", friendly.Bytes(c.MaxFileSize)) }
+									data-upload-msg-dir-not-found="File upload failed: directory has been removed. Please reload"
+									data-upload-msg-unexpected="File upload failed: unexpected server error"
+								/>
+								<div class="c-file-upload__content">
+									<p class="pt-2">Drag and drop or</p>
+									<button class="btn btn-outline-primary" data-loading="Uploading...">
+										Upload files
+									</button>
+									<p class="small pt-2 mb-0">Maximum file size: { friendly.Bytes(c.MaxFileSize) }</p>
+								</div>
+							</div>
+						</form>
+						<ul class="list-group list-group-flush" id="file-upload-progress"></ul>
+					</div>
+				</div>
+				<div
+					hx-get={ c.Path("folder", "folderID", folder.ID).String() }
+					hx-swap="innerHTML"
+					hx-trigger="refresh-files from:body"
+				>
+					@Files(c, folder.Files)
+				</div>
+			</div>
+		</div>
+		<template id="tmpl-upload-progress">
+			<li class="list-group-item">
+				<div class="list-group-item-inner">
+					<div class="list-group-item-main u-min-w-0">
+						<div class="bc-toolbar bc-toolbar--auto">
+							<div class="bc-toolbar-left">
+								<div class="bc-toolbar-item">
+									<h4 class="list-group-item-title mb-0 upload-name"></h4>
+								</div>
+							</div>
+							<div class="bc-toolbar-right">
+								<div class="bc-toolbar-item ms-auto ms-lg-0">
+									<button class="btn btn-sm btn-cancel-upload" type="button">
+										<i class="if if-close"></i>
+										<span class="btn-text">Cancel upload</span>
+									</button>
+									<button class="btn btn-sm btn-remove-upload d-none" type="button">
+										<i class="if if-close"></i>
+										<span class="btn-text">Remove</span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="progress w-100 mt-4">
+							<div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+						</div>
+						<div class="bc-toolbar bc-toolbar--auto mt-2">
+							<div class="bc-toolbar-left">
+								<span class="small text-muted upload-msg"></span>
+							</div>
+							<div class="bc-toolbar-right">
+								<span class="small text-muted"><span class="upload-size"></span> &mdash; <span class="upload-percent">0</span>%</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</li>
+		</template>
+	}
 }

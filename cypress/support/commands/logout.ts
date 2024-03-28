@@ -1,15 +1,15 @@
-import { logCommand } from './helpers'
+import { logCommand } from "./helpers";
 
 export default function logout(): void {
-  logCommand('logout')
+  logCommand("logout");
 
-  cy.clearAllCookies({ log: false })
+  cy.clearAllCookies({ log: false });
 }
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      logout(): Chainable<void>
+      logout(): Chainable<void>;
     }
   }
 }

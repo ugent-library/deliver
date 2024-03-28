@@ -35,9 +35,25 @@ func (fu *FileUpdate) SetFolderID(s string) *FileUpdate {
 	return fu
 }
 
+// SetNillableFolderID sets the "folder_id" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableFolderID(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetFolderID(*s)
+	}
+	return fu
+}
+
 // SetMd5 sets the "md5" field.
 func (fu *FileUpdate) SetMd5(s string) *FileUpdate {
 	fu.mutation.SetMd5(s)
+	return fu
+}
+
+// SetNillableMd5 sets the "md5" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableMd5(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetMd5(*s)
+	}
 	return fu
 }
 
@@ -47,10 +63,26 @@ func (fu *FileUpdate) SetName(s string) *FileUpdate {
 	return fu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableName(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetName(*s)
+	}
+	return fu
+}
+
 // SetSize sets the "size" field.
 func (fu *FileUpdate) SetSize(i int64) *FileUpdate {
 	fu.mutation.ResetSize()
 	fu.mutation.SetSize(i)
+	return fu
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableSize(i *int64) *FileUpdate {
+	if i != nil {
+		fu.SetSize(*i)
+	}
 	return fu
 }
 
@@ -63,6 +95,14 @@ func (fu *FileUpdate) AddSize(i int64) *FileUpdate {
 // SetContentType sets the "content_type" field.
 func (fu *FileUpdate) SetContentType(s string) *FileUpdate {
 	fu.mutation.SetContentType(s)
+	return fu
+}
+
+// SetNillableContentType sets the "content_type" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableContentType(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetContentType(*s)
+	}
 	return fu
 }
 
@@ -244,9 +284,25 @@ func (fuo *FileUpdateOne) SetFolderID(s string) *FileUpdateOne {
 	return fuo
 }
 
+// SetNillableFolderID sets the "folder_id" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableFolderID(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetFolderID(*s)
+	}
+	return fuo
+}
+
 // SetMd5 sets the "md5" field.
 func (fuo *FileUpdateOne) SetMd5(s string) *FileUpdateOne {
 	fuo.mutation.SetMd5(s)
+	return fuo
+}
+
+// SetNillableMd5 sets the "md5" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableMd5(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetMd5(*s)
+	}
 	return fuo
 }
 
@@ -256,10 +312,26 @@ func (fuo *FileUpdateOne) SetName(s string) *FileUpdateOne {
 	return fuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableName(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetName(*s)
+	}
+	return fuo
+}
+
 // SetSize sets the "size" field.
 func (fuo *FileUpdateOne) SetSize(i int64) *FileUpdateOne {
 	fuo.mutation.ResetSize()
 	fuo.mutation.SetSize(i)
+	return fuo
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableSize(i *int64) *FileUpdateOne {
+	if i != nil {
+		fuo.SetSize(*i)
+	}
 	return fuo
 }
 
@@ -272,6 +344,14 @@ func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
 // SetContentType sets the "content_type" field.
 func (fuo *FileUpdateOne) SetContentType(s string) *FileUpdateOne {
 	fuo.mutation.SetContentType(s)
+	return fuo
+}
+
+// SetNillableContentType sets the "content_type" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableContentType(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetContentType(*s)
+	}
 	return fuo
 }
 

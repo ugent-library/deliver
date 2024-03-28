@@ -3,15 +3,19 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ugent-library/bind"
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
-	"github.com/ugent-library/okay"
 	"github.com/ugent-library/deliver/views"
+	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
+	"github.com/ugent-library/okay"
 )
 
 var reSplitAdmins = regexp.MustCompile(`\s*[,;]\s*`)
@@ -42,7 +46,7 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 			Type: "info",
 			Body: "Create an initial space to get started",
 		})
-		http.Redirect(w, r, c.PathTo("newSpace").String(), http.StatusSeeOther)
+		http.Redirect(w, r, c.Path("newSpace").String(), http.StatusSeeOther)
 		return
 	}
 
@@ -52,17 +56,27 @@ func ListSpaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	space, err := c.Repo.Spaces.GetByName(r.Context(), userSpaces[0].Name)
+	http.Redirect(w, r, c.Path("space", "spaceName", userSpaces[0].Name).String(), http.StatusSeeOther)
+}
+
+func ShowSpace(w http.ResponseWriter, r *http.Request) {
+	showSpace(w, r, &models.Folder{}, nil)
+}
+
+func GetFolders(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r)
+	space := ctx.GetSpace(r)
+
+	pagination := getPagination(r)
+	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space.ID, pagination)
 	if err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
 
-	views.ShowSpace(c, space, userSpaces, &models.Folder{}, okay.NewErrors()).Render(r.Context(), w)
-}
+	htmx.PushURL(w, c.Path("space", "spaceName", space.Name, pagination.ToPairs()).String())
 
-func ShowSpace(w http.ResponseWriter, r *http.Request) {
-	showSpace(w, r, &models.Folder{}, nil)
+	views.Folders(c, space, folders, pagination).Render(r.Context(), w)
 }
 
 func NewSpace(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +101,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Spaces.Create(r.Context(), space); err != nil {
 		validationErrors := okay.NewErrors()
-		if err != nil && !errors.As(err, &validationErrors) {
+		if !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
 		}
@@ -102,7 +116,7 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 		DismissAfter: 3 * time.Second,
 	})
 
-	loc := c.PathTo("space", "spaceName", space.Name).String()
+	loc := c.Path("space", "spaceName", space.Name).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -126,7 +140,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Spaces.Update(r.Context(), space); err != nil {
 		validationErrors := okay.NewErrors()
-		if err != nil && !errors.As(err, &validationErrors) {
+		if !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
 		}
@@ -134,7 +148,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loc := c.PathTo("space", "spaceName", space.Name).String()
+	loc := c.Path("space", "spaceName", space.Name).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -159,5 +173,34 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	views.ShowSpace(c, space, userSpaces, folder, validationErrors).Render(r.Context(), w)
+	pagination := getPagination(r)
+	folders, err := c.Repo.Folders.GetBySpace(r.Context(), space.ID, pagination)
+	if err != nil {
+		c.HandleError(w, r, err)
+		return
+	}
+
+	views.ShowSpace(c, space, folders, pagination, userSpaces, folder, validationErrors).Render(r.Context(), w)
+}
+
+func getPagination(r *http.Request) *models.Pagination {
+	query := r.URL.Query()
+	filters := make([]models.Filter, 0, len(query))
+	q := strings.TrimSpace(query.Get("q"))
+	if q != "" {
+		filters = append(filters, models.Filter{Name: "q", Value: q})
+	}
+
+	return models.NewPagination(getQueryParamAsInt(query, "offset"), getQueryParamAsInt(query, "limit"), query.Get("sort"), filters...)
+}
+
+func getQueryParamAsInt(query url.Values, paramName string) int {
+	param := query.Get(paramName)
+
+	intValue, err := strconv.Atoi(param)
+	if err != nil {
+		return -1
+	}
+
+	return intValue
 }

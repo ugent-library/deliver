@@ -2,11 +2,13 @@ package cli
 
 import "fmt"
 
+//go:generate go run github.com/g4s8/envdoc@v0.1.2 --output ../CONFIG.md --all
+
 // Version info
 type Version struct {
-	Branch string `env:"SOURCE_BRANCH"`
-	Commit string `env:"SOURCE_COMMIT"`
-	Image  string `env:"IMAGE_NAME"`
+	Branch string `json:"branch" env:"SOURCE_BRANCH"`
+	Commit string `json:"commit" env:"SOURCE_COMMIT"`
+	Image  string `json:"image" env:"IMAGE_NAME"`
 }
 
 type Config struct {
@@ -24,10 +26,13 @@ type Config struct {
 		Conn string `env:"CONN,notEmpty"`
 	} `envPrefix:"REPO_"`
 	OIDC struct {
-		URL         string `env:"URL,notEmpty"`
-		ID          string `env:"ID,notEmpty"`
-		Secret      string `env:"SECRET,notEmpty"`
-		RedirectURL string `env:"REDIRECT_URL,notEmpty"`
+		URL           string `env:"URL,notEmpty"`
+		ID            string `env:"ID,notEmpty"`
+		Secret        string `env:"SECRET,notEmpty"`
+		RedirectURL   string `env:"REDIRECT_URL,notEmpty"`
+		UsernameClaim string `env:"USERNAME_CLAIM" envDefault:"preferred_username"`
+		NameClaim     string `env:"NAME_CLAIM" envDefault:"name"`
+		EmailClaim    string `env:"EMAIL_CLAIM" envDefault:"email"`
 	} `envPrefix:"OIDC_"`
 	Cookie struct {
 		Secret string `env:"SECRET,notEmpty"`

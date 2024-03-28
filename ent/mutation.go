@@ -491,6 +491,7 @@ func (m *FileMutation) ResetUpdatedAt() {
 // ClearFolder clears the "folder" edge to the Folder entity.
 func (m *FileMutation) ClearFolder() {
 	m.clearedfolder = true
+	m.clearedFields[file.FieldFolderID] = struct{}{}
 }
 
 // FolderCleared reports if the "folder" edge to the Folder entity was cleared.
@@ -1186,6 +1187,7 @@ func (m *FolderMutation) ResetExpiresAt() {
 // ClearSpace clears the "space" edge to the Space entity.
 func (m *FolderMutation) ClearSpace() {
 	m.clearedspace = true
+	m.clearedFields[folder.FieldSpaceID] = struct{}{}
 }
 
 // SpaceCleared reports if the "space" edge to the Space entity was cleared.

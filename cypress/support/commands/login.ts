@@ -1,6 +1,8 @@
-import { logCommand } from './helpers'
+import { logCommand } from "./helpers";
 
-export default function login(username, password): void {
+const NO_LOG = { log: false };
+
+export default function login(username: string, password: string): void {
   // WARNING: Whenever you change the code of the session setup, Cypress will throw an error:
   //   This session already exists. You may not create a new session with a previously used identifier.
   //   If you want to create a new session with a different setup function, please call cy.session() with
@@ -9,46 +11,37 @@ export default function login(username, password): void {
   // Temporarily uncomment the following line to clear the sessions if this happens
   // Cypress.session.clearAllSavedSessions()
 
-  logCommand('login', { username }, username)
+  logCommand("login", { username }, username);
 
   cy.session(
     username,
     () => {
-      cy.request('/login', { log: false })
-        .then(response => {
-          const action = response.body.match(/action\=\"(.*)\" /)[1]
+      cy.visit("/", NO_LOG);
 
-          return action.replace(/&amp;/g, '&')
-        })
-        .then(actionUrl =>
-          cy.request({
-            method: 'POST',
-            url: actionUrl,
-            form: true,
+      cy.contains(".btn", "Log in", NO_LOG).click(NO_LOG);
 
-            body: {
-              username,
-              password,
-            },
+      cy.get('input[name="username"]', NO_LOG).invoke(NO_LOG, "val", username);
 
-            // Make sure we redirect back and get the cookie we need
-            followRedirect: true,
+      if (password) {
+        cy.get('input[name="password"]', NO_LOG).invoke(
+          NO_LOG,
+          "val",
+          password
+        );
+      }
 
-            // Make sure we don't leak passwords in the Cypress log
-            log: false,
-          })
-        )
+      cy.get("form", NO_LOG).submit(NO_LOG);
     },
     {
       cacheAcrossSpecs: true,
     }
-  )
+  );
 }
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      login(username: string, password: string): Chainable<void>
+      login(username: string, password: string): Chainable<void>;
     }
   }
 }

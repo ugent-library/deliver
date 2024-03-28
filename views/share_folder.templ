@@ -29,7 +29,7 @@ templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
                             <div class="bc-toolbar-left">
                                 <div class="bc-toolbar-item">
                                     <p class="text-muted">
-                                        Public shareable link: { c.URLTo("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
+                                        Public shareable link: { c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String() }
                                     </p>
                                 </div>
                             </div>
@@ -64,7 +64,7 @@ templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
                                     <th class="text-nowrap align-middle">Downloads</th>
                                     <th class="text-nowrap align-middle">Created at</th>
                                     <th class="table-col-sm-fixed table-col-sm-fixed-right text-end align-middle">
-                                        <a class="btn btn-primary" href={ templ.URL(c.PathTo("downloadFolder", "folderID", folder.ID).String()) }>
+                                        <a class="btn btn-primary" href={ templ.URL(c.Path("downloadFolder", "folderID", folder.ID).String()) }>
                                             <i class="if if-download"></i>
                                             <span class="btn-text">Download all files</span>
                                         </a>
@@ -75,7 +75,7 @@ templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
                                 for _, f := range folder.Files {
                                 <tr class="clickable-table-row">
                                     <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
-                                        <a href={ templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String()) }>
+                                        <a href={ templ.URL(c.Path("downloadFile", "fileID", f.ID).String()) }>
                                             <span>{ f.Name }</span>
                                         </a>
                                         <br/><small class="text-muted">md5 checksum: { f.MD5 }</small>
@@ -94,7 +94,7 @@ templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
                                     </td>
                                     <td class="table-col-sm-fixed table-col-sm-fixed-right">
                                         <div class="c-button-toolbar">
-                                            <a class="btn btn-link" href={ templ.URL(c.PathTo("downloadFile", "fileID", f.ID).String()) }>
+                                            <a class="btn btn-link" href={ templ.URL(c.Path("downloadFile", "fileID", f.ID).String()) }>
                                                 <i class="if if-download"></i>
                                                 <span class="btn-txt">Download</span>
                                             </a>

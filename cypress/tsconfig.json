@@ -6,7 +6,9 @@
     "target": "es5",
     "lib": ["es5", "dom"],
     "types": ["cypress", "node"],
-    "noEmit": true
+    "noEmit": true,
+    "downlevelIteration": true,
+    "strict": true
   },
   "include": ["**/*.ts"]
 }

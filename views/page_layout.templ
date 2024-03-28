@@ -26,13 +26,13 @@ templ pageLayout(c *ctx.Ctx, title string) {
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href={ templ.URL(c.PathTo("home").String()) }>
+                                        <a href={ templ.URL(c.Path("home").String()) }>
                                             <img class="d-none d-lg-inline-block" src={ c.AssetPath("/images/ghent-university-library-logo.svg") } alt="Ghent University Library"/>
                                             <img class="d-inline-block d-lg-none" src={ c.AssetPath("/images/ghent-university-library-mark.svg") } alt="Ghent University Library"/>
                                         </a>
                                     </li>
                                     <li class="breadcrumb-item" aria-current="page">
-                                        <a href={ templ.URL(c.PathTo("home").String()) } class="text-muted">Home</a>
+                                        <a href={ templ.URL(c.Path("home").String()) } class="text-muted">Home</a>
                                     </li>
                                 </ol>
                             </nav>
@@ -52,7 +52,7 @@ templ pageLayout(c *ctx.Ctx, title string) {
                                     </li>
                                     }
                                     <li class="nav-item">
-                                        <a class="nav-link" href="https://www.ugent.be/intranet/nl/op-het-werk/bibliotheek/publieksdiensten/deliverhandleiding" target="_blank">
+                                        <a class="nav-link" href="https://ugentbe.sharepoint.com/:b:/r/teams/Group.CA2010_Universiteitsbibliotheek/Gedeelde%20documenten/Publieksdiensten/Bruikleen_Deliver_handleiding_20240327.pdf?csf=1&web=1&e=3QQy71" target="_blank">
                                             <i class="if if-book"></i>
                                             <span class="btn-text">Manual &ndash; NL</span>
                                         </a>
@@ -79,14 +79,14 @@ templ pageLayout(c *ctx.Ctx, title string) {
                                                     </div>
                                                 </div>
                                                 <hr class="dropdown-divider"/>
-                                                <a class="dropdown-item" href={ templ.URL(c.PathTo("logout").String()) }>
+                                                <a class="dropdown-item" href={ templ.URL(c.Path("logout").String()) }>
                                                     <i class="if if-log-out"></i>
                                                     <span>Log out</span>
                                                 </a>
                                             </div>
                                         </div>
                                         } else {
-                                        <a class="btn btn-link btn-sm" href={ templ.URL(c.PathTo("login").String()) }>
+                                        <a class="btn btn-link btn-sm" href={ templ.URL(c.Path("login").String()) }>
                                             <i class="if if-arrow-right mt-0 ms-2"></i>
                                             <span class="btn-text me-2">Log in</span>
                                         </a>
@@ -106,7 +106,7 @@ templ pageLayout(c *ctx.Ctx, title string) {
                         <nav>
                             <ul class="c-sidebar-menu">
                                 <li class="c-sidebar__item c-sidebar__item--active">
-                                    <a href={ templ.URL(c.PathTo("home").String()) }>
+                                    <a href={ templ.URL(c.Path("home").String()) }>
                                         <span class="c-sidebar__icon">
                                             <i class="if if-file"></i>
                                         </span>
@@ -141,7 +141,7 @@ templ pageLayout(c *ctx.Ctx, title string) {
                                     <i class="if if-alert"></i>
                                 </div>
                                 <h4 class="confirm-header">Are you sure?</h4>
-                                <p>You cannot undo this action.</p>
+                                <p class="confirm-content">You cannot undo this action.</p>
                             </div>
                         </div>
                         <div class="modal-footer">

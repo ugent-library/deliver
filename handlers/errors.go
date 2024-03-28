@@ -15,7 +15,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 
 func Unauthorized(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
-	http.Redirect(w, r, c.PathTo("login").String(), http.StatusSeeOther)
+	http.Redirect(w, r, c.Path("login").String(), http.StatusSeeOther)
 }
 
 func Forbidden(w http.ResponseWriter, r *http.Request) {

@@ -1,28 +1,46 @@
-export function logCommand(name, consoleProps = {}, message: unknown = '', $el = undefined) {
+export function logCommand(
+  name: string,
+  consoleProps: Cypress.ObjectLike = {},
+  message: unknown = "",
+  $el = undefined
+) {
   return Cypress.log({
     $el,
     name,
     displayName: name
-      .replace(/([A-Z])/g, ' $1')
+      .replace(/([A-Z])/g, " $1")
       .trim()
       .toUpperCase(),
     message,
-    consoleProps: () => consoleProps,
-  })
+    consoleProps: () => ({ props: consoleProps }),
+  });
 }
 
-export function updateLogMessage(log: Cypress.Log, append: unknown) {
-  const message = log.get('message').split(', ').filter(Boolean)
+export function updateLogMessage(
+  log: Cypress.Log | undefined,
+  append: unknown,
+  separator: string = ", "
+) {
+  if (!log) return;
 
-  message.push(append)
+  const message: unknown[] = (log.get("message") as string)
+    .split(separator)
+    .filter(Boolean);
 
-  log.set('message', message.join(', '))
+  message.push(append);
+
+  log.set("message", message.join(separator));
 }
 
-export function updateConsoleProps(log: Cypress.Log, callback: (ObjectLike) => void) {
-  const consoleProps = log.get('consoleProps')()
+export function updateConsoleProps(
+  log: Cypress.Log | undefined,
+  callback: (consoleProps: Cypress.ObjectLike) => void
+) {
+  if (!log) return;
 
-  callback(consoleProps)
+  const consoleProps = log.get("consoleProps")();
 
-  log.set({ consoleProps: () => consoleProps })
+  callback(consoleProps.props);
+
+  log.set({ consoleProps: () => consoleProps });
 }

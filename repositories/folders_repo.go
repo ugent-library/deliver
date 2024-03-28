@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/ugent-library/deliver/ent"
 	"github.com/ugent-library/deliver/ent/file"
 	"github.com/ugent-library/deliver/ent/folder"
@@ -32,6 +33,43 @@ func (r *FoldersRepo) Get(ctx context.Context, id string) (*models.Folder, error
 	return rowToFolder(row), nil
 }
 
+func (r *FoldersRepo) GetBySpace(ctx context.Context, spaceID string, pagination *models.Pagination) ([]*models.Folder, error) {
+	query := r.client.Folder.Query().
+		Where(folder.SpaceIDEQ(spaceID)).
+		WithFiles()
+
+	if q, _ := pagination.Filter("q"); q.Value != "" {
+		query = query.Where(sql.FieldContainsFold(folder.FieldName, q.Value))
+	}
+
+	switch sort := pagination.Sort(); sort {
+	case "expires-last":
+		query = query.Order(ent.Desc(folder.FieldExpiresAt))
+	default:
+		query = query.Order(ent.Asc(folder.FieldExpiresAt))
+	}
+
+	count, err := query.Count(ctx)
+	if err != nil {
+		return nil, err
+	}
+	pagination.SetTotal(count)
+
+	query.Offset(int(pagination.Offset()))
+	query.Limit(int(pagination.Limit()))
+
+	rows, err := query.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	folders := make([]*models.Folder, len(rows))
+	for i, row := range rows {
+		folders[i] = rowToFolder(row)
+	}
+	return folders, nil
+}
+
 func (r *FoldersRepo) Create(ctx context.Context, f *models.Folder) error {
 	if err := f.Validate(); err != nil {
 		return err
@@ -57,6 +95,7 @@ func (r *FoldersRepo) Update(ctx context.Context, f *models.Folder) error {
 	}
 	row, err := r.client.Folder.UpdateOneID(f.ID).
 		SetName(f.Name).
+		SetExpiresAt(f.ExpiresAt).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
 		return okay.NewErrors(okay.ErrNotUnique("name"))

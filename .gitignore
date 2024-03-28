@@ -21,7 +21,8 @@ node_modules
 reflex.conf
 
 # Config
-/.env*
+.env*
+!.devcontainer/.env
 !.env.example
 
 # Cypress
@@ -34,4 +35,6 @@ cypress/cypress-record.sh
 
 # Docker
 /tmp
-/docker-compose.yml
+
+# Local workspace
+go.work*

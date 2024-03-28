@@ -9,19 +9,35 @@ import (
 	"github.com/ugent-library/oidc"
 )
 
-func AuthCallback(w http.ResponseWriter, r *http.Request) {
+type AuthHandler struct {
+	auth          *oidc.Auth
+	usernameClaim string
+	nameClaim     string
+	emailClaim    string
+}
+
+func NewAuthHandler(auth *oidc.Auth, usernameClaim, nameClaim, emailClaim string) *AuthHandler {
+	return &AuthHandler{
+		auth:          auth,
+		usernameClaim: usernameClaim,
+		nameClaim:     nameClaim,
+		emailClaim:    emailClaim,
+	}
+}
+
+func (h *AuthHandler) AuthCallback(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	claims := oidc.Claims{}
-	if err := c.Auth.CompleteAuth(w, r, &claims); err != nil {
+	if err := h.auth.CompleteAuth(w, r, &claims); err != nil {
 		c.HandleError(w, r, err)
 		return
 	}
 
 	u := &models.User{
-		Username: claims.PreferredUsername,
-		Name:     claims.Name,
-		Email:    claims.Email,
+		Username: claims.GetString(h.usernameClaim),
+		Name:     claims.GetString(h.nameClaim),
+		Email:    claims.GetString(h.emailClaim),
 	}
 	if err := c.Repo.Users.CreateOrUpdate(r.Context(), u); err != nil {
 		c.HandleError(w, r, err)
@@ -37,18 +53,18 @@ func AuthCallback(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 	})
 
-	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
+	http.Redirect(w, r, c.Path("home").String(), http.StatusSeeOther)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
-	if err := c.Auth.BeginAuth(w, r); err != nil {
+	if err := h.auth.BeginAuth(w, r); err != nil {
 		c.HandleError(w, r, err)
 	}
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 
 	if err := c.Repo.Users.RenewRememberToken(r.Context(), c.User.ID); err != nil {
@@ -65,5 +81,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 	})
 
-	http.Redirect(w, r, c.PathTo("home").String(), http.StatusSeeOther)
+	http.Redirect(w, r, c.Path("home").String(), http.StatusSeeOther)
 }

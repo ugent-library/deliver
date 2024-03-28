@@ -1,56 +1,77 @@
+import htmx from "htmx.org";
+import * as bs from "bootstrap";
+import toast from "./toast.js";
+import formSubmit from "./form_submit.js";
+import formUploadProgress from "./form_upload_progress.js";
+import clipboard from "./clipboard.js";
+import selectValue from "./select_value.js";
 
-import htmx from 'htmx.org'
-import * as bs from 'bootstrap'
-import toast from './toast.js'
-import formSubmit from './form_submit.js'
-import formUploadProgress from './form_upload_progress.js'
-import clipboard from './clipboard.js'
-import selectValue from './select_value.js'
-
-window.htmx = htmx
+window.htmx = htmx;
 
 // load htmx extensions
-require('htmx.org/dist/ext/ws.js');
+require("htmx.org/dist/ext/ws.js");
 
-htmx.config.defaultFocusScroll = true
+htmx.config.defaultFocusScroll = true;
 
-htmx.onLoad(function(el) {
-    toast(el)
-    formSubmit(el)
-    formUploadProgress(el)
-    clipboard(el)
-    selectValue(el)
-})
-
-htmx.on('htmx:config-request', (evt) => {
-    evt.detail.headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf-token"]').content
+htmx.onLoad(function (el) {
+  toast(el);
+  formSubmit(el);
+  formUploadProgress(el);
+  clipboard(el);
+  selectValue(el);
 });
 
-htmx.on('htmx:confirm', (evt) => {
-    let el = evt.detail.elt
+htmx.on("htmx:config-request", (evt) => {
+  evt.detail.headers["X-CSRF-Token"] = document.querySelector(
+    'meta[name="csrf-token"]'
+  ).content;
+});
 
-    if (el.dataset.confirm) {
-        evt.preventDefault()
+htmx.on("htmx:confirm", (evt) => {
+  let el = evt.detail.elt;
 
-        let modalEl = document.getElementById('modal-confirm').content.firstElementChild.cloneNode(true)
+  if (el.dataset.confirm) {
+    evt.preventDefault();
 
-        document.body.append(modalEl)
+    const modalEl = document
+      .getElementById("modal-confirm")
+      .content.firstElementChild.cloneNode(true);
+    const confirmProceed = modalEl.querySelector(".confirm-proceed");
 
-        if (el.dataset.confirmHeader) {
-            modalEl.querySelector('.confirm-header').innerHTML = el.dataset.confirmHeader
-        }
-        if (el.dataset.confirmProceed) {
-            modalEl.querySelector('.confirm-proceed').innerHTML = el.dataset.confirmProceed
-        }
+    document.body.append(modalEl);
 
-        modalEl.querySelector('.confirm-proceed').addEventListener('click', () => {
-            evt.detail.issueRequest()
-        }, false)
-
-        modalEl.addEventListener('hidden.bs.modal', () => {
-            modalEl.remove()
-        }, false);
-
-        new bs.Modal(modalEl).show()
+    if (el.dataset.confirmHeader) {
+      modalEl.querySelector(".confirm-header").innerHTML =
+        el.dataset.confirmHeader;
     }
+    if (el.dataset.confirmContent) {
+      modalEl.querySelector(".confirm-content").innerHTML =
+        el.dataset.confirmContent;
+    }
+    if (el.dataset.confirmProceed) {
+      confirmProceed.innerHTML = el.dataset.confirmProceed;
+    }
+    if (el.dataset.confirmProceedStyle) {
+      confirmProceed.classList.remove("btn-danger");
+      confirmProceed.classList.add("btn-" + el.dataset.confirmProceedStyle);
+    }
+
+    confirmProceed.addEventListener(
+      "click",
+      () => {
+        evt.detail.issueRequest();
+      },
+      false
+    );
+
+    modalEl.addEventListener(
+      "hidden.bs.modal",
+      () => {
+        modalEl.remove();
+      },
+      false
+    );
+
+    new bs.Modal(modalEl).show();
+  }
 });

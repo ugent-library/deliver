@@ -58,9 +58,7 @@ var serverCmd = &cobra.Command{
 			ClientID:     config.OIDC.ID,
 			ClientSecret: config.OIDC.Secret,
 			RedirectURL:  config.OIDC.RedirectURL,
-			CookieName:   "deliver.state",
-			CookieSecret: []byte(config.Cookie.Secret),
-			Insecure:     config.Env == "local",
+			CookiePrefix: "deliver.",
 		})
 		if err != nil {
 			return err
@@ -87,6 +85,14 @@ var serverCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		// setup handlers
+		authHandler := handlers.NewAuthHandler(
+			oidcAuth,
+			config.OIDC.UsernameClaim,
+			config.OIDC.NameClaim,
+			config.OIDC.EmailClaim,
+		)
 
 		// setup router
 		router := ich.New()
@@ -141,7 +147,6 @@ var serverCmd = &cobra.Command{
 					Repo:        repo,
 					Storage:     storage,
 					MaxFileSize: config.MaxFileSize,
-					Auth:        oidcAuth,
 					Router:      router,
 					ErrorHandlers: map[int]http.HandlerFunc{
 						http.StatusNotFound:     handlers.NotFound,
@@ -160,9 +165,9 @@ var serverCmd = &cobra.Command{
 			// viewable by everyone
 			r.NotFound(handlers.NotFound)
 			r.Get("/", handlers.Home).Name("home")
-			r.Get("/auth/callback", handlers.AuthCallback)
-			r.Get("/login", handlers.Login).Name("login")
-			r.Get("/logout", handlers.Logout).Name("logout")
+			r.Get("/auth/callback", authHandler.AuthCallback)
+			r.Get("/login", authHandler.Login).Name("login")
+			r.Get("/logout", authHandler.Logout).Name("logout")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/share/{folderID}:{folderSlug}", handlers.ShareFolder).Name("shareFolder")
 			r.With(ctx.SetFile(*repo.Files)).Get("/files/{fileID}", handlers.DownloadFile).Name("downloadFile")
 			r.With(ctx.SetFolder(*repo.Folders)).Get("/folders/{folderID}.zip", handlers.DownloadFolder).Name("downloadFolder")
@@ -191,7 +196,8 @@ var serverCmd = &cobra.Command{
 					r.Use(ctx.SetSpace(*repo.Spaces))
 					r.Use(ctx.CanViewSpace)
 					r.Get("/", handlers.ShowSpace).Name("space")
-					r.Post("/folders", handlers.CreateFolder).Name("createFolder")
+					r.Get("/folders", handlers.GetFolders).Name("getFolders")
+					r.Post("/", handlers.CreateFolder).Name("createFolder")
 					r.With(ctx.RequireAdmin).Get("/edit", handlers.EditSpace).Name("editSpace")
 					r.With(ctx.RequireAdmin).Put("/", handlers.UpdateSpace).Name("updateSpace")
 				})
@@ -201,6 +207,7 @@ var serverCmd = &cobra.Command{
 					r.Get("/", handlers.ShowFolder).Name("folder")
 					r.Get("/edit", handlers.EditFolder).Name("editFolder")
 					r.Put("/", handlers.UpdateFolder).Name("updateFolder")
+					r.Put("/postpone", handlers.PostponeFolderExpiration).Name("postponeExpiration")
 					r.Post("/files", handlers.UploadFile).Name("uploadFile")
 					r.Delete("/", handlers.DeleteFolder).Name("deleteFolder")
 				})

@@ -14,9 +14,7 @@ services:
       - -c
       - |
         cd /src
-        go mod download -x
         bash -i -c 'nvm install'
-        npm install
         tern status
         tern migrate
         sleep infinity
@@ -36,7 +34,6 @@ services:
   db-app:
     image: postgres:16-alpine
     restart: unless-stopped
-    user: postgres
     volumes:
       - ../tmp/app-db/db_data:/var/lib/postgresql/data
     environment:

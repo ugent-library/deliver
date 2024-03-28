@@ -20,7 +20,6 @@ import (
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/mix"
-	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"github.com/unrolled/secure"
 	"go.uber.org/zap"
@@ -92,7 +91,6 @@ type Config struct {
 	Repo          *repositories.Repo
 	Storage       objectstores.Store
 	MaxFileSize   int64
-	Auth          *oidc.Auth
 	Router        *ich.Mux
 	ErrorHandlers map[int]http.HandlerFunc
 	Permissions   *models.Permissions
@@ -140,12 +138,12 @@ func (c *Ctx) HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, http.StatusText(httpErr.StatusCode), httpErr.StatusCode)
 }
 
-func (c *Ctx) PathTo(name string, pairs ...string) *url.URL {
-	return c.Router.PathTo(name, pairs...)
+func (c *Ctx) Path(name string, params ...any) *url.URL {
+	return c.Router.Path(name, params...)
 }
 
-func (c *Ctx) URLTo(name string, pairs ...string) *url.URL {
-	u := c.Router.PathTo(name, pairs...)
+func (c *Ctx) URL(name string, params ...any) *url.URL {
+	u := c.Router.Path(name, params...)
 	u.Host = c.host
 	u.Scheme = c.scheme
 	return u
@@ -222,5 +220,5 @@ func (c *Ctx) WebSocketPath(topics ...string) string {
 	if err != nil {
 		panic(err)
 	}
-	return c.PathTo("ws", "token", token).String()
+	return c.Path("ws", "token", token).String()
 }

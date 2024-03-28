@@ -1,3 +1,11 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "[go]": {
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
+  },
+  "[templ]": {
+    "editor.defaultFormatter": "a-h.templ"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
 }

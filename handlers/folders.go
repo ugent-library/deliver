@@ -39,17 +39,12 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	space := ctx.GetSpace(r)
 
 	b := FolderForm{}
-	if err := bind.Form(r, &b); err != nil {
+	if err := bind.Form(r, &b, bind.Vacuum); err != nil {
 		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
 
-	// TODO constructor for new objects
-	folder := &models.Folder{
-		SpaceID:   space.ID,
-		Name:      b.Name,
-		ExpiresAt: time.Now().AddDate(0, 1, 0),
-	}
+	folder := models.NewFolder(space.ID, b.Name)
 
 	if err := c.Repo.Folders.Create(r.Context(), folder); err != nil {
 		showSpace(w, r, folder, err)
@@ -62,7 +57,7 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 		DismissAfter: 3 * time.Second,
 	})
 
-	loc := c.PathTo("folder", "folderID", folder.ID).String()
+	loc := c.Path("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
@@ -77,7 +72,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r)
 
 	b := FolderForm{}
-	if err := bind.Form(r, &b); err != nil {
+	if err := bind.Form(r, &b, bind.Vacuum); err != nil {
 		c.HandleError(w, r, errors.Join(httperror.BadRequest, err))
 		return
 	}
@@ -86,7 +81,7 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
 		validationErrors := okay.NewErrors()
-		if err != nil && !errors.As(err, &validationErrors) {
+		if !errors.As(err, &validationErrors) {
 			c.HandleError(w, r, err)
 			return
 		}
@@ -95,8 +90,30 @@ func UpdateFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loc := c.PathTo("folder", "folderID", folder.ID).String()
+	loc := c.Path("folder", "folderID", folder.ID).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
+}
+
+func PostponeFolderExpiration(w http.ResponseWriter, r *http.Request) {
+	c := ctx.Get(r)
+	folder := ctx.GetFolder(r)
+
+	folder.PostponeExpiration()
+
+	if err := c.Repo.Folders.Update(r.Context(), folder); err != nil {
+		c.PersistFlash(w, ctx.Flash{
+			Type: "error",
+			Body: fmt.Sprintf("Unexpected error: %s", err.Error()),
+		})
+	} else {
+		c.PersistFlash(w, ctx.Flash{
+			Type:         "success",
+			Body:         fmt.Sprintf("New expiration date for %s: %s", folder.Name, folder.ExpiresAt.In(c.Timezone).Format("2006-01-02")),
+			DismissAfter: 3 * time.Second,
+		})
+	}
+
+	htmx.Refresh(w)
 }
 
 func DeleteFolder(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +139,7 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		DismissAfter: 3 * time.Second,
 	})
 
-	loc := c.PathTo("space", "spaceName", folder.Space.Name).String()
+	loc := c.Path("space", "spaceName", folder.Space.Name).String()
 	http.Redirect(w, r, loc, http.StatusSeeOther)
 }
 
