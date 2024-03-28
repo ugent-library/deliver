@@ -8,17 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
-### Fixed
+* Added search box for folders
+* Added pagination for folders to reduce page loading time
+* Added sorting on folder expiration date
+* Updated manual link to new manual environment
+* Added tests for new features
 
 ## [v1.1.2]
 
 ### Added
 
 - Temporary status messages for migration
-
-### Fixed
-
 
 ## [v1.1.1] - 2024-01-29
 
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - #107: Dev containers
 - Cypress tests
 - CSP policy
-- Better websocket hub (CatBird)  
+- Better websocket hub (CatBird)
 - /health endpoint
 - Major Go code refactor
 - #86: Make timezone configurable
