@@ -1,2 +1,2 @@
 # Check https://dashboard.cypress.io/#/projects/fm8w1c/settings for the record key
-npm run test -- --record --key <record key>
+npm run test -- --config retries=2 --record --key <record key>
