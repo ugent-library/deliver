@@ -132,7 +132,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(folder.Files) > 0 {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap align-middle\">File name</th><th class=\"text-nowrap align-middle\">Size</th><th class=\"text-nowrap align-middle\">Type</th><th class=\"text-nowrap align-middle\">Downloads</th><th class=\"text-nowrap align-middle\">Created at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right text-end align-middle\"><a class=\"btn btn-primary\" href=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive overflow-y-hidden\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap align-middle\">File name</th><th class=\"text-nowrap align-middle\">Size</th><th class=\"text-nowrap align-middle\">Type</th><th class=\"text-nowrap align-middle\">Downloads</th><th class=\"text-nowrap align-middle\">Created at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right text-end align-middle\"><a class=\"btn btn-primary\" href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
