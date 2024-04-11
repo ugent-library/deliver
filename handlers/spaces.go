@@ -165,6 +165,10 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
+	if len(newFolderArgs.Errors.Errors) > 0 {
+		newFolderArgs.Autofocus = true
+	}
+
 	var userSpaces []*models.Space
 	if c.Permissions.IsAdmin(c.User) {
 		userSpaces, err = c.Repo.Spaces.GetAll(r.Context())

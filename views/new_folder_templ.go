@@ -17,8 +17,9 @@ import (
 )
 
 type NewFolderArgs struct {
-	Folder *models.Folder
-	Errors *okay.Errors
+	Folder    *models.Folder
+	Errors    *okay.Errors
+	Autofocus bool
 }
 
 func NewFolder(c *ctx.Ctx, space *models.Space, args NewFolderArgs) templ.Component {
@@ -94,6 +95,12 @@ func NewFolder(c *ctx.Ctx, space *models.Space, args NewFolderArgs) templ.Compon
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			if args.Autofocus {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" autofocus")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
 			if e != nil {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" aria-invalid=\"true\" aria-describedby=\"folder-name-invalid\"")
 				if templ_7745c5c3_Err != nil {
@@ -112,7 +119,7 @@ func NewFolder(c *ctx.Ctx, space *models.Space, args NewFolderArgs) templ.Compon
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(e.Error())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `new_folder.templ`, Line: 44, Col: 77}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `new_folder.templ`, Line: 48, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {

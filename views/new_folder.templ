@@ -7,8 +7,9 @@ import (
 )
 
 type NewFolderArgs struct {
-	Folder *models.Folder
-	Errors *okay.Errors
+	Folder    *models.Folder
+	Errors    *okay.Errors
+	Autofocus bool
 }
 
 templ NewFolder(c *ctx.Ctx, space *models.Space, args NewFolderArgs) {
@@ -36,6 +37,9 @@ templ NewFolder(c *ctx.Ctx, space *models.Space, args NewFolderArgs) {
 									value={ args.Folder.Name }
 									id="folder-name"
 									name="name"
+									if args.Autofocus {
+										autofocus
+									}
 									if e != nil {
 										aria-invalid="true"
 										aria-describedby="folder-name-invalid"
