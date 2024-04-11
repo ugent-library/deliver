@@ -1,0 +1,65 @@
+package views
+
+import (
+	"github.com/ugent-library/deliver/ctx"
+	"github.com/ugent-library/deliver/models"
+	"github.com/ugent-library/okay"
+)
+
+type NewFolderArgs struct {
+	Folder *models.Folder
+	Errors *okay.Errors
+}
+
+templ NewFolder(c *ctx.Ctx, space *models.Space, args NewFolderArgs) {
+	<div class="card w-100 mb-6">
+		<div class="card-header">
+			<div class="bc-toolbar">
+				<div class="bc-toolbar-left">
+					<div class="bc-toolbar-item">
+						<h2>Make a folder</h2>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<form action={ templ.URL(c.Path("createFolder", "spaceName", space.Name).String()) } method="POST">
+				@csrfField(c)
+				if e := args.Errors.Get("name"); true {
+					<div class={ "mb-6", templ.KV("is-invalid", args.Errors.Get("name") != nil) }>
+						<label class="c-label" for="folder-name">Folder name</label>
+						<div class="row">
+							<div class="col-md-6">
+								<input
+									class={ "form-control", templ.KV("is-invalid", e != nil) }
+									type="text"
+									value={ args.Folder.Name }
+									id="folder-name"
+									name="name"
+									if e != nil {
+										aria-invalid="true"
+										aria-describedby="folder-name-invalid"
+									}
+								/>
+								if e != nil {
+									<small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
+								}
+								<small class="form-text text-muted">
+									We will generate a shareable public link for you.
+									<br/>
+									Each folder will expire one month after creation date.
+								</small>
+							</div>
+							<div class="col-md-3">
+								<button class="btn btn-primary ms-4" type="submit">
+									<i class="if if-check"></i>
+									<span class="btn-text">Make folder</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				}
+			</form>
+		</div>
+	</div>
+}
