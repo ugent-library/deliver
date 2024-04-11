@@ -89,30 +89,40 @@ templ ShowSpace(c *ctx.Ctx, space *models.Space, folders []*models.Folder, pagin
 					<div class="card-body">
 						<form action={ templ.URL(c.Path("createFolder", "spaceName", space.Name).String()) } method="POST">
 							@csrfField(c)
-							<div class={ "mb-6", templ.KV("is-invalid", errs.Get("name") != nil) }>
-								<label class="c-label" for="folder-name">Folder name</label>
-								<div class="row">
-									<div class="col-md-6">
-										if e := errs.Get("name"); e != nil {
-											<input class="form-control is-invalid" type="text" value={ folder.Name } id="folder-name" name="name" aria-invalid="true" aria-describedby="folder-name-invalid"/>
-											<small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
-										} else {
-											<input class="form-control" type="text" value={ folder.Name } id="folder-name" name="name"/>
-										}
-										<small class="form-text text-muted">
-											We will generate a shareable public link for you.
-											<br/>
-											Each folder will expire one month after creation date.
-										</small>
-									</div>
-									<div class="col-md-3">
-										<button class="btn btn-primary ms-4" type="submit">
-											<i class="if if-check"></i>
-											<span class="btn-text">Make folder</span>
-										</button>
+							if e := errs.Get("name"); true {
+								<div class={ "mb-6", templ.KV("is-invalid", e != nil) }>
+									<label class="c-label" for="folder-name">Folder name</label>
+									<div class="row">
+										<div class="col-md-6">
+											<input
+												class={ "form-control", templ.KV("is-invalid", e != nil) }
+												type="text"
+												value={ folder.Name }
+												id="folder-name"
+												name="name"
+												if e != nil {
+													aria-invalid="true"
+													aria-describedby="folder-name-invalid"
+												}
+											/>
+											if e != nil {
+												<small class="invalid-feedback" id="folder-name-invalid">{ e.Error() }</small>
+											}
+											<small class="form-text text-muted">
+												We will generate a shareable public link for you.
+												<br/>
+												Each folder will expire one month after creation date.
+											</small>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-primary ms-4" type="submit">
+												<i class="if if-check"></i>
+												<span class="btn-text">Make folder</span>
+											</button>
+										</div>
 									</div>
 								</div>
-							</div>
+							}
 						</form>
 					</div>
 				</div>
