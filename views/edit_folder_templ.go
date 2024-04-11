@@ -52,7 +52,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Space.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 20, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 20, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -74,7 +74,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 24, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 24, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -87,7 +87,7 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(folder.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 37, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 37, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -140,8 +140,21 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if e := errs.Get("name"); e != nil {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input class=\"form-control is-invalid\" type=\"text\" value=\"")
+			if e := errs.Get("name"); true {
+				var templ_7745c5c3_Var11 = []any{"form-control", templ.KV("is-invalid", e != nil)}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input class=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ.CSSClasses(templ_7745c5c3_Var11).String()))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"text\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -149,47 +162,50 @@ func EditFolder(c *ctx.Ctx, folder *models.Folder, errs *okay.Errors) templ.Comp
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" id=\"folder-name\" name=\"name\" aria-invalid=\"true\" aria-describedby=\"folder-name-invalid\"> <small class=\"invalid-feedback\" id=\"folder-name-invalid\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" id=\"folder-name\" name=\"name\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(e.Error())
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 76, Col: 100}
+				if e != nil {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" aria-invalid=\"true\" aria-describedby=\"folder-name-invalid\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</small>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input class=\"form-control\" type=\"text\" value=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(folder.Name))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" id=\"folder-name\" name=\"name\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
+				if e != nil {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<small class=\"invalid-feedback\" id=\"folder-name-invalid\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var12 string
+					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(e.Error())
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 87, Col: 79}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</small>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"row\"><label class=\"col-lg-3 col-xl-2 col-form-label\" for=\"URL\"><p>Public shareable link</p></label><div class=\"col-lg-7 col-xl-9\"><code class=\"c-code\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String())
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(c.URL("shareFolder", "folderID", folder.ID, "folderSlug", folder.Slug()).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 87, Col: 136}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `edit_folder.templ`, Line: 97, Col: 113}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
