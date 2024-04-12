@@ -150,7 +150,7 @@ describe("Managing files", () => {
       .should("eq", "100%");
     cy.get("@uploadProgress").should(
       "contain.text",
-      "Processing your file. Hold on, do not refresh the page."
+      "Processing your file. Hold on, do not refresh the page.",
     );
 
     cy.wait("@uploadFile");
@@ -217,7 +217,7 @@ describe("Managing files", () => {
     cy.visit("@shareUrl");
 
     cy.contains(
-      `Library delivery from ${Cypress.env("DEFAULT_SPACE")}: ${FOLDER_NAME}`
+      `Library delivery from ${Cypress.env("DEFAULT_SPACE")}: ${FOLDER_NAME}`,
     )
       .should("be.visible")
       .then(function () {
@@ -383,6 +383,33 @@ describe("Managing files", () => {
     assertFolderFileCount(0);
   });
 
+  it("should be possible to move back to the make folder form using a hotkey", () => {
+    cy.intercept("POST", "/folders/*/files").as("uploadFile");
+
+    cy.get("input[type=file]").selectFile("cypress/fixtures/test.txt");
+    cy.wait("@uploadFile");
+
+    // Typing capital N should not trigger the hotkey
+    cy.get("body").type("N");
+    cy.url().should("eq", "@adminUrl");
+
+    // Typing in a form field should not trigger the hotkey
+    cy.get('input[value*="/share/"]')
+      .as("shareUrl")
+      .invoke("removeAttr", "readonly");
+    cy.get("@shareUrl").focus().type("{leftArrow}n").blur();
+    cy.url().should("eq", "@adminUrl");
+
+    // Test the actual hotkey
+    cy.get("body").type("n");
+    cy.location("pathname").should(
+      "eq",
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+    );
+
+    cy.get("#folder-name").should("have.attr", "autofocus");
+  });
+
   function assertFileUpload(
     fileName: string,
     {
@@ -393,13 +420,13 @@ describe("Managing files", () => {
       sortOrder?: number;
       md5Checksum?: string;
       mimeType?: string;
-    } = {}
+    } = {},
   ) {
     FILE_COUNT++;
 
     cy.contains(".card-header", "Available files").should(
       "contain",
-      `${FILE_COUNT} items`
+      `${FILE_COUNT} items`,
     );
 
     cy.get("#files table tbody tr")
@@ -424,10 +451,10 @@ describe("Managing files", () => {
   function generateLargeFile(
     fileName: string,
     fileSizeInMegaByte: number,
-    mimeType?: string
+    mimeType?: string,
   ) {
     const buffer = Cypress.Buffer.from(
-      new ArrayBuffer(fileSizeInMegaByte * 1024 * 1024)
+      new ArrayBuffer(fileSizeInMegaByte * 1024 * 1024),
     );
 
     const file: Cypress.FileReferenceObject = {
@@ -441,7 +468,7 @@ describe("Managing files", () => {
 
   function assertNumberOfDownloads(
     fileName: string,
-    expectedNumberOfDownloads: number
+    expectedNumberOfDownloads: number,
   ) {
     cy.contains("table tbody tr", fileName)
       .find("td")
@@ -462,11 +489,11 @@ describe("Managing files", () => {
 
   function assertFileDelete(
     numberOfAvailableFilesAtStart: number,
-    fileToDelete: string
+    fileToDelete: string,
   ) {
     cy.contains(".card-header", "Available files").should(
       "contain",
-      `${numberOfAvailableFilesAtStart} items`
+      `${numberOfAvailableFilesAtStart} items`,
     );
 
     cy.ensureNoModal();
@@ -476,14 +503,14 @@ describe("Managing files", () => {
       .click();
 
     cy.ensureModal(
-      new RegExp(`Are you sure you want to delete the file.*${fileToDelete}\?`)
+      new RegExp(`Are you sure you want to delete the file.*${fileToDelete}\?`),
     ).closeModal("Yes, delete this file");
 
     cy.ensureNoModal();
 
     cy.contains(".card-header", "Available files").should(
       "contain",
-      `${numberOfAvailableFilesAtStart - 1} items`
+      `${numberOfAvailableFilesAtStart - 1} items`,
     );
     cy.contains("#files table tr", fileToDelete).should("not.exist");
   }

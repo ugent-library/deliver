@@ -33,9 +33,16 @@ templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
 						</div>
 						<div class="bc-toolbar-right">
 							<div class="bc-toolbar-item">
-								<a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("space", "spaceName", folder.Space.Name).String()) }>
+								<a
+									class="btn btn-link btn-link-muted"
+									href={ templ.URL(c.Path("space", "spaceName", folder.Space.Name, "focus", "new-folder").String()) }
+									data-hotkey="n"
+								>
 									<i class="if if-add"></i>
-									<span class="btn-text">Make new folder</span>
+									<span class="btn-text">
+										Make new folder
+										<code class="bg-light p-2 rounded">(n)</code>
+									</span>
 								</a>
 							</div>
 							<div class="bc-toolbar-item">

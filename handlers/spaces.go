@@ -165,7 +165,7 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	if len(newFolderArgs.Errors.Errors) > 0 {
+	if len(newFolderArgs.Errors.Errors) > 0 || r.URL.Query().Get("focus") == "new-folder" {
 		newFolderArgs.Autofocus = true
 	}
 
