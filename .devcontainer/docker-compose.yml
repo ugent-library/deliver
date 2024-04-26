@@ -69,13 +69,14 @@ services:
       /bin/sh -c "sleep infinity"
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:3171 minioadmin minioadmin;
-      /usr/bin/mc mb myminio/deliver --ignore-existing;
+      /usr/bin/mc config host add devcontainer http://minio:3171 minioadmin minioadmin;
+      /usr/bin/mc mb devcontainer/deliver --ignore-existing;
       exit 0;
       "
-  
+
 volumes:
   dbdata:
     driver: local
   miniodata:
     driver: local
+
