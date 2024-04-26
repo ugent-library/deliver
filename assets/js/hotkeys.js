@@ -11,7 +11,7 @@ export default function (rootEl) {
       // Make sure the "hotkey-element" is still in the DOM
       // and the triggering element is not a form field
       if (el && el.isConnected && !isFormField(evt.target)) {
-        el.dispatchEvent(new PointerEvent("click"));
+        el.dispatchEvent(new MouseEvent("click"));
       }
     });
   }
