@@ -1,7 +1,7 @@
 export default function loginAsSuperAdmin(): void {
   cy.login(
     Cypress.env("SUPER_ADMIN_USER_NAME"),
-    Cypress.env("SUPER_ADMIN_USER_PASSWORD")
+    Cypress.env("SUPER_ADMIN_USER_PASSWORD"),
   );
 }
 

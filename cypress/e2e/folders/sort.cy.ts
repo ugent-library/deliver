@@ -6,7 +6,7 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
   const randomSuffix = getRandomText();
 
   const TEST_FOLDER_NAMES = ["XYZ", "OPQ", "LMN", "FGH", "ABC"].map(
-    (f) => `${f}-${randomSuffix}`
+    (f) => `${f}-${randomSuffix}`,
   );
 
   before(() => {
@@ -25,7 +25,7 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
     cy.loginAsSpaceAdmin();
 
     cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
-      "filterFolders"
+      "filterFolders",
     );
 
     cy.visitSpace();
@@ -87,7 +87,7 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
     cy.get("@filterFolders.all").should(
       "have.length",
       1,
-      "Search shouldn't have fired an AJAX request"
+      "Search shouldn't have fired an AJAX request",
     );
     cy.getParams("sort").should("eq", "expires-last");
     cy.get("@sort").should("have.value", "expires-last");

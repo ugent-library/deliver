@@ -7,7 +7,7 @@ type SetFieldOptions = {
 export default function setField(
   subject: JQuery<HTMLInputElement | HTMLSelectElement>,
   value: string,
-  options: SetFieldOptions = { log: true }
+  options: SetFieldOptions = { log: true },
 ): Cypress.Chainable<JQuery<HTMLInputElement | HTMLSelectElement>> {
   let log: Cypress.Log | undefined;
   if (options.log === true) {
@@ -27,7 +27,7 @@ export default function setField(
 
     default:
       throw new Error(
-        `Field of type '${subject.prop("tagName")}' is not supported.`
+        `Field of type '${subject.prop("tagName")}' is not supported.`,
       );
   }
 

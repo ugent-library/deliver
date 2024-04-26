@@ -7,7 +7,7 @@ type SubmitFormOptions = {
 export default function submitForm<T = unknown>(
   subject: JQuery<HTMLElement>,
   fields: Record<string, string>,
-  options: SubmitFormOptions
+  options: SubmitFormOptions,
 ): Cypress.Chainable<Cypress.Response<T>> {
   if (subject.length !== 1) {
     throw new Error("Expected exactly one selected FORM element.");
@@ -28,7 +28,7 @@ export default function submitForm<T = unknown>(
     form
       .find("input, select, textarea")
       .get()
-      .map((i) => [i.name, i.value])
+      .map((i) => [i.name, i.value]),
   );
 
   const body = { ...inputs, ...fields };
@@ -44,7 +44,7 @@ export default function submitForm<T = unknown>(
             method,
             action,
           },
-          `${method} ${action}`
+          `${method} ${action}`,
         )
       : undefined;
 
@@ -65,7 +65,7 @@ declare global {
     interface Chainable {
       submitForm<T = unknown>(
         fields?: Record<string, string>,
-        options?: SubmitFormOptions
+        options?: SubmitFormOptions,
       ): Chainable<Response<T>>;
     }
   }

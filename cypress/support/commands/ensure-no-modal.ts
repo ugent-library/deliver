@@ -5,7 +5,7 @@ type EnsureNoModalOptions = {
 };
 
 export default function ensureNoModal(
-  options: EnsureNoModalOptions = { log: true }
+  options: EnsureNoModalOptions = { log: true },
 ): void {
   if (options.log === true) {
     logCommand("ensureNoModal");

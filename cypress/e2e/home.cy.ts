@@ -34,7 +34,7 @@ describe("The home page", () => {
           .is.not.empty;
 
         const redirect = new URL(
-          response.redirects!.at(-1)!.replace(/^3\d\d: /, "")
+          response.redirects!.at(-1)!.replace(/^3\d\d: /, ""),
         ); // Redirect entries are in form '3XX: {url}'
 
         expect(redirect).to.have.property("origin", Cypress.env("OIDC_ORIGIN"));
@@ -55,7 +55,7 @@ describe("The home page", () => {
       const spacesUrl = new URL("/spaces", Cypress.config("baseUrl")!);
       expect(response.redirects!.at(-2)).to.eq(`303: ${spacesUrl}`);
       expect(response.redirects!.at(-1)).to.match(
-        new RegExp(`^303: ${spacesUrl}/[\\w\\d]+$`)
+        new RegExp(`^303: ${spacesUrl}/[\\w\\d]+$`),
       );
     });
 
@@ -74,7 +74,7 @@ describe("The home page", () => {
 
     cy.wrap(DEFAULT_SPACE).should(
       "not.be.empty",
-      "A default space has not been configured."
+      "A default space has not been configured.",
     );
 
     cy.get(".c-sub-sidebar").should("be.visible");

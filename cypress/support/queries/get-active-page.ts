@@ -22,7 +22,7 @@ export default function getActivePage(): () => number {
     if (pageNumbers.length !== 1) {
       expect(pageNumbers).to.have.length(
         1,
-        "Active page is out of sync in header and footer"
+        "Active page is out of sync in header and footer",
       );
     }
 

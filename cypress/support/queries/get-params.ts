@@ -67,7 +67,7 @@ function getParamsObject(url: string): GetParamsResult {
 
       return previous;
     },
-    {}
+    {},
   );
 }
 

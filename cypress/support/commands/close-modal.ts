@@ -9,7 +9,7 @@ type CloseModalOptions = {
 export default function closeModal(
   subject: unknown,
   save: boolean | string | RegExp = false,
-  options: CloseModalOptions = { log: true }
+  options: CloseModalOptions = { log: true },
 ): void {
   const dismissButtonText =
     typeof save === "boolean" ? (save ? "Save" : "Cancel") : save;
@@ -22,7 +22,7 @@ export default function closeModal(
         subject: subject ? (subject as JQuery<HTMLElement>).get(0) : null,
         "Dismiss button text": dismissButtonText,
       },
-      dismissButtonText
+      dismissButtonText,
     );
     log.set("type", !subject ? "parent" : "child");
   }
@@ -54,7 +54,7 @@ declare global {
     interface Chainable {
       closeModal(
         save: boolean | string | RegExp,
-        options?: CloseModalOptions
+        options?: CloseModalOptions,
       ): Chainable<void>;
     }
   }

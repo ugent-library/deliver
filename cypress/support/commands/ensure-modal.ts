@@ -8,14 +8,14 @@ type EnsureModalOptions = {
 
 export default function ensureModal(
   expectedTitle: string | RegExp,
-  options?: EnsureModalOptions
+  options?: EnsureModalOptions,
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   const log =
     options?.log !== false
       ? logCommand(
           "ensureModal",
           { "Expected title": expectedTitle },
-          expectedTitle
+          expectedTitle,
         )
       : undefined;
 
@@ -50,7 +50,7 @@ declare global {
     interface Chainable {
       ensureModal(
         expectedTitle: string | RegExp,
-        options?: EnsureModalOptions
+        options?: EnsureModalOptions,
       ): Chainable<JQuery<HTMLElement>>;
     }
   }

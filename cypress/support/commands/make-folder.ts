@@ -9,7 +9,7 @@ type MakeFolderOptions = {
 
 export default function makeFolder(
   name: string,
-  { space, noRedirect }: MakeFolderOptions = {}
+  { space, noRedirect }: MakeFolderOptions = {},
 ): void {
   space ||= Cypress.env("DEFAULT_SPACE");
 

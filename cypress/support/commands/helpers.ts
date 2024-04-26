@@ -2,7 +2,7 @@ export function logCommand(
   name: string,
   consoleProps: Cypress.ObjectLike = {},
   message: unknown = "",
-  $el = undefined
+  $el = undefined,
 ) {
   return Cypress.log({
     $el,
@@ -19,7 +19,7 @@ export function logCommand(
 export function updateLogMessage(
   log: Cypress.Log | undefined,
   append: unknown,
-  separator: string = ", "
+  separator: string = ", ",
 ) {
   if (!log) return;
 
@@ -34,7 +34,7 @@ export function updateLogMessage(
 
 export function updateConsoleProps(
   log: Cypress.Log | undefined,
-  callback: (consoleProps: Cypress.ObjectLike) => void
+  callback: (consoleProps: Cypress.ObjectLike) => void,
 ) {
   if (!log) return;
 

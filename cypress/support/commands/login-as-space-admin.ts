@@ -1,7 +1,7 @@
 export default function loginAsSpaceAdmin(): void {
   cy.login(
     Cypress.env("SPACE_ADMIN_USER_NAME"),
-    Cypress.env("SPACE_ADMIN_USER_PASSWORD")
+    Cypress.env("SPACE_ADMIN_USER_PASSWORD"),
   );
 }
 

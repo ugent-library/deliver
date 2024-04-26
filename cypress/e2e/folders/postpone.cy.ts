@@ -18,7 +18,7 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.extractFolderId().then((folderId) => {
       cy.intercept("PUT", `/folders/${folderId}/postpone`).as(
-        "postponeExpiration"
+        "postponeExpiration",
       );
     });
   });
@@ -54,8 +54,8 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.ensureModal(
       new RegExp(
-        `Postpone the expiration date of\\s*${FOLDER_NAME} by one month`
-      )
+        `Postpone the expiration date of\\s*${FOLDER_NAME} by one month`,
+      ),
     ).closeModal("No, cancel");
 
     cy.get("@postponeExpiration").should("be.null");
@@ -76,12 +76,12 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
         expect(expiresOnDate.valueOf()).eq(
           calculatedExpirationDate.valueOf(),
-          `Expected ${calculatedExpirationDate.toISOString()} to be equal to ${expiresOnDate.toISOString()}.`
+          `Expected ${calculatedExpirationDate.toISOString()} to be equal to ${expiresOnDate.toISOString()}.`,
         );
 
         cy.wrap(expiresOnDate.format("YYYY-MM-DD")).as("expirationDate");
         cy.wrap(expiresOnDate.add(30, "days").format("YYYY-MM-DD")).as(
-          "nextExpirationDate"
+          "nextExpirationDate",
         );
       });
 
@@ -91,16 +91,16 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.ensureModal(
       new RegExp(
-        `Postpone the expiration date of\\s*${FOLDER_NAME} by one month`
-      )
+        `Postpone the expiration date of\\s*${FOLDER_NAME} by one month`,
+      ),
     )
       .within(function (this: Record<string, unknown>) {
         cy.contains(`Current expiration date: ${this.expirationDate}`).should(
-          "be.visible"
+          "be.visible",
         );
         // Since tests run instantly, this will be the same date
         cy.contains(
-          `Expiration date after postponing: ${this.nextExpirationDate}`
+          `Expiration date after postponing: ${this.nextExpirationDate}`,
         ).should("be.visible");
       })
       .closeModal("Postpone");
@@ -108,7 +108,7 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
     cy.wait("@postponeExpiration").should(
       "have.nested.property",
       "response.statusCode",
-      200
+      200,
     );
 
     cy.url().should("eq", "@adminUrl");
@@ -117,7 +117,7 @@ describe("Issue #87: Postpone button (extend folder expiration date by one month
 
     cy.get<string>("@nextExpirationDate").then((nextExpirationDate) => {
       cy.ensureToast(
-        `New expiration date for ${FOLDER_NAME}: ${nextExpirationDate}`
+        `New expiration date for ${FOLDER_NAME}: ${nextExpirationDate}`,
       );
     });
 

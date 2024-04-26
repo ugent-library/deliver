@@ -4,7 +4,7 @@ export default function getFolderShareUrl(
   this: Record<string, unknown>,
   subject: unknown,
   folderIdOrAlias: string,
-  folderName?: string
+  folderName?: string,
 ): Cypress.Chainable<string> {
   if (typeof subject === "string") {
     // Handle child mode
@@ -36,7 +36,7 @@ export default function getFolderShareUrl(
 
   const url = new URL(
     `/share/${folderIdOrAlias}:${folderName}`,
-    Cypress.config("baseUrl")!
+    Cypress.config("baseUrl")!,
   );
 
   return cy.wrap(url.toString(), { log: false }).finishLog(log);
@@ -47,7 +47,7 @@ declare global {
     interface Chainable {
       getFolderShareUrl(
         folderIdOrAlias: string,
-        folderName: string
+        folderName: string,
       ): Chainable<string>;
 
       getFolderShareUrl(folderName: string): Chainable<string>;

@@ -11,5 +11,5 @@ Cypress.Commands.overwrite<"visit">(
     subject = mapAlias(this, subject);
 
     return originalFn(subject, ...args);
-  }
+  },
 );

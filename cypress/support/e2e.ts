@@ -11,7 +11,7 @@ before(() => {
   function createDefaultSpace() {
     cy.contains("label", "Space name").type(DEFAULT_SPACE);
     cy.contains("label", "Space admins").type(
-      Cypress.env("SPACE_ADMIN_USER_NAME")
+      Cypress.env("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
   }
@@ -33,7 +33,7 @@ before(() => {
     if (pathname.startsWith("/spaces")) {
       cy.then(() => {
         const defaultSpace = Cypress.$(
-          `.c-sub-sidebar .c-sidebar__label:contains("${DEFAULT_SPACE}")`
+          `.c-sub-sidebar .c-sidebar__label:contains("${DEFAULT_SPACE}")`,
         );
 
         if (defaultSpace.length === 0) {

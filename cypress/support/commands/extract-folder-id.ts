@@ -14,7 +14,7 @@ export default function extractFolderId(alias: false | string = "folderId") {
     // Only assert when there is a problem so the command log does not get bloated
     expect(pathname).to.match(
       REGEX,
-      "Folder ID cannot be extracted from the URL"
+      "Folder ID cannot be extracted from the URL",
     );
   });
 

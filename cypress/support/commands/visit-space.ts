@@ -2,7 +2,7 @@ import { logCommand } from "./helpers";
 
 export default function visitSpace(
   space?: string,
-  options?: Partial<Cypress.VisitOptions>
+  options?: Partial<Cypress.VisitOptions>,
 ): Cypress.Chainable<Cypress.AUTWindow> {
   if (typeof space !== "string") {
     options = space;
@@ -23,7 +23,7 @@ declare global {
 
       visitSpace(
         space?: string,
-        options?: Partial<VisitOptions>
+        options?: Partial<VisitOptions>,
       ): Chainable<AUTWindow>;
       visitSpace(options?: Partial<VisitOptions>): Chainable<AUTWindow>;
     }

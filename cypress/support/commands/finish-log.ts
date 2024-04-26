@@ -3,7 +3,7 @@ import { updateConsoleProps, updateLogMessage } from "./helpers";
 export default function finishLog(
   subject: unknown,
   log: Cypress.Log | undefined,
-  appendToMessage = false
+  appendToMessage = false,
 ): typeof subject {
   if (log) {
     let theSubject = subject;
@@ -39,7 +39,7 @@ declare global {
        */
       finishLog(
         log: Log | undefined,
-        appendToMessage?: boolean
+        appendToMessage?: boolean,
       ): Chainable<Subject>;
     }
   }

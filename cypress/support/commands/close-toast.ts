@@ -8,7 +8,7 @@ type CloseToastOptions = {
 
 export default function closeToast(
   subject: JQuery<HTMLElement>,
-  options?: CloseToastOptions
+  options?: CloseToastOptions,
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   if (options?.log !== false) {
     logCommand("closeToast", { subject, options });

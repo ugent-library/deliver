@@ -5,7 +5,7 @@ type EnsureNoToastOptions = {
 };
 
 export default function ensureNoToast(
-  options: EnsureNoToastOptions = { timeout: 6000 } // Toast automatically disappear after 5 seconds
+  options: EnsureNoToastOptions = { timeout: 6000 }, // Toast automatically disappear after 5 seconds
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   logCommand("ensureNoToast", { options });
 
@@ -18,7 +18,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       ensureNoToast(
-        options?: EnsureNoToastOptions
+        options?: EnsureNoToastOptions,
       ): Chainable<JQuery<HTMLElement>>;
     }
   }

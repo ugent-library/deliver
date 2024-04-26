@@ -17,7 +17,7 @@ async function run() {
   }
 
   const response = await fetch(
-    `https://api.github.com/repos/ugent-library/deliver/issues/${issueId}`
+    `https://api.github.com/repos/ugent-library/deliver/issues/${issueId}`,
   );
   if (response.ok) {
     const { title, pull_request } = await response.json();
@@ -34,7 +34,7 @@ describe('Issue #${issueId}: ${title}', () => {
   it('should ...', () => {
 
   })
-})`
+})`,
     );
 
     execSync(`open ${specPath}`);

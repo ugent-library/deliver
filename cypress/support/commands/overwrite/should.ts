@@ -12,5 +12,5 @@ Cypress.Commands.overwrite<"should", "optional">(
     args = args.map((a) => mapAlias(this, a));
 
     return originalFn(subject, chainer, ...args);
-  }
+  },
 );

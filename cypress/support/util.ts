@@ -1,5 +1,5 @@
 export function getRandomText(includeSubstring?: string): string {
-  const randomText =Math.random().toString(36).split('.').at(1)!.toUpperCase()
+  const randomText = Math.random().toString(36).split(".").at(1)!.toUpperCase();
 
   if (includeSubstring) {
     return (
@@ -16,7 +16,7 @@ export function getRandomText(includeSubstring?: string): string {
 
 export function mapAlias(
   thisObject: Record<string, unknown>,
-  argument: unknown
+  argument: unknown,
 ): unknown {
   if (typeof argument === "string" && argument.startsWith("@")) {
     const alias = argument.slice(1);

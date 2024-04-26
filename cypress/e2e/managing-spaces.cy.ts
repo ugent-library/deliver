@@ -17,7 +17,7 @@ describe("Managing spaces", () => {
       "Space admins",
       Cypress.env("SUPER_ADMIN_USER_NAME") +
         "," +
-        Cypress.env("SPACE_ADMIN_USER_NAME")
+        Cypress.env("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
 
@@ -42,7 +42,7 @@ describe("Managing spaces", () => {
       "Space admins",
       Cypress.env("SUPER_ADMIN_USER_NAME") +
         "," +
-        Cypress.env("SPACE_ADMIN_USER_NAME")
+        Cypress.env("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
 
@@ -69,7 +69,7 @@ describe("Managing spaces", () => {
       "Space admins",
       Cypress.env("SUPER_ADMIN_USER_NAME") +
         "," +
-        Cypress.env("SPACE_ADMIN_USER_NAME")
+        Cypress.env("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
 

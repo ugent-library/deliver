@@ -10,7 +10,7 @@ export default function cleanUp(space?: string) {
   deleteAllTestFolders(log, space || Cypress.env("DEFAULT_SPACE")).then(
     (count) => {
       log.set("message", count.toString());
-    }
+    },
   );
 
   cy.get(SELECTOR, NO_LOG).should("not.exist");
@@ -24,7 +24,7 @@ function deleteAllTestFolders(log: Cypress.Log, space: string) {
 
     updateConsoleProps(
       log,
-      (cp) => (cp.links = anchors.map((a) => a.textContent))
+      (cp) => (cp.links = anchors.map((a) => a.textContent)),
     );
 
     const links = anchors.map((a) => a.getAttribute("href"));

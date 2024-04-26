@@ -6,7 +6,7 @@ type GetLabelOptions = {
 
 export default function (
   caption: string | RegExp,
-  options: GetLabelOptions = { log: true }
+  options: GetLabelOptions = { log: true },
 ) {
   const log =
     options.log !== false && logCommand("getLabel", undefined, caption);
@@ -56,7 +56,7 @@ declare global {
     interface Chainable {
       getLabel(
         caption: string | RegExp,
-        options?: GetLabelOptions
+        options?: GetLabelOptions,
       ): Chainable<JQuery<HTMLLabelElement>>;
     }
   }

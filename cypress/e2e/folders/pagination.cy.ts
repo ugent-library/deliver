@@ -13,7 +13,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.getFolderCount("total").then((total) => {
       if (total === NUMBER_OF_TEST_FOLDERS) {
         const folderNames = Cypress.$(
-          "#folders table tbody tr td:first-of-type a"
+          "#folders table tbody tr td:first-of-type a",
         )
           .get()
           .map((a) => a.textContent!);
@@ -50,14 +50,14 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.get('select[name="sort"]').as("sort");
 
     cy.get('.pagination .page-item:has(.page-link[aria-label="Previous"])').as(
-      "previous"
+      "previous",
     );
     cy.get('.pagination .page-item:has(.page-link[aria-label="Next"])').as(
-      "next"
+      "next",
     );
 
     cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
-      "getFolders"
+      "getFolders",
     );
   });
 
@@ -69,7 +69,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
     cy.contains(
       "#folders .card-header .pagination .page-item a.page-link",
-      "2"
+      "2",
     ).should("be.visible");
 
     cy.get("#folders table tbody tr").should("have.length", 20);
@@ -78,7 +78,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
     cy.contains(
       "#folders .card-footer .pagination .page-item a.page-link",
-      "2"
+      "2",
     ).should("be.visible");
   });
 
@@ -133,7 +133,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
 
       cy.get(`#folders .pagination .page-item:not(:contains(${page}))`).should(
         "not.have.class",
-        "active"
+        "active",
       );
     });
   });
@@ -526,7 +526,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
   function getNumberOfPages() {
     return cy
       .get(
-        '.card-header .pagination .page-item:has(.page-link[aria-label="Next"])'
+        '.card-header .pagination .page-item:has(.page-link[aria-label="Next"])',
       )
       .prev()
       .invoke("text")

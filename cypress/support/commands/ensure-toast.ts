@@ -6,7 +6,7 @@ type EnsureToastOptions = {
 
 export default function ensureToast(
   expectedTitle?: string | RegExp,
-  options?: EnsureToastOptions
+  options?: EnsureToastOptions,
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   if (typeof expectedTitle === "object" && !(expectedTitle instanceof RegExp)) {
     if (options) {
@@ -23,7 +23,7 @@ export default function ensureToast(
       ? logCommand(
           "ensureToast",
           { "Expected title": expectedTitle, options },
-          expectedTitle
+          expectedTitle,
         )
       : undefined;
 
@@ -53,7 +53,7 @@ declare global {
     interface Chainable {
       ensureToast(
         expectedTitle?: string | RegExp,
-        options?: EnsureToastOptions
+        options?: EnsureToastOptions,
       ): Chainable<JQuery<HTMLElement>>;
     }
   }

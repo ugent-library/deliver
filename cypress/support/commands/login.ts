@@ -26,7 +26,7 @@ export default function login(username: string, password: string): void {
         cy.get('input[name="password"]', NO_LOG).invoke(
           NO_LOG,
           "val",
-          password
+          password,
         );
       }
 
@@ -34,7 +34,7 @@ export default function login(username: string, password: string): void {
     },
     {
       cacheAcrossSpecs: true,
-    }
+    },
   );
 }
 

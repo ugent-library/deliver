@@ -1,7 +1,7 @@
 import { logCommand } from "./helpers";
 
 export default function setClipboardText(
-  text: string
+  text: string,
 ): Cypress.Chainable<void> {
   logCommand("setClipboardText", { text }, `"${text}"`);
 

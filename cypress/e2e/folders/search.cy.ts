@@ -38,7 +38,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
     cy.getFolderCount("total").should("be.at.least", 5);
 
     cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
-      "filterFolders"
+      "filterFolders",
     );
 
     cy.get("input[name=q]").as("q");

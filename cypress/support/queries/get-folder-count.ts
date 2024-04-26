@@ -9,19 +9,19 @@ type GetFolderCountResult = {
 };
 
 export default function getFolderCount<T extends keyof GetFolderCountResult>(
-  key?: T
+  key?: T,
 ): () => GetFolderCountResult | GetFolderCountResult[T] {
   const log = logCommand("getFolderCount", { key });
 
   const getFn = cy.now(
     "get",
     ".bc-toolbar:has(.pagination) .bc-toolbar-right .bc-toolbar-item span",
-    { log: false }
+    { log: false },
   ) as () => JQuery<HTMLSpanElement>;
 
   return () => {
     const texts = Cypress._.uniq(
-      getFn().map((_, e) => e.textContent?.trim() || "")
+      getFn().map((_, e) => e.textContent?.trim() || ""),
     );
     if (texts.length === 0 || texts?.at(0) === "") {
       throw new Error("Found no folder count messages to parse.");
@@ -29,13 +29,13 @@ export default function getFolderCount<T extends keyof GetFolderCountResult>(
 
     if (texts.length > 1) {
       throw new Error(
-        "Found multiple non-matching folder counts: \n- " + texts.join("\n - ")
+        "Found multiple non-matching folder counts: \n- " + texts.join("\n - "),
       );
     }
 
     const text = texts.at(0)!;
     const matches = text.match(
-      /Showing ((?<start>\d+)-(?<end>\d+) of )?(?<total>\d+) folder\(s\)/
+      /Showing ((?<start>\d+)-(?<end>\d+) of )?(?<total>\d+) folder\(s\)/,
     );
 
     if (!matches) {
@@ -71,7 +71,7 @@ export default function getFolderCount<T extends keyof GetFolderCountResult>(
     } else {
       log.set(
         "message",
-        start || end ? `${start || "..."}-${end || "..."} of ${total}` : total
+        start || end ? `${start || "..."}-${end || "..."} of ${total}` : total,
       );
     }
 
@@ -87,7 +87,7 @@ declare global {
       getFolderCount(): Chainable<GetFolderCountResult>;
 
       getFolderCount<T extends keyof GetFolderCountResult>(
-        key?: T
+        key?: T,
       ): Chainable<GetFolderCountResult[T]>;
     }
   }

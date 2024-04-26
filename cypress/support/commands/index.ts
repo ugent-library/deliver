@@ -72,7 +72,7 @@ Cypress.Commands.addAll(
     setField,
 
     submitForm,
-  }
+  },
 );
 
 // Dual commands
@@ -84,5 +84,5 @@ Cypress.Commands.addAll(
     getFolderShareUrl,
 
     closeModal,
-  }
+  },
 );
