@@ -21,9 +21,7 @@ node_modules
 reflex.conf
 
 # Config
-.env*
-!.devcontainer/.env
-!.env.example
+*.env
 
 # Cypress
 cypress.env.json
