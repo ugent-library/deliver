@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Ignore all .env files
+- Use Docker volumes in devcontainer
+
 ### Fixed
 
 ## [v1.1.4] - 2024-03-28
