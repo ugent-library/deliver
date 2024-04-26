@@ -6,10 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-        - ./.env
+      - ../.devcontainer.env
     volumes:
       - ../..:/src:cached
-    command: 
+    command:
       - bash
       - -c
       - |
@@ -19,8 +19,8 @@ services:
         tern migrate
         sleep infinity
     depends_on:
-      - db-app
-      - minio
+      - db
+      - mc
 
   oidc:
     image: ugentlib/mock-oidc-server
@@ -28,14 +28,14 @@ services:
     volumes:
       - ./oidc:/dist/.data
     env_file:
-      - .env
+      - ../.devcontainer.env
     network_mode: service:app
 
-  db-app:
+  db:
     image: postgres:16-alpine
     restart: unless-stopped
     volumes:
-      - ../tmp/app-db/db_data:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DATABASE: deliver
       POSTGRES_USER: deliver
@@ -54,17 +54,26 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - ../tmp/minio:/data
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  minio-mc:
+  mc:
     image: minio/mc
     depends_on:
       - minio
-    command: >
-      /bin/sh -c "sleep infinity"
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:3171 minioadmin minioadmin;
-      /usr/bin/mc mb myminio/deliver --ignore-existing;
-      exit 0;
-      "
+    entrypoint:
+      - sh
+      - -c
+      - |
+        mc alias set devcontainer http://minio:3171 minioadmin minioadmin
+        mc mb devcontainer/deliver --ignore-existing
+
+volumes:
+  dbdata:
+    driver: local
+  miniodata:
+    driver: local

@@ -1,9 +1,5 @@
 export function getRandomText(includeSubstring?: string): string {
-  const randomText = crypto
-    .randomUUID()
-    .replace(/-/g, "")
-    .toUpperCase()
-    .substring(0, 10);
+  const randomText =Math.random().toString(36).split('.').at(1)!.toUpperCase()
 
   if (includeSubstring) {
     return (

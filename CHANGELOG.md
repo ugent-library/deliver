@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Ignore all .env files
+- Use Docker volumes in devcontainer
 - Added hotkey "n" to the "+ Make new folder" button in the folder view
 
 ### Fixed
