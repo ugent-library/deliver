@@ -9,7 +9,7 @@ services:
         - ./.env
     volumes:
       - ../..:/src:cached
-    command: 
+    command:
       - bash
       - -c
       - |
@@ -19,7 +19,7 @@ services:
         tern migrate
         sleep infinity
     depends_on:
-      - db-app
+      - db
       - minio
 
   oidc:
@@ -31,11 +31,11 @@ services:
       - .env
     network_mode: service:app
 
-  db-app:
+  db:
     image: postgres:16-alpine
     restart: unless-stopped
     volumes:
-      - ../tmp/app-db/db_data:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DATABASE: deliver
       POSTGRES_USER: deliver
@@ -54,7 +54,12 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - ../tmp/minio:/data
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   minio-mc:
     image: minio/mc
@@ -68,3 +73,9 @@ services:
       /usr/bin/mc mb myminio/deliver --ignore-existing;
       exit 0;
       "
+  
+volumes:
+  dbdata:
+    driver: local
+  miniodata:
+    driver: local
