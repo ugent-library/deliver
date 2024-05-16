@@ -91,13 +91,17 @@ describe("Managing folders", () => {
 
     cy.getFolderCount("total").as("totalNumberOfFolders");
 
-    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name")
+      .should("not.have.class", "is-invalid")
+      .should("not.have.attr", "autofocus");
     cy.get("#folder-name-invalid").should("not.exist");
 
     cy.setFieldByLabel("Folder name", " ");
     cy.contains(".btn", "Make folder").click();
 
-    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name")
+      .should("have.class", "is-invalid")
+      .should("have.attr", "autofocus");
     cy.get("#folder-name-invalid")
       .should("be.visible")
       .and("have.text", "name cannot be empty");
@@ -119,13 +123,17 @@ describe("Managing folders", () => {
 
     cy.visitSpace();
 
-    cy.get("#folder-name").should("not.have.class", "is-invalid");
+    cy.get("#folder-name")
+      .should("not.have.class", "is-invalid")
+      .should("not.have.attr", "autofocus");
     cy.get("#folder-name-invalid").should("not.exist");
 
     cy.setFieldByLabel("Folder name", FOLDER_NAME);
     cy.contains(".btn", "Make folder").click();
 
-    cy.get("#folder-name").should("have.class", "is-invalid");
+    cy.get("#folder-name")
+      .should("have.class", "is-invalid")
+      .should("have.attr", "autofocus");
     cy.get("#folder-name-invalid")
       .should("be.visible")
       .and("have.text", "name must be unique");

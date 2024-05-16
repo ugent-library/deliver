@@ -383,6 +383,33 @@ describe("Managing files", () => {
     assertFolderFileCount(0);
   });
 
+  it("should be possible to move back to the make folder form using a hotkey", () => {
+    cy.intercept("POST", "/folders/*/files").as("uploadFile");
+
+    cy.get("input[type=file]").selectFile("cypress/fixtures/test.txt");
+    cy.wait("@uploadFile");
+
+    // Typing capital N should not trigger the hotkey
+    cy.get("body").type("N");
+    cy.url().should("eq", "@adminUrl");
+
+    // Typing in a form field should not trigger the hotkey
+    cy.get('input[value*="/share/"]')
+      .as("shareUrl")
+      .invoke("removeAttr", "readonly");
+    cy.get("@shareUrl").focus().type("{leftArrow}n").blur();
+    cy.url().should("eq", "@adminUrl");
+
+    // Test the actual hotkey
+    cy.get("body").type("n");
+    cy.location("pathname").should(
+      "eq",
+      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+    );
+
+    cy.get("#folder-name").should("have.attr", "autofocus");
+  });
+
   function assertFileUpload(
     fileName: string,
     {

@@ -156,10 +156,17 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
 
-	validationErrors := okay.NewErrors()
-	if err != nil && !errors.As(err, &validationErrors) {
+	newFolderArgs := views.NewFolderArgs{
+		Folder: folder,
+		Errors: okay.NewErrors(),
+	}
+	if err != nil && !errors.As(err, &newFolderArgs.Errors) {
 		c.HandleError(w, r, err)
 		return
+	}
+
+	if len(newFolderArgs.Errors.Errors) > 0 || r.URL.Query().Get("focus") == "new-folder" {
+		newFolderArgs.Autofocus = true
 	}
 
 	var userSpaces []*models.Space
@@ -180,7 +187,7 @@ func showSpace(w http.ResponseWriter, r *http.Request, folder *models.Folder, er
 		return
 	}
 
-	views.ShowSpace(c, space, folders, pagination, userSpaces, folder, validationErrors).Render(r.Context(), w)
+	views.ShowSpace(c, space, folders, pagination, userSpaces, newFolderArgs).Render(r.Context(), w)
 }
 
 func getPagination(r *http.Request) *models.Pagination {
