@@ -12,6 +12,7 @@ export default function (rootEl) {
         );
         let form = input.closest("form");
         let csrfToken = document.querySelector("meta[name=csrf-token]").content;
+        let nUploadsBusy = 0
 
         files.forEach((file, i) => {
           let tmpl = document
@@ -83,6 +84,22 @@ export default function (rootEl) {
           ];
 
           let req = new XMLHttpRequest();
+
+          req.addEventListener(
+            "loadstart", () => {
+              nUploadsBusy++;
+              // duplicate listeners are ignored
+              window.addEventListener("beforeunload", beforeUnloadHandler)
+            }
+          )
+          req.addEventListener(
+            "loadend", () => {
+              nUploadsBusy--;
+              if (nUploadsBusy <= 0) {
+                window.removeEventListener("beforeunload", beforeUnloadHandler)
+              }
+            }
+          )
 
           req.addEventListener(
             "abort",
@@ -184,4 +201,11 @@ function friendlyBytes(n) {
     return val.toFixed(1) + " " + unit;
   }
   return val.toFixed(0) + " " + unit;
+}
+
+function beforeUnloadHandler(evt){
+   // Recommended
+   evt.preventDefault();
+   // Included for legacy support, e.g. Chrome/Edge < 119
+   evt.returnValue = true;
 }
