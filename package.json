@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "reflex -d none -c reflex.docker.conf",
+    "build": "node esbuild.mjs",
     "db:seed": "go run main.go seed",
     "db:reset": "go run main.go reset --force",
     "test": "cypress run --config-file cypress/cypress.config.ts",
@@ -19,6 +20,8 @@
     "cypress-common": "github:ugent-library/cypress-common#3.17.0",
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",
+    "esbuild": "^0.21.4",
+    "esbuild-sass-plugin": "^3.3.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
     "laravel-mix": "^6.0.11",
     "prettier": "^3.2.5",
