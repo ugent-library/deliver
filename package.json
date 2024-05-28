@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "reflex -d none -c reflex.docker.conf",
     "build": "node esbuild.mjs",
+    "build:watch": "node esbuild.mjs --watch",
     "db:seed": "go run main.go seed",
     "db:reset": "go run main.go reset --force",
     "test": "cypress run --config-file cypress/cypress.config.ts",

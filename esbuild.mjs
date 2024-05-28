@@ -1,7 +1,7 @@
 import * as esbuild from "esbuild";
 import { sassPlugin } from "esbuild-sass-plugin";
 
-const ctx = await esbuild.context({
+const config = {
   entryPoints: [
     "assets/ugent/favicon.ico",
     "assets/ugent/fonts/*",
@@ -22,7 +22,13 @@ const ctx = await esbuild.context({
     ".png": "copy",
   },
   plugins: [sassPlugin()],
-});
+};
 
-await ctx.watch();
-console.log("ESBuild finished. Watching for changes...");
+if (process.argv.includes("--watch")) {
+  const ctx = await esbuild.context(config);
+  await ctx.watch();
+
+  console.log("ESBuild running. Watching for changes...");
+} else {
+  await esbuild.build(config);
+}
