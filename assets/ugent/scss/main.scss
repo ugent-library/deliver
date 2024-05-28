@@ -23,7 +23,7 @@ $custom-theme-colors: (
 $theme-colors: map-merge($theme-colors, $custom-theme-colors);
 
 // Followed by our default maps
-@import "~bootstrap/scss/_variables-dark";
+@import "~bootstrap/scss/variables-dark";
 @import "~bootstrap/scss/maps";
 
 // Rest of our imports
