@@ -1,4 +1,5 @@
 import * as esbuild from "esbuild";
+import { clean } from "esbuild-plugin-clean";
 import { sassPlugin } from "esbuild-sass-plugin";
 import manifestPlugin from "esbuild-plugin-manifest";
 
@@ -23,6 +24,7 @@ const config = {
     ".png": "copy",
   },
   plugins: [
+    clean({ patterns: ["./static/*"] }),
     sassPlugin({
       embedded: true,
     }),
