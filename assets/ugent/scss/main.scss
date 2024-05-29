@@ -8,7 +8,7 @@
    ========================================================================== */
 
 // Functions come first
-@import "~bootstrap/scss/functions";
+@import "bootstrap/scss/functions";
 
 // Optional variable overrides here
 $custom-color: #1e64c8;
@@ -17,19 +17,19 @@ $custom-theme-colors: (
 );
 
 // Variables come next
-@import "~bootstrap/scss/variables";
+@import "bootstrap/scss/variables";
 
 // Optional Sass map overrides here
 $theme-colors: map-merge($theme-colors, $custom-theme-colors);
 
 // Followed by our default maps
-@import "~bootstrap/scss/variables-dark";
-@import "~bootstrap/scss/maps";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
 
 // Rest of our imports
-@import "~bootstrap/scss/mixins";
-@import "~bootstrap/scss/root";
-@import "~bootstrap/scss/reboot";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
 
 /* Generic: CSS reset, box-sizing, global CSS tweaks
   ========================================================================== */
@@ -43,33 +43,33 @@ $theme-colors: map-merge($theme-colors, $custom-theme-colors);
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
-@import "~bootstrap/scss/type";
-@import "~bootstrap/scss/images";
-//@import "~bootstrap/scss/code";
-@import "~bootstrap/scss/bootstrap-grid";
-@import "~bootstrap/scss/tables";
-@import "~bootstrap/scss/forms";
-@import "~bootstrap/scss/buttons";
-@import "~bootstrap/scss/transitions";
-@import "~bootstrap/scss/dropdown";
-@import "~bootstrap/scss/button-group";
-@import "~bootstrap/scss/forms/input-group";
-@import "~bootstrap/scss/nav";
-@import "~bootstrap/scss/navbar";
-@import "~bootstrap/scss/card";
-@import "~bootstrap/scss/breadcrumb";
-@import "~bootstrap/scss/pagination";
-@import "~bootstrap/scss/badge";
-@import "~bootstrap/scss/alert";
-@import "~bootstrap/scss/progress";
-@import "~bootstrap/scss/list-group";
-@import "~bootstrap/scss/close";
-@import "~bootstrap/scss/toasts";
-@import "~bootstrap/scss/modal";
-@import "~bootstrap/scss/tooltip";
-@import "~bootstrap/scss/popover";
-@import "~bootstrap/scss/spinners";
-@import "~bootstrap/scss/bootstrap-utilities";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+//@import "bootstrap/scss/code";
+@import "bootstrap/scss/bootstrap-grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/forms/input-group";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/breadcrumb";
+@import "bootstrap/scss/pagination";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/tooltip";
+@import "bootstrap/scss/popover";
+@import "bootstrap/scss/spinners";
+@import "bootstrap/scss/bootstrap-utilities";
 
 // Bootstrap additions
 @import "./bootstrap-additions/alerts";
