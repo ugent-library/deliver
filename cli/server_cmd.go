@@ -66,7 +66,7 @@ var serverCmd = &cobra.Command{
 
 		// setup assets
 		assets, err := mix.New(mix.Config{
-			ManifestFile: "static/mix-manifest.json",
+			ManifestFile: "static/manifest.json",
 			PublicPath:   "/static/",
 		})
 		if err != nil {

@@ -22,6 +22,7 @@
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.21.4",
+    "esbuild-plugin-manifest": "^1.0.3",
     "esbuild-sass-plugin": "^3.3.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
     "laravel-mix": "^6.0.11",
