@@ -25,7 +25,6 @@
     "esbuild-plugin-manifest": "^1.0.3",
     "esbuild-sass-plugin": "^3.3.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
-    "laravel-mix": "^6.0.11",
     "prettier": "^3.2.5",
     "resolve-url-loader": "^4.0.0",
     "sass": "^1.35.1",

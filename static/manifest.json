@@ -1,12 +1,12 @@
 {
-  "/js/app.js": "/js/app.js?id=653b4a61d1d96c1d26883502bb02cf0b",
-  "/css/app.css": "/css/app.css?id=042342727d093ea20c745c5644b11a0d",
-  "/images/ghent-university-library-logo.svg": "/images/ghent-university-library-logo.svg?id=729f32c469a1aaa6f22f913591cd6fa1",
-  "/images/ghent-university-library-mark.svg": "/images/ghent-university-library-mark.svg?id=ddfeba39843a5fa6ab3c7adae01c858c",
-  "/images/logo-ugent-white.svg": "/images/logo-ugent-white.svg?id=c944c2b9b6d753f8c013494c88ebe816",
-  "/images/torentje-forbidden.png": "/images/torentje-forbidden.png?id=ab621dcaed7346f6d317417b4fcd7b3f",
-  "/images/torentje-wrong-delivery.png": "/images/torentje-wrong-delivery.png?id=3a1b0c46ef194f379836aa78ee1faa6c",
-  "/favicon.ico": "/favicon.ico?id=a0ecdb0990ba3521e64d7578ed4a95ed",
-  "/fonts/icon-font.woff": "/fonts/icon-font.woff?id=975fe734137612da840e8150f97e8e77",
-  "/fonts/icon-font.woff2": "/fonts/icon-font.woff2?id=a42cd18ff83843c0b09539400b24aec6"
+  "/js/app.js": "/static/js/app-SFCG7HXW.js",
+  "/fonts/icon-font.woff2": "/static/fonts/icon-font-FD2ZC2Y6.woff2",
+  "/fonts/icon-font.woff": "/static/fonts/icon-font-Y5OTM2MS.woff",
+  "/css/app.css": "/static/css/app-HZ2DNIMM.css",
+  "/images/ghent-university-library-logo.svg": "/static/images/ghent-university-library-logo-DYFVMHAF.svg",
+  "/images/ghent-university-library-mark.svg": "/static/images/ghent-university-library-mark-J23HOVYJ.svg",
+  "/images/logo-ugent-white.svg": "/static/images/logo-ugent-white-S4KZF3U3.svg",
+  "/images/torentje-forbidden.png": "/static/images/torentje-forbidden-ZJWTVNNK.png",
+  "/images/torentje-wrong-delivery.png": "/static/images/torentje-wrong-delivery-4W5AMCPK.png",
+  "/favicon.ico": "/static/favicon-7PUPUXS7.ico"
 }

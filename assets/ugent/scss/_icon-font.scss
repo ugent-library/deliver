@@ -1,8 +1,9 @@
 @font-face {
   font-family: "icon-font";
   src:
-    url("../fonts/icon-font.woff2") format("woff2"),
-    url("../fonts/icon-font.woff") format("woff");
+    // Path is relative starting from /assets/css/app.scss
+    url("../ugent/fonts/icon-font.woff2") format("woff2"),
+    url("../ugent/fonts/icon-font.woff") format("woff");
 }
 
 i[class^="if-"]:before,

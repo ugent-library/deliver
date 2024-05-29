@@ -24,7 +24,6 @@ require (
 	github.com/ugent-library/bind v0.0.0-20230530100714-1c79a1aecab1
 	github.com/ugent-library/catbird v0.0.0-20240117130454-d406e5e698cf
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
-	github.com/ugent-library/mix v0.0.0-20230123152737-b51ce0c6439b
 	github.com/unrolled/secure v1.14.0
 	go.uber.org/zap v1.26.0
 )
