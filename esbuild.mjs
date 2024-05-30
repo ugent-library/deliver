@@ -2,6 +2,7 @@ import * as esbuild from "esbuild";
 import { clean } from "esbuild-plugin-clean";
 import { sassPlugin } from "esbuild-sass-plugin";
 import manifestPlugin from "esbuild-plugin-manifest";
+import fs from "fs";
 
 const config = {
   entryPoints: [
@@ -45,7 +46,9 @@ if (process.argv.includes("--watch")) {
     "---------------------------------- Building assets ----------------------------------",
   );
 
-  await esbuild.build(config);
+  const result = await esbuild.build(config);
+
+  fs.writeFileSync("meta.json", JSON.stringify(result.metafile));
 
   console.log(
     "-------------------------------------------------------------------------------------",
