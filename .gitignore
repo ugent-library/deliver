@@ -36,3 +36,6 @@ cypress/cypress-record.sh
 
 # Local workspace
 go.work*
+
+# esbuild
+meta.json

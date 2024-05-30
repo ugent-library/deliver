@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,7 +20,6 @@ import (
 	"github.com/ugent-library/deliver/objectstores"
 	"github.com/ugent-library/deliver/repositories"
 	"github.com/ugent-library/httperror"
-	"github.com/ugent-library/mix"
 	"github.com/ugent-library/zaphttp"
 	"github.com/unrolled/secure"
 	"go.uber.org/zap"
@@ -94,7 +94,7 @@ type Config struct {
 	Router        *ich.Mux
 	ErrorHandlers map[int]http.HandlerFunc
 	Permissions   *models.Permissions
-	Assets        mix.Manifest
+	Assets        map[string]string
 	Hub           *catbird.Hub
 	Timezone      *time.Location
 	CSRFName      string
@@ -208,11 +208,11 @@ func getFlash(r *http.Request, w http.ResponseWriter) ([]Flash, error) {
 }
 
 func (c *Ctx) AssetPath(asset string) string {
-	ap, err := c.Assets.AssetPath(asset)
-	if err != nil {
-		panic(err)
+	a, ok := c.Assets[asset]
+	if !ok {
+		panic(fmt.Errorf("asset '%s' not found in manifest", asset))
 	}
-	return ap
+	return a
 }
 
 func (c *Ctx) WebSocketPath(topics ...string) string {
