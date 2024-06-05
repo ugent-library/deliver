@@ -14,7 +14,6 @@ export default function (rootEl) {
 
         files.forEach((file) => {
           const tmpl = new FileTemplate(target);
-
           tmpl.uploadName = file.name;
 
           // prevent file upload when above max file size
@@ -26,7 +25,6 @@ export default function (rootEl) {
           }
 
           const req = new XMLHttpRequest();
-
           req.addEventListener("abort", () => {
             tmpl.showRemoveUploadButton();
             tmpl.showMessage(input.dataset.uploadMsgFileAborted, "error");
@@ -91,18 +89,20 @@ export default function (rootEl) {
 }
 
 class FileTemplate {
+  #template = null;
   #qsCache = new Map();
 
   constructor(target) {
-    this.template = document
+    this.#template = document
       .getElementById("tmpl-upload-progress")
       .content.firstElementChild.cloneNode(true);
 
-    target.appendChild(this.template);
+    target.appendChild(this.#template);
 
     this.#qs(".btn-remove-upload").addEventListener(
       "click",
-      this.#onRemoveUploadButtonClick,
+      // Make sure the event handler can reach the class instance via this
+      this.destroy.bind(this),
     );
   }
 
@@ -147,10 +147,7 @@ class FileTemplate {
   }
 
   showRemoveUploadButton() {
-    const cancelButton = this.#qs(".btn-cancel-upload");
-    if (cancelButton && cancelButton.parentElement) {
-      cancelButton.parentElement.removeChild(cancelButton);
-    }
+    this.#remove(".btn-cancel-upload");
 
     const removeButton = this.#qs(".btn-remove-upload");
     if (removeButton) {
@@ -159,21 +156,29 @@ class FileTemplate {
   }
 
   destroy() {
-    this.template.parentElement.removeChild(this.template);
+    if (this.#template && this.#template.parentElement) {
+      this.#template.parentElement.removeChild(this.#template);
+    }
+
+    this.#template = null;
   }
 
   #qs(selector) {
     if (!this.#qsCache.has(selector)) {
-      this.#qsCache.set(selector, this.template.querySelector(selector));
+      this.#qsCache.set(selector, this.#template.querySelector(selector));
     }
 
     return this.#qsCache.get(selector);
   }
 
-  #onRemoveUploadButtonClick() {
-    const i = this.closest(".list-group-item");
+  #remove(selectorOrElement) {
+    if (typeof selectorOrElement == "string") {
+      selectorOrElement = this.#qs(selectorOrElement);
+    }
 
-    i.parentElement.removeChild(i);
+    if (selectorOrElement && selectorOrElement.parentElement) {
+      selectorOrElement.parentElement.removeChild(selectorOrElement);
+    }
   }
 }
 
