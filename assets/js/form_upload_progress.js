@@ -3,165 +3,84 @@ export default function (rootEl) {
     .querySelectorAll("form input[data-upload-progress-target]")
     .forEach((input) => {
       input.addEventListener("change", () => {
-        let files = Array.from(input.files);
+        const files = Array.from(input.files);
 
         if (!files.length) return;
 
-        let target = document.getElementById(
-          input.dataset.uploadProgressTarget
+        const target = document.getElementById(
+          input.dataset.uploadProgressTarget,
         );
-        let form = input.closest("form");
-        let csrfToken = document.querySelector("meta[name=csrf-token]").content;
+        const form = input.closest("form");
 
-        files.forEach((file, i) => {
-          let tmpl = document
-            .getElementById("tmpl-upload-progress")
-            .content.firstElementChild.cloneNode(true);
-          tmpl.querySelector(".upload-name").innerText = file.name;
-          target.appendChild(tmpl);
+        files.forEach((file) => {
+          const tmpl = new FileTemplate(target);
 
-          let hideBtnCancelUpload = function () {
-            let b = tmpl.querySelector(".btn-cancel-upload");
-            if (b == null) return;
-            b.parentElement.removeChild(b);
-          };
-          let showBtnRemoveUpload = function () {
-            let b = tmpl.querySelector(".btn-remove-upload");
-            if (b == null) return;
-            b.classList.remove("d-none");
-          };
-          tmpl
-            .querySelector(".btn-remove-upload")
-            .addEventListener("click", function () {
-              let i = this.closest(".list-group-item");
-              i.parentElement.removeChild(i);
-            });
-          let showMessage = function (msg, level) {
-            let m = tmpl.querySelector(".upload-msg");
-            let cl = "text-muted";
-            if (level == "info") {
-              cl = "text-muted";
-            } else if ((level = "error")) {
-              cl = "text-danger";
-            }
-            m.classList.remove("text-muted");
-            m.classList.add(cl);
-            m.innerText = msg;
-          };
-          let hlPgBar = function (pgBar, level) {
-            let cl = "bg-info";
-            if (level == "warning") {
-              cl = "bg-warning";
-            } else if (level == "error") {
-              cl = "bg-danger";
-            }
-            pgBar.classList.remove("bg-info");
-            pgBar.classList.add(cl);
-          };
+          tmpl.uploadName = file.name;
 
           // prevent file upload when above max file size
-          let maxFileSize = input.dataset.uploadMaxFileSize;
+          const maxFileSize = input.dataset.uploadMaxFileSize;
           if (!isNaN(maxFileSize) && file.size > maxFileSize) {
-            hideBtnCancelUpload();
-            showBtnRemoveUpload();
-            showMessage(input.dataset.uploadMsgFileTooLarge, "error");
-            hlPgBar(tmpl.querySelector(".progress-bar"), "error");
+            tmpl.showRemoveUploadButton();
+            tmpl.showMessage(input.dataset.uploadMsgFiconstooLarge, "error");
             return;
           }
 
-          // send headers along with request
-          let headers = [
-            // set in header or middleware tries to read token from form
-            ["X-CSRF-Token", csrfToken],
-            // weird, but makes sure that middleware does not try to read _method from form
-            ["X-HTTP-Method-Override", "POST"],
-            //"Failed to execute 'setRequestHeader' on 'XMLHttpRequest': String contains non ISO-8859-1 code point"
-            ["X-Upload-Filename", encodeURIComponent(file.name)],
-            //refused by browser
-            //['Content-Length', file.size],
-            ["Content-Type", file.type],
-          ];
+          const req = new XMLHttpRequest();
 
-          let req = new XMLHttpRequest();
+          req.addEventListener("abort", () => {
+            tmpl.showRemoveUploadButton();
+            tmpl.showMessage(input.dataset.uploadMsgFileAborted, "error");
+          });
 
-          req.addEventListener(
-            "abort",
-            (e) => {
-              showMessage(input.dataset.uploadMsgFileAborted, "error");
-              hlPgBar(tmpl.querySelector(".progress-bar"), "error");
-              hideBtnCancelUpload();
-              showBtnRemoveUpload();
-            },
-            false
-          );
+          req.upload.addEventListener("progress", (e) => {
+            if (!e.lengthComputable) return;
 
-          req.upload.addEventListener(
-            "progress",
-            (e) => {
-              if (!e.lengthComputable) return;
+            tmpl.uploadSize = friendlyBytes(e.loaded);
+            tmpl.uploadPercentage = Math.floor((e.loaded / e.total) * 100);
 
-              let percent = Math.floor((e.loaded / e.total) * 100);
-              tmpl.querySelector(".upload-size").innerText = friendlyBytes(
-                e.loaded
-              );
-              tmpl.querySelector(".upload-percent").innerText = percent;
-              let pb = tmpl.querySelector(".progress-bar");
-              pb.style["width"] = `${percent}%`;
-              pb.setAttribute("aria-valuenow", percent);
-
-              if (e.loaded == e.total) {
-                hideBtnCancelUpload();
-                showMessage(input.dataset.uploadMsgFileProcessing, "info");
-              } else {
-                showMessage(input.dataset.uploadMsgFileUploading, "info");
-              }
-            },
-            false
-          );
+            if (e.loaded == e.total) {
+              tmpl.showMessage(input.dataset.uploadMsgFileProcessing, "info");
+            } else {
+              tmpl.showMessage(input.dataset.uploadMsgFileUploading, "info");
+            }
+          });
 
           req.addEventListener("readystatechange", (evt) => {
-            if (req.readyState !== 4) return;
+            if (req.readyState !== 4) return; // 4 = DONE
 
-            hideBtnCancelUpload();
-
-            // file created
             if (req.status == 200 || req.status == 201) {
-              tmpl.parentElement.removeChild(tmpl);
+              // file created
+              tmpl.destroy();
 
               htmx.trigger("body", "refresh-files");
             } else if (req.status == 413) {
-              /*
-               * file too large. Unfortunately this cannot be detected
-               * anymore at server as the error is wrapped inside others.
-               */
-              showBtnRemoveUpload();
-              showMessage(input.dataset.uploadMsgFileTooLarge, "error");
-              hlPgBar(tmpl.querySelector(".progress-bar"), "error");
-            }
-            // directory has been removed in the meantime
-            else if (req.status == 404) {
-              showBtnRemoveUpload();
-              showMessage(input.dataset.uploadMsgDirNotFound, "error");
-              hlPgBar(tmpl.querySelector(".progress-bar"), "error");
-            }
-            // undetermined errors
-            else {
-              showBtnRemoveUpload();
-              showMessage(input.dataset.uploadMsgUnexpected, "error");
-              hlPgBar(tmpl.querySelector(".progress-bar"), "error");
+              // File too large. Unfortunately this cannot be detected
+              // anymore at server as the error is wrapped inside others.
+              tmpl.showRemoveUploadButton();
+              tmpl.showMessage(input.dataset.uploadMsgFileTooLarge, "error");
+            } else if (req.status == 404) {
+              // directory has been removed in the meantime
+              tmpl.showRemoveUploadButton();
+              tmpl.showMessage(input.dataset.uploadMsgDirNotFound, "error");
+            } else {
+              // undetermined errors
+              tmpl.showRemoveUploadButton();
+              tmpl.showMessage(input.dataset.uploadMsgUnexpected, "error");
             }
           });
 
           req.open(form.method, form.action);
-          for (let i = 0; i < headers.length; i++) {
-            req.setRequestHeader(headers[i][0], headers[i][1]);
+
+          const headers = getHttpHeaders(file);
+          for (const key in headers) {
+            req.setRequestHeader(key, headers[key]);
           }
-          tmpl
-            .querySelector(".btn-cancel-upload")
-            .addEventListener("click", function (evt) {
-              evt.preventDefault();
-              req.abort();
-            });
+
+          tmpl.onCancel((evt) => {
+            evt.preventDefault();
+            req.abort();
+          });
+
           req.send(file);
         });
 
@@ -171,17 +90,123 @@ export default function (rootEl) {
     });
 }
 
-const byteUnits = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
+class FileTemplate {
+  #qsCache = new Map();
+
+  constructor(target) {
+    this.template = document
+      .getElementById("tmpl-upload-progress")
+      .content.firstElementChild.cloneNode(true);
+
+    target.appendChild(this.template);
+
+    this.#qs(".btn-remove-upload").addEventListener(
+      "click",
+      this.#onRemoveUploadButtonClick,
+    );
+  }
+
+  set uploadName(fileName) {
+    this.#qs(".upload-name").innerText = fileName;
+  }
+
+  set uploadSize(size) {
+    this.#qs(".upload-size").innerText = size;
+  }
+
+  set uploadPercentage(percentage) {
+    this.#qs(".upload-percent").innerText = percentage;
+
+    const pb = this.#qs(".progress-bar");
+    pb.style["width"] = `${percentage}%`;
+    pb.setAttribute("aria-valuenow", percentage);
+  }
+
+  showMessage(msg, level) {
+    const uploadMessage = this.#qs(".upload-msg");
+    const progressBar = this.#qs(".progress-bar");
+
+    uploadMessage.innerText = msg;
+
+    uploadMessage.classList.remove("text-muted");
+    uploadMessage.classList.remove("text-danger");
+    progressBar.classList.remove("bg-info");
+    progressBar.classList.remove("bg-danger");
+
+    if (level == "error") {
+      uploadMessage.classList.add("text-danger");
+      progressBar.classList.add("bg-danger");
+    } else {
+      uploadMessage.classList.add("text-muted");
+      progressBar.classList.add("bg-info");
+    }
+  }
+
+  onCancel(callback) {
+    this.#qs(".btn-cancel-upload").addEventListener("click", callback);
+  }
+
+  showRemoveUploadButton() {
+    const cancelButton = this.#qs(".btn-cancel-upload");
+    if (cancelButton && cancelButton.parentElement) {
+      cancelButton.parentElement.removeChild(cancelButton);
+    }
+
+    const removeButton = this.#qs(".btn-remove-upload");
+    if (removeButton) {
+      removeButton.classList.remove("d-none");
+    }
+  }
+
+  destroy() {
+    this.template.parentElement.removeChild(this.template);
+  }
+
+  #qs(selector) {
+    if (!this.#qsCache.has(selector)) {
+      this.#qsCache.set(selector, this.template.querySelector(selector));
+    }
+
+    return this.#qsCache.get(selector);
+  }
+
+  #onRemoveUploadButtonClick() {
+    const i = this.closest(".list-group-item");
+
+    i.parentElement.removeChild(i);
+  }
+}
+
+function getHttpHeaders(file) {
+  return {
+    "X-CSRF-Token": getCSRFToken(),
+    // weird, but makes sure that middleware does not try to read _method from form
+    "X-HTTP-Method-Override": "POST",
+    //"Failed to execute 'setRequestHeader' on 'XMLHttpRequest': String contains non ISO-8859-1 code point"
+    "X-Upload-Filename": encodeURIComponent(file.name),
+    // refused by browser
+    // "Content-Length": file.size,
+    "Content-Type": file.type,
+  };
+}
+
+function getCSRFToken() {
+  return document.querySelector("meta[name=csrf-token]").content;
+}
 
 function friendlyBytes(n) {
+  const byteUnits = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
+
   if (n < 10) {
     return n + " B";
   }
-  let e = Math.floor(Math.log(n) / Math.log(1000));
-  let unit = byteUnits[e];
-  let val = Math.floor((n / Math.pow(1000, e)) * 10 + 0.5) / 10;
+
+  const e = Math.floor(Math.log(n) / Math.log(1000));
+  const unit = byteUnits[e];
+  const val = Math.floor((n / Math.pow(1000, e)) * 10 + 0.5) / 10;
   if (val < 10 && !Number.isInteger(val)) {
     return val.toFixed(1) + " " + unit;
   }
+
   return val.toFixed(0) + " " + unit;
 }
