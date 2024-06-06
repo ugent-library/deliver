@@ -1,4 +1,7 @@
 export default function (rootEl) {
+  const requests = [];
+  let onBeforeUnloadListenerAdded = false;
+
   rootEl
     .querySelectorAll("form input[data-upload-progress-target]")
     .forEach((input) => {
@@ -31,7 +34,28 @@ export default function (rootEl) {
             return;
           }
 
+          if (!onBeforeUnloadListenerAdded) {
+            window.addEventListener("beforeunload", (evt) => {
+              // Cancelled/aborted requests have readyState UNSENT (0)
+              if (
+                requests.some(
+                  (r) =>
+                    r.readyState != XMLHttpRequest.UNSENT &&
+                    r.readyState != XMLHttpRequest.DONE,
+                )
+              ) {
+                evt.preventDefault();
+                evt.returnValue =
+                  "One or more file uploads are still in progress. Are you sure you want to leave this page? Your upload(s) will be cancelled.";
+              }
+            });
+
+            onBeforeUnloadListenerAdded = true;
+          }
+
           const req = new XMLHttpRequest();
+          requests.push(req);
+
           req.addEventListener("abort", () => {
             tmpl.showRemoveUploadButton();
             tmpl.showMessage(uploadMsgFileAborted, "error");
@@ -51,7 +75,7 @@ export default function (rootEl) {
           });
 
           req.addEventListener("readystatechange", () => {
-            if (req.readyState !== 4) return; // 4 = DONE
+            if (req.readyState !== XMLHttpRequest.DONE) return;
 
             switch (req.status) {
               case 200:
@@ -73,6 +97,7 @@ export default function (rootEl) {
                 tmpl.showRemoveUploadButton();
                 tmpl.showMessage(uploadMsgDirNotFound, "error");
                 break;
+
               default:
                 // undetermined errors
                 tmpl.showRemoveUploadButton();
