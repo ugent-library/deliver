@@ -7,27 +7,34 @@ export default function (rootEl) {
 
         if (!files.length) return;
 
-        const target = document.getElementById(
-          input.dataset.uploadProgressTarget,
-        );
+        const {
+          uploadProgressTarget,
+          uploadMaxFileSize,
+          uploadMsgFileTooLarge,
+          uploadMsgFileAborted,
+          uploadMsgFileUploading,
+          uploadMsgFileProcessing,
+          uploadMsgDirNotFound,
+          uploadMsgUnexpected,
+        } = input.dataset;
+
+        const target = document.getElementById(uploadProgressTarget);
         const form = input.closest("form");
 
         files.forEach((file) => {
-          const tmpl = new FileTemplate(target);
-          tmpl.uploadName = file.name;
+          const tmpl = new FileTemplate(target, file.name);
 
           // prevent file upload when above max file size
-          const maxFileSize = input.dataset.uploadMaxFileSize;
-          if (!isNaN(maxFileSize) && file.size > maxFileSize) {
+          if (!isNaN(uploadMaxFileSize) && file.size > uploadMaxFileSize) {
             tmpl.showRemoveUploadButton();
-            tmpl.showMessage(input.dataset.uploadMsgFiconstooLarge, "error");
+            tmpl.showMessage(uploadMsgFileTooLarge, "error");
             return;
           }
 
           const req = new XMLHttpRequest();
           req.addEventListener("abort", () => {
             tmpl.showRemoveUploadButton();
-            tmpl.showMessage(input.dataset.uploadMsgFileAborted, "error");
+            tmpl.showMessage(uploadMsgFileAborted, "error");
           });
 
           req.upload.addEventListener("progress", (e) => {
@@ -37,33 +44,39 @@ export default function (rootEl) {
             tmpl.uploadPercentage = Math.floor((e.loaded / e.total) * 100);
 
             if (e.loaded == e.total) {
-              tmpl.showMessage(input.dataset.uploadMsgFileProcessing, "info");
+              tmpl.showMessage(uploadMsgFileProcessing, "info");
             } else {
-              tmpl.showMessage(input.dataset.uploadMsgFileUploading, "info");
+              tmpl.showMessage(uploadMsgFileUploading, "info");
             }
           });
 
-          req.addEventListener("readystatechange", (evt) => {
+          req.addEventListener("readystatechange", () => {
             if (req.readyState !== 4) return; // 4 = DONE
 
-            if (req.status == 200 || req.status == 201) {
-              // file created
-              tmpl.destroy();
+            switch (req.status) {
+              case 200:
+              case 201:
+                // file created
+                tmpl.destroy();
+                htmx.trigger("body", "refresh-files");
+                break;
 
-              htmx.trigger("body", "refresh-files");
-            } else if (req.status == 413) {
-              // File too large. Unfortunately this cannot be detected
-              // anymore at server as the error is wrapped inside others.
-              tmpl.showRemoveUploadButton();
-              tmpl.showMessage(input.dataset.uploadMsgFileTooLarge, "error");
-            } else if (req.status == 404) {
-              // directory has been removed in the meantime
-              tmpl.showRemoveUploadButton();
-              tmpl.showMessage(input.dataset.uploadMsgDirNotFound, "error");
-            } else {
-              // undetermined errors
-              tmpl.showRemoveUploadButton();
-              tmpl.showMessage(input.dataset.uploadMsgUnexpected, "error");
+              case 413:
+                // File too large. Unfortunately this cannot be detected
+                // anymore at server as the error is wrapped inside others.
+                tmpl.showRemoveUploadButton();
+                tmpl.showMessage(uploadMsgFileTooLarge, "error");
+                break;
+
+              case 404:
+                // directory has been removed in the meantime
+                tmpl.showRemoveUploadButton();
+                tmpl.showMessage(uploadMsgDirNotFound, "error");
+                break;
+              default:
+                // undetermined errors
+                tmpl.showRemoveUploadButton();
+                tmpl.showMessage(uploadMsgUnexpected, "error");
             }
           });
 
@@ -92,22 +105,19 @@ class FileTemplate {
   #template = null;
   #qsCache = new Map();
 
-  constructor(target) {
+  constructor(target, fileName) {
     this.#template = document
       .getElementById("tmpl-upload-progress")
       .content.firstElementChild.cloneNode(true);
-
     target.appendChild(this.#template);
+
+    this.#qs(".upload-name").innerText = fileName;
 
     this.#qs(".btn-remove-upload").addEventListener(
       "click",
       // Make sure the event handler can reach the class instance via this
       this.destroy.bind(this),
     );
-  }
-
-  set uploadName(fileName) {
-    this.#qs(".upload-name").innerText = fileName;
   }
 
   set uploadSize(size) {

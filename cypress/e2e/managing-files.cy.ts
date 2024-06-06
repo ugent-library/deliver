@@ -410,6 +410,48 @@ describe("Managing files", () => {
     cy.get("#folder-name").should("have.attr", "autofocus");
   });
 
+  it("should not be possible to upload files exceeding the maximum file size", () => {
+    cy.intercept("POST", "/folders/*/files").as("uploadFile");
+
+    // First lower the maximum upload file size as Cypress doesn't work with giant files
+    cy.get("input[type=file]").attr(
+      "data-upload-max-file-size",
+      1024 * 1024 - 1,
+    );
+
+    cy.contains(".card-header", "Available files").should("contain", "0 items");
+
+    cy.get("input[type=file]").selectFile([
+      "cypress/fixtures/test.txt",
+      generateLargeFile("large.txt", 1),
+      "cypress/fixtures/test.json",
+    ]);
+
+    cy.get("#file-upload-progress .list-group-item").should("have.length", 3);
+
+    // Wait until 2 other uploads succeed
+    cy.get("@uploadFile.all").should("have.length", 2);
+
+    cy.get("#files table tbody tr")
+      .should("contain", "test.txt")
+      .should("contain", "test.json")
+      .should("not.contain", "large.txt");
+
+    cy.get("#file-upload-progress .list-group-item")
+      .should("have.length", 1)
+      .should("contain", "large.txt")
+      .find(".upload-msg")
+      .should("have.class", "text-danger")
+      .invoke("text")
+      .should("match", /^File is too large. Maximum file size is \d+ [KMG]?B$/);
+
+    cy.get("#file-upload-progress .list-group-item button")
+      .should("contain.text", "Remove")
+      .click();
+
+    cy.get("#file-upload-progress .list-group-item").should("have.length", 0);
+  });
+
   function assertFileUpload(
     fileName: string,
     {
