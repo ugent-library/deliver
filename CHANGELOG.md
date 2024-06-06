@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use Docker volumes in devcontainer
 - Added hotkey "n" to the "+ Make new folder" button in the folder view
 - Removed Laravel Mix and added [esbuild](https://esbuild.github.io/) for asset bundling
+- Display popup warning when leaving the files page while not all uploads have finished
 
 ### Fixed
 
