@@ -96,12 +96,12 @@ func ShowFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var7 templ.SafeURL = templ.URL(c.Path("space", "spaceName", folder.Space.Name).String())
+			var templ_7745c5c3_Var7 templ.SafeURL = templ.URL(c.Path("space", "spaceName", folder.Space.Name, "focus", "new-folder").String())
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var7)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><i class=\"if if-add\"></i> <span class=\"btn-text\">Make new folder</span></a></div><div class=\"bc-toolbar-item\"><button class=\"btn btn-link btn-link-muted\" hx-put=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" data-hotkey=\"n\"><i class=\"if if-add\"></i> <span class=\"btn-text\">Make new folder <code class=\"bg-light p-2 rounded\">(n)</code></span></a></div><div class=\"bc-toolbar-item\"><button class=\"btn btn-link btn-link-muted\" hx-put=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -190,7 +190,7 @@ func ShowFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(friendly.Bytes(c.MaxFileSize))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_folder.templ`, Line: 122, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `show_folder.templ`, Line: 129, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {

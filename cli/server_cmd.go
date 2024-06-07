@@ -2,7 +2,10 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexliesenfeld/health"
@@ -14,7 +17,6 @@ import (
 	"github.com/ugent-library/catbird"
 	"github.com/ugent-library/crypt"
 	"github.com/ugent-library/httpx"
-	"github.com/ugent-library/mix"
 	"github.com/ugent-library/oidc"
 	"github.com/ugent-library/zaphttp"
 	"github.com/ugent-library/zaphttp/zapchi"
@@ -65,10 +67,7 @@ var serverCmd = &cobra.Command{
 		}
 
 		// setup assets
-		assets, err := mix.New(mix.Config{
-			ManifestFile: "static/mix-manifest.json",
-			PublicPath:   "/static/",
-		})
+		assets, err := loadAssets("static/manifest.json")
 		if err != nil {
 			return err
 		}
@@ -232,4 +231,18 @@ var serverCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+func loadAssets(manifestFile string) (map[string]string, error) {
+	data, err := os.ReadFile(manifestFile)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't read manifest '%s': %w", manifestFile, err)
+	}
+
+	assets := make(map[string]string)
+	if err = json.Unmarshal(data, &assets); err != nil {
+		return nil, fmt.Errorf("couldn't parse manifest '%s': %w", manifestFile, err)
+	}
+
+	return assets, nil
 }

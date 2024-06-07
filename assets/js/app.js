@@ -5,6 +5,7 @@ import formSubmit from "./form_submit.js";
 import formUploadProgress from "./form_upload_progress.js";
 import clipboard from "./clipboard.js";
 import selectValue from "./select_value.js";
+import hotkeys from "./hotkeys.js";
 
 window.htmx = htmx;
 
@@ -19,11 +20,12 @@ htmx.onLoad(function (el) {
   formUploadProgress(el);
   clipboard(el);
   selectValue(el);
+  hotkeys(el);
 });
 
 htmx.on("htmx:config-request", (evt) => {
   evt.detail.headers["X-CSRF-Token"] = document.querySelector(
-    'meta[name="csrf-token"]'
+    'meta[name="csrf-token"]',
   ).content;
 });
 
@@ -61,7 +63,7 @@ htmx.on("htmx:confirm", (evt) => {
       () => {
         evt.detail.issueRequest();
       },
-      false
+      false,
     );
 
     modalEl.addEventListener(
@@ -69,7 +71,7 @@ htmx.on("htmx:confirm", (evt) => {
       () => {
         modalEl.remove();
       },
-      false
+      false,
     );
 
     new bs.Modal(modalEl).show();
