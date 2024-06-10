@@ -109,7 +109,7 @@ var serverCmd = &cobra.Command{
 			ContentSecurityPolicy: (&cspbuilder.Builder{
 				Directives: map[string][]string{
 					cspbuilder.DefaultSrc: {"'self'"},
-					cspbuilder.ScriptSrc:  {"'self'", "$NONCE"},
+					cspbuilder.ScriptSrc:  {"'self'", "$NONCE", "blob:"},
 					cspbuilder.StyleSrc:   {"'self'", "'unsafe-inline'"}, // htmx injects style tags
 					cspbuilder.ImgSrc:     {"'self'", "data:"},           // bootstrap uses data: images
 				},
@@ -139,6 +139,7 @@ var serverCmd = &cobra.Command{
 					csrf.HttpOnly(true),
 					csrf.SameSite(csrf.SameSiteStrictMode),
 					csrf.FieldName("_csrf_token"),
+					csrf.Secure(config.Env != "local"),
 				),
 				// request context wrapper
 				ctx.Set(ctx.Config{
