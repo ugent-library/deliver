@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Fixed
+
+## [v1.1.5] - 2024-06-12
+
+### Added
+
 - Ignore all .env files
 - Use Docker volumes in devcontainer
 - Added hotkey "n" to the "+ Make new folder" button in the folder view
@@ -109,7 +115,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]: https://github.com/ugent-library/deliver/compare/v1.1.4...HEAD
+[unreleased]: https://github.com/ugent-library/deliver/compare/v1.1.5...HEAD
+[v1.1.5]: https://github.com/ugent-library/deliver/compare/v1.1.4...v1.1.5
 [v1.1.4]: https://github.com/ugent-library/deliver/compare/v1.1.3...v1.1.4
 [v1.1.3]: https://github.com/ugent-library/deliver/compare/v1.1.2...v1.1.3
 [v1.1.2]: https://github.com/ugent-library/deliver/compare/v1.1.1...v1.1.2
