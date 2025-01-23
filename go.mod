@@ -15,7 +15,7 @@ require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/gorilla/csrf v1.7.2
-	github.com/jackc/pgx/v5 v5.3.1
+	github.com/jackc/pgx/v5 v5.5.4
 	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/nics/ich v0.0.0-20240214113125-4ecddc685f7c
@@ -34,9 +34,11 @@ require (
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
 )
 
 require (
