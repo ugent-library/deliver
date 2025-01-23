@@ -27,7 +27,7 @@
     "esbuild-sass-plugin": "^3.3.0",
     "js-precommit-hook": "github:ugent-library/js-precommit-hook",
     "prettier": "^3.2.5",
-    "resolve-url-loader": "^4.0.0",
+    "resolve-url-loader": "^5.0.0",
     "sass": "^1.35.1",
     "sass-loader": "^12.1.0",
     "typescript": "^5.3.2",
