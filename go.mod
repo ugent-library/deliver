@@ -2,7 +2,7 @@ module github.com/ugent-library/deliver
 
 go 1.21.5
 
-toolchain go1.21.6
+toolchain go1.24.1
 
 require (
 	entgo.io/ent v0.12.5
@@ -31,7 +31,7 @@ require (
 require (
 	github.com/coreos/go-oidc/v3 v3.10.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
@@ -76,7 +76,7 @@ require (
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
