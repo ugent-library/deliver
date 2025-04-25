@@ -13,7 +13,7 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.27.0
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.0.11
-	github.com/gorilla/csrf v1.7.2
+	github.com/gorilla/csrf v1.7.3
 	github.com/jackc/pgx/v5 v5.5.4
 	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
