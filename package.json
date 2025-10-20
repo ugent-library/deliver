@@ -17,7 +17,7 @@
   },
   "precommit": "precommit",
   "devDependencies": {
-    "cypress": "^15.3.0",
+    "cypress": "^15.5.0",
     "cypress-common": "github:ugent-library/cypress-common#3.17.0",
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",
