@@ -1,8 +1,7 @@
 module github.com/ugent-library/deliver
 
 go 1.21.5
-
-toolchain go1.21.6
+toolchain go1.24.1
 
 require (
 	entgo.io/ent v0.12.5
@@ -14,8 +13,8 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.27.0
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.0.11
-	github.com/gorilla/csrf v1.7.2
-	github.com/jackc/pgx/v5 v5.3.1
+	github.com/gorilla/csrf v1.7.3
+	github.com/jackc/pgx/v5 v5.5.4
 	github.com/joho/godotenv v1.5.1
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/nics/ich v0.0.0-20240214113125-4ecddc685f7c
@@ -30,12 +29,14 @@ require (
 require (
 	github.com/coreos/go-oidc/v3 v3.10.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 )
 
 require (
@@ -73,9 +74,9 @@ require (
 	github.com/ugent-library/zaphttp v0.0.0-20230513174723-52c27d21c5ce
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	nhooyr.io/websocket v1.8.10
