@@ -151,8 +151,6 @@ github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/ugent-library/bind v0.0.0-20230530100714-1c79a1aecab1 h1:hpy7zZemIzdNp/yIj3dDkakUvB5NmlUq8gi38u1ahAE=
 github.com/ugent-library/bind v0.0.0-20230530100714-1c79a1aecab1/go.mod h1:QN9gGk5/ux2xoIia5EQbkw7XdO7yYQ5dG7/p6WSvp0o=
-github.com/ugent-library/catbird v0.0.0-20240117130454-d406e5e698cf h1:xONs+bz5OR28ZKTjXg446jVyUCPYK2AgGBFrkeu9xK0=
-github.com/ugent-library/catbird v0.0.0-20240117130454-d406e5e698cf/go.mod h1:h36ZDZkAz1NkS0qYYyaukG3TAlpArNSq6OqQzoimgS4=
 github.com/ugent-library/crypt v0.0.0-20240117154030-a71a6ff50afe h1:xCNm+uaTWMRTuWW0V7WnAD4ML4GbMIm60ffQ6/Ss1iw=
 github.com/ugent-library/crypt v0.0.0-20240117154030-a71a6ff50afe/go.mod h1:kamafwnieKPUZiNvnyN0/kBjhO9tzCzSrPY069QBBwk=
 github.com/ugent-library/friendly v0.0.0-20230811091914-e5eb37f47072 h1:DkyZcjjeUqQL1yrCqT8ylFnMdaeV0BEnhUExeaSi9+M=

@@ -22,7 +22,6 @@ require (
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ory/graceful v0.1.3
 	github.com/ugent-library/bind v0.0.0-20230530100714-1c79a1aecab1
-	github.com/ugent-library/catbird v0.0.0-20240117130454-d406e5e698cf
 	github.com/ugent-library/httperror v0.0.0-20230123152913-d3d289bcce20
 	github.com/unrolled/secure v1.14.0
 	go.uber.org/zap v1.26.0
@@ -57,7 +56,7 @@ require (
 	github.com/go-playground/form/v4 v4.2.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/uuid v1.5.0 // indirect
+	github.com/google/uuid v1.5.0
 	github.com/hashicorp/hcl/v2 v2.17.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -79,5 +78,5 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
-	nhooyr.io/websocket v1.8.10 // indirect
+	nhooyr.io/websocket v1.8.10
 )
