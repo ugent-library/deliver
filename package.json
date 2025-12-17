@@ -38,5 +38,9 @@
     "bootstrap": "^5.2.3",
     "bootstrap.native": "5.0.6",
     "htmx.org": "^1.9.0"
+  },
+  "overrides": {
+    "cross-spawn": "^7.0.6",
+    "systeminformation": "^5.27.14"
   }
 }
