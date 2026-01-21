@@ -17,8 +17,8 @@
   },
   "precommit": "precommit",
   "devDependencies": {
-    "cypress": "^15.5.0",
-    "cypress-common": "github:ugent-library/cypress-common#3.17.0",
+    "cypress": "^15.8.2",
+    "cypress-common": "github:ugent-library/cypress-common#v3.17.5",
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.25.2",
@@ -38,5 +38,8 @@
     "bootstrap": "^5.2.3",
     "bootstrap.native": "5.0.6",
     "htmx.org": "^1.9.0"
+  },
+  "overrides": {
+    "cross-spawn": "^7.0.6"
   }
 }
