@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [v1.1.6] - 2026-01-21
+
+Security update
+
 ## [v1.1.5] - 2024-06-12
 
 ### Added
@@ -115,7 +119,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]: https://github.com/ugent-library/deliver/compare/v1.1.5...HEAD
+[unreleased]: https://github.com/ugent-library/deliver/compare/v1.1.6...HEAD
+[v1.1.6]: https://github.com/ugent-library/deliver/compare/v1.1.5...v1.1.6
 [v1.1.5]: https://github.com/ugent-library/deliver/compare/v1.1.4...v1.1.5
 [v1.1.4]: https://github.com/ugent-library/deliver/compare/v1.1.3...v1.1.4
 [v1.1.3]: https://github.com/ugent-library/deliver/compare/v1.1.2...v1.1.3
