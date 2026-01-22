@@ -14,7 +14,7 @@ CMD ["reflex", "-d",  "none",  "-c", "reflex.docker.conf"]
 FROM golang:alpine AS build
 WORKDIR /build
 COPY . .
-RUN go get -d -v ./...
+RUN go get -v ./...
 RUN go build -o app -v
 RUN GOBIN=/build/ go install github.com/jackc/tern/v2@latest
 
