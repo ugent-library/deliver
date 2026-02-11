@@ -28,3 +28,4 @@ Version info
  - 
    - `COOKIE_SECRET` (**required**, non-empty) - 
  - `MAX_FILE_SIZE` (default: `2000000000`) - 
+ - `MAX_ZIP_SIZE` (default: `10000000000`) - 

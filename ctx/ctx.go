@@ -91,6 +91,7 @@ type Config struct {
 	Repo          *repositories.Repo
 	Storage       objectstores.Store
 	MaxFileSize   int64
+	MaxZipSize    int64
 	Router        *ich.Mux
 	ErrorHandlers map[int]http.HandlerFunc
 	Permissions   *models.Permissions

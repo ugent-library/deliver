@@ -38,6 +38,7 @@ type Config struct {
 		Secret string `env:"SECRET,notEmpty"`
 	} `envPrefix:"COOKIE_"`
 	MaxFileSize int64 `env:"MAX_FILE_SIZE" envDefault:"2000000000"`
+	MaxZipSize  int64 `env:"MAX_ZIP_SIZE" envDefault:"10000000000"`
 }
 
 func (c Config) Addr() string {
