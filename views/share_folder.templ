@@ -69,8 +69,8 @@ templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
                                                 <i class="if if-download"></i>
                                                 <span class="btn-text">Download all files</span>
                                             </button>
-                                            <p class="small text-muted mt-3">
-                                            Disabled: maximum of { friendly.Bytes(c.MaxZipSize) } exceeded
+                                            <p class="text-muted mt-4">
+                                            The zipfile containing all files is too large to download at once.
                                             </p>
                                         } else {
                                             <a class="btn btn-primary" href={ templ.URL(c.Path("downloadFolder", "folderID", folder.ID).String()) }>
