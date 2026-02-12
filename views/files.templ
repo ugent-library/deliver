@@ -7,8 +7,8 @@ import (
     "github.com/ugent-library/deliver/models"
 )
 
-templ Files(c *ctx.Ctx, files []*models.File) {
-    <div class="card w-100 mb-6" id="files">
+templ Files(c *ctx.Ctx, folder *models.Folder) {
+    <div class="card w-100 mb-6" id="files" data-zip-size={fmt.Sprint(folder.TotalSize())} data-max-zip-size={fmt.Sprint(c.MaxZipSize)}>
         <div class="card-header">
             <div class="bc-toolbar">
                 <div class="bc-toolbar-left">
@@ -18,12 +18,12 @@ templ Files(c *ctx.Ctx, files []*models.File) {
                 </div>
                 <div class="bc-toolbar-right">
                     <div class="bc-toolbar-item">
-                        <p id="folder-number-of-files">{ fmt.Sprint(len(files)) } items</p>
+                        <p id="folder-number-of-files">{ fmt.Sprint(len(folder.Files)) } items</p>
                     </div>
                 </div>
             </div>
         </div>
-        if len(files) > 0 {
+        if len(folder.Files) > 0 {
         <div class="table-responsive overflow-y-hidden">
             <table class="table table-sm table-bordered">
                 <thead>
@@ -37,7 +37,7 @@ templ Files(c *ctx.Ctx, files []*models.File) {
                     </tr>
                 </thead>
                 <tbody>
-                    for _, f := range files {
+                    for _, f := range folder.Files {
                     <tr class="clickable-table-row">
                         <td class="text-nowrap table-col-lg-fixed table-col-sm-fixed-left">
                             <a href={ templ.URL(c.Path("downloadFile", "fileID", f.ID).String()) }>

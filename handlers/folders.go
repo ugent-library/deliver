@@ -28,7 +28,7 @@ func ShowFolder(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r)
 
 	if htmx.Request(r) {
-		views.Files(c, folder.Files).Render(r.Context(), w)
+		views.Files(c, folder).Render(r.Context(), w)
 		return
 	}
 

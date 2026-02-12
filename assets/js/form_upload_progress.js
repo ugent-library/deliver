@@ -1,6 +1,123 @@
+import * as bs from "bootstrap";
+
 export default function (rootEl) {
   const requests = [];
   let onBeforeUnloadListenerAdded = false;
+
+  function uploadInputFiles(input) {
+    const {
+      uploadProgressTarget,
+      uploadMaxFileSize,
+      uploadMsgFileTooLarge,
+      uploadMsgFileAborted,
+      uploadMsgFileUploading,
+      uploadMsgFileProcessing,
+      uploadMsgDirNotFound,
+      uploadMsgUnexpected,
+    } = input.dataset;
+
+    const target = document.getElementById(uploadProgressTarget);
+    const form = input.closest("form");
+
+    Array.from(input.files).forEach((file) => {
+      const tmpl = new FileTemplate(target, file.name);
+
+      // prevent file upload when above max file size
+      if (!isNaN(uploadMaxFileSize) && file.size > uploadMaxFileSize) {
+        tmpl.showRemoveUploadButton();
+        tmpl.showMessage(uploadMsgFileTooLarge, "error");
+        return;
+      }
+
+      if (!onBeforeUnloadListenerAdded) {
+        window.addEventListener("beforeunload", (evt) => {
+          // Cancelled/aborted requests have readyState UNSENT (0)
+          if (
+            requests.some(
+              (r) =>
+                r.readyState != XMLHttpRequest.UNSENT &&
+                r.readyState != XMLHttpRequest.DONE,
+            )
+          ) {
+            evt.preventDefault();
+            evt.returnValue =
+              "One or more file uploads are still in progress. Are you sure you want to leave this page? Your upload(s) will be cancelled.";
+          }
+        });
+
+        onBeforeUnloadListenerAdded = true;
+      }
+
+      const req = new XMLHttpRequest();
+      requests.push(req);
+
+      req.addEventListener("abort", () => {
+        tmpl.showRemoveUploadButton();
+        tmpl.showMessage(uploadMsgFileAborted, "error");
+      });
+
+      req.upload.addEventListener("progress", (e) => {
+        if (!e.lengthComputable) return;
+
+        tmpl.uploadSize = friendlyBytes(e.loaded);
+        tmpl.uploadPercentage = Math.floor((e.loaded / e.total) * 100);
+
+        if (e.loaded == e.total) {
+          tmpl.showMessage(uploadMsgFileProcessing, "info");
+        } else {
+          tmpl.showMessage(uploadMsgFileUploading, "info");
+        }
+      });
+
+      req.addEventListener("readystatechange", () => {
+        if (req.readyState !== XMLHttpRequest.DONE) return;
+
+        switch (req.status) {
+          case 200:
+          case 201:
+            // file created
+            tmpl.destroy();
+            htmx.trigger("body", "refresh-files");
+            break;
+
+          case 413:
+            // File too large. Unfortunately this cannot be detected
+            // anymore at server as the error is wrapped inside others.
+            tmpl.showRemoveUploadButton();
+            tmpl.showMessage(uploadMsgFileTooLarge, "error");
+            break;
+
+          case 404:
+            // directory has been removed in the meantime
+            tmpl.showRemoveUploadButton();
+            tmpl.showMessage(uploadMsgDirNotFound, "error");
+            break;
+
+          default:
+            // undetermined errors
+            tmpl.showRemoveUploadButton();
+            tmpl.showMessage(uploadMsgUnexpected, "error");
+        }
+      });
+
+      req.open(form.method, form.action);
+
+      const headers = getHttpHeaders(file);
+      for (const key in headers) {
+        req.setRequestHeader(key, headers[key]);
+      }
+
+      tmpl.onCancel((evt) => {
+        evt.preventDefault();
+        req.abort();
+      });
+
+      req.send(file);
+    });
+
+    // important to retrigger "change" when someone enters the same file again
+    input.value = "";
+  }
 
   rootEl
     .querySelectorAll("form input[data-upload-progress-target]")
@@ -10,118 +127,42 @@ export default function (rootEl) {
 
         if (!files.length) return;
 
-        const {
-          uploadProgressTarget,
-          uploadMaxFileSize,
-          uploadMsgFileTooLarge,
-          uploadMsgFileAborted,
-          uploadMsgFileUploading,
-          uploadMsgFileProcessing,
-          uploadMsgDirNotFound,
-          uploadMsgUnexpected,
-        } = input.dataset;
+        const fileTbl = document.getElementById("files");
+        let zipSize = parseInt(fileTbl.dataset.zipSize);
+        const maxZipSize = parseInt(fileTbl.dataset.maxZipSize);
 
-        const target = document.getElementById(uploadProgressTarget);
-        const form = input.closest("form");
+        for (let i = 0; i < files.length; i++) {
+          zipSize += files[i].size
+        }
 
-        files.forEach((file) => {
-          const tmpl = new FileTemplate(target, file.name);
+        if (zipSize > maxZipSize) {
 
-          // prevent file upload when above max file size
-          if (!isNaN(uploadMaxFileSize) && file.size > uploadMaxFileSize) {
-            tmpl.showRemoveUploadButton();
-            tmpl.showMessage(uploadMsgFileTooLarge, "error");
-            return;
-          }
+          const modalConfirm = document.getElementById("modal-confirm").content.firstElementChild.cloneNode(true);
+          const confirmProceed = modalConfirm.querySelector(".confirm-proceed");
+          modalConfirm.querySelector(".confirm-header").innerHTML = "The size of the zipfile is getting too big<br>to download all files at once."
+          modalConfirm.querySelector(".confirm-content").innerHTML = "The recipient will be able to download each file separately.<br>Add more files at your own peril."
+          confirmProceed.innerHTML = "I will tread carefully"
+          confirmProceed.addEventListener(
+            "click",
+            () => {
+              uploadInputFiles(input);
+            }, false,
+          );
+          modalConfirm.addEventListener(
+            "hidden.bs.modal",
+            () => {
+              modalConfirm.remove();
+            },
+            false,
+          );
+          new bs.Modal(modalConfirm).show();
 
-          if (!onBeforeUnloadListenerAdded) {
-            window.addEventListener("beforeunload", (evt) => {
-              // Cancelled/aborted requests have readyState UNSENT (0)
-              if (
-                requests.some(
-                  (r) =>
-                    r.readyState != XMLHttpRequest.UNSENT &&
-                    r.readyState != XMLHttpRequest.DONE,
-                )
-              ) {
-                evt.preventDefault();
-                evt.returnValue =
-                  "One or more file uploads are still in progress. Are you sure you want to leave this page? Your upload(s) will be cancelled.";
-              }
-            });
+        } else {
 
-            onBeforeUnloadListenerAdded = true;
-          }
+          uploadInputFiles(input);
 
-          const req = new XMLHttpRequest();
-          requests.push(req);
+        }
 
-          req.addEventListener("abort", () => {
-            tmpl.showRemoveUploadButton();
-            tmpl.showMessage(uploadMsgFileAborted, "error");
-          });
-
-          req.upload.addEventListener("progress", (e) => {
-            if (!e.lengthComputable) return;
-
-            tmpl.uploadSize = friendlyBytes(e.loaded);
-            tmpl.uploadPercentage = Math.floor((e.loaded / e.total) * 100);
-
-            if (e.loaded == e.total) {
-              tmpl.showMessage(uploadMsgFileProcessing, "info");
-            } else {
-              tmpl.showMessage(uploadMsgFileUploading, "info");
-            }
-          });
-
-          req.addEventListener("readystatechange", () => {
-            if (req.readyState !== XMLHttpRequest.DONE) return;
-
-            switch (req.status) {
-              case 200:
-              case 201:
-                // file created
-                tmpl.destroy();
-                htmx.trigger("body", "refresh-files");
-                break;
-
-              case 413:
-                // File too large. Unfortunately this cannot be detected
-                // anymore at server as the error is wrapped inside others.
-                tmpl.showRemoveUploadButton();
-                tmpl.showMessage(uploadMsgFileTooLarge, "error");
-                break;
-
-              case 404:
-                // directory has been removed in the meantime
-                tmpl.showRemoveUploadButton();
-                tmpl.showMessage(uploadMsgDirNotFound, "error");
-                break;
-
-              default:
-                // undetermined errors
-                tmpl.showRemoveUploadButton();
-                tmpl.showMessage(uploadMsgUnexpected, "error");
-            }
-          });
-
-          req.open(form.method, form.action);
-
-          const headers = getHttpHeaders(file);
-          for (const key in headers) {
-            req.setRequestHeader(key, headers[key]);
-          }
-
-          tmpl.onCancel((evt) => {
-            evt.preventDefault();
-            req.abort();
-          });
-
-          req.send(file);
-        });
-
-        // important to retrigger "change" when someone enters the same file again
-        input.value = "";
       });
     });
 }

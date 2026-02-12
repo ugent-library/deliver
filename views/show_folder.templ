@@ -139,7 +139,7 @@ templ ShowFolder(c *ctx.Ctx, folder *models.Folder) {
 					hx-swap="innerHTML"
 					hx-trigger="refresh-files from:body"
 				>
-					@Files(c, folder.Files)
+					@Files(c, folder)
 				</div>
 			</div>
 		</div>
