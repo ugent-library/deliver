@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- hide "download all" button on folder share page when sum of file sizes exceed maximum limit
+- block zip download at controller level when sum of file sizes exceed maximum limit
+- add confirmation dialogue that warns operators when the sum exceeds the limit
+
 ### Fixed
 
 ## [v1.1.6] - 2026-01-21
