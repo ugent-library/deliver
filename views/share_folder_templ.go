@@ -137,7 +137,7 @@ func ShareFolder(c *ctx.Ctx, folder *models.Folder) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if folder.TotalSize() > c.MaxZipSize {
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button type=\"button\" aria-disabled=\"true\" disabled class=\"btn disabled btn-primary\"><i class=\"if if-download\"></i> <span class=\"btn-text\">Download all files</span></button><p class=\"text-muted mt-4\">The zipfile containing all files is too large to download at once.</p>")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button type=\"button\" aria-disabled=\"true\" disabled class=\"btn disabled btn-primary\"><i class=\"if if-download\"></i> <span class=\"btn-text\">Download all files</span></button><p class=\"text-muted mt-4\">The zipfile containing all files is too large to download at once. Please download the files individually.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
