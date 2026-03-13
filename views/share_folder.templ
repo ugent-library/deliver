@@ -70,7 +70,7 @@ templ ShareFolder(c *ctx.Ctx, folder *models.Folder) {
                                                 <span class="btn-text">Download all files</span>
                                             </button>
                                             <p class="text-muted mt-4">
-                                            The zipfile containing all files is too large to download at once.
+                                            The zipfile containing all files is too large to download at once. Please download the files individually.
                                             </p>
                                         } else {
                                             <a class="btn btn-primary" href={ templ.URL(c.Path("downloadFolder", "folderID", folder.ID).String()) }>
