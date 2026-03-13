@@ -139,6 +139,8 @@ export default function (rootEl) {
 
           const modalConfirm = document.getElementById("modal-confirm").content.firstElementChild.cloneNode(true);
           const confirmProceed = modalConfirm.querySelector(".confirm-proceed");
+          confirmProceed.classList.remove("btn-danger")
+          confirmProceed.classList.add("btn-primary");
           modalConfirm.querySelector(".confirm-header").innerHTML = "The size of the zipfile is getting too big<br>to download all files at once."
           modalConfirm.querySelector(".confirm-content").innerHTML = "The recipient will be able to download each file separately.<br>Add more files at your own peril."
           confirmProceed.innerHTML = "I will tread carefully"
