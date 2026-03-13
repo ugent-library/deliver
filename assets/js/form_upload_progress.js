@@ -142,9 +142,11 @@ export default function (rootEl) {
           modalConfirm.querySelector(".confirm-header").innerHTML = "The size of the zipfile is getting too big<br>to download all files at once."
           modalConfirm.querySelector(".confirm-content").innerHTML = "The recipient will be able to download each file separately.<br>Add more files at your own peril."
           confirmProceed.innerHTML = "I will tread carefully"
+          let confirmed = false;
           confirmProceed.addEventListener(
             "click",
             () => {
+              confirmed = true;
               uploadInputFiles(input);
             }, false,
           );
@@ -152,6 +154,10 @@ export default function (rootEl) {
             "hidden.bs.modal",
             () => {
               modalConfirm.remove();
+              if (!confirmed) {
+                // make reentering the same value retriggers this modal
+                input.value = "";
+              }
             },
             false,
           );
