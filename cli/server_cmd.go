@@ -147,6 +147,7 @@ var serverCmd = &cobra.Command{
 					Repo:        repo,
 					Storage:     storage,
 					MaxFileSize: config.MaxFileSize,
+					MaxZipSize:  config.MaxZipSize,
 					Router:      router,
 					ErrorHandlers: map[int]http.HandlerFunc{
 						http.StatusNotFound:     handlers.NotFound,

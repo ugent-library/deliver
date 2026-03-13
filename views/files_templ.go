@@ -17,7 +17,7 @@ import (
 	"github.com/ugent-library/friendly"
 )
 
-func Files(c *ctx.Ctx, files []*models.File) templ.Component {
+func Files(c *ctx.Ctx, folder *models.Folder) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -30,14 +30,30 @@ func Files(c *ctx.Ctx, files []*models.File) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card w-100 mb-6\" id=\"files\"><div class=\"card-header\"><div class=\"bc-toolbar\"><div class=\"bc-toolbar-left\"><div class=\"bc-toolbar-item\"><h5>Available files</h5></div></div><div class=\"bc-toolbar-right\"><div class=\"bc-toolbar-item\"><p id=\"folder-number-of-files\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card w-100 mb-6\" id=\"files\" data-zip-size=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprint(folder.TotalSize())))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" data-max-zip-size=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprint(c.MaxZipSize)))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><div class=\"card-header\"><div class=\"bc-toolbar\"><div class=\"bc-toolbar-left\"><div class=\"bc-toolbar-item\"><h5>Available files</h5></div></div><div class=\"bc-toolbar-right\"><div class=\"bc-toolbar-item\"><p id=\"folder-number-of-files\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(len(files)))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(len(folder.Files)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `files.templ`, Line: 20, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `files.templ`, Line: 20, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -47,12 +63,12 @@ func Files(c *ctx.Ctx, files []*models.File) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if len(files) > 0 {
+		if len(folder.Files) > 0 {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"table-responsive overflow-y-hidden\"><table class=\"table table-sm table-bordered\"><thead><tr><th class=\"table-col-lg-fixed table-col-sm-fixed-left text-nowrap\">File name</th><th class=\"text-nowrap\">Size</th><th class=\"text-nowrap\">Type</th><th class=\"text-nowrap\">Downloads</th><th class=\"text-nowrap\">Created at</th><th class=\"table-col-sm-fixed table-col-sm-fixed-right\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, f := range files {
+			for _, f := range folder.Files {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr class=\"clickable-table-row\"><td class=\"text-nowrap table-col-lg-fixed table-col-sm-fixed-left\"><a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

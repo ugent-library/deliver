@@ -13,6 +13,7 @@ import (
 	"github.com/ugent-library/deliver/ctx"
 	"github.com/ugent-library/deliver/models"
 	"github.com/ugent-library/deliver/views"
+	"github.com/ugent-library/friendly"
 	"github.com/ugent-library/htmx"
 	"github.com/ugent-library/httperror"
 	"github.com/ugent-library/okay"
@@ -27,7 +28,7 @@ func ShowFolder(w http.ResponseWriter, r *http.Request) {
 	folder := ctx.GetFolder(r)
 
 	if htmx.Request(r) {
-		views.Files(c, folder.Files).Render(r.Context(), w)
+		views.Files(c, folder).Render(r.Context(), w)
 		return
 	}
 
@@ -153,6 +154,15 @@ func ShareFolder(w http.ResponseWriter, r *http.Request) {
 func DownloadFolder(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	folder := ctx.GetFolder(r)
+
+	zipSize := folder.TotalSize()
+	if zipSize > c.MaxZipSize {
+		c.HandleError(
+			w, r,
+			errors.Join(httperror.BadRequest, fmt.Errorf("Refused to serve zip bigger than %s (total size: %s)", friendly.Bytes(c.MaxZipSize), friendly.Bytes(zipSize))),
+		)
+		return
+	}
 
 	w.Header().Add("Content-Type", "application/zip")
 	w.Header().Add(
