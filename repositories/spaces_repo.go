@@ -91,8 +91,12 @@ func (r *SpacesRepo) Update(ctx context.Context, s *models.Space) error {
 		return err
 	}
 	row, err := r.client.Space.UpdateOneID(s.ID).
+		SetName(s.Name).
 		SetAdmins(s.Admins).
 		Save(ctx)
+	if ent.IsConstraintError(err) {
+		return okay.NewErrors(okay.ErrNotUnique("name"))
+	}
 	if err != nil {
 		return err
 	}

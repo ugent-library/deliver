@@ -123,12 +123,13 @@ func CreateSpace(w http.ResponseWriter, r *http.Request) {
 func EditSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
-	views.EditSpace(c, space, okay.NewErrors()).Render(r.Context(), w)
+	views.EditSpace(c, space, okay.NewErrors(), space.Name).Render(r.Context(), w)
 }
 
 func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 	c := ctx.Get(r)
 	space := ctx.GetSpace(r)
+	routeName := space.Name
 
 	b := SpaceForm{}
 	if err := bind.Form(r, &b); err != nil {
@@ -136,6 +137,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	space.Name = b.Name
 	space.Admins = reSplitAdmins.Split(b.Admins, -1)
 
 	if err := c.Repo.Spaces.Update(r.Context(), space); err != nil {
@@ -144,7 +146,7 @@ func UpdateSpace(w http.ResponseWriter, r *http.Request) {
 			c.HandleError(w, r, err)
 			return
 		}
-		views.EditSpace(c, space, validationErrors).Render(r.Context(), w)
+		views.EditSpace(c, space, validationErrors, routeName).Render(r.Context(), w)
 		return
 	}
 

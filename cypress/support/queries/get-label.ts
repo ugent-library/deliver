@@ -5,6 +5,7 @@ type GetLabelOptions = {
 };
 
 export default function (
+  this: unknown,
   caption: string | RegExp,
   options: GetLabelOptions = { log: true },
 ) {

@@ -3,6 +3,24 @@ describe("Managing spaces", () => {
     cy.loginAsSuperAdmin();
   });
 
+  it("should rename a space", () => {
+    const originalName = Cypress.env("DEFAULT_SPACE");
+    const renamedName = `R${Date.now()}`;
+
+    cy.visit("/");
+    cy.contains("Edit space").click();
+    cy.get("#space-name").should("have.value", originalName);
+    cy.setFieldByLabel("Space name", renamedName);
+    cy.contains(".btn", "Save changes").click();
+    cy.location("pathname").should("include", renamedName);
+    cy.contains(`${renamedName} folders`).should("be.visible");
+
+    cy.contains("Edit space").click();
+    cy.setFieldByLabel("Space name", originalName);
+    cy.contains(".btn", "Save changes").click();
+    cy.location("pathname").should("include", originalName);
+  });
+
   it("should return an error if a new space name is empty", () => {
     cy.visit("/");
 

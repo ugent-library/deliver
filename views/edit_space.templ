@@ -8,7 +8,7 @@ import (
     "github.com/ugent-library/okay"
 )
 
-templ EditSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) {
+templ EditSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors, routeName string) {
     @pageLayout(c, fmt.Sprintf("Edit %s", space.Name)) {
     <div class="w-100 u-scroll-wrapper">
         <div class="bg-white">
@@ -31,7 +31,7 @@ templ EditSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) {
                         </div>
                         <div class="bc-toolbar-right">
                             <div class="bc-toolbar-item">
-                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("space", "spaceName", space.Name).String()) }>
+                                <a class="btn btn-link btn-link-muted" href={ templ.URL(c.Path("space", "spaceName", routeName).String()) }>
                                     <i class="if if-close"></i>
                                     <span class="btn-text">Discard changes</span>
                                 </a>
@@ -46,9 +46,20 @@ templ EditSpace(c *ctx.Ctx, space *models.Space, errs *okay.Errors) {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action={ templ.URL(c.Path("updateSpace", "spaceName", space.Name).String()) } method="POST" id="update-space">
+                    <form action={ templ.URL(c.Path("updateSpace", "spaceName", routeName).String()) } method="POST" id="update-space">
                         <input type="hidden" name="_method" value="PUT"/>
                         @csrfField(c)
+                        <div class="row mb-6">
+                            <label class="col-lg-3 col-xl-2 col-form-label" for="space-name">Space name</label>
+                            <div class="col-lg-5 col-xl-4">
+                                if e := errs.Get("name"); e != nil {
+                                    <input class="form-control is-invalid" type="text" value={ space.Name } id="space-name" name="name" aria-invalid="true" aria-describedby="space-name-invalid"/>
+                                    <small class="invalid-feedback" id="space-name-invalid">{ e.Error() }</small>
+                                } else {
+                                    <input class="form-control" type="text" value={ space.Name } id="space-name" name="name"/>
+                                }
+                            </div>
+                        </div>
                         <div class="row">
                             <label class="col-lg-3 col-xl-2 col-form-label" for="space-admins">Space admins</label>
                             <div class="col-lg-5 col-xl-4">
