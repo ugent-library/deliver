@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [v1.1.8] - 2026-09-28
+
+### Added
+
+- Allow space admins to rename a space
+
 ## [v1.1.6] - 2026-01-21
 
 Security update
