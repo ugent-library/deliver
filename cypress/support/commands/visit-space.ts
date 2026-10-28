@@ -6,7 +6,7 @@ export default function visitSpace(
 ): Cypress.Chainable<Cypress.AUTWindow> {
   if (typeof space !== "string") {
     options = space;
-    space = Cypress.env("DEFAULT_SPACE");
+    space = Cypress.expose("DEFAULT_SPACE");
   }
 
   if (options?.log !== false) {

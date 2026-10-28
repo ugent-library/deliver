@@ -37,7 +37,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
 
     cy.getFolderCount("total").should("be.at.least", 5);
 
-    cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
+    cy.intercept(`/spaces/${Cypress.expose("DEFAULT_SPACE")}/folders*`).as(
       "filterFolders",
     );
 
@@ -165,7 +165,7 @@ describe("Issue #92: [Speed and usability] Add search to folder overview", () =>
     cy.get("@q").should("have.value", "School work");
 
     // Clear by setting the value property instead of fake typing with cy.clear()
-    cy.get<HTMLInputElement>("@q").then((q) => (q.get(0).value = ""));
+    cy.get<JQuery<HTMLInputElement>>("@q").then((q) => (q.get(0).value = ""));
     // Trigger the search event, which is equivalent to clicking the clear "✖️" button in the search input
     cy.get("@q").trigger("search");
 

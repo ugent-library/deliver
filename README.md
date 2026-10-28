@@ -80,5 +80,4 @@ The application and its dependencies run on these ports:
 | Deliver        | 3101 |
 | Mock OIDC      | 3102 |
 | DB Application | 3151 |
-| Minio          | 3171 |
-| Minio Console  | 3172 |
+| LocalStack S3  | 3171 |

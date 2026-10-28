@@ -9,7 +9,7 @@
     "db:reset": "go run main.go reset --force",
     "test": "cypress run --config-file cypress/cypress.config.ts",
     "test:libtest": "env-cmd --file ./cypress/.env npm test --",
-    "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e --browser electron",
+    "cypress:open": "cypress open --config-file cypress/cypress.config.ts --e2e",
     "cypress:open:libtest": "env-cmd --file ./cypress/.env npm run cypress:open --",
     "cypress:lint": "tsc -p cypress/",
     "precommit": "node node_modules/js-precommit-hook",
@@ -17,7 +17,7 @@
   },
   "precommit": "precommit",
   "devDependencies": {
-    "cypress": "^15.8.2",
+    "cypress": "^16.2.0",
     "cypress-common": "github:ugent-library/cypress-common#v3.17.5",
     "dayjs": "^1.11.10",
     "env-cmd": "^10.1.0",
@@ -30,7 +30,7 @@
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.35.1",
     "sass-loader": "^12.1.0",
-    "typescript": "^5.3.2",
+    "typescript": "^6.0.3",
     "uglify-js": "^3.14.2"
   },
   "dependencies": {
@@ -41,5 +41,12 @@
   },
   "overrides": {
     "cross-spawn": "^7.0.6"
+  },
+  "allowScripts": {
+    "esbuild@0.25.2": true,
+    "fsevents@2.3.2": true,
+    "pre-commit@1.2.2": true,
+    "spawn-sync@1.0.15": true,
+    "cypress@16.2.0": true
   }
 }

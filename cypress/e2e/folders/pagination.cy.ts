@@ -56,7 +56,7 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
       "next",
     );
 
-    cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
+    cy.intercept(`/spaces/${Cypress.expose("DEFAULT_SPACE")}/folders*`).as(
       "getFolders",
     );
   });
@@ -448,21 +448,26 @@ describe("Issue #91: [Speed and usability] Add pagination to folder overview", (
     cy.getFolderCount("text").should("eq", "Showing 1-20 of 21 folder(s)");
   });
 
-  it("should work with HTMX disabled", () => {
+  // NOTE: this test fails in Cypress UI in Chrome. The window:before:load event that disables HTMX only fires once there
+  // instead of on every page load. That's why the browser filter is added here and we added defaultBrowser Firefox.
+  it("should work with HTMX disabled", { browser: "!chrome" }, () => {
     cy.disableHtmx();
 
     cy.visitSpace({ qs: { limit: 2 } });
+    cy.get("html").should("have.attr", "hx-disable", "");
     getNumberOfPages().should("eq", 11);
     cy.getActivePage().should("eq", 1);
     getPagerButtons().should("eql", ["<", 1, 2, "...", 11, ">"]);
 
     goToPage(2);
+    cy.get("html").should("have.attr", "hx-disable", "");
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "2" });
     cy.getActivePage().should("eq", 2);
     getPagerButtons().should("eql", ["<", 1, 2, 3, "...", 11, ">"]);
 
     goToPage("next");
+    cy.get("html").should("have.attr", "hx-disable", "");
     cy.get("@getFolders").should("be.null");
     cy.getParams().should("eql", { limit: "2", offset: "4" });
     cy.getActivePage().should("eq", 3);

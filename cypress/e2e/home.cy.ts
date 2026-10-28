@@ -37,7 +37,7 @@ describe("The home page", () => {
           response.redirects!.at(-1)!.replace(/^3\d\d: /, ""),
         ); // Redirect entries are in form '3XX: {url}'
 
-        expect(redirect).to.have.property("origin", Cypress.env("OIDC_ORIGIN"));
+        expect(redirect).to.have.property("origin", Cypress.expose("OIDC_ORIGIN"));
       });
     };
 
@@ -70,7 +70,7 @@ describe("The home page", () => {
       .should("have.length", 1)
       .should("have.class", "c-sidebar--dark-gray");
 
-    const DEFAULT_SPACE = Cypress.env("DEFAULT_SPACE");
+    const DEFAULT_SPACE = Cypress.expose("DEFAULT_SPACE");
 
     cy.wrap(DEFAULT_SPACE).should(
       "not.be.empty",

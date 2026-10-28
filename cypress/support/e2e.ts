@@ -6,12 +6,12 @@ import "./commands/overwrite/visit";
 import "./queries";
 
 before(() => {
-  const DEFAULT_SPACE = Cypress.env("DEFAULT_SPACE");
+  const DEFAULT_SPACE = Cypress.expose("DEFAULT_SPACE");
 
   function createDefaultSpace() {
     cy.contains("label", "Space name").type(DEFAULT_SPACE);
     cy.contains("label", "Space admins").type(
-      Cypress.env("SPACE_ADMIN_USER_NAME"),
+      Cypress.expose("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
   }

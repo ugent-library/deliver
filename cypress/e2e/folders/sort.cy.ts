@@ -24,7 +24,7 @@ describe("Issue #73: [Speed and usability] Add sort to folder overview on expiry
   beforeEach(() => {
     cy.loginAsSpaceAdmin();
 
-    cy.intercept(`/spaces/${Cypress.env("DEFAULT_SPACE")}/folders*`).as(
+    cy.intercept(`/spaces/${Cypress.expose("DEFAULT_SPACE")}/folders*`).as(
       "filterFolders",
     );
 

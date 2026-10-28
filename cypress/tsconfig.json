@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "ES2015",
-    "moduleResolution": "node",
-    "target": "es5",
-    "lib": ["es5", "dom"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
     "types": ["cypress", "node"],
     "noEmit": true,
-    "downlevelIteration": true,
-    "strict": true
+    "strict": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "paths": {
+      "support/*": ["./support/*"]
+    }
   },
   "include": ["**/*.ts"]
 }

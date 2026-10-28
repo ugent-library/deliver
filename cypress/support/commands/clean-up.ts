@@ -7,7 +7,7 @@ const NO_LOG = { log: false };
 export default function cleanUp(space?: string) {
   const log = logCommand("cleanUp", { space }, space);
 
-  deleteAllTestFolders(log, space || Cypress.env("DEFAULT_SPACE")).then(
+  deleteAllTestFolders(log, space || Cypress.expose("DEFAULT_SPACE")).then(
     (count) => {
       log.set("message", count.toString());
     },

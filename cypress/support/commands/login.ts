@@ -16,21 +16,31 @@ export default function login(username: string, password: string): void {
   cy.session(
     username,
     () => {
-      cy.visit("/", NO_LOG);
+      cy.request({ ...NO_LOG, url: "/login", followRedirect: false }).then(
+        (response) => {
+          if (typeof response.headers.location !== "string") {
+            throw new Error("No location header found in response");
+          }
 
-      cy.contains(".btn", "Log in", NO_LOG).click(NO_LOG);
+          const formUrl = new URL(response.headers.location);
+          const formData = [...formUrl.searchParams];
+          formData.push(["username", username]);
 
-      cy.get('input[name="username"]', NO_LOG).invoke(NO_LOG, "val", username);
+          if (password) {
+            formData.push(["password", password]);
+          }
 
-      if (password) {
-        cy.get('input[name="password"]', NO_LOG).invoke(
-          NO_LOG,
-          "val",
-          password,
-        );
-      }
-
-      cy.get("form", NO_LOG).submit(NO_LOG);
+          cy.request({
+            ...NO_LOG,
+            method: "POST",
+            url: formUrl.origin + formUrl.pathname,
+            body: new URLSearchParams(formData).toString(),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          });
+        },
+      );
     },
     {
       cacheAcrossSpecs: true,

@@ -7,7 +7,7 @@ describe("Managing folders", () => {
     cy.loginAsSpaceAdmin();
   });
 
-  it("should be possible to create a new folder", () => {
+  it("should be possible to create a new folder", { browser: "chrome" }, () => {
     const FOLDER_NAME = getRandomText();
 
     cy.visitSpace({ qs: { limit: 1000 } });
@@ -25,7 +25,7 @@ describe("Managing folders", () => {
     cy.ensureNoToast();
 
     cy.get(".bc-toolbar-title")
-      .should("contain.text", Cypress.env("DEFAULT_SPACE"))
+      .should("contain.text", Cypress.expose("DEFAULT_SPACE"))
       .should("contain.text", FOLDER_NAME);
 
     cy.get('.btn:contains("Copy public shareable link")')
@@ -78,7 +78,7 @@ describe("Managing folders", () => {
     cy.contains(".btn", "Make folder").click();
 
     cy.get(".bc-toolbar-title")
-      .should("contain.text", Cypress.env("DEFAULT_SPACE"))
+      .should("contain.text", Cypress.expose("DEFAULT_SPACE"))
       .should("contain.text", FOLDER_NAME);
 
     cy.contains(".btn", "Edit").click();
@@ -108,7 +108,7 @@ describe("Managing folders", () => {
 
     cy.location("pathname").should(
       "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+      `/spaces/${Cypress.expose("DEFAULT_SPACE")}`,
     );
 
     cy.getFolderCount("total").should("eq", "@totalNumberOfFolders");
@@ -301,7 +301,7 @@ describe("Managing folders", () => {
 
     cy.location("pathname").should(
       "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+      `/spaces/${Cypress.expose("DEFAULT_SPACE")}`,
     );
 
     cy.get<number>("@totalNumberOfFolders").then((totalNumberOfFolders) => {
@@ -330,7 +330,7 @@ describe("Managing folders", () => {
       cy.get("body > header").should("be.visible");
       cy.get(".c-sidebar").should("be.visible");
       cy.get(".c-sub-sidebar").should("be.visible");
-      cy.contains("h1", Cypress.env("DEFAULT_SPACE") + " folders").should(
+      cy.contains("h1", Cypress.expose("DEFAULT_SPACE") + " folders").should(
         "be.visible",
       );
     });

@@ -4,8 +4,12 @@ import * as fs from "fs";
 
 export default defineConfig({
   projectId: "fm8w1c",
+  retries: {
+    runMode: 2,
+    openMode: 0,
+  },
 
-  env: {
+  expose: {
     OIDC_ORIGIN: "http://localhost:3102",
     SUPER_ADMIN_USER_NAME: "superdeliver",
     SPACE_ADMIN_USER_NAME: "deliver",
@@ -14,8 +18,9 @@ export default defineConfig({
 
   e2e: {
     baseUrl: "http://localhost:3101/",
+    // One test in pagination.cy.ts fails in Chrome and Electron is deprecated, so we set the default browser to Firefox for now.
+    defaultBrowser: "firefox",
 
-    experimentalStudio: true,
     experimentalRunAllSpecs: true,
 
     // Increase viewport width because GitHub Actions may render a wider font which

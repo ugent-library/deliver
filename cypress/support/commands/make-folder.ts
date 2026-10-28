@@ -11,7 +11,7 @@ export default function makeFolder(
   name: string,
   { space, noRedirect }: MakeFolderOptions = {},
 ): void {
-  space ||= Cypress.env("DEFAULT_SPACE");
+  space ||= Cypress.expose("DEFAULT_SPACE");
 
   logCommand("makeFolder", { name, space, "No redirect": noRedirect }, name);
 

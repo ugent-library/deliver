@@ -1,6 +1,6 @@
 // https://github.com/ugent-library/deliver/issues/87
 
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 import { getRandomText } from "support/util";
 

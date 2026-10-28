@@ -4,7 +4,7 @@ describe("Managing spaces", () => {
   });
 
   it("should rename a space", () => {
-    const originalName = Cypress.env("DEFAULT_SPACE");
+    const originalName = Cypress.expose("DEFAULT_SPACE");
     const renamedName = `R${Date.now()}`;
 
     cy.visit("/");
@@ -33,9 +33,9 @@ describe("Managing spaces", () => {
 
     cy.setFieldByLabel(
       "Space admins",
-      Cypress.env("SUPER_ADMIN_USER_NAME") +
+      Cypress.expose("SUPER_ADMIN_USER_NAME") +
         "," +
-        Cypress.env("SPACE_ADMIN_USER_NAME"),
+        Cypress.expose("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
 
@@ -58,9 +58,9 @@ describe("Managing spaces", () => {
     cy.setFieldByLabel("Space name", "test space"); // Invalid trailing space
     cy.setFieldByLabel(
       "Space admins",
-      Cypress.env("SUPER_ADMIN_USER_NAME") +
+      Cypress.expose("SUPER_ADMIN_USER_NAME") +
         "," +
-        Cypress.env("SPACE_ADMIN_USER_NAME"),
+        Cypress.expose("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
 
@@ -71,7 +71,7 @@ describe("Managing spaces", () => {
   });
 
   it("should return an error if a new space name is already in use", () => {
-    const SPACE_NAME = Cypress.env("DEFAULT_SPACE");
+    const SPACE_NAME = Cypress.expose("DEFAULT_SPACE");
 
     cy.visit("/");
 
@@ -85,9 +85,9 @@ describe("Managing spaces", () => {
     cy.setFieldByLabel("Space name", SPACE_NAME);
     cy.setFieldByLabel(
       "Space admins",
-      Cypress.env("SUPER_ADMIN_USER_NAME") +
+      Cypress.expose("SUPER_ADMIN_USER_NAME") +
         "," +
-        Cypress.env("SPACE_ADMIN_USER_NAME"),
+        Cypress.expose("SPACE_ADMIN_USER_NAME"),
     );
     cy.contains(".btn", "Make Space").click();
 

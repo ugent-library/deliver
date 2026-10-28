@@ -132,6 +132,15 @@ var serverCmd = &cobra.Command{
 				func(next http.Handler) http.Handler {
 					return http.MaxBytesHandler(next, config.MaxFileSize)
 				},
+				// csrf assumes https when checking the Origin header
+				func(next http.Handler) http.Handler {
+					return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						if config.Env == "local" {
+							r = csrf.PlaintextHTTPRequest(r)
+						}
+						next.ServeHTTP(w, r)
+					})
+				},
 				csrf.Protect(
 					[]byte(config.Cookie.Secret),
 					csrf.CookieName("deliver.csrf"),

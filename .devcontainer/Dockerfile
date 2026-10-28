@@ -1,4 +1,7 @@
-FROM mcr.microsoft.com/devcontainers/go:1-1.21-bullseye
+FROM mcr.microsoft.com/devcontainers/go:1.27-bookworm
+
+# The base image sets GOTOOLCHAIN=local. Let go download the version go.mod requires.
+ENV GOTOOLCHAIN=auto
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
@@ -12,7 +15,7 @@ FROM mcr.microsoft.com/devcontainers/go:1-1.21-bullseye
 USER vscode
 RUN go install github.com/jackc/tern/v2@latest
 RUN go install github.com/cespare/reflex@latest
-RUN sudo apt-get update && sudo apt-get install telnet
+RUN sudo apt-get update && sudo apt-get install -y telnet
 USER root
 
 RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/motd' \

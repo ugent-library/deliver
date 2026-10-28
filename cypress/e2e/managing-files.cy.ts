@@ -217,7 +217,7 @@ describe("Managing files", () => {
     cy.visit("@shareUrl");
 
     cy.contains(
-      `Library delivery from ${Cypress.env("DEFAULT_SPACE")}: ${FOLDER_NAME}`,
+      `Library delivery from ${Cypress.expose("DEFAULT_SPACE")}: ${FOLDER_NAME}`,
     )
       .should("be.visible")
       .then(function () {
@@ -404,7 +404,7 @@ describe("Managing files", () => {
     cy.get("body").type("n");
     cy.location("pathname").should(
       "eq",
-      `/spaces/${Cypress.env("DEFAULT_SPACE")}`,
+      `/spaces/${Cypress.expose("DEFAULT_SPACE")}`,
     );
 
     cy.get("#folder-name").should("have.attr", "autofocus");
