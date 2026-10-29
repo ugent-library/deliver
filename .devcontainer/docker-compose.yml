@@ -50,11 +50,16 @@ services:
   localstack:
     image: gresau/localstack-persist:4
     environment:
-      - SERVICES=s3
-      - GATEWAY_LISTEN=0.0.0.0:3171
+      SERVICES: s3
+      GATEWAY_LISTEN: 0.0.0.0:3171
     volumes:
       - localstack-data:/persisted-data
-      - ./localstack/create-bucket.sh:/etc/localstack/init/ready.d/create-bucket.sh
+      - ./localstack/create-bucket.sh:/etc/localstack/init/ready.d/create-bucket.sh:ro
+    healthcheck:
+      test: curl -s -f localhost:3171/_localstack/health >/dev/null || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   dbdata:

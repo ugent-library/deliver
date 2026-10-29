@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+- Rebuild the image with Go 1.27.3 and the current Alpine CA bundle because of the eMudhra intermediate CA key compromise (CVE-2026-111943)
+- Pin the base images and upgrade Alpine packages on every image build
+- Add Docker ARG "SNAPSHOT_EPOCH" to bypass the build cache, so the Alpine package upgrade runs on every build
+
 ## [v1.1.8] - 2026-09-28
 
 ### Added

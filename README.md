@@ -20,11 +20,26 @@ You will need Docker and git to get started
 * configure the oidc provider
 * `docker compose up`
 
+## Container image
+
+Docker Hub builds the image from the [Dockerfile](Dockerfile) through [hooks/build](hooks/build). The hook builds with
+`--pull` and passes a new `SNAPSHOT_EPOCH` on every build, so the `apk upgrade` step in the final stage never comes from
+cache and every build picks up current Alpine packages, including the CA bundle.
+
+The base images are pinned: `golang:1.27.3-alpine` (twice in the Dockerfile) and `alpine:3.24`. Moving to a new Go or
+Alpine release means changing these tags. Alpine package updates need no code change, only a new build.
+
+To build locally the way Docker Hub does:
+
+```sh
+DOCKERFILE_PATH=Dockerfile IMAGE_NAME=deliver:local hooks/build
+```
+
 ## Local development setup with live reload
 
 For local development you will also need:
 
-* Go >= 1.20
+* Go >= 1.27.3
 * A recent version of node.js
 * A recent version of Postgres
 * An S3 compatible object store
