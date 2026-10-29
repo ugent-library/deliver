@@ -23,6 +23,17 @@ var expireFoldersCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return repo.Folders.DeleteExpired(context.Background())
+
+		logger.Info("deleting expired folders")
+
+		n, err := repo.Folders.DeleteExpired(context.Background())
+		if err != nil {
+			logger.Errorf("could not delete expired folders: %s", err)
+			return err
+		}
+
+		logger.Infof("deleted %d expired folders", n)
+
+		return nil
 	},
 }
