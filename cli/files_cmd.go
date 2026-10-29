@@ -31,17 +31,34 @@ var gcFilesCmd = &cobra.Command{
 			return err
 		}
 
-		return storage.IterateID(ctx, func(id string) error {
+		logger.Info("starting file garbage collection")
+
+		var checked, deleted int
+
+		err = storage.IterateID(ctx, func(id string) error {
+			checked++
 			exists, err := repo.Files.Exists(ctx, id)
 			if err != nil {
+				logger.Errorf("could not check if file %s exists: %s", id, err)
 				return err
 			}
 			if !exists {
+				logger.Infof("deleting orphaned file %s", id)
 				if err = storage.Delete(ctx, id); err != nil {
+					logger.Errorf("could not delete file %s: %s", id, err)
 					return err
 				}
+				deleted++
 			}
 			return nil
 		})
+		if err != nil {
+			logger.Errorf("file garbage collection aborted after checking %d files (%d deleted): %s", checked, deleted, err)
+			return err
+		}
+
+		logger.Infof("finished file garbage collection: checked %d files, deleted %d", checked, deleted)
+
+		return nil
 	},
 }
