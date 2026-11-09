@@ -114,12 +114,11 @@ func (r *FoldersRepo) Delete(ctx context.Context, folderID string) error {
 	return err
 }
 
-func (r *FoldersRepo) DeleteExpired(ctx context.Context) error {
-	_, err := r.client.Folder.
+func (r *FoldersRepo) DeleteExpired(ctx context.Context) (int, error) {
+	return r.client.Folder.
 		Delete().
 		Where(folder.ExpiresAtLT(time.Now())).
 		Exec(ctx)
-	return err
 }
 
 func rowToFolder(row *ent.Folder) *models.Folder {
