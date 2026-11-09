@@ -31,7 +31,7 @@ var gcFilesCmd = &cobra.Command{
 			return err
 		}
 
-		logger.Info("starting file garbage collection")
+		logger.Debug("starting file garbage collection")
 
 		var checked, deleted int
 
@@ -57,7 +57,7 @@ var gcFilesCmd = &cobra.Command{
 			return err
 		}
 
-		logger.Infof("finished file garbage collection: checked %d files, deleted %d", checked, deleted)
+		logger.Debugf("finished file garbage collection: checked %d files, deleted %d", checked, deleted)
 
 		return nil
 	},
